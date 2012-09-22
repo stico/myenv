@@ -1,0 +1,29 @@
+# rule 1: 1st number means weight
+# rule 2: use # as path separator
+# rule 2: use %% for variable
+# rule 3: later var might depend on previous var, but previous can not depend on later ones
+# info 1: HOME (with a slash in it! e.g: E:\) and HOME2 should always be set manually or automatically by system
+
+# current almost all are in OS specific file, merge later
+
+MY_ENV		%HOME%.myenv
+MY_DOC		%HOME%Documents
+
+CUR_OS_LU	lu
+CUR_OS_WIN	win
+
+ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"
+
+# set less cmd charset. if locale contains utf-8, also works without setting below
+LESSCHARSET	utf-8
+
+# The command history control. Those 1st/2end options only affects when exit shell.
+# You can not control "history in current shell never exceed xxx lines"
+# HISTSIZE mean how many history commands to keep in current shell
+# HISTFILESIZE mean how many history commands to keep in $HISTFILE after shell exit
+# HISTCONTROL:	ignoredups means remove consecutive duplicate cmd, erasedups means eliminate duplicates across the whole history
+HISTSIZE	1000
+HISTFILESIZE	1000
+#HISTIGNORE
+HISTCONTROL	ignoredups:erasedups
+#HISTCONTROL	ignoredups:erasedups

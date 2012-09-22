@@ -1,0 +1,2 @@
+virc			"vi %HOME%.bashrc"
+catrc			"cat %HOME%.bashrc"

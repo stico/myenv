@@ -1,0 +1,2 @@
+# not want git to process the line ending. "*	text=lf" seems not work
+*	-crlf

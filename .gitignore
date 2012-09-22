@@ -1,0 +1,33 @@
+# make the ignore become include, the starting / is important
+/*
+
+# DIR, need 2 line for one dir
+!/.vim/
+!/.vim/*
+!/.fonts/
+!/.fonts/*
+!/.myenv/
+!/.myenv/*
+!/vimfiles/
+!/vimfiles/*
+
+# FILE
+!/.vimrc
+!/.netrc
+!/.cshrc
+!/.bashrc
+!/.inputrc
+!/.gitignore
+!/.dir_colors
+!/.bash_profile
+!/.gitattributes
+!/.backupMyenv.sh
+!/.backupMyenv.bat
+!/.restoreMyenv.sh
+!/.restoreMyenv.bat
+
+# IGNORE, for those really not needed
+/.myenv/z_log/
+/.myenv/.fl_files.txt
+/.myenv/.grep_result.txt
+/.myenv/script_a_secure/

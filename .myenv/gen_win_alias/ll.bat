@@ -1,0 +1,2 @@
+@ECHO OFF 
+ls -ltr %* 

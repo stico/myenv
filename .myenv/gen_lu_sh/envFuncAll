@@ -1,0 +1,4 @@
+function mkdircd	{ [ -e "$@" ] || mkdir -p "$@" && eval cd "\"\$$#\""; }
+function showresp	{ wget --timeout=2 --tries=1 -O - 2>&1 $1 | sed -e '/'${1//\//.}'/d;/^Resolving/d;/^Length/d;/^Saving/d;/100%.*=.*s/d;/0K.*0.00.=0s/d;/^$/d'; }
+
+

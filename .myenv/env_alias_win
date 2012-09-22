@@ -1,0 +1,6 @@
+# all those used same name as command, need special treatment, otherwise will cause endless loop, override the common define of "ls"
+ls		"%CYGWIN_HOME%#bin#ls -hF --color"
+df		"%CYGWIN_HOME%#bin#df -h"
+du		"%CYGWIN_HOME%#bin#du -h"
+grep		"%CYGWIN_HOME%#bin#grep --color"
+vi		"bash script_vim.sh"
