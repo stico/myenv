@@ -6,8 +6,6 @@ MY_LUH_Base	TO_BE_DEFINED
 # Keep the MY_PF for demo pupose
 MY_PF		"%Home2%#Program Files"
 MY_PF2		%HOME2%#program
-MY_DEV		%HOME%dev
-MY_TMP		%HOME%amp
 MY_SAMPLE_JAVA	%MY_DEV%#a_workspaces#sample-java
 MY_TMP_PAY	%MY_DEV%#workspace_recharge#trunk#payservice
 

@@ -4,26 +4,45 @@
 # rule 3: later var might depend on previous var, but previous can not depend on later ones
 # info 1: HOME (with a slash in it! e.g: E:\) and HOME2 should always be set manually or automatically by system
 
-# current almost all are in OS specific file, merge later
-
-MY_ENV		%HOME%.myenv
-MY_DOC		%HOME%Documents
-
+################################################################################
+# ENV - Constants
+################################################################################
 CUR_OS_LU	lu
 CUR_OS_WIN	win
 
+################################################################################
+# ENV - Main Path
+################################################################################
+MY_ENV		%HOME%.myenv
+MY_DOC		%HOME%Documents
+MY_PRO		%HOME%program
+MY_DEV		%HOME%dev
+MY_TMP		%HOME%amp
+
+################################################################################
+# ENV - App Path/Home/Options. For path, 1st here, last in env!
+################################################################################
+ANT_HOME	%MY_DEV%#ant
 ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"
+PATH		%ANT_HOME%#bin
 
-# set less cmd charset. if locale contains utf-8, also works without setting below
+M2_HOME		%MY_DEV%#maven
+MAVEN_HOME	%MY_DEV%#maven
+PATH		%M2_HOME%#bin
+
+################################################################################
+# ENV - Shell
+################################################################################
 LESSCHARSET	utf-8
+		# for less cmd. if locale contains utf-8, this is not necessary
 
-# The command history control. Those 1st/2end options only affects when exit shell.
-# You can not control "history in current shell never exceed xxx lines"
-# HISTSIZE mean how many history commands to keep in current shell
-# HISTFILESIZE mean how many history commands to keep in $HISTFILE after shell exit
-# HISTCONTROL:	ignoredups means remove consecutive duplicate cmd, erasedups means eliminate duplicates across the whole history
 HISTSIZE	1000
+		# for shell, only affects when exit shell. 
+		# You can not control "history in current shell never exceed xxx lines"
+		# HISTSIZE mean how many history commands to keep in current shell
 HISTFILESIZE	1000
+		# HISTFILESIZE mean how many history commands to keep in $HISTFILE after shell exit
 #HISTIGNORE
 HISTCONTROL	ignoredups:erasedups
-#HISTCONTROL	ignoredups:erasedups
+		# ignoredups: remove consecutive duplicate cmd
+		# erasedups: eliminate duplicates across the whole history

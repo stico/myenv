@@ -7,9 +7,6 @@ MY_LUH_Base	Z:
 # Keep the MY_PF for demo pupose
 MY_PF		"%MY_APP_Base%#Program Files"
 MY_PF_86	"%MY_APP_Base%#Program Files (x86)"
-MY_PRO		%HOME%program
-MY_DEV		%HOME%dev
-MY_TMP		%HOME%amp
 MY_SAMPLE	%MY_DEV%#a_workspaces
 MY_SAMPLE_JAVA	%MY_SAMPLE%#sample-java
 MY_TMP_RECHARGE	%MY_DEV%#workspaces#recharge#trunk
@@ -23,10 +20,7 @@ CYGWIN_HOME	%MY_PRO%#A_System_Cygwin
 GVIM_HOME	%MY_PRO%#A_Text_Vim_7.2_PA-Basic#App#vim#vim72
 JAVA_HOME	%MY_DEV%#jdk1.6.0_22
 GRAILS_HOME	%MY_DEV%#grails-2.0.3
-ANT_HOME	%MY_DEV%#ant-1.7.0
 ANDROID_HOME	%MY_DEV%#android-sdk-windows
-#M2_HOME	%MY_DEV%#maven-3.0.3
-M2_HOME		%MY_DEV%#maven-2.2.1
 CASSANDRA_HOME	%MY_DEV%#cassandra-0.8.1
 GIT_HOME	%MY_DEV%#git-1.7.6-preview20110709
 MYSQL_HOME	%MY_DEV%#mysql-5.5.11-win32
@@ -45,8 +39,6 @@ CYGWIN		nodosfilewarning
 PATH		%SystemRoot%#system32
 PATH		%SystemRoot%
 PATH		%ANDROID_HOME%#bin
-PATH		%ANT_HOME%#bin
-PATH		%M2_HOME%#bin
 PATH		%PYTHON_HOME%
 PATH		%PYTHON_HOME%#Scripts
 PATH		%RUBY_HOME%#bin
