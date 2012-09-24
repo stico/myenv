@@ -3,9 +3,6 @@
 # make it simple, we works under the .myenv dir
 cd $HOME/.myenv
 
-# some self-define system level var
-TODAY_DATE=`date '+%Y-%m-%d'`
-
 # var 
 genShPath=gen_lu_sh
 genEnvVar=$genShPath/envVarAll
