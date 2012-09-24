@@ -18,10 +18,22 @@ MY_DOC		%HOME%Documents
 MY_PRO		%HOME%program
 MY_DEV		%HOME%dev
 MY_TMP		%HOME%amp
+MY_CODE_REPO	%MY_DEV%#code_repo
+MY_CODE_WORK	%MY_DEV%#code_work
+
+WIN_PF		"%MY_APP_Base%#Program Files"
+WIN_PF_86	"%MY_APP_Base%#Program Files (x86)"
 
 ################################################################################
 # ENV - App Path/Home/Options. For path, 1st here, last in env!
 ################################################################################
+JAVA_HOME	%MY_DEV%#jdk
+PATH		%JAVA_HOME%#bin
+
+PYTHON_HOME	%MY_DEV%#python#App
+PATH		%PYTHON_HOME%
+PATH		%PYTHON_HOME%#Scripts
+
 ANT_HOME	%MY_DEV%#ant
 ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"
 PATH		%ANT_HOME%#bin
@@ -29,6 +41,9 @@ PATH		%ANT_HOME%#bin
 M2_HOME		%MY_DEV%#maven
 MAVEN_HOME	%MY_DEV%#maven
 PATH		%M2_HOME%#bin
+
+SVN_HOME	%WIN_PF%#Tortoise#bin
+PATH		%SVN_HOME%
 
 ################################################################################
 # ENV - Shell

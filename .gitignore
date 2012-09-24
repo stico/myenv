@@ -26,7 +26,10 @@
 !/.restoreMyenv.sh
 !/.restoreMyenv.bat
 
-# IGNORE, for those really not needed
+# IGNORE, for secure reason
+/.subversion/
+
+# IGNORE, for those really not needed, or for secure reason
 /.myenv/z_log/
 /.myenv/.fl_files.txt
 /.myenv/.grep_result.txt

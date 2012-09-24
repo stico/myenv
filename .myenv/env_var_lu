@@ -1,18 +1,6 @@
-# check and follow rule in env_var file!
-
-MY_SDC_Base	TO_BE_DEFINED
-MY_LUH_Base	TO_BE_DEFINED
-
-# Keep the MY_PF for demo pupose
-MY_PF		"%Home2%#Program Files"
-MY_PF2		%HOME2%#program
-MY_SAMPLE_JAVA	%MY_DEV%#a_workspaces#sample-java
-MY_TMP_PAY	%MY_DEV%#workspace_recharge#trunk#payservice
-
 CUR_OS		%CUR_OS_LU%
 
 USR_LOCAL	#usr#local
-JAVA_HOME	%USR_LOCAL%#java#latest
 JENKINS_HOME	%USR_LOCAL%#jenkins
 
 # set LANG (LLANG or LANG?) to avoid vi crash
@@ -27,10 +15,3 @@ PATH		%JAVA_HOME%#bin
 PATH		%HOME%bin
 PATH		%MY_ENV%
 PATH		%MY_ENV%#script_a_secure
-
-# Deprecated
-#DISPLAY	EV88AE1DAC71FB.eapac.ericsson.se:0.0
-#USER_WL_ROOT	#tmp#ezhuouy#bea
-#USER_WL_ROOT	/tmp/ezhuouy/bea
-#USER_GF_ROOT	/tmp/ezhuouy/server
-#PATH		#usr#atria#bin
