@@ -21,12 +21,12 @@ rm $genCshPath/*
 
 # gen env var
 foreach envFile ($envVarSrc)
-	sed -e '/^#/d;/^\s*$/d;s/\(\W\)%/\1${/g;s/%\(\W\|$\)/}\1/g;s/\s\+/ /;s/#/\//g;s/\s*$//;s/^PATH.*/&:${PATH}/;s/^/setenv /' $envFile >> $genEnvVar
+	sed -e '/^\s*#/d;/^\s*$/d;s/\(\W\)%/\1${/g;s/%\(\W\|$\)/}\1/g;s/\s\+/ /;s/#/\//g;s/\s*$//;s/^PATH.*/&:${PATH}/;s/^/setenv /' $envFile >> $genEnvVar
 end
 
 # gen env alias
 foreach envFile ($envAliasSrc)
-	sed -e '/^#/d;/^\s*$/d;s/\(\W\)%/\1${/g;s/%\(\W\|$\)/}\1/g;s/\s\+/ /;s/#/\//g;s/^/alias /' $envFile >> $genEnvAlias
+	sed -e '/^\s*#/d;/^\s*$/d;s/\(\W\)%/\1${/g;s/%\(\W\|$\)/}\1/g;s/\s\+/ /;s/#/\//g;s/^/alias /' $envFile >> $genEnvAlias
 end
 
 source $genEnvVar

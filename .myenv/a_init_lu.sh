@@ -39,7 +39,7 @@ rm $genShPath/*
 # gen env var
 for envFile in "${envVarSrc[@]}"
 do
-	sed -e '/^#/d' \
+	sed -e '/^\s*#/d' \
 	    -e '/^\s*$/d' \
 	    -e 's/%HOME%/${HOME}/g' \
 	    -e 's/\([^A-Za-z0-9_]\)%/\1${/g' \
@@ -55,8 +55,7 @@ done
 # gen env alias
 for aliasFile in "${envAliasSrc[@]}"
 do
-	#sed -e '/^#/d;/^\s*$/d;s/\([^A-Za-z0-9_]\)%/\1${/g;s/%\([^A-Za-z0-9_]\|$\)/}\1/g;s/\t*"/="/;s/#/\//g;s/^/alias /' $aliasFile >> $genEnvAlias
-	sed -e '/^#/d' \
+	sed -e '/^\s*#/d' \
 	    -e '/^\s*$/d' \
 	    -e 's/\([^A-Za-z0-9_]\)%/\1${/g' \
 	    -e 's/%\([^A-Za-z0-9_]\)/}\1/g' \
