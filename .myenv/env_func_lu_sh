@@ -1,2 +1,5 @@
 function mkdircd	{ [ -e "$@" ] || mkdir -p "$@" && eval cd "\"\$$#\""; }
 function showresp	{ wget --timeout=2 --tries=1 -O - 2>&1 $1 | sed -e '/'${1//\//.}'/d;/^Resolving/d;/^Length/d;/^Saving/d;/100%.*=.*s/d;/0K.*0.00.=0s/d;/^$/d'; }
+function gitpull	{ [[ -n $1 ]] && (cd $1 && git pull github master && git status && cd -) || echo "ERROR: must input base path!"; }
+function gitstatus	{ [[ -n $1 ]] && (cd $1 && git status && cd -) || echo "ERROR: must input base path!"; }
+function gitcommitpush	{ [[ -n $1 && -n $2 ]] && (cd $1 && git commit -a -m "$2" && git push && git status && cd -) || echo "ERROR: must input base path and comments!"; }

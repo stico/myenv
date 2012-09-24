@@ -18,11 +18,14 @@ hi		"history"
 grephi		"history | grep"
 sshp		"bash script_a_secure/script_sshp.sh"
 
+vivimrc		"vi %MY_SOFT_CONF%/vim/_vimrc"
 vienv		"vi %MY_ENV%/env_var"
 vialias		"vi %MY_ENV%/env_alias"
 
-gitpush		"git push github"
-gitpull		"git pull github master"
+updatemyenv	"gitpull %MY_ENV%"
+statusmyenv	"gitstatus %MY_ENV%"
+commitmyenv	"gitcommitpush %MY_ENV%"
+updatevimrc	"bash %MY_SOFT_CONF%/vim/deploy_vimrc.sh"
 
 grep		"grep --color"
 grepi		"grep -i --color"
