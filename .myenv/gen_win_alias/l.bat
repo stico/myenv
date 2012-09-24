@@ -1,2 +1,0 @@
-@ECHO OFF 
-ls -CF %* 
