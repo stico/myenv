@@ -1,7 +1,7 @@
 CUR_OS		%CUR_OS_LU%
 
 USR_LOCAL	#usr#local
-JENKINS_HOME	%USR_LOCAL%#jenkins
+#JENKINS_HOME	%USR_LOCAL%#jenkins
 
 # set LANG (LLANG or LANG?) to avoid vi crash
 LANG		en_US.UTF-8
@@ -11,7 +11,6 @@ LLANG		en_US.UTF-8
 PATH		#usr#local#bin
 PATH		#usr#ccs#bin
 PATH		#usr#lib
-PATH		%JAVA_HOME%#bin
 PATH		%HOME%bin
 PATH		%MY_ENV%
 PATH		%MY_ENV%#script_a_secure
