@@ -38,6 +38,7 @@ for envFile in "${envVarSrc[@]}"
 do
 	sed -e '/^\s*#/d' \
 	    -e '/^\s*$/d' \
+	    -e 's/\s\+#.*$//' \
 	    -e 's/%HOME%/${HOME}/g' \
 	    -e 's/\([^A-Za-z0-9_]\)%/\1${/g' \
 	    -e 's/%\([^A-Za-z0-9_]\)/}\1/g' \

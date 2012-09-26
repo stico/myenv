@@ -31,9 +31,10 @@ WIN_PF_86	"%MY_APP_Base%#Program Files (x86)"
 JAVA_HOME	%MY_DEV%#jdk
 PATH		%JAVA_HOME%#bin
 
-PYTHON_HOME	%MY_DEV%#python#App
-PATH		%PYTHON_HOME%
-PATH		%PYTHON_HOME%#Scripts
+PYTHON_HOME	%MY_DEV%#python
+PATH		%PYTHON_HOME%#bin
+PATH		%PYTHON_HOME%#App		# for win portable version
+PATH		%PYTHON_HOME%#App#Scripts	# for win portable version
 
 ANT_HOME	%MY_DEV%#ant
 ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"

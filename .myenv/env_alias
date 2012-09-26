@@ -21,7 +21,7 @@ envvi			"vi %MY_ENV%/env_var"
 aliasvi			"vi %MY_ENV%/env_alias"
 
 myenvgitpull		"gitpull %MY_ENV%"
-myenvgitstat		"gitstatus %MY_ENV%"
+myenvgitstatus		"gitstatus %MY_ENV%"
 myenvgitcommitpush	"gitcommitpush %MY_ENV%"
 
 vimrcdeploy		"bash %MY_SOFT_CONF%/vim/deploy_vimrc.sh"
