@@ -48,6 +48,14 @@ PATH		%MYSQL_HOME%#bin
 PATH		%GVIM_HOME%
 PATH		%CYGWIN_HOME%#bin
 
+PATH		"C:#Program Files#TortoiseSVN#bin"
+PATH		"C:#Program Files#TortoiseSVN"
+PATH		"C:#Program Files#Support Tools"
+PATH		%SYSTEMROOT%#System32#WindowsPowerShell#v1.0
+PATH		%SystemRoot%#System32#Wbem
+PATH		%SystemRoot%
+
+
 LANG		en_US.UTF-8
 LLANG		en_US.UTF-8
 
