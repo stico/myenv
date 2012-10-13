@@ -1,17 +1,12 @@
 @ECHO OFF
 
-REM set key=cd ; abc
-REM set key=updatecd               "cd E:\dev\code_work/update-server_trunk"
-REM set key=updatecd               "cd E:\dev\code_work/update-server_trunk | sed -e '/^\s*$/d;/^\(Fetching\|Updated\) external/d;' ; cd -"
-set key=updatesvnupdate		"cd %MY_CODE_WORK%/update-server_trunk ; svn update | sed -e '/^\s*$/d;/^Updated external/d;/^Fetching external/d;' ; cd -"
-echo "------------%key%"
 
-CALL:FUNC_SET_ALIAS  %key%
+For /f "tokens=* delims=" %%V in ('script_getWinVersion.bat') Do (set WinVersion=%%V)
+echo "Current win version is: %WinVersion%"
 
-:FUNC_SET_ALIAS
-	echo %1
-	echo %2
-	echo %*
-GOTO:EOF
+IF "%WinVersion:~0,2%"=="XP" SET CmdSetX=setx 
+IF "%WinVersion:~0,4%"=="WIN7" SET CmdSetX="C:\Program Files\Support Tools\SETX" 
+ECHO Setting setx path: %CmdSetX% 
+
 
 pause
