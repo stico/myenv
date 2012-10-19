@@ -31,13 +31,6 @@ WIN_PF_86	"%MY_APP_Base%#Program Files (x86)"
 JAVA_HOME	%MY_DEV%#jdk
 PATH		%JAVA_HOME%#bin
 
-PYTHON_HOME	%MY_DEV%#python
-PATH		%PYTHON_HOME%#bin
-PATH		%PYTHON_HOME%#App
-		# for win portable version
-PATH		%PYTHON_HOME%#App#Scripts
-		# for win portable version
-
 ANT_HOME	%MY_DEV%#ant
 ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"
 PATH		%ANT_HOME%#bin
@@ -49,19 +42,36 @@ PATH		%M2_HOME%#bin
 SVN_HOME	%WIN_PF%#Tortoise#bin
 PATH		%SVN_HOME%
 
+PYTHON_HOME	%MY_DEV%#python
+PATH		%PYTHON_HOME%#bin
+		# for win portable version
+PATH		%PYTHON_HOME%#App
+		# for win portable version
+PATH		%PYTHON_HOME%#App#Scripts
+					# for virtualenvs & virtualenvwrapper
+WORKON_HOME				%HOME%#.virtualenvs
+PROJECT_HOME				%MY_DEV%#code_repo#python
+VIRTUALENVWRAPPER_PYTHON		%PYTHON_HOME%#bin#python
+VIRTUALENVWRAPPER_VIRTUALENV		%PYTHON_HOME%#bin#virtualenv
+VIRTUALENVWRAPPER_VIRTUALENV_ARGS	'--no-site-packages'
+					# make pip use the same directory for virtualenvs & virtualenvwrapper
+PIP_VIRTUALENV_BASE			%WORKON_HOME%
+PIP_RESPECT_VIRTUALENV			true
+
 ################################################################################
 # ENV - Shell
 ################################################################################
-LESSCHARSET	utf-8
 		# for less cmd. if locale contains utf-8, this is not necessary
+LESSCHARSET	utf-8
 
-HISTSIZE	1000
 		# for shell, only affects when exit shell. 
 		# You can not control "history in current shell never exceed xxx lines"
 		# HISTSIZE mean how many history commands to keep in current shell
-HISTFILESIZE	1000
+HISTSIZE	1000
+
 		# HISTFILESIZE mean how many history commands to keep in $HISTFILE after shell exit
-#HISTIGNORE
-HISTCONTROL	ignoredups:erasedups
+HISTFILESIZE	1000
+
 		# ignoredups: remove consecutive duplicate cmd
 		# erasedups: eliminate duplicates across the whole history
+HISTCONTROL	ignoredups:erasedups

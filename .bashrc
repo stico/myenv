@@ -7,7 +7,11 @@ if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
 
+# init myenv
 . $HOME/.myenv/a_init_lu.sh
+
+# init python virtualenv
+. $MY_DEV/python//bin/virtualenvwrapper_lazy.sh
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
@@ -27,13 +31,8 @@ stty -ixon
 stty -ixoff
 #stty stop ''
 
-########################## Below are just copied from example file ########################## 
 
-# don't put duplicate lines in the history. 
-# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
-export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
-# ... or force ignoredups and ignorespace
-export HISTCONTROL=ignoreboth
+########################## Below are just copied from example file ########################## 
 
 # append to the history file, don't overwrite it
 shopt -s histappend
