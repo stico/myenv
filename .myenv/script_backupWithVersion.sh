@@ -8,7 +8,7 @@ srcPath="$*"
 fileName=${srcPath##*\\}
 targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_"$fileName"
 #bakPath=("$MY_SDC_Base/VersionBackup" "$MY_LUH_Base/VersionBackup" "$MY_DOC/ECB/OnlineStorage/VersionBackup" "$MY_NET_Base/VersionBackup" )
-bakPath=( "$MY_DOC/ECB/OnlineStorage/VersionBackup" )
+bakPath=( "$MY_DOC/DCB/Google Drive/VERSION_BACKUP" )
 success="success"
 
 # if path is a directory, zip it first
@@ -22,10 +22,10 @@ if [[ -d "$srcPath" ]]; then
 fi
 
 # backup file to candidate place (if exist)
-for path in ${bakPath[@]}
+for path in "${bakPath[@]}"
 do
+	echo "Backup to path: $path" 
 	if [[ -e "$path" ]]; then
-		echo "Copy backup to $path" 
 		cp "$srcPath" "$path/$targetFile"
 		ls -lh "$path/$targetFile"
 		copied=$success
