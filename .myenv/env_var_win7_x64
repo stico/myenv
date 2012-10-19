@@ -1,8 +1,0 @@
-# Additional settings, will override those in env_var_win_common
-JAVA_HOME	%MY_DEV%#jdk1.6.0_30_x64
-
-PATH		"C:#Program Files#TortoiseSVN#bin"
-PATH		"C:#Program Files#Support Tools"
-PATH		%SYSTEMROOT%#System32#WindowsPowerShell#v1.0
-PATH		%SystemRoot%#System32#Wbem
-PATH		%SystemRoot%

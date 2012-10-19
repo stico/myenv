@@ -28,7 +28,7 @@ vimrcdeploy		"bash %MY_SOFT_CONF%/vim/deploy_vimrc.sh"
 vimrcupdate		"vi %MY_SOFT_CONF%/vim/_vimrc"
 
 updatecd		"cd %MY_CODE_WORK%/update-server_trunk"
-updatesvnupdate		"cd %MY_CODE_WORK%/update-server_trunk ; svn update | sed -e '/^\s*$/d;/^\(Fetching\|Updated\) external/d;' ; cd -"
+updatesvnupdate		"cd %MY_CODE_WORK%/update-server_trunk ; svn update | sed -e '/^\s*$/d;/^Updated external/d;/^Fetching external/d;' ; cd -"
 updatesvncheckin	"cd %MY_CODE_WORK%/update-server_trunk ; svn ci ; cd -"
 
 l			"ls -hF --color=auto"
