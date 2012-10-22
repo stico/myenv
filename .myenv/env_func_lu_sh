@@ -1,6 +1,60 @@
-function mkdircd	{ [ -e "$@" ] || mkdir -p "$@" && eval cd "\"\$$#\""; }
-function mkdircdtt	{ mkdircd $MY_TMP/`date "+%Y-%m-%d"`; } # so could evaluate the date every time
-function showresp	{ wget --timeout=2 --tries=1 -O - 2>&1 $1 | sed -e '/'${1//\//.}'/d;/^Resolving/d;/^Length/d;/^Saving/d;/100%.*=.*s/d;/0K.*0.00.=0s/d;/^$/d'; }
-function gitpull	{ [[ -n $1 ]] && (cd $1 && git pull github master && git status && cd -) || echo "ERROR: must input base path!"; }
-function gitstatus	{ [[ -n $1 ]] && (cd $1 && git status && cd -) || echo "ERROR: please input base path!"; }
-function gitcommitpush	{ [[ -n $1 && -n $2 ]] && (cd $1 && git commit -a -m "$2" && git push && git status && cd -) || echo "ERROR: please input base path and comments!"; }
+function func_mkdir_cd { 
+	[[ -z $1 ]] && echo "ERROR: must input path!" && return 1
+
+	mkdir -p "$@" 				&& \
+	eval cd "\"\$$#\""
+}
+
+function func_cd_tmp_today { 
+	# so could evaluate the date every time
+	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
+}
+
+function func_show_resp { 
+	[[ -z $1 ]] && echo "ERROR: must input url!" && return 1
+
+	wget --timeout=2 --tries=1 -O - 2>&1 $1	\
+	| sed -e '/'${1//\//.}'/d'		\
+	| sed -e '/^Resolving/d'		\
+	| sed -e '/^Length/d'			\
+	| sed -e '/^Saving/d;/100%.*=.*s/d'	\
+	| sed -e '/0K.*0.00.=0s/d'		\
+	| sed -e '/^$/d'
+}
+
+function func_git_pull { 
+	[[ -z $1 ]] && echo "ERROR: must input code path!" && return 1
+
+	cd $1		 			&& \
+	git pull github master 			&& \
+	git status	 			&& \
+	cd -
+}
+
+function func_git_status { 
+	[[ -z $1 ]] && echo "ERROR: must input code path!" && return 1
+
+	cd $1					&& \ 
+	git status 				&& \
+	cd -
+}
+
+function func_git_commit_push { 
+	[[ -z $1 ]] && echo "ERROR: must input code path!" && return 1
+	[[ -z $2 ]] && echo "ERROR: must input commit comment!" && return 1
+
+	cd $1					&& \ 
+	git commit -a -m "$2" 			&& \
+	git push 				&& \
+	git status 				&& \
+	cd - 
+}
+
+function func_grep_cmd { 
+	[[ -z $1 ]] && echo "ERROR: must input string to grep!" && return 1
+	strToGrep=$1
+	shift
+	[[ -z $* ]] && echo "ERROR: must input command for grep!" && return 1
+
+	$* | grep $strToGrep
+}

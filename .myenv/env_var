@@ -39,6 +39,9 @@ M2_HOME		%MY_DEV%#maven
 MAVEN_HOME	%MY_DEV%#maven
 PATH		%M2_HOME%#bin
 
+RUBY_HOME	%MY_DEV%#ruby
+PATH		%RUBY_HOME%#bin
+
 SVN_HOME	%WIN_PF%#Tortoise#bin
 PATH		%SVN_HOME%
 

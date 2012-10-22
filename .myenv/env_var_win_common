@@ -28,8 +28,6 @@ CYGWIN		nodosfilewarning
 # cygwin must after git, so it will be used first
 GROOVY_HOME	%MY_DEV%#groovy
 PATH		%GROOVY_HOME%#bin
-RUBY_HOME	%MY_DEV%#ruby
-PATH		%RUBY_HOME%#bin
 PATH		%PHP_HOME%
 PHP_HOME	%MY_DEV%#php
 
