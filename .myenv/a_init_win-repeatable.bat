@@ -1,12 +1,12 @@
 @ECHO OFF
 
 REM log record, in case need some rollback
-ECHO Start to set env, before setting record: PATH=%PATH% >> z_log\log-win.txt
+ECHO Start to set env, before setting record: PATH=%PATH% >> gen_log\log-win.txt
 
 SET envVarCommon=%HOME%\.myenv\env_var
 SET envVarWinCommon=%HOME%\.myenv\env_var_win_common
 SET envAliasCommon=%HOME%\.myenv\env_alias
-SET envAliasSecure=%HOME%\.myenv\script_a_secure\env_alias_secure 
+SET envAliasSecure=%HOME%\.myenv\secure\env_alias_secure 
 SET envAliasWin=%HOME%\.myenv\env_alias_win
 SET genAliasPath=%HOME%\.myenv\gen_win_alias
 REM In a control env, prefer to use a blank init PATH var. In a non-control env, prefer to reserve old PATH

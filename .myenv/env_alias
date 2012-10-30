@@ -5,7 +5,7 @@
 
 
 # Inbox
-sshp			"bash script_a_secure/script_sshp.sh"
+sshp			"bash secure/script_sshp.sh"
 
 
 # Alias - Misc

@@ -30,10 +30,11 @@
 /.subversion/
 
 # IGNORE, for those really not needed, or for secure reason
-/.myenv/z_log/
 /.myenv/.fl_files.txt
 /.myenv/.grep_result.txt
+/.myenv/gVim.exe.stackdump
+/.myenv/gen_log/
 /.myenv/gen_lu_sh/
 /.myenv/gen_lu_csh/
 /.myenv/gen_win_alias/
-/.myenv/script_a_secure/
+/.myenv/secure/

@@ -38,7 +38,7 @@ PATH		%CASSANDRA_HOME%#bin
 PATH		%ARCANIST_HOME%#bin
 PATH		%GRAILS_HOME%#bin
 PATH		%MY_ENV%
-PATH		%MY_ENV%#script_a_secure
+PATH		%MY_ENV%#secure
 PATH		%MY_ENV%#gen_win_alias
 PATH		%GIT_HOME%
 PATH		%GIT_HOME%#bin

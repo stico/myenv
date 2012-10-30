@@ -13,4 +13,4 @@ PATH		#usr#ccs#bin
 PATH		#usr#lib
 PATH		%HOME%bin
 PATH		%MY_ENV%
-PATH		%MY_ENV%#script_a_secure
+PATH		%MY_ENV%#secure

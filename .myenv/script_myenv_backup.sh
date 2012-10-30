@@ -30,7 +30,7 @@ while read line ; do
 done < ${backupList}
 
 echo "--> Insure security related files not packed"
-rm -rf $backupDir/.myenv/script_a_secure
+rm -rf $backupDir/.myenv/secure
 findSecureFile=`find $backupDir -regex ".*\(script_sshp\|env_alias_secure\|/ssh/.*pub\).*"`
 [ ${#findSecureFile} != 0 ] && echo "there are secure files in back dir ($findSecureFile), will not backup, pls check!" && exit
 
