@@ -8,7 +8,7 @@
 sshp			"bash script_a_secure/script_sshp.sh"
 
 
-# Alias
+# Alias - Misc
 df			"df -h"
 du			"du -h"
 ftp			"script_ftp.exp"
@@ -17,9 +17,22 @@ findname		"find . -name"
 findtype		"find . -type"
 hi			"history"
 higrep			"history | grep -i"
+rmv			"rvm"
+tree			"tree -A"
 
 showresp		"func_show_resp"
 
+# Alias - By Topic
+pycd			"cd %MY_CODE_REPO%/python"
+pyvenvload		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
+rbcd			"cd %MY_CODE_REPO%/ruby"
+			# always use the "global" gemset
+rbvenvload		"source %RVM_HOME%/scripts/rvm ; rvm gemset use global"
+
+venvpyload		pyvenvload
+venvrbload		rbvenvload
+
+envcd			"cd %MY_ENV%"
 envvarvi		"vi %MY_ENV%/env_var"
 envfuncvi		"vi %MY_ENV%/env_func_lu_sh"
 envaliasvi		"vi %MY_ENV%/env_alias"
@@ -34,6 +47,7 @@ updatecd		"cd %MY_CODE_WORK%/update-server_trunk"
 updatesvnupdate		"cd %MY_CODE_WORK%/update-server_trunk ; svn update | sed -e '/^\s*$/d;/^Updated external/d;/^Fetching external/d;' ; cd -"
 updatesvncheckin	"cd %MY_CODE_WORK%/update-server_trunk ; svn ci ; cd -"
 
+# Alias - By Action
 l			"ls -hF --color=auto"
 ls			"ls -hF --color=auto"
 la			"ls -A"
@@ -44,19 +58,30 @@ lld			"ls -lh | grep '^d'"
 llf			"ls -lh | grep -v '^d'"
 
 grep			"grep --color"
+g			grep
 grepi			"grep -i --color"
+gi			grepi
 grephi			"higrep"
+ghi			grephi
 grepcmd			"func_grep_cmd"
+gc			grepcmd
 grepfile		"bash script_grepNonBinFiles.sh -"
+gf			grepfile
 grepjava		"bash script_grepNonBinFiles.sh java"
-greptxt			"bash script_grepNonBinFiles.sh txt"
+gj			grepjava
 grepxml			"bash script_grepNonBinFiles.sh xml"
+gx			grepxml
+greptxt			"bash script_grepNonBinFiles.sh txt"
 greppy			"bash script_grepNonBinFiles.sh py"
 grepsh			"bash script_grepNonBinFiles.sh sh"
 grepsql			"bash script_grepNonBinFiles.sh sql"
 grepproperties		"bash script_grepNonBinFiles.sh properties"
 
-cdsamjava		"cd %MY_CODE_REPO%/sample-java"
+cdrb			"cd %MY_CODE_REPO%/ruby"
+cdpy			"cd %MY_CODE_REPO%/python"
+cdjava			"cd %MY_CODE_REPO%/java"
+
+cdupdate		"cd %MY_CODE_WORK%/update-server_trunk"
 cdrecharge		"cd %MY_CODE_WORK%/recharge_trunk"
 			# note, there are some addition work to gen cd_*, check the gen script for detail
 cd2			"cd ../.."

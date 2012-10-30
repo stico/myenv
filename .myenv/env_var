@@ -39,11 +39,12 @@ M2_HOME		%MY_DEV%#maven
 MAVEN_HOME	%MY_DEV%#maven
 PATH		%M2_HOME%#bin
 
-RUBY_HOME	%MY_DEV%#ruby
-PATH		%RUBY_HOME%#bin
-
 SVN_HOME	%WIN_PF%#Tortoise#bin
 PATH		%SVN_HOME%
+
+RUBY_HOME	%MY_DEV%#ruby
+PATH		%RUBY_HOME%#bin
+RVM_HOME	%HOME%.rvm
 
 PYTHON_HOME	%MY_DEV%#python
 PATH		%PYTHON_HOME%#bin
@@ -53,6 +54,7 @@ PATH		%PYTHON_HOME%#App
 PATH		%PYTHON_HOME%#App#Scripts
 					# for virtualenvs & virtualenvwrapper
 WORKON_HOME				%HOME%#.virtualenvs
+					# virtualenvwrapper need this
 PROJECT_HOME				%MY_DEV%#code_repo#python
 VIRTUALENVWRAPPER_PYTHON		%PYTHON_HOME%#bin#python
 VIRTUALENVWRAPPER_VIRTUALENV		%PYTHON_HOME%#bin#virtualenv
