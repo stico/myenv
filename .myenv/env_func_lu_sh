@@ -56,5 +56,6 @@ function func_grep_cmd {
 	shift
 	[[ -z $* ]] && echo "ERROR: must input command for grep!" && return 1
 
-	$* | grep $strToGrep
+	# directly run without eval, will not work with alias
+	eval $* | eval grep $strToGrep
 }
