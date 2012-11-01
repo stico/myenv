@@ -2,13 +2,13 @@
 
 umask 077
 
-# enable completion (let it run first, as a_init_lu.sh need turn off some completion on cygwin)
+# enable completion (let it run first, as init/lu.sh need turn off some completion on cygwin)
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
 
 # init myenv
-. $HOME/.myenv/a_init_lu.sh
+. $HOME/.myenv/init/lu.sh
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
