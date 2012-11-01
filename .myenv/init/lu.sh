@@ -77,4 +77,4 @@ echo -e "\n" >> $genEnvAlias
 . $genEnvFunc
 . $genEnvAlias
 
-cd -
+cd $HOME

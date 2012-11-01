@@ -5,7 +5,7 @@
 
 
 # Inbox
-sshp			"bash secure/script_sshp.sh"
+sshp			"%MY_ENV%/secure/script_sshp.sh"
 
 
 # Alias - Misc
@@ -21,6 +21,9 @@ rmv			"rvm"
 tree			"tree -A"
 
 showresp		"func_show_resp"
+
+sshx			"func_ssh_with_jump"
+scpx			"func_scp_with_jump"
 
 # Alias - By Topic
 pycd			"cd %MY_CODE_REPO%/python"

@@ -1,7 +1,9 @@
 function func_mkdir_cd { 
-	[[ -z $1 ]] && echo "ERROR: must input path!" && return 1
+	usage="Usage: func_mkdir_cd [path]"
+	[[ -z $1 ]] && echo $usage && return 1
 
-	mkdir -p "$@" 				&& \
+	mkdir -p "$@" 				&&
+	# why need such complex eval?
 	eval cd "\"\$$#\""
 }
 
@@ -11,7 +13,8 @@ function func_cd_tmp_today {
 }
 
 function func_show_resp { 
-	[[ -z $1 ]] && echo "ERROR: must input url!" && return 1
+	usage="Usage: func_show_resp [url]"
+	[[ -z $1 ]] && echo $usage && return 1
 
 	wget --timeout=2 --tries=1 -O - 2>&1 $1	\
 	| sed -e '/'${1//\//.}'/d'		\
@@ -23,40 +26,119 @@ function func_show_resp {
 }
 
 function func_git_pull { 
-	[[ -z $1 ]] && echo "ERROR: must input code path!" && return 1
+	usage="Usage: func_git_pull [code_base]"
+	[[ -z $1 ]] && echo $usage && return 1
 
-	cd $1		 			&& \
-	git pull github master 			&& \
-	git status	 			&& \
+	cd $1		 			&&
+	git pull github master 			&&
+	git status	 			&&
 	cd -
 }
 
 function func_git_status { 
-	[[ -z $1 ]] && echo "ERROR: must input code path!" && return 1
+	usage="Usage: func_git_status [code_base]"
+	[[ -z $1 ]] && echo $usage && return 1
 
-	cd $1					&& \ 
-	git status 				&& \
+	cd $1					&&	
+	git status 	
 	cd -
 }
 
 function func_git_commit_push { 
-	[[ -z $1 ]] && echo "ERROR: must input code path!" && return 1
-	[[ -z $2 ]] && echo "ERROR: must input commit comment!" && return 1
+	usage="Usage: func_git_commit_push [code_base] [comment]"
+	[[ -z $1 || -z $2 ]] && echo $usage && return 1
 
-	cd $1					&& \ 
-	git add .				&& \
-	git commit -a -m "$2" 			&& \
-	git push 				&& \
-	git status 				&& \
+	cd $1					&& 
+	git add .				&&
+	git commit -a -m "$2" 			&&
+	git push 				&&
+	git status 				&&
 	cd - 
 }
 
 function func_grep_cmd { 
-	[[ -z $1 ]] && echo "ERROR: must input string to grep!" && return 1
+	usage="Usage: func_grep_cmd [pattern] [cmd]"
+	[[ -z $1 || -z $2 ]] && echo $usage && return 1
+
 	strToGrep=$1
 	shift
-	[[ -z $* ]] && echo "ERROR: must input command for grep!" && return 1
 
-	# directly run without eval, will not work with alias
+	# need eval to work with alias
 	eval $* | eval grep $strToGrep
 }
+
+function func_ssh_with_jump {
+	usage="Usage: func_ssh_with_jump [target]"
+	[[ -z $1 ]] && echo $usage && return 1
+
+	PORT=32200
+	JUMP_MACHINE=dw
+	
+	ssh -t $JUMP_MACHINE "ssh -p $PORT $1"
+
+	# Demo: func_ssh_with_jump 222.88.95.197 
+}
+
+function func_scp_with_jump {
+	usage="Usage: func_scp_with_jump [source] [target]"
+	[[ -z $1 || -z $2 ]] && echo $usage && return 1
+
+	PORT=32200
+	JUMP_MACHINE=dw
+
+	source=$1
+	sourceName=$(basename $source)
+	tmpTransferName=tmp_transfer_`date "+%Y-%m-%d_%H-%M-%S"`_${sourceName}
+	target=$2
+	targetDir=$(dirname ${target##*:})
+	targetCmd="mkdir -p $targetDir"
+	targetAddr=${target%%:*}
+
+	if [[ $(echo $1 | grep -c ":") == 1 ]] 
+	then
+		echo "Downloading ..."
+
+		# download content to jump machine
+		ssh $JUMP_MACHINE "scp -r -P $PORT $source ~/$tmpTransferName"
+
+		# create dir and download content to local machine 
+		$targetCmd
+		scp -r -P $PORT ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName $target
+	else
+		echo "Uploading ..."
+
+		# upload content to jump machine
+		scp -r -P $PORT $source ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName
+
+		# create dir and upload content to target machine in jump machine
+		ssh $JUMP_MACHINE "ssh -p $PORT $targetAddr $targetCmd"
+		ssh $JUMP_MACHINE "scp -r -P $PORT ~/$tmpTransferName $target"
+	fi
+
+	# delete tmp file in jump machine
+	ssh $JUMP_MACHINE "rm -rf ~/$tmpTransferName"
+
+	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
+
+	# Improve: support all senario 
+	#	L > R	I	cmd on L(src=L-Path		target=J-Host-Tmp)		II: cmd on J(src=J-Tmp	target=R-Host-Path)
+	#	R > L	II	cmd on J(src=R-Host-Path	target=J-Tmp)			II: cmd on L(src=L-Path	target=J-Host-Tmp)
+	#	R1 > R2	III	cmd on J(src=R1-Host-Path	target=J-Tmp)			II: cmd on J(src=J-Tmp	target=R2-Host-Tmp)
+	#
+	#	rule for scp exe location		J if $1 contains :, otherwise L
+	#	rule for scp exe stage 1 src		directly use
+	#	rule for scp exe stage 1 target		J-Tmp if $1 contains :, otherwise J-Host-Tmp
+	#	rule for scp exe stage 2 src		J-Tmp if $2 contains :, otherwise directly use
+	#	rule for scp exe stage 2 target		directly use if $2 contains :, otherwuse J-Host-Tmp
+	#
+	#	and mkdir?
+
+
+	# Demo: 
+		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test
+		#func_scp_with_jump ~/amp/test/t1 ouyangzhu@222.134.66.106:~/test1
+		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test2/test
+		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test/t1 ~/amp/2012-11-01/test1
+		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
+}
+
