@@ -44,6 +44,7 @@ function func_git_commit_push {
 	[[ -z $2 ]] && echo "ERROR: must input commit comment!" && return 1
 
 	cd $1					&& \ 
+	git add .				&& \
 	git commit -a -m "$2" 			&& \
 	git push 				&& \
 	git status 				&& \
