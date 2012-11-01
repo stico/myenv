@@ -1,0 +1,14 @@
+$HOME/.bashrc
+$HOME/.bash_profile
+$HOME/.inputrc
+$HOME/.cshrc
+$HOME/.netrc
+$HOME/.vimrc			__TAG_SUFFIX__
+$HOME/vimfiles
+$HOME/.fonts
+$HOME/.dir_colors
+$HOME/.backupMyenv.sh
+$HOME/.backupMyenv.bat
+$HOME/.ssh			__TAG_SUFFIX__
+$MY_ENV
+$HOME/*-bc
