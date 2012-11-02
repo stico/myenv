@@ -1,3 +1,9 @@
+function func_cd { 
+	cd $*
+	eval ll
+	# might have more hack in future
+}
+
 function func_mkdir_cd { 
 	usage="Usage: func_mkdir_cd [path]"
 	[[ -z $1 ]] && echo $usage && return 1
@@ -103,7 +109,8 @@ function func_scp_with_jump {
 
 		# create dir and download content to local machine 
 		$targetCmd
-		scp -r -P $PORT ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName $target
+		[[ -d $target ]] && targetFullName=$target/$sourceName
+		scp -r -P $PORT ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName $targetFullName
 	else
 		echo "Uploading ..."
 
@@ -112,6 +119,7 @@ function func_scp_with_jump {
 
 		# create dir and upload content to target machine in jump machine
 		ssh $JUMP_MACHINE "ssh -p $PORT $targetAddr $targetCmd"
+		# TODO: support rename in target (see above)
 		ssh $JUMP_MACHINE "scp -r -P $PORT ~/$tmpTransferName $target"
 	fi
 
@@ -133,6 +141,7 @@ function func_scp_with_jump {
 	#
 	#	and mkdir?
 
+	# Improve: cache the file based on MD5?
 
 	# Demo: 
 		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test

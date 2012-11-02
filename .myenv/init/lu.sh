@@ -17,15 +17,16 @@ if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 	# winVer=`cmd /C script_getWinVersion.bat`	# this line works in cygwin/bash, not work in GIT/bash
 	envVarSrc=(env_var env_var_win_common)
 	envFuncSrc=(env_func_lu_sh)
-	envAliasSrc=(env_alias secure/env_alias_secure env_alias_lu_sh env_alias_win)
+	envAliasSrc=(env_alias env_alias_lu_sh env_alias_win)
 
 	# vi complete seems very annoying (shows help of gawk!) on cygwin
 	complete -r vi vim gvim unzip
 else
 	envVarSrc=(env_var env_var_lu env_var_lu_sh)
 	envFuncSrc=(env_func_lu_sh)
-	envAliasSrc=(env_alias secure/env_alias_secure env_alias_lu_sh)
+	envAliasSrc=(env_alias env_alias_lu_sh)
 fi
+[[ -e $HOME/.myenv/secure/env_alias_secure ]] && envAliasSrc+=(secure/env_alias_secure)
 
 # even could directly set env, still better have file record left to trace
 if [ ! -e $genShPath ] ; then
