@@ -36,6 +36,7 @@ venvpyload		pyvenvload
 venvrbload		rbvenvload
 
 envcd			"func_cd %MY_ENV%"
+envreload		"source %HOME%/.bashrc"
 envvarvi		"vi %MY_ENV%/env_var"
 envfuncvi		"vi %MY_ENV%/env_func_lu_sh"
 envaliasvi		"vi %MY_ENV%/env_alias"
