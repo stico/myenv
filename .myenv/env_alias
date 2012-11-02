@@ -21,9 +21,10 @@ rmv			"rvm"
 tree			"tree -A"
 			
 			# use in cygwin: dbackup "a b - Copy"
-ddelete			"%MY_ENV%/utilities/dated_delete.sh"
+ddelete			"bash %MY_ENV%/utilities/dated_delete.sh"
 dd			"ddelete"
-dbackup			"%MY_ENV%/utilities/dated_backup.sh"
+drm			"ddelete"
+dbackup			"bash %MY_ENV%/utilities/dated_backup.sh"
 db			"dbackup"
 
 showresp		"func_show_resp"
