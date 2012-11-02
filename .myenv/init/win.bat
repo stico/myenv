@@ -48,8 +48,10 @@ REM reg delete HKEY_CLASSES_ROOT\Directory\shell\VersionBackup\command /f
 REM reg delete HKEY_CLASSES_ROOT\Directory\shell\VersionBackup /f
 REM C:\WINDOWS\system32\reg add HKEY_CLASSES_ROOT\*\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
 REM C:\WINDOWS\system32\reg add HKEY_CLASSES_ROOT\Directory\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
-reg add HKEY_CLASSES_ROOT\*\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
-reg add HKEY_CLASSES_ROOT\Directory\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
+REM reg add HKEY_CLASSES_ROOT\*\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
+REM reg add HKEY_CLASSES_ROOT\Directory\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
+reg add HKEY_CLASSES_ROOT\*\shell\DBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\utilities\dated_backup.bat \"%%1\""
+reg add HKEY_CLASSES_ROOT\Directory\shell\DBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\utilities\dated_backup.bat \"%%1\""
 reg add HKEY_CLASSES_ROOT\*\shell\DatedDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_datedDelete.bat \"%%1\""
 reg add HKEY_CLASSES_ROOT\Directory\shell\DatedDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_datedDelete.bat \"%%1\""
 

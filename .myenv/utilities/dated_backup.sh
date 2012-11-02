@@ -1,14 +1,13 @@
 #!/bin/bash
 
 [[ ! -n $1 ]] && echo '-!> Must set the 1st parameter, which indicating the file to be backup. Exiting ...' && exit
-[[ ! -e $MY_DOC ]] && echo '-!> Must set the env variable of $MY_DOC, and the path must exist. Exiting ...' && exit
 
 # the path might have blank, so use $*, and embrace with "" (many place used this)
 srcPath="$*"
 fileName=${srcPath##*\\}
-targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_"$fileName"
+targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_`uname -n`_"$fileName"
 #bakPath=("$MY_SDC_Base/VersionBackup" "$MY_LUH_Base/VersionBackup" "$MY_DOC/ECB/OnlineStorage/VersionBackup" "$MY_NET_Base/VersionBackup" )
-bakPath=( "$MY_DOC/DCB/Google Drive/VERSION_BACKUP" )
+bakPath=("$MY_DOC/DCB/Google Drive/VERSION_BACKUP" "$HOME/ampext/download")
 success="success"
 
 # if path is a directory, zip it first
