@@ -10,4 +10,5 @@ sed -e "/^\s*$/d;		\
 	/.fl_files.txt/d;	\
 	/.grep_result.txt/d;	\
 	/gVim.exe.stackdump/d;	\
-	s/^!//;"	$src > $target
+	s/^!//;		\
+	s/^/\$HOME/;"	$src > $target
