@@ -10,6 +10,9 @@ MY_TMP_RECHARGE	%MY_DEV%#workspaces#recharge#trunk
 MY_TMP_UPDATE	%MY_DEV%#workspaces#client-update-server#trunk
 MY_TMP_CBBS	%MY_DEV%#workspaces#util#trunk
 
+LOC_HOSTS	%WINDIR%#system32#drivers#etc#hosts
+LOC_MYSQL_CONF	%WINDIR%#my.ini
+
 CUR_OS		%CUR_OS_WIN%
 
 CYGWIN_HOME	%MY_PRO%#A_System_Cygwin
@@ -18,7 +21,6 @@ GRAILS_HOME	%MY_DEV%#grails-2.0.3
 ANDROID_HOME	%MY_DEV%#android-sdk-windows
 CASSANDRA_HOME	%MY_DEV%#cassandra-0.8.1
 GIT_HOME	%MY_DEV%#git-1.7.6-preview20110709
-MYSQL_HOME	%MY_DEV%#mysql-5.5.11-win32
 ARCANIST_HOME	%MY_DEV%#arcanist#arcanist
 
 # this turn of the warning when using windows style path with cygwin cmd
@@ -42,7 +44,6 @@ PATH		%MY_ENV%#secure
 PATH		%MY_ENV%#gen_win_alias
 PATH		%GIT_HOME%
 PATH		%GIT_HOME%#bin
-PATH		%MYSQL_HOME%#bin
 PATH		%GVIM_HOME%
 PATH		%CYGWIN_HOME%#bin
 

@@ -1,7 +1,10 @@
 CUR_OS		%CUR_OS_LU%
 
-USR_LOCAL	#usr#local
-#JENKINS_HOME	%USR_LOCAL%#jenkins
+LOC_USR_LOCAL	#usr#local
+LOC_HOSTS	#etc#hosts
+LOC_FSTAB	#etc#fstab
+LOC_CRONTAB	#etc#crontab
+LOC_CONF_MYSQL	#etc#mysql#my.cnf
 
 # set LANG (LLANG or LANG?) to avoid vi crash
 LANG		en_US.UTF-8

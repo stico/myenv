@@ -20,11 +20,10 @@ if [[ -d "$srcPath" ]]; then
 	srcPath="$packFile"
 fi
 
-# backup file to candidate place (if exist)
 for path in "${bakPath[@]}"
 do
-	echo "Backup to path: $path" 
 	if [[ -e "$path" ]]; then
+		echo "Backup to path: $path" 
 		cp "$srcPath" "$path/$targetFile"
 		ls -lh "$path/$targetFile"
 		copied=$success
@@ -33,11 +32,8 @@ do
 	fi
 done
 
-# remove the tmp zip file if exist
-if [[ -e "$packFile" ]]; then
-	echo "Deleting tmp zip file: $packFile"
-	rm "$packFile"
-fi
+echo "Deleting tmp zip file: $packFile"
+rm "$packFile"
 
 # this should never happen, as always should success in $MY_DOC/ECB ...
 if [[ $copied != $success ]]; then 

@@ -27,7 +27,9 @@
 !/.restoreMyenv.bat
 
 # IGNORE, for secure reason
-/.subversion/
+#/.subversion/
+#/.ssh/
+/.myenv/secure/
 
 # IGNORE, for those really not needed, or for secure reason
 /.myenv/.fl_files.txt
@@ -37,4 +39,3 @@
 /.myenv/gen_lu_sh/
 /.myenv/gen_lu_csh/
 /.myenv/gen_win_alias/
-/.myenv/secure/

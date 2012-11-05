@@ -1,0 +1,10 @@
+# This fils stores file which can not be public
+
+/.ssh/
+/.subversion/
+/.myenv/secure/
+
+$LOC_HOSTS
+$LOC_FSTAB
+$LOC_CRONTAB
+$LOC_CONF_MYSQL

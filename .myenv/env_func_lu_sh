@@ -66,8 +66,10 @@ function func_grep_env {
 	usage="Usage: func_grep_env [pattern]"
 	[[ -z $1 ]] && echo $usage && return 1
 
+	cd $HOME
 	cat $MY_ENV/list/myenv.lst | xargs grep -i $1 > .grep_result.txt
 	eval grepi $1 .grep_result.txt
+	cd -
 }
 
 function func_grep_cmd { 
