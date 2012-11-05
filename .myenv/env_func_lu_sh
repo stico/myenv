@@ -62,6 +62,14 @@ function func_git_commit_push {
 	cd - 
 }
 
+function func_grep_env { 
+	usage="Usage: func_grep_env [pattern]"
+	[[ -z $1 ]] && echo $usage && return 1
+
+	cat $MY_ENV/list/myenv.lst | xargs grep -i $1 > .grep_result.txt
+	eval grepi $1 .grep_result.txt
+}
+
 function func_grep_cmd { 
 	usage="Usage: func_grep_cmd [pattern] [cmd]"
 	[[ -z $1 || -z $2 ]] && echo $usage && return 1

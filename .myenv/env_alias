@@ -51,6 +51,9 @@ envgitpull		"func_git_pull %HOME%"
 envgitstatus		"func_git_status %HOME%"
 envgitcommitpush	"func_git_commit_push %HOME%"
 
+listgenhosts		"bash %MY_ENV%/list/hosts_gen.sh"
+listgenmyenv		"bash %MY_ENV%/list/myenv_gen.sh"
+
 vimrcdeploy		"bash %MY_SOFT_CONF%/vim/deploy_vimrc.sh"
 vimrcupdate		"vi %MY_SOFT_CONF%/vim/_vimrc"
 
@@ -68,20 +71,27 @@ llt			"ls -lhtr"
 lld			"ls -lh | grep '^d'"
 llf			"ls -lh | grep -v '^d'"
 
+genlisthosts		"listgenhosts"
+genlistmyenv		"listgenmyenv"
+
 grep			"grep --color"
 g			grep
-grepi			"grep -i --color"
-gi			grepi
-grephi			"higrep"
-ghi			grephi
+envgrep			"func_grep_env"
+grepenv			envgrep
+ge			envgrep
 grepcmd			"func_grep_cmd"
 gc			grepcmd
 grepfile		"bash script_grepNonBinFiles.sh -"
 gf			grepfile
+grephi			"higrep"
+gh			grephi
+grepi			"grep -i --color"
+gi			grepi
 grepjava		"bash script_grepNonBinFiles.sh java"
 gj			grepjava
 grepxml			"bash script_grepNonBinFiles.sh xml"
 gx			grepxml
+
 greptxt			"bash script_grepNonBinFiles.sh txt"
 greppy			"bash script_grepNonBinFiles.sh py"
 grepsh			"bash script_grepNonBinFiles.sh sh"

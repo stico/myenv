@@ -20,32 +20,10 @@ then
 	suffix=""
 	shift
 	search="$*"
-
-# TODO: delete those lines after a while
-#	sed -e "/\/.svn\//d" $fileList	| \
-#	sed -e "/\/.git\//d"		| \
-#	sed -e "/\/.metadata\//d"	| \
-#	sed -e "/\/.class$\//d"		| \
-#	sed -e "/\/.jar$\//d"		| \
-#	# the target is mvn, but might cause miss-hit!
-#	sed -e "/\/target\//d"		| \
-#	# remove the .fi_files itself
-#	sed -e "/$fileList$/d"		| \
-#	# -I is not match binary files
-#	xargs grep -I -i "$*"		| tee $grepResult	|	grep --color -i "$*"
 else
 	suffix=".$1"
 	shift
 	search="$*"
-
-# TODO: delete those lines after a while
-#	grep $suffix'$' $fileList	| \
-#	# the target is mvn, but might cause miss-hit!
-#	sed -e "/\/target\//d"		| \
-#	# remove the .fi_files itself
-#	sed -e "/$fileList$/d"		| \
-#	# -I is not match binary files
-#	xargs grep -I -i "$*"		| tee $grepResult	|	grep --color -i "$*"
 fi
 
 # Step: prepare, we treat path in search text as .
