@@ -42,17 +42,18 @@ RButton::	Window_Drag()
 ^RButton::	Window_Resize()
 
 ; to prevent catch cmd send by itself, use $ prefix for cmd
-$^d::		Filter_Ctrl_d_Cmd_Console_Outlook()
-$+Insert::	Filter_Shift_Insert()
-$^TAB::		Filter_CtrlTab_Excel_Console_Eclipse()
-$^+TAB::	Filter_CtrlShiftTab_Excel_Console_Eclipse()
-$^+w::		Filter_CtrlShift_w_Chrome()
-$ESC::		Filter_Esc_Excel()
-$^+q::		Filter_CtrlShift_q_Eclipse()
-$^+e::		Filter_CtrlShift_e_Eclipse()
-$f4::		Filter_F4_Eclipse()
-$f3::		Filter_F3_FreeCommander()
+$^+TAB::	Filter_C_S_Tab_Excel_Console_Eclipse()
+$^+w::		Filter_C_S_w_Chrome()
+$^+q::		Filter_C_S_q_Eclipse()
+$^+e::		Filter_C_S_e_Eclipse()
+$^d::		Filter_C_d_Cmd_Console_Outlook()
+$^TAB::		Filter_C_Tab_Excel_Console_Eclipse()
+$+Insert::	Filter_S_Insert()
+$!Enter::	Filter_A_Enter()
 $f1::		Filter_F1_Vim()
+$f3::		Filter_F3_FreeCommander()
+$f4::		Filter_F4_Eclipse()
+$ESC::		Filter_Esc_Excel()
 
 ^`::		QuickOpen_Vim()
 ^ESC::		RunTaskCenter()	
@@ -80,7 +81,7 @@ InitGlobalVar()
 ;^+x::		temp_startEclipse35()
 ;^!b::		ShowHide_Window_Chrome()		; specially for chrome, works (2012-10-25). seems ShowHide_Window() also works
 ;$^!d::		Filter_CtrlAlt_d()			; removed as this keys now is use for show/hide dictionary
-;$^+g::		Filter_CtrlShift_g_Eclipse()		; remvoed as found it is the clipX hacked the hot key
+;$^+g::		Filter_C_S_g_Eclipse()		; remvoed as found it is the clipX hacked the hot key
 ;^!d::		ShowDesktop()				; removed as #d works either
 ;^!e::		ShowExplorer()				; removed as #e works either
 ;#x::		MinimizeCurrentWindow()			; removed as seldom use
@@ -92,7 +93,17 @@ InitGlobalVar()
 ;^!+x::		Window_CloseCurrent_NoSave()		; too danger and not seldom used
 
 
-Filter_Shift_Insert() {
+Filter_A_Enter()
+{
+	; seems can not filter YY chat window
+	;IfWinActive, ahk_class QWidget
+	;IfWinActive 909011
+	;{
+	;	msgbox aaa
+	;}
+}
+
+Filter_S_Insert() {
 	IfWinActive cmd.exe
 	{
 		sendInput {ALT DOWN}{Space}{ALT UP}{e}{p}
@@ -111,7 +122,7 @@ Filter_Shift_Insert() {
 	}
 }
 
-Filter_Ctrl_d_Cmd_Console_Outlook() {
+Filter_C_d_Cmd_Console_Outlook() {
 	IfWinActive cmd.exe 
 	{
 		SendInput {Enter}exit{Enter}
@@ -358,7 +369,7 @@ QuickOpen_Vim()
 	;winActivate t.txt
 }
 
-Filter_CtrlTab_Excel_Console_Eclipse()
+Filter_C_Tab_Excel_Console_Eclipse()
 {
 	IfWinActive, Microsoft Excel
 	{
@@ -375,7 +386,7 @@ Filter_CtrlTab_Excel_Console_Eclipse()
 	}
 }
 
-Filter_CtrlShiftTab_Excel_Console_Eclipse()
+Filter_C_S_Tab_Excel_Console_Eclipse()
 {
 	IfWinActive, Microsoft Excel
 	{
@@ -414,7 +425,7 @@ Filter_CtrlShiftTab_Excel_Console_Eclipse()
 ;	}
 ;}
 
-Filter_CtrlShift_w_Chrome()
+Filter_C_S_w_Chrome()
 {
 	IfWinActive, Chrome
 	{
@@ -435,7 +446,7 @@ Filter_Esc_Excel()
 	}
 }
 
-Filter_CtrlShift_g_Eclipse()
+Filter_C_S_g_Eclipse()
 {
 	; don't which program register the ^+g in win system (probably Firefox) for searching, I don't need it.
 	IfWinActive, Eclipse
@@ -445,7 +456,7 @@ Filter_CtrlShift_g_Eclipse()
 	}
 }
 
-Filter_CtrlShift_q_Eclipse()
+Filter_C_S_q_Eclipse()
 {
 	; This will override the "Quick Diff Toggle" shortcut
 	IfWinActive, Eclipse
@@ -468,7 +479,7 @@ Filter_CtrlAlt_s_Vim()
 	}
 }
 
-Filter_CtrlShift_e_Eclipse()
+Filter_C_S_e_Eclipse()
 {
 	; This will override the "Close All" shortcut, which is duplicated with "Ctrl + Shift + F4"
 	IfWinActive, Eclipse
