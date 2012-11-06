@@ -1,5 +1,5 @@
 # default shell title
-shelltitle ScreenWindow
+shelltitle Screen
  
 #utf-8 encoding
 defutf8 on

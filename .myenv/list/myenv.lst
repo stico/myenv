@@ -42,12 +42,16 @@
 .myenv/env_var_win_32bit
 .myenv/env_var_win_64bit
 .myenv/env_var_win_common
-.myenv/fl_gen_myenv.sh
-.myenv/fl_myenv.list
 .myenv/init/lu.csh
 .myenv/init/lu.sh
 .myenv/init/ruby.sh
 .myenv/init/win.bat
+.myenv/list/hosts.lst
+.myenv/list/hosts_append.sh
+.myenv/list/hosts_gen.sh
+.myenv/list/myenv.lst
+.myenv/list/myenv_gen.sh
+.myenv/list/myenv_secure.lst
 .myenv/script_a_tasksCenter.sh
 .myenv/script_backupDev.bat
 .myenv/script_backupDev.sh
@@ -70,6 +74,7 @@
 .myenv/utilities/dated_backup.sh
 .myenv/utilities/dated_delete.bat
 .myenv/utilities/dated_delete.sh
+.myenv/utilities/listed_backup.sh
 .myenv/z_deprecated/addRoute-Repeatable.bat
 .myenv/z_deprecated/backup_PF2_Prefixed_A_A-zip.sh
 .myenv/z_deprecated/backup_eclipse_configurations.bat
@@ -98,6 +103,7 @@
 .netrc
 .restoreMyenv.bat
 .restoreMyenv.sh
+.screenrc
 .vim/autoload/pathogen.vim
 .vim/bundle/MultipleSearch/autoload/MultipleSearch.vim
 .vim/bundle/MultipleSearch/doc/MultipleSearch.txt

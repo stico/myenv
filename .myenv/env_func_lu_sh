@@ -55,6 +55,7 @@ function func_git_commit_push {
 	[[ -z $1 || -z $2 ]] && echo $usage && return 1
 
 	cd $1					&& 
+	git pull github master			&&
 	git add .				&&
 	git commit -a -m "$2" 			&&
 	git push 				&&

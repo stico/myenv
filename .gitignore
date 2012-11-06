@@ -18,6 +18,7 @@
 !/.bashrc
 !/.inputrc
 !/.screenrc
+!/.tmux.conf
 !/.gitignore
 !/.dir_colors
 !/.bash_profile
