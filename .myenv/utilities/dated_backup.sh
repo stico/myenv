@@ -4,7 +4,7 @@
 
 # the path might have blank, so use $*, and embrace with "" (many place used this)
 srcPath="$*"
-fileName=${srcPath##*\\}
+fileName=$(basename $srcPath)
 targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_`uname -n`_"$fileName"
 #bakPath=("$MY_SDC_Base/VersionBackup" "$MY_LUH_Base/VersionBackup" "$MY_DOC/ECB/OnlineStorage/VersionBackup" "$MY_NET_Base/VersionBackup" )
 bakPath=("$MY_DOC/DCB/Google Drive/VERSION_BACKUP" "$HOME/ampext/download")

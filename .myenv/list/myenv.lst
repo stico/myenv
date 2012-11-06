@@ -104,6 +104,7 @@
 .restoreMyenv.bat
 .restoreMyenv.sh
 .screenrc
+.tmux.conf
 .vim/autoload/pathogen.vim
 .vim/bundle/MultipleSearch/autoload/MultipleSearch.vim
 .vim/bundle/MultipleSearch/doc/MultipleSearch.txt
