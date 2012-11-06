@@ -10,7 +10,7 @@ genEnvAlias=$genShPath/envAliasAll
 genEnvFunc=$genShPath/envFuncAll
 
 # need to ensure the HOME var end with a "/"
-[[ ${HOME} =~ "*/" ]] || export HOME="${HOME}/" 
+[[ $(echo $HOME | grep -c "/$") == 0 ]] && export HOME="${HOME}/"
 
 # check if it is bash on windows
 if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
