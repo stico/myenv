@@ -55,4 +55,4 @@ if [[ $copied != $success ]]; then
 	echo -e "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 fi
 
-#rm -rf $target_tmp ${target_tmp}.zip
+rm -rf $target_tmp ${target_tmp}.zip
