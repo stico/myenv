@@ -49,7 +49,6 @@ $^+e::		Filter_C_S_e_Eclipse()
 $^d::		Filter_C_d_Cmd_Console_Outlook()
 $^TAB::		Filter_C_Tab_Excel_Console_Eclipse()
 $+Insert::	Filter_S_Insert()
-$!Enter::	Filter_A_Enter()
 $f1::		Filter_F1_Vim()
 $f3::		Filter_F3_FreeCommander()
 $f4::		Filter_F4_Eclipse()
@@ -76,6 +75,7 @@ InitGlobalVar()
 }
 
 ;Following keys are deprecated, but the logic in them may useful
+;$!Enter::	Filter_A_Enter()
 ;$^!s::		Filter_CtrlAlt_s_Vim()
 ;^!d::		ShowHide_Window("\A_A_Script-Basic\starDict-Repeatable.bat", "StarDict")	; deprecated by GoldenDict (set in that app itself)
 ;^+x::		temp_startEclipse35()

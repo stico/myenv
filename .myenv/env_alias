@@ -57,7 +57,7 @@ listgenhosts		"bash %MY_ENV%/list/hosts_gen.sh"
 listgenmyenv		"bash %MY_ENV%/list/myenv_gen.sh"
 
 vimrcdeploy		"bash %MY_SOFT_CONF%/vim/deploy_vimrc.sh"
-vimrcupdate		"vi %MY_SOFT_CONF%/vim/_vimrc"
+vimrcupdate		"vi %MY_SOFT_CONF%/vim/vimrc"
 
 updatecd		"func_cd %MY_CODE_DW%/update-server_trunk"
 updatesvnupdate		"func_cd %MY_CODE_DW%/update-server_trunk ; svn update | sed -e '/^\s*$/d;/^Updated external/d;/^Fetching external/d;' ; cd -"
