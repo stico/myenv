@@ -1,0 +1,19 @@
+# default shell title
+shelltitle ScreenWindow
+ 
+#utf-8 encoding
+defutf8 on
+ 
+# can't remember what this does
+termcapinfo xterm ti@:te@
+ 
+# turn off anoying flashing for visual bell
+vbell off
+ 
+# have the last line show a list of tabs
+hardstatus alwayslastline " %c | %Y-%m-%d | %w"
+ 
+# add shortcut keys to resize split windows
+bind = resize =
+bind + resize +1
+bind - resize -1
