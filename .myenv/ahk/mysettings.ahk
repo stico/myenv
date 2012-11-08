@@ -25,7 +25,7 @@ return
 
 ^!p::		ShowHide_TextWindow("dev\a_workspaces\A_Project.lst", true, false, false, ": set isfname+=:")
 
-^!x::		ShowHide_Window("E:\program\A_System_Console2_2.00b148-Beta_32bit\Console.exe", "G_Console_")
+^!x::		ShowHide_Window("E:\program\A_System_ConEmuPack_X\ConEmu.exe", "ahk_class VirtualConsoleClass")
 ^!s::		ShowHide_Window("E:\program\A_Network_SecureCRT_6.2.2\SecureCRT.EXE", "SecureCRT")
 ^!b::		ShowHide_Window("E:\program\A_Network_Chrome_X_PA-Basic\GoogleChromePortable.exe", "ahk_class Chrome_WidgetWin_1")
 ^!o::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu\Microsoft Outlook 2010.lnk", "Microsoft Outlook")
@@ -78,6 +78,7 @@ InitGlobalVar()
 ;$!Enter::	Filter_A_Enter()
 ;$^!s::		Filter_CtrlAlt_s_Vim()
 ;^!d::		ShowHide_Window("\A_A_Script-Basic\starDict-Repeatable.bat", "StarDict")	; deprecated by GoldenDict (set in that app itself)
+;^!x::		ShowHide_Window("E:\program\A_System_ConEmuPack_X\ConEmu.exe", "G_Console_")
 ;^+x::		temp_startEclipse35()
 ;^!b::		ShowHide_Window_Chrome()		; specially for chrome, works (2012-10-25). seems ShowHide_Window() also works
 ;$^!d::		Filter_CtrlAlt_d()			; removed as this keys now is use for show/hide dictionary
