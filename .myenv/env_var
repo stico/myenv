@@ -20,6 +20,7 @@ MY_DEV		%HOME%dev
 MY_TMP		%HOME%amp
 MY_CODE_DW	%MY_DEV%#code_dw
 MY_CODE_REPO	%MY_DEV%#code_repo
+MY_CODE_MISC	%MY_DEV%#code_misc
 MY_SOFT_CONF	%MY_DOC%/DCB/SoftwareConf
 
 WIN_PF		"%MY_APP_Base%#Program Files"
