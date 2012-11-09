@@ -32,13 +32,7 @@ do
 	fi
 done
 
-echo "Deleting tmp zip file: $packFile"
-rm "$packFile"
 
-# this should never happen, as always should success in $MY_DOC/ECB ...
-if [[ $copied != $success ]]; then 
-	echo -e "\n"
-	echo -e "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-	echo -e "! Failed to do any backup, pls check it !"
-	echo -e "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-fi
+[[ -e $packFile ]] && echo "Deleting tmp zip file: $packFile" && rm "$packFile"
+
+[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup, pls check it !\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

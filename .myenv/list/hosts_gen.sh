@@ -19,9 +19,12 @@ do
 	[[ ! -f ${session_file} ]] && echo "Skipping unexist file: $session_file" && continue
 	[[ "${file_name}" = "__FolderData__.ini" || "${file_name}" = "Default.ini" ]] && echo "Skipping: Default.ini/__FolderData__.ini" && continue
 
-	hostname=`sed -n 's/S:"Hostname"=\([\d\.]*\)/\1/p;' ${session_file} | sed -e 's/\d013//;'`
+	jumped_ip=`sed -n 's/S:"Shell Command"=\([\d\.]*\)/\1/p;' ${session_file} | sed -e 's/\d013//;s/ssh\|-p\|32200\| //g;'`
+	direct_ip=`sed -n 's/S:"Hostname"=\([\d\.]*\)/\1/p;' ${session_file} | sed -e 's/\d013//;'`
 
-	echo -e "${hostname}\t\t${file_name%%.ini}" >> $target
+	[[ ${#jumped_ip} -ge 7 ]] && real_ip=$jumped_ip || real_ip=$direct_ip
+
+	echo -e "${real_ip}\t\t${file_name%%.ini}" >> $target
 done
 
 
