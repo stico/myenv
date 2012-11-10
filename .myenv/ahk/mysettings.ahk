@@ -25,7 +25,9 @@ return
 
 ^!p::		ShowHide_TextWindow("dev\a_workspaces\A_Project.lst", true, false, false, ": set isfname+=:")
 
+;^!d::		ShowHide_Window("E:\program\A_Text_GoldenDict_1.0.1_Official\GoldenDict.exe", "GoldenDict")	; ahk can not activate GoldenDict, set the key in itself
 ^!x::		ShowHide_Window("E:\program\A_System_ConEmuPack_X\ConEmu.exe", "ahk_class VirtualConsoleClass")
+^!e::		ShowHide_Window("E:\program\A_Network_Chrome_X_PA-Basic\GoogleChromePortable.exe", "Google Chrome")
 ^!s::		ShowHide_Window("E:\program\A_Network_SecureCRT_6.2.2\SecureCRT.EXE", "SecureCRT")
 ^!b::		ShowHide_Window("E:\program\A_Network_Chrome_X_PA-Basic\GoogleChromePortable.exe", "ahk_class Chrome_WidgetWin_1")
 ^!o::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu\Microsoft Outlook 2010.lnk", "Microsoft Outlook")
@@ -265,8 +267,8 @@ ShowHide_Window(CmdPath, WindowName)
 {
 	IfWinActive %WindowName% 
 	{
-		; can not hide the chrome window yet, which uses "ahk_class"
-		WinHide %WindowName%
+		;WinHide %WindowName%
+		Winminimize %WindowName%
 	} else {
 		winShow %WindowName%
 		winActivate %WindowName%
