@@ -55,6 +55,7 @@ $f1::		Filter_F1_Vim()
 $f3::		Filter_F3_FreeCommander()
 $f4::		Filter_F4_Eclipse()
 $ESC::		Filter_Esc_Excel()
+$LButton::	Filter_Mouse_Right_Click_ConEmu()
 
 ^`::		QuickOpen_Vim()
 ^ESC::		RunTaskCenter()	
@@ -513,6 +514,30 @@ Filter_F3_FreeCommander()
 		sendInput {CTRL DOWN}{SHIFT DOWN}{Tab}{CTRL UP}{SHIFT UP}{CTRL DOWN}{Tab}{CTRL UP}
 	} else {
 		sendInput {f3}
+	}
+}
+
+Filter_Mouse_Right_Click_ConEmu()
+{
+	LButtonDownTime:=A_TickCount
+
+	IfWinActive %WindowName% ahk_class VirtualConsoleClass
+	{
+		send {Shift Down}{LButton Down}
+		Loop
+		{
+			; Break if button has been released.
+			GetKeyState,KDE_Button,LButton,P
+			If KDE_Button = U
+			{
+				send {LButton Up}{Shift Up}
+				break
+			}
+		}
+		return
+	} else
+	{
+		send {LButton}
 	}
 }
 
