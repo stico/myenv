@@ -18,6 +18,9 @@ SetTitleMatchMode 2		; This match mode could make the winTitle match any part of
 CoordMode,Mouse
 return
 
+Capslock::Ctrl
+;+Capslock::Capslock	; seems will actually cause "ctrl"
+
 ^!q::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Record.txt", false, false, false, "")
 ^!z::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Schedule.txt", false, false, false, "")
 ^!c::		ShowHide_TextWindow("Documents\DCB\Record\Z\A_A_NOTE_Copy.txt", true, false, true, "")
