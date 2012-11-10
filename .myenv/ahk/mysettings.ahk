@@ -537,7 +537,17 @@ Filter_Mouse_Right_Click_ConEmu()
 		return
 	} else
 	{
-		send {LButton}
+		send {LButton Down}
+		Loop
+		{
+			; Break if button has been released.
+			GetKeyState,KDE_Button,LButton,P
+			If KDE_Button = U
+			{
+				send {LButton Up}
+				break
+			}
+		}
 	}
 }
 
