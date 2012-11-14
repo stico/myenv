@@ -170,12 +170,12 @@ noremap Y y$
 inoremap <A-S-Y> <Esc>l"+y$
 nnoremap <A-S-Y> <Esc>"+y$
 " to insert a line/tab/space in normal mode
-noremap <CR> o<Esc>
-noremap <S-CR> O<Esc>j
-noremap <C-CR> i<CR><Esc>
-noremap <Tab> i<Tab><Esc>
-noremap <S-Tab> $F<Tab>i<Tab><Esc>
-noremap <Space> i<Space><Esc>
+nnoremap <CR> o<Esc>
+nnoremap <S-CR> O<Esc>j
+nnoremap <C-CR> i<CR><Esc>
+nnoremap <Tab> i<Tab><Esc>
+nnoremap <S-Tab> $F<Tab>i<Tab><Esc>
+nnoremap <Space> i<Space><Esc>
 " delete by words
 inoremap <C-Del> <Esc>ldwi
 inoremap <C-Backspace> <Esc>ldbi
