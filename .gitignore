@@ -37,6 +37,7 @@
 /.myenv/.fl_files.txt
 /.myenv/.grep_result.txt
 /.myenv/gVim.exe.stackdump
+/.myenv/bash.exe.stackdump
 /.myenv/gen_log/
 /.myenv/gen_lu_sh/
 /.myenv/gen_lu_csh/
