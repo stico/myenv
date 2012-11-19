@@ -11,7 +11,8 @@ fi
 . $HOME/.myenv/init/lu.sh
 
 # init auto complete
-complete -F _known_hosts sshx
+complete -o nospace -F _scp scpx
+complete -F _ssh sshx
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
