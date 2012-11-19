@@ -10,6 +10,9 @@ fi
 # init myenv
 . $HOME/.myenv/init/lu.sh
 
+# init auto complete
+complete -F _known_hosts sshx
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 

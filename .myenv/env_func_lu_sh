@@ -89,10 +89,14 @@ function func_ssh_with_jump {
 	usage="Usage: func_ssh_with_jump [target]"
 	[[ -z $1 ]] && echo $usage && return 1
 
+	ip_addr=`getent hosts $1 | sed "s/\s\+.*$//"`
+	[[ -z $ip_addr ]] && ip_addr=$1
+
 	PORT=32200
 	JUMP_MACHINE=dw
 	
-	ssh -t $JUMP_MACHINE "ssh -p $PORT $1"
+	shift
+	ssh -t $JUMP_MACHINE "ssh -p $PORT $ip_addr $@"
 
 	# Demo: func_ssh_with_jump 222.88.95.197 
 }
@@ -140,6 +144,9 @@ function func_scp_with_jump {
 
 	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
 
+	# Improve: support hostname (need translate, since the jump machine didn't set the hosts)
+	# Improve: support file name with wildcard
+	# Improve: cache the file based on MD5?
 	# Improve: support all senario 
 	#	L > R	I	cmd on L(src=L-Path		target=J-Host-Tmp)		II: cmd on J(src=J-Tmp	target=R-Host-Path)
 	#	R > L	II	cmd on J(src=R-Host-Path	target=J-Tmp)			II: cmd on L(src=L-Path	target=J-Host-Tmp)
@@ -152,8 +159,6 @@ function func_scp_with_jump {
 	#	rule for scp exe stage 2 target		directly use if $2 contains :, otherwuse J-Host-Tmp
 	#
 	#	and mkdir?
-
-	# Improve: cache the file based on MD5?
 
 	# Demo: 
 		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test
