@@ -9,6 +9,7 @@ sshp			"%MY_ENV%/secure/script_sshp.sh"
 
 
 # Alias - Misc
+wl			"wc -l"
 df			"df -h"
 du			"du -h"
 ftp			"script_ftp.exp"
@@ -123,14 +124,13 @@ cddl			"func_cd %MY_TMP%/download"
 cdpf			"func_cd %WIN_PF%"
 cdtt			"func_cd_tmp_today"
 
-cddw			"cdwcd"
-cdrepo			"crepocd"
-cdmisc			"cmisccd"
+cdcdw			"cdwcd"
+cdcrepo			"crepocd"
+cdcmisc			"cmisccd"
 cdrb			"rbcd"
 cdpy			"pycd"
 cdjava			"func_cd %MY_CODE_REPO%/java"
 cdupdate		"func_cd %MY_CODE_DW%/update-server_trunk"
-cdrecharge		"func_cd %MY_CODE_DW%/recharge_trunk"
 
 ################################################################################
 # Depreated

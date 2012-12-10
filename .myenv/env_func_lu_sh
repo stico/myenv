@@ -22,12 +22,13 @@ function func_show_resp {
 	usage="Usage: func_show_resp [url]"
 	[[ -z $1 ]] && echo $usage && return 1
 
-	wget --timeout=2 --tries=1 -O - 2>&1 $1	\
-	| sed -e '/'${1//\//.}'/d'		\
-	| sed -e '/^Resolving/d'		\
-	| sed -e '/^Length/d'			\
-	| sed -e '/^Saving/d;/100%.*=.*s/d'	\
-	| sed -e '/0K.*0.00.=0s/d'		\
+	echo "sending request to: $1"
+	wget --timeout=2 --tries=1 -O - 2>&1 "$1"	\
+	| sed -e '/'${1//\//.}'/d'			\
+	| sed -e '/^Resolving/d'			\
+	| sed -e '/^Length/d'				\
+	| sed -e '/^Saving/d;/100%.*=.*s/d'		\
+	| sed -e '/0K.*0.00.=0s/d'			\
 	| sed -e '/^$/d'
 }
 
@@ -98,6 +99,8 @@ function func_ssh_with_jump {
 	shift
 	ssh -t $JUMP_MACHINE "ssh -p $PORT $ip_addr $@"
 
+	# TODO: check the $1, if it is a ip, should not parse as hostname
+	# TODO: add function for run cmd on multiple host
 	# Demo: func_ssh_with_jump 222.88.95.197 
 }
 
@@ -144,6 +147,7 @@ function func_scp_with_jump {
 
 	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
 
+	# Improve: the file name was changed to tmp_xxx
 	# Improve: support hostname (need translate, since the jump machine didn't set the hosts)
 	# Improve: support file name with wildcard
 	# Improve: cache the file based on MD5?

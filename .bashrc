@@ -1,6 +1,10 @@
 #!/bin/bash
 
-umask 077
+if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
+	umask 000
+else
+	umask 077
+fi
 
 # enable completion (let it run first, as init/lu.sh need turn off some completion on cygwin)
 if [ -f /etc/bash_completion ]; then
@@ -27,19 +31,16 @@ else
         eval `dircolors -b /etc/DIR_COLORS` 
 fi 
 
-# to avoid ^s/^q to frozen/unfrozen the terminal (so vim could also use ^q for blockwise edit)
-stty -ixon
+stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
-#stty stop ''
+
+shopt -s checkwinsize	# check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
+shopt -s histappend	# append to the history file, don't overwrite it
+shopt -s histreedit	# puts a failed history substitution back on the command line for re-editing
+#shopt -s histverify	# (caution to use it, since most system not use it, train yourself that way) puts the command to be executed after a substitution on command line as if you had typed it
 
 
 ########################## Below are just copied from example file ########################## 
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
-shopt -s checkwinsize
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -48,3 +49,5 @@ shopt -s checkwinsize
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
+
+PATH=$PATH:$HOME//.rvm/bin # Add RVM to PATH for scripting
