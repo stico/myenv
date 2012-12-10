@@ -223,11 +223,11 @@ command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
 command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
 
-command! -nargs=* RCmd			:w | :silent ! cmd.exe <args> "%:p" & pause
-command! -nargs=* RBash			:w | :silent ! bash    <args> "%:p" & pause
-command! -nargs=* RRuby			:w | :silent ! ruby    <args> "%:p" & pause
-command! -nargs=* RPython		:w | :silent ! python  <args> "%:p" & pause
-command! -nargs=* RGroovy		:w | :silent ! groovy  <args> "%:p" & pause
+command! -nargs=* RInCmd			:wa | :silent	! cmd.exe		<args> "%:p" & pause
+command! -nargs=* RInBash			:wa | :silent	! bash			<args> "%:p" & pause
+command! -nargs=* RInRuby                       :wa |		! bundle exec ruby	<args> "%:p"
+command! -nargs=* RInPython			:wa | :silent	! python		<args> "%:p" & pause
+command! -nargs=* RInGroovy			:wa | :silent	! groovy		<args> "%:p" & pause
 
 "autocmd BufNewFile,BufReadPost *.sh map <buffer> <F11> :pwd
 autocmd Filetype sh map <buffer> <F11> :RInBash<Enter>
