@@ -13,6 +13,7 @@ fi
 
 # init myenv
 . $HOME/.myenv/init/lu.sh
+rbvenvload
 
 # init auto complete
 complete -o nospace -F _scp scpx

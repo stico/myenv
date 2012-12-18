@@ -87,3 +87,6 @@ HISTFILESIZE	1000
 		# ignoredups: remove consecutive duplicate cmd
 		# erasedups: eliminate duplicates across the whole history
 HISTCONTROL	ignoredups:erasedups
+		
+		# bash auto-complete filter the .svn path
+FIGNORE		.svn
