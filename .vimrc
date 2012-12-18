@@ -10,34 +10,32 @@ let loaded_settings_of_stico = 1
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 
-
 """""""""""""""""""""""""""""" H1 - Syntax
 syntax on						" switch syntax highlighting on
-set diffopt=filler,iwhite,context:1000,vertical
-hi DiffAdd	guibg=#DDDDFF guifg=#993333 gui=none	" for added lines
-hi DiffDelete	guibg=#DDDDFF guifg=#993333 gui=none	" for delete lines
-hi DiffChange	guibg=#EEEEFF guifg=Gray gui=none	" for identical text in changed lines
-hi DiffText	guibg=#DDDDFF guifg=#993333 gui=none	" for different text in changed lines
-"hi Normal guibg=grey90					" seem could use num to specify color level?
-"
-"au BufEnter <buffer> hi Comment	ctermfg=DarkGrey guifg=DarkGrey		" need this way to override the hi defined by filetype specifiy one
-"au FileType *	hi Comment	cterm=italic ctermfg=DarkCyan gui=italic guifg=DarkCyan " seems better than line above, as could match filetype  
-au FileType *	hi Comment	ctermbg=Grey ctermfg=DarkCyan guibg=LightGrey guifg=DarkCyan " seems better than line above, as could match filetype  
-au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
-au FileType javascript set expandtab tabstop=4 shiftwidth=4 
+if has('gui_running')
+    set background=light
+else
+    set background=dark
+endif
 
 
 """""""""""""""""""""""""""""" H1 - Plugins
-" for pathogen.vim
 call pathogen#infect()
+colorscheme solarized
 
-" for ctrlp.vim
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
 let g:ctrlp_custom_ignore = {
 	\ 'dir':  '\.git$\|\.hg$\|\.svn$|\.metadata$',
 	\ 'file': '\.class$\|\.jar$\|\.lnk$|\*\.svn-base$',
 	\ 'link': '',
 	\ }
+
+
+"""""""""""""""""""""""""""""" H1 - Indent
+"au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
+"au FileType javascript set expandtab tabstop=4 shiftwidth=4 
+
+
 """""""""""""""""""""""""""""" H1 - Settings - Misc
 set nocompatible					" very important for vim, since we are using vim, not vi
 set nobackup						" won't leave additional file(s) after close VIM
@@ -322,17 +320,26 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SKILLS            "
 """""""""""""""""""""
-" 1 use "setlocal textwidth=78" to set the width when needed
-" 2 put plugin files in directory (~/.vim/pulgin or $VIM/vimfiles/plugin),
-"   they will be sourced by the vim, just so simple.
-"   For filetype plugins, you should put them into directory "ftplugin").
-"
-"
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TODO List         "
 """""""""""""""""""""
 " done:
 " 	1 How to set the right click command "Edit with Vim" 	
 "
-"
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Deprecated
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"	" Deprecated as used vim-colors-solarized
+"	set diffopt=filler,iwhite,context:1000,vertical
+"	hi DiffAdd	guibg=#DDDDFF guifg=#993333 gui=none	" for added lines
+"	hi DiffDelete	guibg=#DDDDFF guifg=#993333 gui=none	" for delete lines
+"	hi DiffChange	guibg=#EEEEFF guifg=Gray gui=none	" for identical text in changed lines
+"	hi DiffText	guibg=#DDDDFF guifg=#993333 gui=none	" for different text in changed lines
+"	"hi Normal guibg=grey90					" seem could use num to specify color level?
+"
+"	"au BufEnter <buffer> hi Comment	ctermfg=DarkGrey guifg=DarkGrey		" need this way to override the hi defined by filetype specifiy one
+"	"au FileType *	hi Comment	cterm=italic ctermfg=DarkCyan gui=italic guifg=DarkCyan " seems better than line above, as could match filetype  
+"	au FileType *	hi Comment	ctermbg=Grey ctermfg=DarkCyan guibg=LightGrey guifg=DarkCyan " seems better than line above, as could match filetype  

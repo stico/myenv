@@ -6,6 +6,8 @@ LOC_FSTAB	#etc#fstab
 LOC_CRONTAB	#etc#crontab
 LOC_CONF_MYSQL	#etc#mysql#my.cnf
 
+VIM_CONF	%HOME%#.vim
+
 # set LANG (LLANG or LANG?) to avoid vi crash
 LANG		en_US.UTF-8
 LLANG		en_US.UTF-8

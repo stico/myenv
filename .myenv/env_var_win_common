@@ -16,7 +16,8 @@ LOC_MYSQL_CONF	%WINDIR%#my.ini
 CUR_OS		%CUR_OS_WIN%
 
 CYGWIN_HOME	%MY_PRO%#A_System_Cygwin
-GVIM_HOME	%MY_PRO%#A_Text_Vim_7.2_PA-Basic#App#vim#vim72
+VIM_HOME	%MY_PRO%#A_Text_Vim_7.2_PA-Basic#App#vim#vim72
+VIM_CONF	%HOME%#vimfiles
 GRAILS_HOME	%MY_DEV%#grails-2.0.3
 ANDROID_HOME	%MY_DEV%#android-sdk-windows
 CASSANDRA_HOME	%MY_DEV%#cassandra-0.8.1
@@ -44,7 +45,7 @@ PATH		%MY_ENV%#secure
 PATH		%MY_ENV%#gen_win_alias
 PATH		%GIT_HOME%
 PATH		%GIT_HOME%#bin
-PATH		%GVIM_HOME%
+PATH		%VIM_HOME%
 PATH		%CYGWIN_HOME%#bin
 
 PATH		"C:#Program Files#TortoiseSVN#bin"
