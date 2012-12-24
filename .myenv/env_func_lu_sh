@@ -4,6 +4,13 @@ function func_cd {
 	# might have more hack in future
 }
 
+function func_ip {
+	/sbin/ifconfig 									\
+	| grep -B1 "inet addr" 								\
+	| awk '{ if($1=="inet"){print $2}else if($2=="Link"){ printf "%s:", $1}}'	\
+	| awk -F: '{ print $1 ": " $3 }'; 
+}
+
 function func_mkdir_cd { 
 	usage="Usage: func_mkdir_cd [path]"
 	[[ -z $1 ]] && echo $usage && return 1
