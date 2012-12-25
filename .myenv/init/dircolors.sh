@@ -14,10 +14,10 @@ fi
 
 target=~/.dir_colors
 rm $target
-ln -s $base/dircolors.ansi-universal $target
-echo "Link created: `ls -l $target`"
+cp $base/dircolors.ansi-universal $target
+echo "color setting copied, source: $base/dircolors.ansi-universal, target: $target"
 
 if [ -z `readlink -e $target` ] ; then
-	ln -s $MY_CONF/dircolors_basic/dir_colors $target
-	echo "Warn: seems setup dir color failed, will use the basic one. Link created: `ls -l $target`"
+	cp $MY_CONF/dircolors_basic/dir_colors $target
+	echo "Warn: seems setup dir color failed, will copy basic one, source: $base/dircolors.ansi-universal, target: $target"
 fi
