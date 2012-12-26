@@ -1,15 +1,9 @@
 #!/bin/bash
 
-if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
-	umask 000
-else
-	umask 077
-fi
-
-# enable completion (let it run first, as init/lu.sh need turn off some completion on cygwin)
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
+# init basic env
+if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then umask 000; else umask 077; fi
+if [ -f /etc/bash_completion ]; then . /etc/bash_completion; fi		# run it first, init/lu.sh need turn off some completion on cygwin
+export SHELL="/bin/bash"; if [[ -f ~/.dir_colors ]]; then eval `dircolors -b ~/.dir_colors`; else eval `dircolors -b /etc/DIR_COLORS`; fi 
 
 # init myenv
 . $HOME/.myenv/init/lu.sh
@@ -22,16 +16,6 @@ complete -F _ssh sshx
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-# the dircolors need this env to work
-export SHELL="/bin/bash"
-
-# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489 
-if [[ -f ~/.dir_colors ]]; then 
-        eval `dircolors -b ~/.dir_colors` 
-else 
-        eval `dircolors -b /etc/DIR_COLORS` 
-fi 
-
 stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
 
@@ -41,7 +25,7 @@ shopt -s histreedit	# puts a failed history substitution back on the command lin
 #shopt -s histverify	# (caution to use it, since most system not use it, train yourself that way) puts the command to be executed after a substitution on command line as if you had typed it
 
 
-########################## Below are just copied from example file ########################## 
+########################## Below are just copied from example file
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -52,3 +36,10 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 PATH=$PATH:$HOME//.rvm/bin # Add RVM to PATH for scripting
+
+
+################################################################################
+# Deprecated
+################################################################################
+
+# Deprecated as used Solarized color scheme
