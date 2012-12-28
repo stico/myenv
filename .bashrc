@@ -10,6 +10,7 @@ export SHELL="/bin/bash"; [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colo
 # init myenv
 source $HOME/.myenv/init/lu.sh
 rbvenvload
+[ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
 # init auto complete
 complete -o nospace -F _scp scpx
