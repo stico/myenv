@@ -15,6 +15,7 @@ rbvenvload
 # init auto complete
 complete -o nospace -F _scp scpx
 complete -F _ssh sshx
+complete -r dd			# alias conflict with /bin/dd, disable its complete
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
