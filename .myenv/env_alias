@@ -38,7 +38,7 @@ pycd			"func_cd %MY_CODE_REPO%/python"
 pyvenvload		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
 rbcd			"func_cd %MY_CODE_REPO%/ruby"
 			# always use the "global" gemset
-rbvenvload		"source %RVM_HOME%/scripts/rvm ; rvm gemset use global"
+rbvenvload		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm && rvm gemset use global"
 
 venvpyload		pyvenvload
 venvrbload		rbvenvload
@@ -133,6 +133,8 @@ cdrb			"rbcd"
 cdpy			"pycd"
 cdjava			"func_cd %MY_CODE_REPO%/java"
 cdupdate		"func_cd %MY_CODE_DW%/update-server_trunk"
+cdupdateensure		"func_cd %MY_CODE_DW%/update-server_trunk/update_ensure"
+cdupdatebranch1		"func_cd %MY_CODE_DW%/update-server_branch1"
 
 ################################################################################
 # Depreated
