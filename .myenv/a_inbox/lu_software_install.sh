@@ -22,6 +22,7 @@ echo "Start os init with work dir $work_dir"
 
 # add ppa source 
 #sudo add-apt-repository ppa:tualatrix/ppa			# ubuntu tweak stable
+#sudo add-apt-repository ppa:gnome-terminator			# terminator
 
 # install - common
 sudo apt-get update
@@ -29,6 +30,7 @@ sudo apt-get install -y zip unzip expect unison			# Common, basic tools
 sudo apt-get install -y openssh-server samba smbfs
 sudo apt-get install -y build-essential make gcc cmake		# Common, build tools
 sudo apt-get install -y git subversion				# Common, dev tools
+sudo apt-get install -y tmux terminator
 
 sudo apt-get install -y xrdp virtualbox	vim-gnome 		# OS with X, xrdp supports windows native remote desktop connection
 sudo apt-get install -y linux-headers-`uname -r`		# for what?
@@ -37,11 +39,21 @@ sudo apt-get install -y linux-headers-`uname -r`		# for what?
 # todo check os version
 # todo check if chrome installed
 # sudo apt-get -y install ubuntu-tweak
+# sudo apt-get install libnspr4-0d libcurl3			# for chrome
 # chrome_stable="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 # cd $work_dir
-# sudo apt-get install libnspr4-0d libcurl3			# for chrome
 # wget $chrome_stable
 # sudo dpkg -i google-chrome-stable_current_amd64.deb		# will show error on ubuntu desktop 12.04
 # if [ "$?" -ne 0 ] ; then sudo apt-get -f install; fi		# if error happen, this will force to install
 
+# Autokey
+#if grep -q 'Autokey' <(echo `gsettings get com.canonical.Unity.Panel systray-whitelist`); then 
+#	echo "'Autokey' exists in Unity panel whitelist. Nothing to do here." ; 
+#else  
+#	echo "Adding 'Autokey' to Unity panel whitelist." ; 
+#	gsettings set com.canonical.Unity.Panel systray-whitelist "`echo \`gsettings get com.canonical.Unity.Panel systray-whitelist | tr -d ]\`,\'Autokey\']`";  
+#fi
 
+
+# Deprecated
+# sudo apt-get -y install wmctrl
