@@ -133,8 +133,8 @@ cdcmisc			"cmisccd"
 cdrb			"rbcd"
 cdpy			"pycd"
 cdjava			"func_cd %MY_CODE_REPO%/java"
-cdupdate		"func_cd %MY_CODE_DW%/update-server_trunk"
-cdupdateensure		"func_cd %MY_CODE_DW%/update-server_trunk/update_ensure"
+cdupdate		"func_cd %MY_CODE_DW%/update-server_trunk "
+cdupdateensure		"[ -e %MY_CODE_DW%/update-server_trunk/update_ensure ] && func_cd %MY_CODE_DW%/update-server_trunk/update_ensure || func_cd /data/var/update_ensure"
 cdupdatebranch1		"func_cd %MY_CODE_DW%/update-server_branch1"
 
 ################################################################################
