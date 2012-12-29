@@ -42,3 +42,4 @@
 /.myenv/gen_lu_sh/
 /.myenv/gen_lu_csh/
 /.myenv/gen_win_alias/
+/.vim/.netrwhist

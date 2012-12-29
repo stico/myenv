@@ -4,7 +4,7 @@
 
 cd $VIM_CONF/bundle
 name=vim-colors-solarized
-if [ -e $name ] ; then
+if [ -e $name/.git ] ; then
 	echo "Updateing plugin: $name"
 	cd $name
 	git pull
