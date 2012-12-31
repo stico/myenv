@@ -46,7 +46,7 @@ venvrbload		rbvenvload
 ecd			"func_cd %MY_ENV%"
 ecdconf			"func_cd %MY_CONF%"
 ecdinit			"func_cd %MY_INIT%"
-ecdinbox		"func_cd %MY_ENV%/a_inbox"
+ecdainbox		"func_cd %MY_ENV%/a_inbox"
 evarvi			"vi %MY_ENV%/env_var"
 efuncvi			"vi %MY_ENV%/env_func_lu_sh"
 ealiasvi		"vi %MY_ENV%/env_alias"

@@ -2,13 +2,21 @@
 
 [ -z $VIM_CONF ] && echo 'ERROR: env $VIM_CONF not set, pls check!' && exit
 
-cd $VIM_CONF/bundle
-name=vim-colors-solarized
-if [ -e $name/.git ] ; then
-	echo "Updateing plugin: $name"
-	cd $name
-	git pull
-else
-	echo "Init (Cloning) plugin: $name"
-	git clone git://github.com/altercation/vim-colors-solarized.git
-fi
+declare -A plugin_addr
+plugin_addr["vim-colors-solarized"]="git://github.com/altercation/vim-colors-solarized.git"
+plugin_addr["vim-surround"]="git://github.com/tpope/vim-surround.git"
+plugin_addr["vim-repeat"]="git://github.com/tpope/vim-repeat.git"
+
+for plugin in "${!plugin_addr[@]}" ; do
+
+
+	if [ -e $VIM_CONF/bundle/$plugin/.git ] ; then
+		echo "Updateing plugin: $plugin"
+		cd $VIM_CONF/bundle/$plugin
+		git pull
+	else
+		echo "Init (Cloning) plugin: $plugin"
+		cd $VIM_CONF/bundle
+		git clone ${plugin_addr[$plugin]} 
+	fi
+done
