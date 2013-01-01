@@ -12,7 +12,6 @@ fi
 echo -e "INFO\tGenerating myenv list to: $target"
 cd $HOME
 git ls-files > $target
-cd -
 
 
 # from .gitignore

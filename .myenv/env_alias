@@ -12,7 +12,7 @@ puff			"[ $(netstat -an | grep -c '127.0.0.1:1984.*LISTEN') = 1 ] && (echo 'ERRO
 wl			"wc -l"
 df			"df -h"
 du			"du -h"
-ftp			"script_ftp.exp"
+ftp			"%MY_ENV_UTIL%/autoftp.exp"
 tailf			"tail -f"
 findname		"find . -name"
 findtype		"find . -type"
