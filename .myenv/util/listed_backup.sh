@@ -28,7 +28,7 @@ for fl in $source ; do
 done
 
 cd `dirname $target_tmp`
-bash $MY_ENV/utilities/dated_backup.sh `basename $target_tmp`
+bash $MY_ENV_UTIL/dated_backup.sh `basename $target_tmp`
 
 echo -e "INFO\tDeleting tmp dir: $target_tmp"
 rm -rf $target_tmp 

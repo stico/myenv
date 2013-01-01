@@ -83,6 +83,8 @@ set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /
 
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
+map <F1> <Esc>
+imap <F1> <Esc>
 noremap <C-T> :tabnew<CR>
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 

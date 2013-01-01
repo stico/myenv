@@ -68,6 +68,7 @@ function func_git_commit_push {
 	git commit -a -m "$2" 			&&
 	git push github				&&
 	git status 				&&
+	bash $MY_ENV_LIST/myenv_gen.sh		&&
 	cd - 
 }
 
