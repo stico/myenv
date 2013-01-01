@@ -14,7 +14,7 @@ REM SET newPathEnv=%PATH%
 SET newPathEnv=
 
 REM Set platform specific stuff
-For /f "tokens=* delims=" %%V in ('script_getWinVersion.bat') Do (set WinVersion=%%V)
+For /f "tokens=* delims=" %%V in ('%HOME%\.myenv\util\win_ver.bat') Do (set WinVersion=%%V)
 ECHO Current win version is: %WinVersion%. 
 IF "%WinVersion%"=="WIN7-64bit" SET envVarWinWordLength=%HOME%\.myenv\env_var_win_64bit
 IF "%WinVersion%"=="WIN7-32bit" SET envVarWinWordLength=%HOME%\.myenv\env_var_win_32bit
@@ -58,7 +58,7 @@ reg add HKEY_CLASSES_ROOT\*\shell\DDelete\command /f /t REG_EXPAND_SZ /ve /d "%%
 reg add HKEY_CLASSES_ROOT\Directory\shell\DDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV_UTIL%%\dated_delete.bat \"%%1\""
 
 ECHO Updating file association
-%MY_ENV%\script_fileAssoc-repeatable.bat
+%MY_ENV_INIT%\win_assoc.bat
 
 PAUSE
 GOTO:EOF

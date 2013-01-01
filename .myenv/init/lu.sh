@@ -14,7 +14,7 @@ genEnvFunc=$genShPath/envFuncAll
 
 # check if it is bash on windows
 if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
-	# winVer=`cmd /C script_getWinVersion.bat`	# this line works in cygwin/bash, not work in GIT/bash
+	# winVer=`cmd /C win_ver.bat`			# works in cygwin/bash, not in GIT/bash
 	envVarSrc=(env_var env_var_win_common)
 	envFuncSrc=(env_func_lu_sh)
 	envAliasSrc=(env_alias env_alias_lu_sh env_alias_win)
