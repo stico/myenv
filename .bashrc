@@ -3,12 +3,12 @@
 # TODO: seems cygwin init is very slow
 
 # init basic env
-[ -f /etc/bash_completion ] && source /etc/bash_completion						# very slow in cygwin, run it first, init/lu.sh need turn off some completion on cygwin
+[ -f /etc/bash_completion ] && source /etc/bash_completion						# very slow in cygwin, run it first, init/lu_bash.sh need turn off some completion on cygwin
 [ $(uname -s | grep -c CYGWIN) -eq 1 -o $(uname -s | grep -c MINGW) -eq 1 ] && umask 000 || umask 077
 export SHELL="/bin/bash"; [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
 
 # init myenv
-source $HOME/.myenv/init/lu.sh
+source $HOME/.myenv/init/lu_bash.sh
 rbvenvload
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 

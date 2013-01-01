@@ -35,6 +35,7 @@ ECHO Setting PATH with value=%newPathEnv% (note, if want set on system level, us
 REM Init Alias, use .bat in PATH as win not really have alias
 REM Maybe could backup the generated files instead of del
 DEL /F /Q %genAliasPath%\*
+MD %genAliasPath%
 CD %genAliasPath%
 FOR /f "tokens=* eol=# delims=;" %%k in (%envAliasCommon% %envAliasSecu% %envAliasWin%) do (
 	CALL:FUNC_SET_ALIAS  %%k 
