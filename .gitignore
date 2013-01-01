@@ -31,6 +31,7 @@
 # IGNORE, for secure reason
 #/.subversion/
 #/.ssh/
+/.myenv/secu/
 /.myenv/secure/
 
 # IGNORE, for those really not needed, or for secure reason

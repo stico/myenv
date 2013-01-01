@@ -5,8 +5,8 @@
 
 
 # Inbox
-sshp			"%MY_ENV%/secure/script_sshp.sh"
-
+sshp			"%MY_ENV_SECU%/script_sshp.sh"
+puff			"[ $(netstat -an | grep -c '127.0.0.1:1984.*LISTEN') = 1 ] && (echo 'ERROR: port is already in use, pls check') || ($MY_ENV_SECU/autossh.exp &)"
 
 # Alias - Misc
 wl			"wc -l"
@@ -22,10 +22,10 @@ rmv			"rvm"
 tree			"tree -A"
 			
 			# use in cygwin: dbackup "a b - Copy"
-ddelete			"bash %MY_ENV%/utilities/dated_delete.sh"
+ddelete			"bash %MY_ENV_UTIL%/dated_delete.sh"
+dbackup			"bash %MY_ENV_UTIL%/dated_backup.sh"
 dd			"ddelete"
 drm			"ddelete"
-dbackup			"bash %MY_ENV%/utilities/dated_backup.sh"
 db			"dbackup"
 
 showresp		"func_show_resp"
@@ -33,29 +33,14 @@ showresp		"func_show_resp"
 sshx			"func_ssh_with_jump"
 scpx			"func_scp_with_jump"
 
-# Alias - By Topic
+# Alias - By Topic (<topic><action><obj/arg>)
+vimrcupdate		"vi %HOME%/.vimrc"
+
 pycd			"func_cd %MY_CODE_REPO%/python"
 pyvenvload		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
+
 rbcd			"func_cd %MY_CODE_REPO%/ruby"
-			# always use the "global" gemset
 rbvenvload		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm && rvm gemset use global"
-
-venvpyload		pyvenvload
-venvrbload		rbvenvload
-
-ecd			"func_cd %MY_ENV%"
-ecdconf			"func_cd %MY_CONF%"
-ecdinit			"func_cd %MY_INIT%"
-ecdainbox		"func_cd %MY_ENV%/a_inbox"
-evarvi			"vi %MY_ENV%/env_var"
-efuncvi			"vi %MY_ENV%/env_func_lu_sh"
-ealiasvi		"vi %MY_ENV%/env_alias"
-ebackup			"bash %MY_ENV%/list/myenv_gen.sh; bash %MY_ENV%/utilities/listed_backup.sh myenv_full %MY_ENV%/list/myenv.lst %MY_ENV%/list/myenv_secure.lst"
-ereload			"source %HOME%/.bashrc"
-ehostsupdate		"sudo -E bash hosts_append.sh"
-egitpull		"func_git_pull %HOME%"
-egitstatus		"func_git_status %HOME%"
-egitcommitpush		"func_git_commit_push %HOME%"
 
 cdwcd			"cd %MY_CODE_DW%"
 cmisccd			"cd %MY_CODE_MISC%"
@@ -64,17 +49,33 @@ crepogitpull		"func_git_pull %MY_CODE_REPO%"
 crepogitstatus		"func_git_status %MY_CODE_REPO%"
 crepogitcommitpush	"func_git_commit_push %MY_CODE_REPO%"
 
-listgenhosts		"bash %MY_ENV%/list/hosts_gen.sh"
-listgenmyenv		"bash %MY_ENV%/list/myenv_gen.sh"
-
-vimrcdeploy		"bash %MY_SOFT_CONF%/vim/deploy_vimrc.sh"
-vimrcupdate		"vi %MY_SOFT_CONF%/vim/vimrc"
+egrep			"func_e_grep"
+ebackup			"bash %MY_ENV_LIST%/myenv_gen.sh; bash %MY_ENV_UTIL%/listed_backup.sh myenv_full %MY_ENV_LIST%/myenv.lst %MY_ENV_LIST%/myenv_secu.lst"
+ereload			"source %HOME%/.bashrc"
+ehostsupdate		"sudo -E bash hosts_append.sh"
+ecd			"func_cd %MY_ENV%"
+ecdtodo			"func_cd %MY_ENV_TODO%"
+ecdconf			"func_cd %MY_ENV_CONF%"
+ecdinit			"func_cd %MY_ENV_INIT%"
+ecdlist			"func_cd %MY_ENV_LIST%"
+ecdutil			"func_cd %MY_ENV_UTIL%"
+ecdsecu			"func_cd %MY_ENV_SECU%"
+evivar			"vi %MY_ENV%/env_var"
+evifunc			"vi %MY_ENV%/env_func_lu_sh"
+evialias		"vi %MY_ENV%/env_alias"
+egitpull		"func_git_pull %HOME%"
+egitstatus		"func_git_status %HOME%"
+egitcommitpush		"func_git_commit_push %HOME%"
 
 updatecd		"func_cd %MY_CODE_DW%/update-server_trunk"
+updatecdrule		"func_cd %MY_CODE_DW%/update-server_trunk/update_rule"
+updatecdconfig		"func_cd %MY_CODE_DW%/update-server_trunk/update_config"
+updatecdensure		"[ -e %MY_CODE_DW%/update-server_trunk/update_ensure ] && func_cd %MY_CODE_DW%/update-server_trunk/update_ensure || func_cd /data/var/update_ensure"
+updatecdbranch1		"func_cd %MY_CODE_DW%/update-server_branch1"
 updatesvnupdate		"func_cd %MY_CODE_DW%/update-server_trunk ; svn update | sed -e '/^\s*$/d;/^Updated external/d;/^Fetching external/d;' ; cd -"
 updatesvncheckin	"func_cd %MY_CODE_DW%/update-server_trunk ; svn ci ; cd -"
 
-# Alias - By Action
+# Alias - By Action (<action><obj/arg>)
 l			"ls -hF --color=auto"
 ls			"ls -hF --color=auto"
 la			"ls -A"
@@ -84,32 +85,29 @@ llt			"ls -lhtr"
 lld			"ls -lh | grep '^d'"
 llf			"ls -lh | grep -v '^d'"
 
-genlisthosts		"listgenhosts"
-genlistmyenv		"listgenmyenv"
-
-grep			"grep --color"
-g			grep
-envgrep			"func_grep_env"
-grepenv			envgrep
-ge			envgrep
-grepcmd			"func_grep_cmd"
-gc			grepcmd
-grepfile		"bash script_grepNonBinFiles.sh -"
-gf			grepfile
 grephi			"higrep"
-gh			grephi
+grep			"grep --color"
+grepcmd			"func_grep_cmd"
 grepi			"grep -i --color"
-gi			grepi
-grepjava		"bash script_grepNonBinFiles.sh java"
-gj			grepjava
-grepxml			"bash script_grepNonBinFiles.sh xml"
-gx			grepxml
-
+grepproc		"ps -ef | grep "
+grepport		"netstat -an | grep "
+grepfile		"bash script_grepNonBinFiles.sh -"
 greptxt			"bash script_grepNonBinFiles.sh txt"
 greppy			"bash script_grepNonBinFiles.sh py"
 grepsh			"bash script_grepNonBinFiles.sh sh"
 grepsql			"bash script_grepNonBinFiles.sh sql"
+grepxml			"bash script_grepNonBinFiles.sh xml"
+grepjava		"bash script_grepNonBinFiles.sh java"
 grepproperties		"bash script_grepNonBinFiles.sh properties"
+gh			grephi
+gi			grepi
+gj			grepjava
+gp			grepport
+gx			grepxml
+g			grep
+ge			egrep
+gc			grepcmd
+gf			grepfile
 
 			# note, there are some addition work to gen cd_*, check the gen script for detail
 cd2			"cd ../.."
@@ -122,20 +120,16 @@ cddev			"cd %MY_DEV%"
 cdpro			"cd %MY_PRO%"
 cdtmp			"func_cd %MY_TMP%"
 cdamp			"func_cd %MY_TMP%"
-cdenv			"ecd"
+cde			"ecd"
 cddl			"func_cd %MY_TMP%/download"
 cdpf			"func_cd %WIN_PF%"
 cdtt			"func_cd_tmp_today"
-
 cdcdw			"cdwcd"
 cdcrepo			"crepocd"
 cdcmisc			"cmisccd"
 cdrb			"rbcd"
 cdpy			"pycd"
 cdjava			"func_cd %MY_CODE_REPO%/java"
-cdupdate		"func_cd %MY_CODE_DW%/update-server_trunk "
-cdupdateensure		"[ -e %MY_CODE_DW%/update-server_trunk/update_ensure ] && func_cd %MY_CODE_DW%/update-server_trunk/update_ensure || func_cd /data/var/update_ensure"
-cdupdatebranch1		"func_cd %MY_CODE_DW%/update-server_branch1"
 
 ################################################################################
 # Depreated

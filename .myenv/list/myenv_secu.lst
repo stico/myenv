@@ -2,7 +2,7 @@
 
 /.ssh/
 /.subversion/
-/.myenv/secure/
+/.myenv/secu/
 
 $LOC_HOSTS
 $LOC_FSTAB

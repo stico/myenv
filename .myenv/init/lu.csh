@@ -11,7 +11,7 @@ set genCshPath=gen_lu_csh
 set genEnvVar=$genCshPath/envVarAll
 set genEnvAlias=$genCshPath/envAliasAll
 set envVarSrc=(env_var env_var_lu)
-set envAliasSrc=(env_alias secure/env_alias_secure env_alias_lu_csh)
+set envAliasSrc=(env_alias secu/env_alias_secu env_alias_lu_csh)
 
 # hard for csh to read files line by line, so we need tmp files
 if( ! -e $genCshPath ) then

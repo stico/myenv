@@ -30,7 +30,7 @@ sudo apt-get install -y zip unzip expect unison			# Common, basic tools
 sudo apt-get install -y openssh-server samba smbfs
 sudo apt-get install -y build-essential make gcc cmake		# Common, build tools
 sudo apt-get install -y git subversion				# Common, dev tools
-sudo apt-get install -y tmux terminator
+sudo apt-get install -y tmux terminator autossh
 
 sudo apt-get install -y xrdp virtualbox	vim-gnome 		# OS with X, xrdp supports windows native remote desktop connection
 sudo apt-get install -y linux-headers-`uname -r`		# for what?

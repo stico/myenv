@@ -3,7 +3,7 @@
 .inputrc
 .cshrc
 .netrc
-#.ssh			__TAG_SUFFIX__
+.ssh			__TAG_SUFFIX__
 .vimrc			__TAG_SUFFIX__
 vimfiles		__TAG_SUFFIX__
 .fonts

@@ -1,0 +1,10 @@
+#!/usr/bin/expect
+
+# use expect to force ftp client set binary mode. Will use the user/password set in ~/.netrc file, so not auth interaction here.
+
+spawn ftp "[lindex $argv 0]" "[lindex $argv 1]"
+expect "*Logged on"
+expect "*ftp>"
+send "binary\r"
+expect "*ftp>"
+interact

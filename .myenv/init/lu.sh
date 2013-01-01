@@ -26,7 +26,7 @@ else
 	envFuncSrc=(env_func_lu_sh)
 	envAliasSrc=(env_alias env_alias_lu_sh)
 fi
-[[ -e $HOME/.myenv/secure/env_alias_secure ]] && envAliasSrc+=(secure/env_alias_secure)
+[[ -e $HOME/.myenv/secu/env_alias_secu ]] && envAliasSrc+=(secu/env_alias_secu)
 
 # even could directly set env, still better have file record left to trace
 if [ ! -e $genShPath ] ; then

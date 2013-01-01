@@ -29,10 +29,10 @@ while read line ; do
 	fi
 done < ${backupList}
 
-echo "--> Insure security related files not packed"
-rm -rf $backupDir/.myenv/secure
-findSecureFile=`find $backupDir -regex ".*\(script_sshp\|env_alias_secure\|/ssh/.*pub\).*"`
-[ ${#findSecureFile} != 0 ] && echo "there are secure files in back dir ($findSecureFile), will not backup, pls check!" && exit
+#echo "--> Insure security related files not packed"
+#rm -rf $backupDir/.myenv/secu
+#findSecuFile=`find $backupDir -regex ".*\(script_sshp\|env_alias_secu\|/ssh/.*pub\).*"`
+#[ ${#findSecuFile} != 0 ] && echo "there are secu files in back dir ($findSecuFile), will not backup, pls check!" && exit
 
 echo "--> Create package and clean up tmp directory"
 zip -rq $backupFile $backupDir

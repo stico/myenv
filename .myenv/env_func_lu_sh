@@ -71,8 +71,8 @@ function func_git_commit_push {
 	cd - 
 }
 
-function func_grep_env { 
-	usage="Usage: func_grep_env [pattern]"
+function func_e_grep { 
+	usage="Usage: func_e_grep [pattern]"
 	[[ -z $1 ]] && echo $usage && return 1
 
 	cd $HOME

@@ -6,7 +6,7 @@ ECHO Start to set env, before setting record: PATH=%PATH% >> gen_log\log-win.txt
 SET envVarCommon=%HOME%\.myenv\env_var
 SET envVarWinCommon=%HOME%\.myenv\env_var_win_common
 SET envAliasCommon=%HOME%\.myenv\env_alias
-SET envAliasSecure=%HOME%\.myenv\secure\env_alias_secure 
+SET envAliasSecu=%HOME%\.myenv\secu\env_alias_secu 
 SET envAliasWin=%HOME%\.myenv\env_alias_win
 SET genAliasPath=%HOME%\.myenv\gen_win_alias
 REM In a control env, prefer to use a blank init PATH var. In a non-control env, prefer to reserve old PATH
@@ -36,7 +36,7 @@ REM Init Alias, use .bat in PATH as win not really have alias
 REM Maybe could backup the generated files instead of del
 DEL /F /Q %genAliasPath%\*
 CD %genAliasPath%
-FOR /f "tokens=* eol=# delims=;" %%k in (%envAliasCommon% %envAliasSecure% %envAliasWin%) do (
+FOR /f "tokens=* eol=# delims=;" %%k in (%envAliasCommon% %envAliasSecu% %envAliasWin%) do (
 	CALL:FUNC_SET_ALIAS  %%k 
 )
 
@@ -52,10 +52,10 @@ REM reg add HKEY_CLASSES_ROOT\*\shell\VersionBackup\command /f /t REG_EXPAND_SZ 
 REM reg add HKEY_CLASSES_ROOT\Directory\shell\VersionBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_backupWithVersion.bat \"%%1\""
 REM reg add HKEY_CLASSES_ROOT\*\shell\DatedDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_datedDelete.bat \"%%1\""
 REM reg add HKEY_CLASSES_ROOT\Directory\shell\DatedDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\script_datedDelete.bat \"%%1\""
-reg add HKEY_CLASSES_ROOT\*\shell\DBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\utilities\dated_backup.bat \"%%1\""
-reg add HKEY_CLASSES_ROOT\Directory\shell\DBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\utilities\dated_backup.bat \"%%1\""
-reg add HKEY_CLASSES_ROOT\*\shell\DDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\utilities\dated_delete.bat \"%%1\""
-reg add HKEY_CLASSES_ROOT\Directory\shell\DDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV%%\utilities\dated_delete.bat \"%%1\""
+reg add HKEY_CLASSES_ROOT\*\shell\DBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV_UTIL%%\dated_backup.bat \"%%1\""
+reg add HKEY_CLASSES_ROOT\Directory\shell\DBackup\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV_UTIL%%\dated_backup.bat \"%%1\""
+reg add HKEY_CLASSES_ROOT\*\shell\DDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV_UTIL%%\dated_delete.bat \"%%1\""
+reg add HKEY_CLASSES_ROOT\Directory\shell\DDelete\command /f /t REG_EXPAND_SZ /ve /d "%%MY_ENV_UTIL%%\dated_delete.bat \"%%1\""
 
 ECHO Updating file association
 %MY_ENV%\script_fileAssoc-repeatable.bat
