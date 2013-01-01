@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 # make it simple, we works under the .myenv dir
 cd $HOME/.myenv
 
 # var 
-genShPath=gen_lu_sh
+genShPath=zgen/lu_alias_bash
 genEnvVar=$genShPath/envVarAll
 genEnvAlias=$genShPath/envAliasAll
 genEnvFunc=$genShPath/envFuncAll

@@ -43,7 +43,7 @@ PATH		%GRAILS_HOME%#bin
 PATH		%MY_ENV%
 PATH		%MY_ENV_UTIL%
 PATH		%MY_ENV_SECU%
-PATH		%MY_ENV%#gen_win_alias
+PATH		%MY_ENV%#zgen#win_alias
 PATH		%GIT_HOME%
 PATH		%GIT_HOME%#bin
 PATH		%VIM_HOME%

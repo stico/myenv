@@ -6,7 +6,7 @@
 # have no idea in which path this will be sourced, so need define the path
 cd $HOME/.myenv
 
-set genCshPath=gen_lu_csh
+set genCshPath=zgen/lu_alias_csh
 
 set genEnvVar=$genCshPath/envVarAll
 set genEnvAlias=$genCshPath/envAliasAll
