@@ -5,11 +5,12 @@ SET envAliasSecu=%HOME%\.myenv\secu\env_alias_secu
 SET envAliasWin=%HOME%\.myenv\env_alias_win
 SET genAliasPath=%HOME%\.myenv\zgen\win_alias
 
-REM Init Alias, use .bat in PATH as win not really have alias
-REM Maybe could backup the generated files instead of del
+REM Init Alias, use .bat in PATH as win not really have alias. NOTE, goto the root driveer first!
+E:
 DEL /F /Q %genAliasPath%\*
 MD %genAliasPath%
 CD %genAliasPath%
+
 FOR /f "tokens=* eol=# delims=;" %%k in (%envAliasCommon% %envAliasSecu% %envAliasWin%) do (
 	echo "00000000000000000000000%%k"
 	CALL:FUNC_SET_ALIAS %%k 
