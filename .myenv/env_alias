@@ -2,11 +2,12 @@
 # rule 2: use %% for variable
 # guide 1: alias in this file shoud either "common for all OS", or "no harm to other OS"
 # info 1: since windows don"t have alias, will make .bat for it, check init for detail
+#
+# Problem: for windows, currently can not deal with this alias contains "|", ")"
 
 
 # Inbox
 sshp			"%MY_ENV_SECU%/script_sshp.sh"
-puff			"[ $(netstat -an | grep -c '127.0.0.1:1984.*LISTEN') = 1 ] && (echo 'ERROR: port is already in use, pls check') || ($MY_ENV_SECU/autossh.exp &)"
 
 # Alias - Misc
 wl			"wc -l"

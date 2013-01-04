@@ -1,3 +1,0 @@
-# check and follow rules in env_alias file!
-virc "vi %HOME%.cshrc"
-catrc "cat %HOME%.cshrc"

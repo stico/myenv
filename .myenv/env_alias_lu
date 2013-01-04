@@ -1,0 +1,1 @@
+puff			"[ $(netstat -an | grep -c '127.0.0.1:1984.*LISTEN') = 1 ] && (echo 'ERROR: port is already in use, pls check') || ($MY_ENV_SECU/autossh.exp &)"

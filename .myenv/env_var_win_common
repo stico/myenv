@@ -34,6 +34,10 @@ PATH		%GROOVY_HOME%#bin
 PATH		%PHP_HOME%
 PHP_HOME	%MY_DEV%#php
 
+PATH		"C:#Program Files#TortoiseSVN#bin"
+PATH		"C:#Program Files#TortoiseSVN"
+PATH		"C:#Program Files#Support Tools"
+PATH		%SystemRoot%#System32#Wbem
 PATH		%SystemRoot%#system32
 PATH		%SystemRoot%
 PATH		%ANDROID_HOME%#bin
@@ -48,13 +52,6 @@ PATH		%GIT_HOME%
 PATH		%GIT_HOME%#bin
 PATH		%VIM_HOME%
 PATH		%CYGWIN_HOME%#bin
-
-PATH		"C:#Program Files#TortoiseSVN#bin"
-PATH		"C:#Program Files#TortoiseSVN"
-PATH		"C:#Program Files#Support Tools"
-PATH		%SYSTEMROOT%#System32#WindowsPowerShell#v1.0
-PATH		%SystemRoot%#System32#Wbem
-PATH		%SystemRoot%
 
 
 LANG		en_US.UTF-8

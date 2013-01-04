@@ -5,7 +5,7 @@
 if (-r /etc/home/cshrc) source /etc/home/cshrc
 
 umask 27
-source $HOME/.myenv/a_init_lu.csh
+source $HOME/.myenv/init/csh.csh
 
 #bindkey ^p i-search-back
 #bindkey ^n i-search-fwd
