@@ -1,7 +1,8 @@
 #!/bin/bash
 
 source=$HOME/.git
-target=$MY_ENV/list/myenv.lst
+#target=$MY_ENV/list/myenv.lst
+target=$MY_ENV_ZGEN/myenv.lst
 
 if [[ ! -e $source ]] ; then
 	echo -e "ERROR\t${source} not exists, pls check! Exit..." 
