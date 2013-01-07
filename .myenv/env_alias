@@ -15,13 +15,19 @@ df			"df -h"
 du			"du -h"
 ftp			"%MY_ENV_UTIL%/autoftp.exp"
 tailf			"tail -f"
-findname		"find . -name"
-findtype		"find . -type"
-hi			"history"
-higrep			"history | grep -i"
 rmv			"rvm"
 tree			"tree -A"
-			
+showresp		"func_show_resp"
+sshx			"func_ssh_with_jump"
+scpx			"func_scp_with_jump"
+
+# Alias - By Topic (<topic><action><obj/arg>)
+findname		"find . -name"
+findtype		"find . -type"
+
+hi			"history"
+higrep			"history | grep -i"
+
 			# use in cygwin: dbackup "a b - Copy"
 ddelete			"bash %MY_ENV_UTIL%/dated_delete.sh"
 dbackup			"bash %MY_ENV_UTIL%/dated_backup.sh"
@@ -29,12 +35,6 @@ dd			"ddelete"
 drm			"ddelete"
 db			"dbackup"
 
-showresp		"func_show_resp"
-
-sshx			"func_ssh_with_jump"
-scpx			"func_scp_with_jump"
-
-# Alias - By Topic (<topic><action><obj/arg>)
 vimrcupdate		"vi %HOME%/.vimrc"
 
 pycd			"func_cd %MY_CODE_REPO%/python"

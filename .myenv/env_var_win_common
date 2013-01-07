@@ -51,6 +51,8 @@ PATH		%MY_ENV%#zgen#win_alias
 PATH		%GIT_HOME%
 PATH		%GIT_HOME%#bin
 PATH		%VIM_HOME%
+PATH		%CYGWIN_HOME%#usr#sbin
+PATH		%CYGWIN_HOME%#usr#bin
 PATH		%CYGWIN_HOME%#bin
 
 

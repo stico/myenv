@@ -1,4 +1,5 @@
 @ECHO OFF
+REM Problem: still crashing, still can not correctly handle |,||,^
 
 SET envAliasCommon=%HOME%\.myenv\env_alias
 SET envAliasSecu=%HOME%\.myenv\secu\env_alias_secu 
@@ -6,7 +7,7 @@ SET envAliasWin=%HOME%\.myenv\env_alias_win
 SET genAliasPath=%HOME%\.myenv\zgen\win_alias
 
 REM Init Alias, use .bat in PATH as win not really have alias. NOTE, goto the root driveer first!
-E:
+CALL:FUNC_CHANGE_DRIVER %genAliasPath%
 DEL /F /Q %genAliasPath%\*
 MD %genAliasPath%
 CD %genAliasPath%
@@ -15,16 +16,18 @@ FOR /f "tokens=* eol=# delims=;" %%k in (%envAliasCommon% %envAliasSecu% %envAli
 	echo "00000000000000000000000%%k"
 	CALL:FUNC_SET_ALIAS %%k 
 )
+PAUSE
+GOTO:EOF
 
 :FUNC_SET_ALIAS
+	ECHO "99999999999999999999999%*"
 	SET aliasKey=%~1
 	ECHO "=======================%aliasKey%"
 	IF "%aliasKey%"=="" GOTO:EOF
 	IF "%~2"=="" GOTO:EOF
 
 	REM Filter contents
-	SHIFT
-	SET valueTmp1=%*
+	SET valueTmp1=%2
 
 	ECHO "11111111111111111111111%valueTmp1%"
 	SET valueTmp2=%valueTmp1:|=^|%
@@ -65,6 +68,10 @@ REM need special treat as the root driver must correct
 		ECHO %driver% >> %key%.bat
 	)
 	ECHO cd %value% >> %key%.bat
+GOTO:EOF
+
+:FUNC_CHANGE_DRIVER
+	%~d1
 GOTO:EOF
 
 PAUSE

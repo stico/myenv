@@ -16,6 +16,8 @@
 !/.netrc
 !/.cshrc
 !/.bashrc
+!/.muttrc
+!/.msmtprc
 !/.inputrc
 !/.screenrc
 !/.tmux.conf
