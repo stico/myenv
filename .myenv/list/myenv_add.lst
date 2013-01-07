@@ -1,7 +1,7 @@
 # stores file/path which not in git, usually secure reason 
 
 # eval result not path/file, but will be in this back dir
-cat $LOC_HOSTS > $MY_ENV_ZGEN/hosts
+cat $LOC_HOSTS > $MY_ENV_ZGEN/hosts; echo -e $MY_ENV_ZGEN/
 
 # eval result will be path/file
 echo -e $LOC_HOSTS

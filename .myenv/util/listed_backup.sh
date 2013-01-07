@@ -13,18 +13,31 @@ for fl in $source ; do
 
 	[[ ! -e $fl ]] && echo -e "WARN\tfile list ($fl) not exist, pls check!"
 
-	for file in `sed -e "/^\s*$/d;/^\s*#/d;" $fl` ; do
-
-		if [[ -e $HOME/$file ]] ; then
-			#echo -e "File under home:\t$file"
-			cp --parents -R $HOME/$file $target_tmp/
-		elif [[ -e $(eval "$file") ]] ; then
-			#echo -e "File in env var:\t$file"
-			cp --parents -R $(eval "$file") $target_tmp/
+	sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
+		#echo -e "INFO\tStart to handle $line"
+		if [ -n "$HOME/$line" -a -e "$HOME/$line" ] ; then
+			#echo -e "INFO\tline is a path:\t$line"
+			cp --parents -R "$HOME/$line" $target_tmp/
+		elif [ -e "$(eval $line)" ] ; then
+			#echo -e "INFO\tline is a path after eval:\t$line"
+			cp --parents -R "$(eval $line)" $target_tmp/
 		else
-			echo -e "WARN\tcan not handle object ($file), probably not exist!"
+			echo -e "WARN\tcan not handle object ($line), probably not exist!"
 		fi
 	done
+
+	#for file in `sed -e "/^\s*$/d;/^\s*#/d;" $fl` ; do
+	#	echo -e "INFO\tStart to handle $file"
+	#	if [[ -e $HOME/$file ]] ; then
+	#		echo -e "INFO\tFile under home:\t$file"
+	#		cp --parents -R $HOME/$file $target_tmp/
+	#	elif [[ -e "$(eval '$file')" ]] ; then
+	#		echo -e "INFO\tFile in env var:\t$file"
+	#		cp --parents -R "$(eval '$file')" $target_tmp/
+	#	else
+	#		echo -e "WARN\tcan not handle object ($file), probably not exist!"
+	#	fi
+	#done
 done
 
 cd `dirname $target_tmp`
