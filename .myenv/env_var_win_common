@@ -9,8 +9,7 @@ MY_TMP_UPDATE	%MY_DEV%#workspaces#client-update-server#trunk
 MY_TMP_CBBS	%MY_DEV%#workspaces#util#trunk
 
 LOC_FSTABD	#etc#fstab.d
-#Following line works, but will cause the ebackup(listed_backup.sh) have priviledge problem, as this file is in C:
-#LOC_HOSTS	`cygpath -u %WINDIR%#system32#drivers#etc#hosts`
+LOC_HOSTS	`cygpath -u %WINDIR%#system32#drivers#etc#hosts`
 LOC_MYSQL_CONF	%WINDIR%#my.ini
 
 CUR_OS		%CUR_OS_WIN%

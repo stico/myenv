@@ -51,7 +51,7 @@ crepogitstatus		"func_git_status %MY_CODE_REPO%"
 crepogitcommitpush	"func_git_commit_push %MY_CODE_REPO%"
 
 egrep			"func_e_grep"
-ebackup			"bash %MY_ENV_LIST%/myenv_gen.sh; bash %MY_ENV_UTIL%/listed_backup.sh myenv_full $MY_ENV_ZGEN/myenv.lst %MY_ENV_LIST%/myenv_secu.lst"
+ebackup			"bash %MY_ENV_LIST%/myenv_gen.sh; bash %MY_ENV_UTIL%/listed_backup.sh myenv_full $MY_ENV_ZGEN/myenv.lst %MY_ENV_LIST%/myenv_add.lst"
 ereload			"source %HOME%/.bashrc"
 ehostsupdate		"sudo -E bash hosts_append.sh"
 ecd			"func_cd %MY_ENV%"

@@ -18,9 +18,9 @@ for fl in $source ; do
 		if [[ -e $HOME/$file ]] ; then
 			#echo -e "File under home:\t$file"
 			cp --parents -R $HOME/$file $target_tmp/
-		elif [[ -e $(eval "echo -e $file") ]] ; then
+		elif [[ -e $(eval "$file") ]] ; then
 			#echo -e "File in env var:\t$file"
-			cp --parents -R $(eval "echo -e $file") $target_tmp/
+			cp --parents -R $(eval "$file") $target_tmp/
 		else
 			echo -e "WARN\tcan not handle object ($file), probably not exist!"
 		fi

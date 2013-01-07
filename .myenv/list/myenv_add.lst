@@ -1,0 +1,17 @@
+# stores file/path which not in git, usually secure reason 
+
+# eval result not path/file, but will be in this back dir
+cat $LOC_HOSTS > $MY_ENV_ZGEN/hosts
+
+# eval result will be path/file
+echo -e $LOC_HOSTS
+echo -e $LOC_FSTAB
+echo -e $LOC_FSTABD
+echo -e $LOC_CRONTAB
+echo -e $LOC_CONF_MYSQL
+echo -e $MY_ENV_SECU
+echo -e $MY_ENV_ZGEN
+
+# path/file
+/.ssh/
+/.subversion/
