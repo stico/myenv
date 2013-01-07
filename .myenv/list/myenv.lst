@@ -21,8 +21,8 @@
 .muttrc
 .myenv/README.txt
 .myenv/_viminfo
-.myenv/conf/dircolors_basic/dir_colors
-.myenv/conf/dircolors_solarized
+.myenv/conf/dircolors-basic/dir_colors
+.myenv/conf/dircolors-solarized
 .myenv/env_alias
 .myenv/env_alias_lu
 .myenv/env_alias_win
