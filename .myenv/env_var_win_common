@@ -1,5 +1,3 @@
-# check and follow rule in env_var file!
-
 MY_APP_Base	C:
 MY_SDC_Base	F:
 MY_LUH_Base	Z:
@@ -10,6 +8,7 @@ MY_TMP_RECHARGE	%MY_DEV%#workspaces#recharge#trunk
 MY_TMP_UPDATE	%MY_DEV%#workspaces#client-update-server#trunk
 MY_TMP_CBBS	%MY_DEV%#workspaces#util#trunk
 
+LOC_FSTABD	#etc#fstab.d
 LOC_HOSTS	%WINDIR%#system32#drivers#etc#hosts
 LOC_MYSQL_CONF	%WINDIR%#my.ini
 
@@ -48,8 +47,8 @@ PATH		%MY_ENV%
 PATH		%MY_ENV_UTIL%
 PATH		%MY_ENV_SECU%
 PATH		%MY_ENV%#zgen#win_alias
-PATH		%GIT_HOME%
-PATH		%GIT_HOME%#bin
+#PATH		%GIT_HOME%
+#PATH		%GIT_HOME%#bin
 PATH		%VIM_HOME%
 PATH		%CYGWIN_HOME%#usr#sbin
 PATH		%CYGWIN_HOME%#usr#bin
