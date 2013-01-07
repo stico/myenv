@@ -4,7 +4,7 @@
 cat $LOC_HOSTS > $MY_ENV_ZGEN/hosts; echo -e $MY_ENV_ZGEN/
 
 # eval result will be path/file
-echo -e $LOC_HOSTS
+[ $(echo `uname -a` | grep -c -x "^Linux .*") -eq 1 ] && echo -e $LOC_HOSTS
 echo -e $LOC_FSTAB
 echo -e $LOC_FSTABD
 echo -e $LOC_CRONTAB

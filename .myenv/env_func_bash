@@ -77,7 +77,7 @@ function func_e_grep {
 	[[ -z $1 ]] && echo $usage && return 1
 
 	cd $HOME
-	cat $MY_ENV/list/myenv.lst | xargs grep -i "$1" > .grep_result.txt
+	cat $MY_ENV_ZGEN/myenv.lst | xargs grep -i "$1" > .grep_result.txt
 	grep -i --color "$1" .grep_result.txt
 	# this not work when $1 has grouping "\(\)": eval grepi "$1" .grep_result.txt
 	cd -
