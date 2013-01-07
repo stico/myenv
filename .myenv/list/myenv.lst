@@ -17,6 +17,8 @@
 .gitattributes
 .gitignore
 .inputrc
+.msmtprc
+.muttrc
 .myenv/README.txt
 .myenv/_viminfo
 .myenv/conf/dircolors_basic/dir_colors
@@ -35,7 +37,6 @@
 .myenv/init/csh.csh
 .myenv/init/dircolors.sh
 .myenv/init/mysql_all.sh
-.myenv/init/os_win.bat
 .myenv/init/os_win_alias.bat
 .myenv/init/os_win_assoc.bat
 .myenv/init/os_win_reg.bat
