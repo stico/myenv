@@ -61,7 +61,6 @@ $ESC::		Filter_Esc_Excel()
 $LButton::	Filter_Mouse_Right_Click_ConEmu()
 
 ^`::		QuickOpen_Vim()
-^ESC::		RunTaskCenter()	
 f12::		BackupFile_Freecommander()
 #b::		ScreenSave_Black()	
 #TAB::		Goto_Taskbar()
@@ -81,6 +80,7 @@ InitGlobalVar()
 }
 
 ;Following keys are deprecated, but the logic in them may useful
+;^ESC::		RunTaskCenter()	
 ;$!Enter::	Filter_A_Enter()
 ;$^!s::		Filter_CtrlAlt_s_Vim()
 ;^!d::		ShowHide_Window("\A_A_Script-Basic\starDict-Repeatable.bat", "StarDict")	; deprecated by GoldenDict (set in that app itself)

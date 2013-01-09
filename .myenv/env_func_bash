@@ -83,17 +83,6 @@ function func_e_grep {
 	cd -
 }
 
-function func_grep_cmd { 
-	usage="Usage: func_grep_cmd [pattern] [cmd]"
-	[[ -z $1 || -z $2 ]] && echo $usage && return 1
-
-	strToGrep=$1
-	shift
-
-	# need eval to work with alias
-	eval $* | eval grepi $strToGrep
-}
-
 function func_ssh_with_jump {
 	usage="Usage: func_ssh_with_jump [target]"
 	[[ -z $1 ]] && echo $usage && return 1

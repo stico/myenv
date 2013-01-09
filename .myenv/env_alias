@@ -25,9 +25,6 @@ scpx			"func_scp_with_jump"
 findname		"find . -name"
 findtype		"find . -type"
 
-hi			"history"
-higrep			"history | grep -i"
-
 			# use in cygwin: dbackup "a b - Copy"
 ddelete			"bash %MY_ENV_UTIL%/dated_delete.sh"
 dbackup			"bash %MY_ENV_UTIL%/dated_backup.sh"
@@ -37,22 +34,26 @@ db			"dbackup"
 
 vimrcupdate		"vi %HOME%/.vimrc"
 
-pycd			"func_cd %MY_CODE_REPO%/python"
-pyvenvload		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
+			# Head: d
+dcd			"cd %MY_DEV%"
+dcdw			"cd %MY_CODE_DW%"
+dcdmisc			"cd %MY_CODE_MISC%"
+dcdrepo			"cd %MY_CODE_REPO%"
+dcdc			"func_cd %MY_CODE_REPO%/c"
+dcdcpp			"func_cd %MY_CODE_REPO%/cpp"
+dcdrb			"func_cd %MY_CODE_REPO%/ruby"
+dcdjava			"func_cd %MY_CODE_REPO%/java"
+dcdpy			"func_cd %MY_CODE_REPO%/python"
+dloadpyvenv		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
+dloadrbvenv		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm && rvm gemset use global"
+dgitpullrepo		"func_git_pull %MY_CODE_REPO%"
+dgitstatusrepo		"func_git_status %MY_CODE_REPO%"
+dgitcommitpushrepo	"func_git_commit_push %MY_CODE_REPO%"
 
-rbcd			"func_cd %MY_CODE_REPO%/ruby"
-rbvenvload		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm && rvm gemset use global"
-
-cdwcd			"cd %MY_CODE_DW%"
-cmisccd			"cd %MY_CODE_MISC%"
-crepocd			"cd %MY_CODE_REPO%"
-crepogitpull		"func_git_pull %MY_CODE_REPO%"
-crepogitstatus		"func_git_status %MY_CODE_REPO%"
-crepogitcommitpush	"func_git_commit_push %MY_CODE_REPO%"
-
+			# Head: e
 egrep			"func_e_grep"
+eload			"source %HOME%/.bashrc"
 ebackup			"bash %MY_ENV_LIST%/myenv_gen.sh; bash %MY_ENV_UTIL%/listed_backup.sh myenv_full $MY_ENV_ZGEN/myenv.lst %MY_ENV_LIST%/myenv_add.lst"
-ereload			"source %HOME%/.bashrc"
 ehostsupdate		"sudo -E bash hosts_append.sh"
 ecd			"func_cd %MY_ENV%"
 ecdtodo			"func_cd %MY_ENV_TODO%"
@@ -78,6 +79,7 @@ updatesvnupdate		"func_cd %MY_CODE_DW%/update-server_trunk ; svn update | sed -e
 updatesvncheckin	"func_cd %MY_CODE_DW%/update-server_trunk ; svn ci ; cd -"
 
 # Alias - By Action (<action><obj/arg>)
+			# Head: l
 l			"ls -hF --color=auto"
 ls			"ls -hF --color=auto"
 la			"ls -A"
@@ -87,29 +89,20 @@ llt			"ls -lhtr"
 lld			"ls -lh | grep '^d'"
 llf			"ls -lh | grep -v '^d'"
 
-grephi			"higrep"
+			# Head: g
 grep			"grep --color"
-grepcmd			"func_grep_cmd"
-grepi			"grep -i --color"
-grepproc		"ps -ef | grep "
-grepport		"netstat -an | grep "
-grepfile		"bash grep_file.sh -"
-greptxt			"bash grep_file.sh txt"
-greppy			"bash grep_file.sh py"
-grepsh			"bash grep_file.sh sh"
-grepsql			"bash grep_file.sh sql"
-grepxml			"bash grep_file.sh xml"
-grepjava		"bash grep_file.sh java"
-grepproperties		"bash grep_file.sh properties"
-gh			grephi
-gi			grepi
-gj			grepjava
-gp			grepport
-gx			grepxml
-g			grep
-ge			egrep
-gc			grepcmd
-gf			grepfile
+gi			"grep -i --color"
+ghi			"history | grep -i"
+gproc			"ps -ef | grep "
+gport			"netstat -an | grep "
+gf			"bash grep_file.sh -"
+gftxt			"bash grep_file.sh txt"
+gfpy			"bash grep_file.sh py"
+gfsh			"bash grep_file.sh sh"
+gfsql			"bash grep_file.sh sql"
+gfxml			"bash grep_file.sh xml"
+gfjava			"bash grep_file.sh java"
+gfproperties		"bash grep_file.sh properties"
 
 			# note, there are some addition work to gen cd_*, check the gen script for detail
 cd2			"cd ../.."
@@ -118,7 +111,6 @@ cd4			"cd ../../../.."
 cd5			"cd ../../../../.."
 cd6			"cd ../../../../../.."
 cddoc			"cd %MY_DOC%"
-cddev			"cd %MY_DEV%"
 cdpro			"cd %MY_PRO%"
 cdtmp			"func_cd %MY_TMP%"
 cdamp			"func_cd %MY_TMP%"
@@ -126,12 +118,6 @@ cde			"ecd"
 cddl			"func_cd %MY_TMP%/download"
 cdpf			"func_cd %WIN_PF%"
 cdtt			"func_cd_tmp_today"
-cdcdw			"cdwcd"
-cdcrepo			"crepocd"
-cdcmisc			"cmisccd"
-cdrb			"rbcd"
-cdpy			"pycd"
-cdjava			"func_cd %MY_CODE_REPO%/java"
 
 ################################################################################
 # Depreated
