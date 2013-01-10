@@ -4,7 +4,7 @@ REM log record, in case need some rollback
 ECHO Start to set env, before setting record: PATH=%PATH% >> zgen\win_gen.log
 
 SET envVarCommon=%HOME%\.myenv\env_var
-SET envVarWinCommon=%HOME%\.myenv\env_var_win_common
+SET envVarWinCommon=%HOME%\.myenv\env_var_win
 
 REM In a control env, prefer to use a blank init PATH var. In a non-control env, prefer to reserve old PATH
 REM SET newPathEnv=%PATH%

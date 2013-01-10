@@ -15,14 +15,14 @@ genEnvFunc=$genShPath/envFuncAll
 # check if it is bash on windows
 if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 	# winVer=`cmd /C win_ver.bat`			# works in cygwin/bash, not in GIT/bash
-	envVarSrc=(env_var env_var_win_common)
+	envVarSrc=(env_var env_var_win env_var_bash)
 	envFuncSrc=(env_func_bash)
 	envAliasSrc=(env_alias env_alias_win)
 
 	# vi complete seems very annoying (shows help of gawk!) on cygwin
 	complete -r vi vim gvim unzip
 else
-	envVarSrc=(env_var env_var_lu )
+	envVarSrc=(env_var env_var_lu env_var_bash)
 	envFuncSrc=(env_func_bash)
 	envAliasSrc=(env_alias )
 fi
