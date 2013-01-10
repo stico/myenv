@@ -9,5 +9,5 @@ if [ $(echo $1 | grep -c "^/") -eq 1 ] ; then
 	shift
 fi
 
-echo "INFO: invoking ${vimBin} $winPath $* &"
+#echo "INFO: invoking ${vimBin} $winPath $* &"
 ${vimBin} $winPath $* &

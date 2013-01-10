@@ -18,11 +18,12 @@ tailf			"tail -f"
 rmv			"rvm"
 tree			"tree -A"
 showresp		"func_show_resp"
+virc			"vi %HOME%/.vimrc"
+vihosts			"vi %LOC_HOSTS%"
 sshx			"func_ssh_with_jump"
 scpx			"func_scp_with_jump"
 
 # Alias - By Topic (<topic><action><obj/arg>)
-vimrcupdate		"vi %HOME%/.vimrc"
 
 findname		"find . -name"
 findtype		"find . -type"

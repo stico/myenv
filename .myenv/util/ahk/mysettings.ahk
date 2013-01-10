@@ -602,7 +602,7 @@ RunTaskCenter()
 ScreenSave_Black()	
 {
 	sleep, 500
-	run %MY_ENV%\script_ahk\z\BlackScreenSaver.scr /s
+	run %MY_ENV_UTIL%\ahk\z\BlackScreenSaver.scr /s
 }
 
 Goto_Taskbar()
