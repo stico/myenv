@@ -9,7 +9,7 @@ export SHELL="/bin/bash"; [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colo
 
 # init myenv
 source $HOME/.myenv/init/bash.sh
-rbvenvload
+dloadrbvenv
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
 # init auto complete
