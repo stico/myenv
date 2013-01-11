@@ -21,13 +21,15 @@ endif
 
 """""""""""""""""""""""""""""" H1 - Plugins
 call pathogen#infect()
+
 colorscheme solarized
 
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
+"let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_custom_ignore = {
-	\ 'dir':  '\.git$\|\.hg$\|\.svn$|\.metadata$',
-	\ 'file': '\.class$\|\.jar$\|\.lnk$|\*\.svn-base$',
-	\ 'link': '',
+	\ 'dir':  '/\.(git\|hg\|svn\|metadata)$\|/target/\|\\target\\',
+	\ 'file': '\.(exe\|so\|dll\|class\|jar\|svn-base)$',
+	\ 'link': 'some_bad_symbolic_links',
 	\ }
 
 
