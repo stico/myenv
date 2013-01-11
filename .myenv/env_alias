@@ -7,21 +7,24 @@
 
 
 # Inbox
-sshp			"%MY_ENV_SECU%/script_sshp.sh"
+sshp			"%MY_ENV_SECU%#script_sshp.sh"
 
 # Alias - Misc
 wl			"wc -l"
 df			"df -h"
 du			"du -h"
-ftp			"%MY_ENV_UTIL%/autoftp.exp"
+ftp			"%MY_ENV_UTIL%#autoftp.exp"
 tailf			"tail -f"
 rmv			"rvm"
 tree			"tree -A"
 showresp		"func_show_resp"
-virc			"vi %HOME%/.vimrc"
 vihosts			"vi %LOC_HOSTS%"
 sshx			"func_ssh_with_jump"
 scpx			"func_scp_with_jump"
+
+vimrc			"vi %HOME%/.vimrc"
+vimcdconf		"func_cd %VIM_CONF%"
+vimupdateplugin		"bash %MY_ENV_INIT%#vim_plugin.sh"
 
 # Alias - By Topic (<topic><action><obj/arg>)
 

@@ -30,7 +30,9 @@ Capslock::Ctrl
 
 ;^!d::		ShowHide_Window("E:\program\A_Text_GoldenDict_1.0.1_Official\GoldenDict.exe", "GoldenDict")	; ahk can not activate GoldenDict, set the key in itself
 ^!x::		ShowHide_Window("E:\program\A_System_ConEmuPack_X\ConEmu.exe", "ahk_class VirtualConsoleClass")
-^!e::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Local\Google\Chrome\Application\chrome.exe", "Google Chrome")
+^!f::		ShowHide_Window("E:\program\A_System_FreeCommander\FreeCommanderPortable.exe", "FreeCommander")
+^!e::		ShowHide_Window("E:\dev\eclipse\eclipse.exe", "Eclipse")
+^!d::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Local\Google\Chrome\Application\chrome.exe", "Google Chrome")
 ^!s::		ShowHide_Window("E:\program\A_Network_SecureCRT_6.2.2\SecureCRT.EXE", "SecureCRT")
 ^!b::		ShowHide_Window("E:\program\A_Network_Chrome_X_PA-Basic\GoogleChromePortable.exe", "ahk_class Chrome_WidgetWin_1")
 ^!o::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu\Microsoft Outlook 2010.lnk", "Microsoft Outlook")
