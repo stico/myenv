@@ -1,5 +1,5 @@
 
-source=$MY_ENV/list/hosts.lst
+source=$MY_ENV_SECU/hosts.lst
 target=$LOC_HOSTS 
 line_begin='########## myenv host append begin (DO NOT update this line) ##########'
 line_end='########## myenv host append end (DO NOT update this line) ##########'

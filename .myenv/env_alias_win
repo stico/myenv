@@ -5,3 +5,5 @@ du		"%CYGWIN_HOME%#bin#du -h"
 grep		"%CYGWIN_HOME%#bin#grep --color"
 vi		"bash win_vim.sh"
 vim		"bash win_vim.sh"
+
+ping		"/cygdrive/c/Windows/system32/ping"
