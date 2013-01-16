@@ -49,12 +49,12 @@ RButton::	Window_Drag()
 ^RButton::	Window_Resize()
 
 ; to prevent catch cmd send by itself, use $ prefix for cmd
-$^+TAB::	Filter_C_S_Tab_Excel_Console_Eclipse()
 $^+w::		Filter_C_S_w_Chrome()
 $^+q::		Filter_C_S_q_Eclipse()
 $^+e::		Filter_C_S_e_Eclipse()
+$^+TAB::	Filter_C_S_Tab_Excel_Console_Eclipse_FreeCommander()
+$^TAB::		Filter_C_Tab_Excel_Console_Eclipse_FreeCommander()
 $^d::		Filter_C_d_Cmd_Console_Outlook()
-$^TAB::		Filter_C_Tab_Excel_Console_Eclipse()
 $+Insert::	Filter_S_Insert()
 $f1::		Filter_F1_Vim()
 $f3::		Filter_F3_FreeCommander()
@@ -378,7 +378,7 @@ QuickOpen_Vim()
 	;winActivate t.txt
 }
 
-Filter_C_Tab_Excel_Console_Eclipse()
+Filter_C_Tab_Excel_Console_Eclipse_FreeCommander()
 {
 	IfWinActive, Microsoft Excel
 	{
@@ -387,6 +387,9 @@ Filter_C_Tab_Excel_Console_Eclipse()
 	{
 		send {CTRL DOWN}{PgDn}{CTRL UP}
 	} else IfWinActive, Eclipse
+	{
+		send {CTRL DOWN}{PgDn}{CTRL UP}
+	} else IfWinActive, FreeCommander
 	{
 		send {CTRL DOWN}{PgDn}{CTRL UP}
 	} else 
@@ -395,7 +398,7 @@ Filter_C_Tab_Excel_Console_Eclipse()
 	}
 }
 
-Filter_C_S_Tab_Excel_Console_Eclipse()
+Filter_C_S_Tab_Excel_Console_Eclipse_FreeCommander()
 {
 	IfWinActive, Microsoft Excel
 	{
@@ -404,6 +407,9 @@ Filter_C_S_Tab_Excel_Console_Eclipse()
 	{
 		send {CTRL DOWN}{PgUp}{CTRL UP}
 	} else IfWinActive, Eclipse
+	{
+		send {CTRL DOWN}{PgUp}{CTRL UP}
+	} else IfWinActive, FreeCommander
 	{
 		send {CTRL DOWN}{PgUp}{CTRL UP}
 	} else 
@@ -516,7 +522,8 @@ Filter_F3_FreeCommander()
 	; This will override the "refresh" shortcut
 	IfWinActive, FreeCommander
 	{
-		sendInput {CTRL DOWN}{SHIFT DOWN}{Tab}{CTRL UP}{SHIFT UP}{CTRL DOWN}{Tab}{CTRL UP}
+		;sendInput {CTRL DOWN}{SHIFT DOWN}{Tab}{CTRL UP}{SHIFT UP}{CTRL DOWN}{Tab}{CTRL UP}
+		sendInput {CTRL DOWN}{PgDn}{CTRL UP}{CTRL DOWN}{PgUp}{CTRL UP}
 	} else {
 		sendInput {f3}
 	}
