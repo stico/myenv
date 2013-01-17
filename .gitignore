@@ -34,7 +34,9 @@
 #/.subversion/
 #/.ssh/
 /.myenv/secu/
+/.myenv/secu_*/
 /.myenv/secure/
+/.myenv/secure_*/
 
 # IGNORE, for those really not needed, or for secure reason
 /.myenv/.fl_files.txt
@@ -42,6 +44,7 @@
 /.myenv/gVim.exe.stackdump
 /.myenv/bash.exe.stackdump
 /.vim/.netrwhist
+/.vim/autoload/pathogen.vim
 /.myenv/zgen/
 
 # IGNORE, to deprecate

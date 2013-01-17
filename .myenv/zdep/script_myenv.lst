@@ -1,0 +1,18 @@
+.bashrc
+.bash_profile
+.inputrc
+.cshrc
+.netrc
+.ssh			__TAG_SUFFIX__
+.vimrc			__TAG_SUFFIX__
+vimfiles		__TAG_SUFFIX__
+.fonts
+.dir_colors
+.backupMyenv.sh
+.backupMyenv.bat
+.restoreMyenv.sh
+.restoreMyenv.bat
+.gitignore
+.gitattributes
+.myenv
+*-bc
