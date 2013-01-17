@@ -17,6 +17,7 @@ cd $devtool_path/devtools
 ./$devtool_cmd
 
 sed -i -e "s/:cygwin.*=>.*,/:cygwin => 'E:\\\\program\\\\A_System_Cygwin\\\\Cygwin.bat',/" $settings
+# seems still will install ruby even cmd below works correctly, and need manually input q to proceed
 sed -i -e "s/.*rvm_install_some_rubies/#&/" $devtool_cmd
 ./$devtool_cmd
 
