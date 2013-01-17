@@ -10,3 +10,4 @@ source ~/.rvm/scripts/rvm
 command rvm install ruby-1.9.3-p327
 rvm use ruby-1.9.3-p327@global --default
 gem install rails
+source ~/.rvm/scripts/rvm

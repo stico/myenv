@@ -1,4 +1,5 @@
 #!/bin/bash
+# Tested on: cygwin with some small error report on yaml configure (2013-01-17)
 
 [ -e ~/.rvm ] && echo "ERROR: ~/.rvm already exist, if want reinstall, remove it" && exit
 
