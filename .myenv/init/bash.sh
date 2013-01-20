@@ -24,7 +24,7 @@ if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 else
 	envVarSrc=(env_var env_var_lu env_var_bash)
 	envFuncSrc=(env_func_bash)
-	envAliasSrc=(env_alias )
+	envAliasSrc=(env_alias env_alias_lu)
 fi
 [[ -e $HOME/.myenv/secu/env_alias_secu ]] && envAliasSrc+=(secu/env_alias_secu)
 

@@ -38,8 +38,10 @@ sudo apt-get install -y linux-headers-`uname -r`		# for what?
 # install based on ubuntu desktop
 # todo check os version
 # todo check if chrome installed
+# sudo apt-get -y install ibus-table-wubi			# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 # sudo apt-get -y install ubuntu-tweak
-# sudo apt-get install libnspr4-0d libcurl3			# for chrome
+# sudo apt-get -y install gitk
+# sudo apt-get -y install libnspr4-0d libcurl3			# for chrome
 # chrome_stable="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 # cd $work_dir
 # wget $chrome_stable
