@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function func_cd { 
 	cd $*
 	eval ll
@@ -169,3 +171,61 @@ function func_scp_with_jump {
 		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
 }
 
+function func_sys_info { 
+	# format: <os_name>          _<os_ver>  _<os_len>     _<os_type>               _<hostname>
+	# exampe: ubuntu/cygwin/win  _12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm    
+
+	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+
+	# os_name
+	if [ -e /etc/lsb-release ] ; then				os_name=`sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release`
+	elif [ $(echo $uname_info | grep -ic "cygwin") -eq 1 ] ; then	os_name="cygwin"
+	elif [ $(echo $uname_info | grep -ic "mingw") -eq 1 ] ; then	os_name="mingw"
+	else								os_name="unknown"
+	fi
+
+	# use cache if cached, need os_name to distiguish cygwin/mingw
+	[ -n $MY_ENV_ZGEN ] && cache_file=$MY_ENV_ZGEN/sys_info_${os_name} || cache_file=/tmp/sys_info_${os_name}
+	[ -e $cache_file ] && cat $cache_file && return
+
+	# os_ver
+	if [ -e /etc/lsb-release ] ; then	os_ver=`sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release`
+	elif [ "$os_name" = "cygwin" ] ; then	os_ver=`uname -r | sed -e "s/(.*//"`
+	else					os_ver="unknown"
+	fi
+	
+	# os_len, note, cygwin is usually 32bit
+	if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then			os_len="64bit"
+	elif [ $(echo $uname_info | grep -ic "i386\|i486\|i586\|i686") -eq 1 ] ; then	os_len="32bit"
+	else										os_len="unknown"
+	fi
+
+	# os_type
+	if [ "$os_name" = "ubuntu" ] && (command -v dpkg &> /dev/null) ; then 
+		if (dpkg -l ubuntu-desktop &> /dev/null) ; then			os_type="desktop"
+		else								os_type="server"
+		fi
+	elif [ "$os_name" = "cygwin" -o "$os_name" = "mingw" ] ; then		os_type="desktop"
+	else									os_type="unknown"
+	fi
+
+	# hostname
+	hostname=`hostname`
+
+	############################################################## (not include in output yet)
+	# cpu_type 
+	cpu_type="unknown"
+
+	# cpu_len 
+	# if [ $(grep -c "flags.* lm " /proc/cpuinfo) -ge 1 ] ; then # lm (long bit), deprecated
+	if [ $(getconf -a | grep -c "LONG_BIT\s*64") -eq 1 ] ; then	cpu_len=64bit
+	elif [ $(getconf -a | grep -c "LONG_BIT\s*32") -eq 1 ] ; then	cpu_len=32bit
+	else								cpu_len="unknown"
+	fi
+	############################################################## (not include in output yet)
+
+	echo -e "${os_name}_${os_ver}_${os_len}_${os_type}_${hostname}" > $cache_file
+	cat $cache_file
+
+	# TODO: put this func to another file, pre load as basic functions
+}
