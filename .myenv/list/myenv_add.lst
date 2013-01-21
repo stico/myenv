@@ -1,7 +1,9 @@
 # stores file/path which not in git, usually secure reason 
 
-# eval result not path/file, but will be in this back dir
-cat $LOC_HOSTS > $MY_ENV_ZGEN/hosts; echo -e $MY_ENV_ZGEN/
+# eval result not path/file, but will in back dir
+[ -e "$MY_EXT" ] && tree -L 2 $MY_EXT > $MY_ENV_ZGEN/tree_ext.txt ;	\
+cat $LOC_HOSTS > $MY_ENV_ZGEN/hosts;					\
+echo -e $MY_ENV_ZGEN/
 
 # eval result will be path/file
 [ $(echo `uname -a` | grep -c -x "^Linux .*") -eq 1 ] && echo -e $LOC_HOSTS

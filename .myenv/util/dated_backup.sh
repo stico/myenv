@@ -22,10 +22,15 @@ fi
 
 for path in "${bakPath[@]}"
 do
-	if [[ -e "$path" ]]; then
+	# seems the -w detection not correct for samba storage
+	#if [ ! -w "$path" ]; then
+	#	echo -e "WARN\tNot have write permission to $path" 
+	#	continue
+	#fi
+
+	if [ -e "$path" ]; then
 		echo -e "INFO\tBackup to path: $path" 
-		cp "$srcPath" "$path/$targetFile"
-		ls -lh "$path/$targetFile"
+		[ $(cp "$srcPath" "$path/$targetFile") ] && echo -e "INFO\t`ls -lh \"$path/$targetFile\"`"
 		copied=$success
 	else
 		echo -e "WARN\tPath not exist: $path" 

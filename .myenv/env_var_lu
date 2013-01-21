@@ -1,5 +1,7 @@
 CUR_OS		%CUR_OS_LU%
 
+MY_EXT		#ext
+
 LOC_USR_LOCAL	#usr#local
 LOC_HOSTS	#etc#hosts
 LOC_FSTAB	#etc#fstab
