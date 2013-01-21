@@ -5,4 +5,7 @@
 *A_Network_SecureCRT_6.2.2/download/*
 *A_Network_SecureCRT_6.2.2/upload/*
 *A_System_Cygwin/tmp/*
+*A_System_Cygwin_*/tmp/*
+*A_System_Cygwin_*/%SystemDrive%/*
+*A_System_Cygwin_*/http%*/*
 *Z_Z_Deprecated*

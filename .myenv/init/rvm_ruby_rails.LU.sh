@@ -1,5 +1,5 @@
 #!/bin/bash
-#Tested on: ubuntu 12.04 server (2013-01-17)
+#Tested on: ubuntu server 12.04/11.10 (2013-01-18)
 
 [ -e ~/.rvm ] && echo "ERROR: ~/.rvm already exist, if want reinstall, remove it" && exit
 sudo apt-get update

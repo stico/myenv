@@ -2,10 +2,14 @@
 
 # TODO: seems cygwin init is very slow
 
+# set flags
+[ $(uname -s | grep -c CYGWIN) -eq 1 ] && os_cygwin="true" || os_cygwin="false"
+[ $(uname -s | grep -c MINGW) -eq 1 ] && os_mingw="true" || os_mingw="false"
+
 # init basic env
-[ -f /etc/bash_completion ] && source /etc/bash_completion						# very slow in cygwin, run it first, init/bash.sh need turn off some completion on cygwin
-[ $(uname -s | grep -c CYGWIN) -eq 1 -o $(uname -s | grep -c MINGW) -eq 1 ] && umask 000 || umask 077
-export SHELL="/bin/bash"; [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
+[ "$os_cygwin" = "true" -o "$os_mingw" = "true" ] && umask 000 || umask 077
+[ "$os_cygwin" = "false" -a -f /etc/bash_completion ] && source /etc/bash_completion 	# very slow in cygwin, run it first, init/bash.sh need turn off some completion on cygwin
+SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
 
 # init myenv
 source $HOME/.myenv/init/bash.sh
@@ -13,9 +17,12 @@ dloadrbvenv
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
 # init auto complete
-complete -o nospace -F _scp scpx
-complete -F _ssh sshx
-complete -r dd			# alias conflict with /bin/dd, disable its complete
+if [ "$os_cygwin" = "false" ] ; then
+	complete -o nospace -F _scp scpx
+	complete -F _ssh sshx
+	complete -r dd			# alias conflict with /bin/dd, disable its complete
+	#complete -r vi vim gvim unzip	# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
+fi
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
@@ -39,11 +46,11 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-PATH=$PATH:$HOME//.rvm/bin # Add RVM to PATH for scripting
-
-
 ################################################################################
 # Deprecated
 ################################################################################
 
-# Deprecated as used Solarized color scheme
+################################################################################
+# Below are not added manually, clean them up!
+################################################################################
+

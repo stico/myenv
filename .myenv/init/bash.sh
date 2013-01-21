@@ -18,9 +18,6 @@ if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 	envVarSrc=(env_var env_var_win env_var_bash)
 	envFuncSrc=(env_func_bash)
 	envAliasSrc=(env_alias env_alias_win)
-
-	# vi complete seems very annoying (shows help of gawk!) on cygwin
-	complete -r vi vim gvim unzip
 else
 	envVarSrc=(env_var env_var_lu env_var_bash)
 	envFuncSrc=(env_func_bash)

@@ -16,6 +16,7 @@
 !/.netrc
 !/.cshrc
 !/.bashrc
+!/.curlrc
 !/.muttrc
 !/.msmtprc
 !/.inputrc
