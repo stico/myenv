@@ -1,3 +1,4 @@
+#!/bin/bash
 
 source=$MY_ENV_SECU/hosts.lst
 target=$LOC_HOSTS 

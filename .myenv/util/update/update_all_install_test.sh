@@ -1,4 +1,6 @@
-installFile=update-server-install-1.2.2 \
+[ -z $1 ] && echo "Error: pls input version number!" && exit 1
+
+installFile=update-server-install-$1 \
 && work_dir=~/amp/`date "+%Y-%m-%d"` \
 && mkdir -p $work_dir \
 && cd $work_dir \
