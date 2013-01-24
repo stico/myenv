@@ -42,6 +42,7 @@ sudo apt-get install -y linux-headers-`uname -r`		# for what?
 # sudo apt-get -y install ubuntu-tweak
 # sudo apt-get -y install gitk
 # sudo apt-get -y install libnspr4-0d libcurl3			# for chrome
+# sudo apt-get -y autokey
 # chrome_stable="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 # cd $work_dir
 # wget $chrome_stable
