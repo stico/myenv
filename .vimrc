@@ -25,7 +25,7 @@ call pathogen#infect()
 colorscheme solarized
 
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
-"let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
 let g:ctrlp_custom_ignore = {
 	\ 'dir':  '/\.(git\|hg\|svn\|metadata)$\|/target/\|\\target\\',
 	\ 'file': '\.(exe\|so\|dll\|class\|jar\|svn-base)$',

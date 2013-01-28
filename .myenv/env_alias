@@ -21,6 +21,7 @@ showresp		"func_show_resp"
 vihosts			"vi %LOC_HOSTS%"
 sshx			"func_ssh_with_jump"
 scpx			"func_scp_with_jump"
+mvn			"mvn -Dmaven.repo.local=${HOME}/.m2/repository"
 
 vimrc			"vi %HOME%/.vimrc"
 vimcdconf		"func_cd %VIM_CONF%"
@@ -54,7 +55,7 @@ dgitstatusrepo		"func_git_status %MY_CODE_REPO%"
 dgitcommitpushrepo	"func_git_commit_push %MY_CODE_REPO%"
 
 			# Head: e - myenv 
-egrep			"func_e_grep"
+egf			"func_e_grep"
 eload			"source %HOME%/.bashrc"
 ebackup			"bash %MY_ENV_LIST%/myenv_gen.sh; bash %MY_ENV_UTIL%/listed_backup.sh myenv_full $MY_ENV_ZGEN/myenv.lst %MY_ENV_LIST%/myenv_add.lst"
 ehostsupdate		"sudo -E bash hosts_append.sh"
