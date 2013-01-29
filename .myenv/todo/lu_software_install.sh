@@ -26,6 +26,8 @@ echo "Start os init with work dir $work_dir"
 
 # install - common
 sudo apt-get update
+sudo apt-get install -y python-software-properties		# for cmd add-apt-repository 
+sudo apt-get install -y software-properties-common		# for cmd add-apt-repository 
 sudo apt-get install -y zip unzip expect unison			# Common, basic tools
 sudo apt-get install -y openssh-server samba smbfs
 sudo apt-get install -y build-essential make gcc cmake		# Common, build tools
