@@ -1,0 +1,6 @@
+#!/bin/sh
+
+QUICKPARLOCATION="c:\\Program Files\\Foxit\\FoxitReaderPortable.exe"
+PARAM=`winepath -w "$*"`
+wine "$QUICKPARLOCATION" "$PARAM"
+exit 0

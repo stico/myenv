@@ -32,6 +32,13 @@ vimupdateplugin		"bash %MY_ENV_INIT%#vim_plugin.sh"
 findname		"find . -name"
 findtype		"find . -type"
 
+			# Head: d - doc
+dccd			"cd %MY_DOC%"
+dcddcb			"cd %MY_DOC_DCB%"
+dcddcc			"cd %MY_DOC_DCC%"
+dcddcd			"cd %MY_DOC_DCD%"
+dcddco			"cd %MY_DOC_DCO%"
+
 			# Head: d - dated
 ddelete			"bash %MY_ENV_UTIL%/dated_delete.sh"
 dbackup			"bash %MY_ENV_UTIL%/dated_backup.sh"
@@ -116,7 +123,6 @@ cd3			"cd ../../.."
 cd4			"cd ../../../.."
 cd5			"cd ../../../../.."
 cd6			"cd ../../../../../.."
-cddoc			"cd %MY_DOC%"
 cdpro			"cd %MY_PRO%"
 cdtmp			"func_cd %MY_TMP%"
 cdamp			"func_cd %MY_TMP%"

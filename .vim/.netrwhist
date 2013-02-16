@@ -1,5 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_cnt =8
 let g:netrw_dirhist_1='/data/file/update.yy.com/222.134.66.106'
 let g:netrw_dirhist_2='/ext/data_vmdk/file/update.yy.com/222.134.66.106'
 let g:netrw_dirhist_3='/ext/data_vmdk/file/update.yy.com/113.106.100.62'
@@ -7,3 +7,4 @@ let g:netrw_dirhist_4='/home/ouyangzhu/.vim'
 let g:netrw_dirhist_5='/ext/data_vmdk/var/update_ensure/113.106.100.62'
 let g:netrw_dirhist_6='/ext/data_vmdk/var/update_ensure/115.238.171.223'
 let g:netrw_dirhist_7='/home/ouyangzhu/.git'
+let g:netrw_dirhist_8='/home/ouyangzhu/.myenv/conf/terminator'

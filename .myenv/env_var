@@ -14,7 +14,11 @@ CUR_OS_WIN	win
 # ENV - Main Path
 ################################################################################
 MY_DOC		%HOME%Documents
-MY_PRO		%HOME%program
+MY_DOC_DCB	%HOME%Documents#DCB
+MY_DOC_DCC	%HOME%Documents#DCC
+MY_DOC_DCD	%HOME%Documents#DCD
+MY_DOC_DCO	%HOME%Documents#DCO
+MY_DOC_PRO	%HOME%program
 MY_DEV		%HOME%dev
 MY_TMP		%HOME%amp
 MY_ENV		%HOME%.myenv

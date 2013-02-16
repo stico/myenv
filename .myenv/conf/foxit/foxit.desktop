@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Foxit Reader 5
+Comment=PDF reader
+Exec=/home/ouyangzhu/.myenv/conf/foxit/wine_foxit5 %f
+Icon=/home/ouyangzhu/.myenv/conf/foxit/foxit_icon.png
+Terminal=false
+Type=Application
+MimeType=application/pdf;application/x-pdf;
+Categories=Office;
+X-GNOME-Bugzilla-Bugzilla=Foxit
+X-GNOME-Bugzilla-Product=foxit reader
+X-GNOME-Bugzilla-Component=Zwischenlager
+X-GNOME-Bugzilla-Version=3.2.1
+StartupNotify=true
+X-HildonDesk-ShowInToolbar=true
+X-Osso-Service=org.gnome.Games.AisleRiot
+X-Osso-Type=application/x-executable
+X-Ubuntu-Gettext-Domain=aisleriot

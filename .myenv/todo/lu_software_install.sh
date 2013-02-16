@@ -20,10 +20,6 @@ echo "Start os init with work dir $work_dir"
 
 # todo - redirect output to place for logging
 
-# add ppa source 
-#sudo add-apt-repository ppa:tualatrix/ppa			# ubuntu tweak stable
-#sudo add-apt-repository ppa:gnome-terminator			# terminator
-
 # install - common
 sudo apt-get update
 sudo apt-get install -y python-software-properties		# for cmd add-apt-repository 
@@ -37,10 +33,23 @@ sudo apt-get install -y tmux terminator autossh
 sudo apt-get install -y xrdp virtualbox	vim-gnome 		# OS with X, xrdp supports windows native remote desktop connection
 sudo apt-get install -y linux-headers-`uname -r`		# for what?
 
+# install - for desktop
+sudo apt-get install -y python-software-properties software-properties-common
+sudo add-apt-repository ppa:alexx2000/doublecmd
+sudo apt-get update
+sudo apt-get install wine1.5
+sudo apt-get install doublecmd-gtk
+
 # install based on ubuntu desktop
+# add ppa source 
+#sudo add-apt-repository ppa:tualatrix/ppa			# ubuntu tweak stable
+#sudo add-apt-repository ppa:gnome-terminator			# terminator
+#sudo add-apt-repository ppa:videolan/stable-daily		# vlc
+
 # todo check os version
 # todo check if chrome installed
 # sudo apt-get -y install ibus-table-wubi			# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
+# sudo apt-get -y install vlc
 # sudo apt-get -y install ubuntu-tweak
 # sudo apt-get -y install gitk
 # sudo apt-get -y install libnspr4-0d libcurl3			# for chrome
@@ -62,3 +71,4 @@ sudo apt-get install -y linux-headers-`uname -r`		# for what?
 
 # Deprecated
 # sudo apt-get -y install wmctrl
+

@@ -1,0 +1,20 @@
+[global_config]
+  focus = system
+
+[keybindings]
+  new_tab = <Ctrl>T
+  next_tab = <Ctrl>Tab
+  prev_tab = <Ctrl><Shift>Tab
+  paste = <Shift>Insert
+  full_screen = F11
+
+[profiles]
+  [[default]]
+    font = "Mono 15"			# ! not work yet !
+    scrollback_lines = '5000'
+    copy_on_selection = True
+
+    #cursor_blink = True
+    #custom_command = "echo \"foo#bar\"" #Final comment - this will work as expected.
+    #background_color = "#000000"	# hex colour values must be quoted
+    #foreground_color = "#FFFFFF"
