@@ -1,1 +1,0 @@
-lrwxrwxrwx 1 ouyangzhu ouyangzhu 38 Feb 5 19:33 /home/ouyangzhu//.config/doublecmd -> /home/ouyangzhu//.myenv/conf/doublecmd/
