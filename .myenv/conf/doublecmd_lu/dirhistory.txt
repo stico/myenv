@@ -1,3 +1,16 @@
+/home/ouyangzhu/Documents/DCC/Programming_Python/Book/
+/home/ouyangzhu/Documents/DCC/Programming_Python/
+/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/
+/home/ouyangzhu/Documents/DCC/Network_Monitoring/
+/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/A_TODO/
+/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Article/
+/home/ouyangzhu/Documents/DCO/
+/home/ouyangzhu/Documents/DCC/
+/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/
+/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/
+/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOLEARN_DCC/
+/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/
+/home/ouyangzhu/Documents/DCB/Google Drive/VERSION_BACKUP/
 /home/ouyangzhu/Documents/DCB/Record/Todo/
 /home/ouyangzhu/Documents/DCB/Record/
 /home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/lib/
@@ -36,18 +49,3 @@
 /home/ouyangzhu/Documents/DCC/Design_Patterns/
 /home/ouyangzhu/Documents/DCB/Google Drive/
 /home/ouyangzhu/Documents/DCM/2012-04 东风公园（Parents）/
-/home/ouyangzhu/Documents/DCM/2004-10 国庆清远韶关游/me/
-/home/ouyangzhu/Documents/DCM/2004-10 国庆清远韶关游/
-/home/ouyangzhu/Documents/DCM/2006-04 阳朔照片/me/
-/home/ouyangzhu/Documents/DCM/2006-04 阳朔照片/
-/home/ouyangzhu/Documents/DCM/2006-01 老乡天河公园烧烤/
-/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/自动化的毕业照/
-/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/me/
-/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/
-/home/ouyangzhu/Documents/DCM/2001-11 田宇星告别/
-/home/ouyangzhu/Documents/DCM/2007-05 小冲生日/
-/home/ouyangzhu/Documents/DCM/2008-08 公司从化TeamBuilding/
-/home/ouyangzhu/Documents/DCM/2010-03 火凤火/
-/home/ouyangzhu/Documents/DCM/2010-06 火炉山聚会/
-/home/ouyangzhu/Documents/DCM/2012-01 Web组珠海出游/
-/home/ouyangzhu/Documents/DCM/Friends/

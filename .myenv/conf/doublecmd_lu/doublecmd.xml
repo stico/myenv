@@ -224,7 +224,7 @@
     <DirectoryTabs>True</DirectoryTabs>
     <CurrentDirectory>True</CurrentDirectory>
     <TabHeader>True</TabHeader>
-    <StatusBar>False</StatusBar>
+    <StatusBar>True</StatusBar>
     <CmdLine>False</CmdLine>
     <LogWindow>False</LogWindow>
     <TermWindow>False</TermWindow>
@@ -369,6 +369,34 @@
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/VERSION_BACKUP/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOLEARN_DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Article/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/A_TODO/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -388,7 +416,7 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>2</ActiveTab>
+        <ActiveTab>3</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
@@ -443,6 +471,12 @@
                   <Path>/home/ouyangzhu/Documents/FCZ/</Path>
                   <Path>/home/ouyangzhu/Documents/FCZ/record/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCO/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCO/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCO/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -478,6 +512,7 @@
                   <Path>/home/ouyangzhu/Documents/DCB/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Record/Todo/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -592,6 +627,21 @@
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/Book/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -673,10 +723,6 @@
                   <Path>/home/ouyangzhu/amp/misc/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/amp/2013-02-08/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/src/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/lib/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                 </Paths>
               </Entry>
@@ -847,10 +893,10 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>299</Left>
-      <Top>172</Top>
-      <Width>1001</Width>
-      <Height>448</Height>
+      <Left>143</Left>
+      <Top>142</Top>
+      <Width>1106</Width>
+      <Height>531</Height>
       <Maximized>False</Maximized>
     </Position>
   </MainWindow>

@@ -203,7 +203,7 @@
         }, 
         {
             "folders": [], 
-            "usageCount": 366, 
+            "usageCount": 469, 
             "modes": [], 
             "abbreviation": {
                 "ignoreCase": false, 
@@ -278,7 +278,7 @@
                     "store": {}
                 }, 
                 {
-                    "usageCount": 21, 
+                    "usageCount": 27, 
                     "omitTrigger": false, 
                     "code": "system.exec_command('wmctrl -c :ACTIVE:')", 
                     "prompt": false, 
@@ -362,7 +362,7 @@
                     "store": {}
                 }, 
                 {
-                    "usageCount": 16, 
+                    "usageCount": 32, 
                     "omitTrigger": false, 
                     "code": "winName = 'allFile_All.txt'\nwinCmd = ['/usr/bin/gvim', '/home/ouyangzhu/Documents/DCB/Collection/allFile_All.txt']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\ntry :\n    winId=store.get_value(winName)\nexcept :\n    winId = \"0x00000000\"\n\nif winId in winList : \n    system.exec_command('wmctrl -i -a ' + winId, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)", 
                     "prompt": false, 
@@ -388,10 +388,12 @@
                     "showInTrayMenu": false, 
                     "filter": null, 
                     "type": "script", 
-                    "store": {}
+                    "store": {
+                        "allFile_All.txt": "0x03a00024"
+                    }
                 }, 
                 {
-                    "usageCount": 1, 
+                    "usageCount": 2, 
                     "omitTrigger": false, 
                     "code": "subprocess.Popen(['/usr/bin/gvim'])", 
                     "prompt": false, 
@@ -419,7 +421,7 @@
                     "store": {}
                 }, 
                 {
-                    "usageCount": 22, 
+                    "usageCount": 27, 
                     "omitTrigger": false, 
                     "code": "winName = 'A_NOTE_Todo.txt'\nwinCmd = ['/usr/bin/gvim', '/home/ouyangzhu/Documents/FCZ/record/A_NOTE_Todo.txt']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\ntry :\n    winId=store.get_value(winName)\nexcept :\n    winId = \"0x00000000\"\n\nif winId in winList : \n    system.exec_command('wmctrl -i -a ' + winId, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)\n    ", 
                     "prompt": false, 
@@ -446,7 +448,7 @@
                     "filter": null, 
                     "type": "script", 
                     "store": {
-                        "A_NOTE_Todo.txt": "0x04c00024"
+                        "A_NOTE_Todo.txt": "0x03c00024"
                     }
                 }, 
                 {
@@ -479,7 +481,7 @@
                     "store": {}
                 }, 
                 {
-                    "usageCount": 7, 
+                    "usageCount": 9, 
                     "omitTrigger": false, 
                     "code": "winName = 'A_NOTE_Tmp.txt'\nwinCmd = ['/usr/bin/gvim', '/home/ouyangzhu/Documents/FCZ/record/A_NOTE_Tmp.txt']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\ntry :\n    winId=store.get_value(winName)\nexcept :\n    winId = \"0x00000000\"\n\nif winId in winList : \n    system.exec_command('wmctrl -i -a ' + winId, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)", 
                     "prompt": false, 
@@ -510,9 +512,9 @@
                     }
                 }, 
                 {
-                    "usageCount": 9, 
+                    "usageCount": 32, 
                     "omitTrigger": false, 
-                    "code": "winName = 'Double Commander'\nwinCmd = ['/usr/bin/doublecmd']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\ntry :\n    winId=store.get_value(winName)\nexcept :\n    winId = \"0x00000000\"\n\nif winId in winList : \n    system.exec_command('wmctrl -i -a ' + winId, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)", 
+                    "code": "winName = 'Double Commander'\nwinCmd = ['/usr/bin/doublecmd']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\n\nif winName in winList: \n    system.exec_command('wmctrl -a ' + winName, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)", 
                     "prompt": false, 
                     "description": "win_show_app_doublecmd", 
                     "abbreviation": {
@@ -536,12 +538,14 @@
                     "showInTrayMenu": false, 
                     "filter": null, 
                     "type": "script", 
-                    "store": {}
+                    "store": {
+                        "Double Commander": "0x03c0007d"
+                    }
                 }, 
                 {
-                    "usageCount": 17, 
+                    "usageCount": 37, 
                     "omitTrigger": false, 
-                    "code": "winName = '/bin/bash'\nwinCmd = ['/usr/bin/terminator']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\ntry :\n    winId=store.get_value(winName)\nexcept :\n    winId = \"0x00000000\"\n\nif winId in winList : \n    system.exec_command('wmctrl -i -a ' + winId, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)", 
+                    "code": "winName = '/bin/bash'\nwinCmd = ['/usr/bin/terminator']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\n\nif winName in winList: \n    system.exec_command('wmctrl -a ' + winName, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)", 
                     "prompt": false, 
                     "description": "win_show_app_terminator", 
                     "abbreviation": {
@@ -566,13 +570,13 @@
                     "filter": null, 
                     "type": "script", 
                     "store": {
-                        "/bin/bash": "0x03a00004"
+                        "/bin/bash": "0x03e00004"
                     }
                 }, 
                 {
-                    "usageCount": 4, 
+                    "usageCount": 34, 
                     "omitTrigger": false, 
-                    "code": "winName = 'Google Chrome'\nwinCmd = ['/usr/bin/google-chrome']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\ntry :\n    winId=store.get_value(winName)\nexcept :\n    winId = \"0x00000000\"\n\nif winId in winList : \n    system.exec_command('wmctrl -i -a ' + winId, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n", 
+                    "code": "winName = 'Google Chrome'\nwinCmd = ['/usr/bin/google-chrome']\n\nimport subprocess\n\nwinList = system.exec_command('wmctrl -l', getOutput=True)\n\nif winName in winList: \n    system.exec_command('wmctrl -a ' + winName, getOutput=True)\nelse :\n    subprocess.Popen(winCmd)\n    window.wait_for_exist(winName, timeOut=5)\n    winId = system.exec_command('wmctrl -l | grep \"' + winName + '\" | cut -f1 -d\" \"', getOutput=True)\n    store.set_value(winName, winId)\n", 
                     "prompt": false, 
                     "description": "win_show_app_chrome", 
                     "abbreviation": {
@@ -627,14 +631,14 @@
         "showToolbar": true, 
         "serviceRunning": true, 
         "columnWidths": [
-            248, 
+            146, 
             56, 
             267
         ], 
         "isFirstRun": false, 
         "sortByUsageCount": true, 
         "notificationIcon": "/usr/share/pixmaps/akicon.png", 
-        "hPanePosition": 552, 
+        "hPanePosition": 438, 
         "menuTakesFocus": false
     }, 
     "userCodeDir": null, 
