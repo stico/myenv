@@ -1,0 +1,23 @@
+#! /bin/sh
+MONGO_CONF=/data/mongo
+
+case "$1" in
+    start)
+	 echo "start mongodb server"
+       	 $MONGO_CONF/start-server.sh
+	 ;;
+    restart|reload|force-reload)
+         echo "restart mongodb server"
+         $MONGO_CONF/stop-server.sh
+         sleep 5
+	 $MONGO_CONF/start-server.sh
+        ;;
+    stop)
+        $MONGO_CONF/stop-server.sh
+        ;;
+    *)
+        echo "Usage: $0 start|stop|restart" >&2
+        exit 3
+        ;;
+esac
+

@@ -23,6 +23,15 @@ case "$1" in
                 $EXEC $CONF
         fi
         ;;
+    status)
+        if [ -f $PIDFILE ]
+        then
+                echo "$PIDFILE exists, process is already running or crashed"
+		ps -ef | grep $(cat $PIDFILE) | grep -v grep
+        else
+                echo "$PIDFILE not exists, process is not running"
+	fi
+        ;;
     stop)
         if [ ! -f $PIDFILE ]
         then
@@ -39,6 +48,10 @@ case "$1" in
                 echo "Redis stopped"
         fi
         ;;
+    restart)
+	sh $0 stop
+	sh $0 start
+	;;
     *)
         echo "Please use start or stop as first argument"
         ;;
