@@ -24,7 +24,7 @@ Capslock::Ctrl
 ^!q::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Record.txt", false, false, false, "")
 ^!z::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Schedule.txt", false, false, false, "")
 ^!c::		ShowHide_TextWindow("Documents\DCB\Record\Z\A_A_NOTE_Copy.txt", true, false, true, "")
-^!a::		ShowHide_TextWindow("Documents\DCB\Collection\allFile_All.txt", false, true, false, ": set isfname+=:")
+^!a::		ShowHide_TextWindow("Documents\DCB\Collection_Note\allFile_All.txt", false, true, false, ": set isfname+=:")
 
 ^!p::		ShowHide_TextWindow("dev\a_workspaces\A_Project.lst", true, false, false, ": set isfname+=:")
 
@@ -55,6 +55,7 @@ $^+e::		Filter_C_S_e_Eclipse()
 $^+TAB::	Filter_C_S_Tab_Excel_Console_Eclipse_FreeCommander()
 $^TAB::		Filter_C_Tab_Excel_Console_Eclipse_FreeCommander()
 $^d::		Filter_C_d_Cmd_Console_Outlook()
+$Insert::	Filter_Insert()
 $+Insert::	Filter_S_Insert()
 $f1::		Filter_F1_Vim()
 $f3::		Filter_F3_FreeCommander()
@@ -110,6 +111,10 @@ Filter_A_Enter()
 	;{
 	;	msgbox aaa
 	;}
+}
+
+Filter_Insert() {
+	; just not need the insert
 }
 
 Filter_S_Insert() {

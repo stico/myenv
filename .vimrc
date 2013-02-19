@@ -92,7 +92,7 @@ noremap <C-T> :tabnew<CR>
 " failed to update to use <C-A-s>, seems vim never received 
 " failed to update to use <C-S-T>, seems will override the <C-T>
 " suggest not to use <A-T>, it means alt+shift+t
-noremap <A-t> :tabnew<CR>:e $HOME/Documents/DCB/Collection/allFile_All.txt<CR><CR>:set isfname+=:<CR>
+noremap <A-t> :tabnew<CR>:e $HOME/Documents/DCB/Collection_Note/allFile_All.txt<CR><CR>:set isfname+=:<CR>
 " for schedule done
 inoremap <A-S-D> <Esc>A<Tab><Tab>done<Esc>5h
 nnoremap <A-S-D> <Esc>A<Tab><Tab>done<Esc>5h
