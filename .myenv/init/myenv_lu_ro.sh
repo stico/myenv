@@ -8,7 +8,7 @@ git_myenv_addr=https://github.com/stico/myenv.git
 
 [ -e $apt_update_stamp ] && (( $apt_update_ago > 86400 )) && sudo apt-get update || echo "INFO: last 'apt-get update' was $apt_update_ago seconds ago, skip this time"
 
-sudo apt-get install -y git svn
+sudo apt-get install -y git subversion
 sudo apt-get install -y tree zip
 
 cd ~

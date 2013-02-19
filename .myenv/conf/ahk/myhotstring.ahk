@@ -1,5 +1,5 @@
 ; tag	C	case-sensitive
-; tag	*	an ending character (e.g. space, period, or enter) is not required to trigger the hotstring. 
+; tag	*	ending char (e.g. space/period/enter) is not required to trigger the hotstring. 
 ; tag	?	triggered even when it is inside another word
 ; From Help FIle:"Hotstrings can never be triggered by keystrokes produced by any AutoHotkey script. This avoids the possibility of an infinite loop where hotstrings trigger each other over and over."
 ; !!!	ff	all use prefix "ff", reason 1) already used for ffdate, which could used by one hand
@@ -61,6 +61,7 @@ return
 ;:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; yangpeng@yy.com
 :*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; panleiming@yy.com; wangqitao@yy.com; wuhaoqing@yy.com; duanyunfeng@yy.com
 :*:ffmlintern::sunxiaodi@yy.com; zengmeng@yy.com; huangdijie@yy.com; jiangchengyan@yy.com; lianghairui@yy.com; luozhixin@yy.com; wuhaoqing@yy.com
+:*:ffmyenvinit::curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv_lu_ro.sh | bash
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Deprecated
 ;::jws::JAX-WS
