@@ -2,7 +2,7 @@
 
 pack_name=/tmp/wz.zip
 tomcat_ver=7.0.29
-rsync_ver=3.0.7
+rsync_ver=3.0.7.3
 nginx_ver=1.2.3
 java_ver=6.0.27
 
@@ -20,5 +20,5 @@ zip -r $pack_name							\
        /etc/init.d/nginx						\
     -x /data/services/tomcat-$tomcat_ver/admin/monitor.sh-err.log 	\
     -x /data/services/tomcat-$tomcat_ver/admin/report.sh-err.log 	\
-    -x /data/services/tomcat-$tomcat_ver/admin/report-content.log
+    -x /data/services/tomcat-$tomcat_ver/admin/report-content.log\*
 

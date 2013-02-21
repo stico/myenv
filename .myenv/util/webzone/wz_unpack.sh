@@ -3,7 +3,7 @@
 tmp_dir=/tmp/wz_tmp
 pack_name=/tmp/wz.zip
 tomcat_ver=7.0.29
-rsync_ver=3.0.7
+rsync_ver=3.0.7.3
 nginx_ver=1.2.3
 java_ver=6.0.27
 
@@ -28,10 +28,11 @@ unzip $pack_name -d $tmp_dir
 rm -rf $tmp_dir/data/services/tomcat_base/*
 rm -rf $tmp_dir/data/services/nginx_vhost/*
 
-exit
-sudo mv $tmp_dir/* /
+[ ! -e /data ] && mkdir /data && chmod 755 /data
+cp -rf $tmp_dir/data/* /data/
+cp -rf $tmp_dir/etc/init.d/* /etc/init.d/
 ln -s /data/services/tomcat-$tomcat_ver /usr/local/tomcat
 ln -s /data/services/nginx-$nginx_ver /usr/local/nginx
 ln -s /data/services/java-$java_ver /usr/local/java
 ln -s /data/services/rsync-$rsync_ver /usr/local/rsync
-ln -s /etc/rc2.d/S52rsync_8730 /etc/init.d/rsync_8730
+ln -s /etc/init.d/rsync_8730 /etc/rc2.d/S52rsync_8730
