@@ -4,7 +4,7 @@ function func_cd {
 	cd $1
 	shift
 	for path in $@ ; do
-		cd *${path}*
+		cd *${path}* || return 1
 		shift
 	done
 
