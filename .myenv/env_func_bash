@@ -1,7 +1,13 @@
 #!/bin/bash
 
 function func_cd { 
-	cd $*
+	cd $1
+	shift
+	for path in $@ ; do
+		cd *${path}*
+		shift
+	done
+
 	eval ll
 	# might have more hack in future
 }
@@ -67,7 +73,8 @@ function func_git_commit_push {
 	cd $1					&& 
 	git pull github master			&&
 	git add .				&&
-	git commit -a -m "$2" 			&&
+	shift					&&
+	git commit -a -m "$@" 			&&
 	git push github				&&
 	git status 				&&
 	bash $MY_ENV_LIST/myenv_gen.sh		&&
