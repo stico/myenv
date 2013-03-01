@@ -1,0 +1,35 @@
+## Unison preferences file
+root=/home/ouyangzhu/Documents/
+root=/media/22D0B554D0B52F43/backup/
+fastcheck=yes
+# Paths to synchronize
+path=DCB
+path=DCC
+path=DCD
+path=DCM
+path=DCO
+path=ECB
+path=ECE
+path=ECH
+path=ECS
+path=ECZ
+#path=FCS
+#path=FCZ
+
+# regex to ignore
+ignore=Name temp.*
+ignore=Name *~
+ignore=Name ~*
+ignore=Name .*~
+ignore=Name *.class
+ignore=Name *.o
+ignore=Name *.tmp
+ignore=Name *.swp
+#ignore=Name *.metadata
+#ignore=Path Backup/Mail
+#ignore=Path DCB/Mail
+#ignore=Name unison.log
+#ignore=Name JavaDecompiler-gui.cfg
+#ignore=Path DCZ/Music_Classic_West_Serial_100
+#ignore=Path DCZ/Z
+#ignore = Path {DCB/Z/T2HH-43.dat}
