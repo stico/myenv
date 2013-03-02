@@ -241,6 +241,12 @@ autocmd Filetype dosbatch map <buffer> <F11> :RInCmd<Enter>
 
 """""""""""""""""""""""""""""" H1 - Script
 
+" the vim's * add word boundary, usually I prefer not
+nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>
+function! SearchCurrentWordWithoutBoundary()
+	let @/ = '\V'.escape(expand('<cword>'), '\')
+endfunction
+
 """ copied from vimrc_example.vim, see comments there
 if has("autocmd") && !exists("autocommands_loaded")
   let autocommands_loaded = 1
