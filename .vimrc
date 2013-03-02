@@ -302,6 +302,7 @@ function! AutoHighlightToggle()
   else
     augroup auto_highlight
       au!
+      " TODO: when holding nothing, will search all
       au CursorHold * let @/ = '\V'.escape(expand('<cword>'), '\')		" without word boundary
       "au CursorHold * let @/ = '\V\<'.escape(expand('<cword>'), '\').'\>'	" with word boundary
       "au CursorHold * let @/ = '\<'.expand('<cword>').'\>'			" In general the escape is a good idea, but in practice the current word (cword) is unlikely to have punctuation in it that needs escaping. Thoughts?
