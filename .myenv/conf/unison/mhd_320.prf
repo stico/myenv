@@ -2,6 +2,7 @@
 root=/home/ouyangzhu/Documents/
 root=/media/22D0B554D0B52F43/backup/
 fastcheck=yes
+perms=0
 # Paths to synchronize
 path=DCB
 path=DCC
