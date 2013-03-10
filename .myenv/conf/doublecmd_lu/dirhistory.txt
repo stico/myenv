@@ -1,3 +1,12 @@
+/home/ouyangzhu/VirtualBox VMs/xpvm/
+/home/ouyangzhu/VirtualBox VMs/
+/home/ouyangzhu/vmware/w7vm/
+/home/ouyangzhu/vmware/
+/home/ouyangzhu/Documents/FCZ/vm/
+/home/ouyangzhu/Documents/FCZ/
+/home/ouyangzhu/Documents/ECB/Z/小鸡/
+/home/ouyangzhu/Documents/ECB/Z/
+/home/ouyangzhu/Documents/ECB/
 /home/ouyangzhu/Documents/DCC/Programming_Python/Book/
 /home/ouyangzhu/Documents/DCC/Programming_Python/
 /home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/
