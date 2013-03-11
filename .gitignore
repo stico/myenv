@@ -11,6 +11,11 @@
 !/vimfiles/
 !/vimfiles/*
 
+# only some file in sub dir
+!/.unison/
+/.unison/*
+!/.unison/*.prf
+
 # FILE
 !/.vimrc
 !/.netrc

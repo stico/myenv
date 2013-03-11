@@ -1,0 +1,14 @@
+## Unison preferences file
+root=/home/ouyangzhu/.m2/
+root=/cygdrive/g/backup/os_spec_win/m2_repo/
+fastcheck=yes
+perms=0
+
+ignore = Regex .*/.svn
+ignore = Regex .*/.svn/.*
+ignore = Regex .*/.settings
+ignore = Regex .*/.settings/.*
+ignore = Regex code_.*/target
+ignore = Regex code_.*/target/.*
+
+ignore = Path repository/.cache

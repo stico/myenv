@@ -1,0 +1,7 @@
+## Unison preferences file
+root=/home/ouyangzhu/program/
+root=/cygdrive/g/backup/os_spec_win/program/
+fastcheck=yes
+perms=0
+
+ignore = Name *_SyncIgnore
