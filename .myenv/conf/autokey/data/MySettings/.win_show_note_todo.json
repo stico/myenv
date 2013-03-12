@@ -1,0 +1,35 @@
+{
+    "usageCount": 27, 
+    "omitTrigger": false, 
+    "prompt": false, 
+    "description": "win_show_note_todo", 
+    "abbreviation": {
+        "wordChars": "[\\w]", 
+        "abbreviations": [
+            null
+        ], 
+        "immediate": false, 
+        "ignoreCase": false, 
+        "backspace": true, 
+        "triggerInside": false
+    }, 
+    "hotkey": {
+        "hotKey": "z", 
+        "modifiers": [
+            "<alt>", 
+            "<ctrl>"
+        ]
+    }, 
+    "modes": [
+        3
+    ], 
+    "showInTrayMenu": false, 
+    "filter": {
+        "regex": null, 
+        "isRecursive": false
+    }, 
+    "type": "script", 
+    "store": {
+        "A_NOTE_Todo.txt": "0x03c00024"
+    }
+}
