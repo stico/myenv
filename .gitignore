@@ -59,9 +59,3 @@
 /.myenv/gVim.exe.stackdump
 /.myenv/bash.exe.stackdump
 /.vim/autoload/pathogen.vim
-
-# IGNORE, to deprecate
-/.myenv/gen_log/
-/.myenv/gen_lu_sh/
-/.myenv/gen_lu_csh/
-/.myenv/gen_win_alias/

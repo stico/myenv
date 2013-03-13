@@ -18,9 +18,14 @@ LANG		en_US.UTF-8
 LLANG		en_US.UTF-8
 
 # NOTE there is sequence relation, last line, first entry !
+PATH		#usr#local#sbin
 PATH		#usr#local#bin
 PATH		#usr#ccs#bin
+PATH		#usr#sbin
+PATH		#usr#bin
 PATH		#usr#lib
+PATH		#sbin
+PATH		#bin
 PATH		%HOME%bin
 PATH		%MY_ENV%
 PATH		%MY_ENV_UTIL%
