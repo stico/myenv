@@ -15,7 +15,7 @@ CUR_OS		%CUR_OS_WIN%
 
 CYGWIN_HOME	%MY_PRO%#A_System_Cygwin
 VIM_HOME	%MY_PRO%#A_Text_Vim_7.2_PA-Basic#App#vim#vim72
-VIM_CONF	%HOME%#vimfiles
+VIM_CONF	%HOME%vimfiles
 GRAILS_HOME	%MY_DEV%#grails-2.0.3
 ANDROID_HOME	%MY_DEV%#android-sdk-windows
 CASSANDRA_HOME	%MY_DEV%#cassandra-0.8.1
@@ -37,8 +37,8 @@ PATH		%GROOVY_HOME%#bin
 PATH		%PHP_HOME%
 PATH		%MY_ENV%
 PATH		%MY_ENV_UTIL%
+PATH		%MY_ENV_UTIL%#win_alias
 PATH		%MY_ENV_SECU%
-PATH		%MY_ENV%#zgen#win_alias
 #PATH		%GIT_HOME%
 #PATH		%GIT_HOME%#bin
 PATH		%VIM_HOME%
