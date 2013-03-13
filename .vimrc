@@ -225,11 +225,11 @@ command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
 command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
 
-command! -nargs=* RInCmd			:wa | :silent	! cmd.exe		<args> "%:p" & pause
-command! -nargs=* RInBash			:wa | :silent	! bash			<args> "%:p" & pause
-command! -nargs=* RInRuby                       :wa |		! bundle exec ruby	<args> "%:p"
-command! -nargs=* RInPython			:wa | :silent	! python		<args> "%:p" & pause
-command! -nargs=* RInGroovy			:wa | :silent	! groovy		<args> "%:p" & pause
+command! -nargs=* RInCmd		:wa | :silent	! cmd.exe		<args> "%:p" & pause
+command! -nargs=* RInBash		:wa | :silent	! bash			<args> "%:p" & pause
+command! -nargs=* RInRuby               :wa |		! bundle exec ruby	<args> "%:p"
+command! -nargs=* RInPython		:wa | :silent	! python		<args> "%:p" & pause
+command! -nargs=* RInGroovy		:wa | :silent	! groovy		<args> "%:p" & pause
 
 "autocmd BufNewFile,BufReadPost *.sh map <buffer> <F11> :pwd
 autocmd Filetype sh map <buffer> <F11> :RInBash<Enter>
@@ -241,11 +241,12 @@ autocmd Filetype dosbatch map <buffer> <F11> :RInCmd<Enter>
 
 """""""""""""""""""""""""""""" H1 - Script
 
+" Deprecated - cmd g*/g# already did this
 " the vim's * add word boundary, usually I prefer not
-nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>
-function! SearchCurrentWordWithoutBoundary()
-	let @/ = '\V'.escape(expand('<cword>'), '\')
-endfunction
+"nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>n
+"function! SearchCurrentWordWithoutBoundary()
+"	let @/ = '\V'.escape(expand('<cword>'), '\')
+"endfunction
 
 """ copied from vimrc_example.vim, see comments there
 if has("autocmd") && !exists("autocommands_loaded")
@@ -289,21 +290,21 @@ function OnlyFileNameInTab()
 endfunction
 
 " Highlight all instances of word under cursor, when idle. Useful when studying strange source code.
-" Type z/ to toggle highlighting on/off.
-nnoremap z/ :if AutoHighlightToggle()<Bar>set hls<Bar>endif<CR>
-function! AutoHighlightToggle()
+command! -nargs=0 TAutoHighLight	:if ToggleAutoHighlight() | :set hls | endif
+function! ToggleAutoHighlight()
   let @/ = ''
   if exists('#auto_highlight')
     au! auto_highlight
     augroup! auto_highlight
     setl updatetime=4000
-    echo 'Highlight current word: off'
+    echo 'Highlight current word: OFF'
     return 0
   else
     augroup auto_highlight
       au!
       " TODO: when holding nothing, will search all
-      au CursorHold * let @/ = '\V'.escape(expand('<cword>'), '\')		" without word boundary
+      au CursorHold * let text = expand('<cword>') | if strlen(text) | let @/ = '\V'.escape(expand('<cword>'), '\') | endif		" without word boundary, non-empty string
+      "au CursorHold * let @/ = '\V'.escape(expand('<cword>'), '\')		" without word boundary
       "au CursorHold * let @/ = '\V\<'.escape(expand('<cword>'), '\').'\>'	" with word boundary
       "au CursorHold * let @/ = '\<'.expand('<cword>').'\>'			" In general the escape is a good idea, but in practice the current word (cword) is unlikely to have punctuation in it that needs escaping. Thoughts?
     augroup end
@@ -344,8 +345,8 @@ endfunction
 """""""""""""""""""""
 " show the diff between current buffer and the original loaded content
 if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis 
+  	\ | wincmd p | diffthis
 endif
 " In many terminal emulators the mouse works just fine, thus enable it.
 if has('mouse')

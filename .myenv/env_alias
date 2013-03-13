@@ -40,6 +40,7 @@ db			"dbackup"
 
 			# Head: d - dev 
 dcd			"func_cd %MY_DEV%"
+dwcd			"func_cd %MY_DEV%/code_dw"
 dloadpyvenv		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
 dloadrbvenv		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm"
 dgitpullrepo		"func_git_pull %MY_CODE_REPO%"
