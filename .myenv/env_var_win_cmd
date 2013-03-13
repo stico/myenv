@@ -1,0 +1,8 @@
+LOC_HOSTS	%MY_APP_Base%#Windows#system32#drivers#etc#hosts
+
+PATH		"%MY_APP_Base%#Program Files#Support Tools"
+PATH		"%MY_APP_Base%#Program Files#TortoiseSVN"
+PATH		"%MY_APP_Base%#Program Files#TortoiseSVN#bin"
+PATH		%MY_APP_Base%#Windows
+PATH		%MY_APP_Base%#Windows#System32
+PATH		%MY_APP_Base%#Windows#System32#Wbem

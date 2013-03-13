@@ -32,8 +32,6 @@ MY_CODE_REPO	%MY_DEV%#code_repo
 MY_CODE_MISC	%MY_DEV%#code_misc
 MY_SOFT_CONF	%MY_DOC%/DCB/SoftwareConf
 
-WIN_PF		"%MY_APP_Base%#Program Files"
-WIN_PF_86	"%MY_APP_Base%#Program Files (x86)"
 
 ################################################################################
 # ENV - App Path/Home/Options. For path, 1st here, last in env!

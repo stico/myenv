@@ -1,0 +1,10 @@
+LOC_HOSTS	`cygpath -u %MY_APP_Base%#Windows#system32#drivers#etc#hosts`
+SVN_HOME	"`cygpath -u %MY_APP_Base%#Program\ Files#TortoiseSVN`"
+WIN_TOOL_HOME	"`cygpath -u %MY_APP_Base%#Program\ Files#Support\ Tools`"
+
+PATH		%WIN_TOOL_HOME%
+PATH		%SVN_HOME%
+PATH		%SVN_HOME%#bin
+PATH		#cygdrive#c#Windows
+PATH		#cygdrive#c#Windows#System32
+PATH		#cygdrive#c#Windows#System32#Wbem

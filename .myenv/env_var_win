@@ -9,7 +9,6 @@ MY_TMP_UPDATE	%MY_DEV%#workspaces#client-update-server#trunk
 MY_TMP_CBBS	%MY_DEV%#workspaces#util#trunk
 
 LOC_FSTABD	#etc#fstab.d
-LOC_HOSTS	`cygpath -u %WINDIR%#system32#drivers#etc#hosts`
 LOC_MYSQL_CONF	%WINDIR%#my.ini
 
 CUR_OS		%CUR_OS_WIN%
@@ -22,27 +21,20 @@ ANDROID_HOME	%MY_DEV%#android-sdk-windows
 CASSANDRA_HOME	%MY_DEV%#cassandra-0.8.1
 GIT_HOME	%MY_DEV%#git-1.7.6-preview20110709
 ARCANIST_HOME	%MY_DEV%#arcanist#arcanist
+GROOVY_HOME	%MY_DEV%#groovy
+PHP_HOME	%MY_DEV%#php
 
 # this turn of the warning when using windows style path with cygwin cmd
 CYGWIN		nodosfilewarning
 
 # NOTE there is sequence relation, last line, first entry !
 # cygwin must after git, so it will be used first
-GROOVY_HOME	%MY_DEV%#groovy
-PATH		%GROOVY_HOME%#bin
-PATH		%PHP_HOME%
-PHP_HOME	%MY_DEV%#php
-
-PATH		"C:#Program Files#TortoiseSVN#bin"
-PATH		"C:#Program Files#TortoiseSVN"
-PATH		"C:#Program Files#Support Tools"
-PATH		%SystemRoot%#System32#Wbem
-PATH		%SystemRoot%#system32
-PATH		%SystemRoot%
 PATH		%ANDROID_HOME%#bin
 PATH		%CASSANDRA_HOME%#bin
 PATH		%ARCANIST_HOME%#bin
 PATH		%GRAILS_HOME%#bin
+PATH		%GROOVY_HOME%#bin
+PATH		%PHP_HOME%
 PATH		%MY_ENV%
 PATH		%MY_ENV_UTIL%
 PATH		%MY_ENV_SECU%
@@ -53,7 +45,6 @@ PATH		%VIM_HOME%
 PATH		%CYGWIN_HOME%#usr#sbin
 PATH		%CYGWIN_HOME%#usr#bin
 PATH		%CYGWIN_HOME%#bin
-
 
 LANG		en_US.UTF-8
 LLANG		en_US.UTF-8

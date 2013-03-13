@@ -5,6 +5,7 @@ ECHO Start to set env, before setting record: PATH=%PATH% >> zgen\win_gen.log
 
 SET envVarCommon=%HOME%\.myenv\env_var
 SET envVarWinCommon=%HOME%\.myenv\env_var_win
+SET envVarWinCommonCmd=%HOME%\.myenv\env_var_win_cmd
 
 REM In a control env, prefer to use a blank init PATH var. In a non-control env, prefer to reserve old PATH
 REM SET newPathEnv=%PATH%
@@ -22,7 +23,7 @@ ECHO Setting setx path: %CmdSetX%
 
 REM Init ENV Var, PATH is special which only should set once
 REM the eol=# makes lines with # will be ignored, batch also auto ignore blank line
-FOR /f "tokens=* eol=# delims=;" %%k in (%envVarCommon% %envVarWinWordLength% %envVarWinCommon%) do (
+FOR /f "tokens=* eol=# delims=;" %%k in (%envVarCommon% %envVarWinWordLength% %envVarWinCommon% %envVarWinCommonCmd%) do (
 	CALL:FUNC_SET_ENV  %%k 
 )
 
@@ -58,7 +59,7 @@ GOTO:EOF
 :FUNC_SET_ENV_PATH
 	REM seems not really works for all path: SET test=%~$PATH:1
 	REM but following way works ...
-	ECHO %newPathEnv% | %SYSTEMROOT%\system32\find "%1" > nul
+	ECHO %newPathEnv% | %SYSTEMROOT%\system32\find "%value%" > nul
 	IF ERRORLEVEL 1 (
 		ECHO Appending PATH with value=%value%
 		SET newPathEnv=%value%;%newPathEnv%
