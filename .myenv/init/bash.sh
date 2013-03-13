@@ -4,7 +4,7 @@
 cd $HOME/.myenv
 
 # var 
-genShPath=zgen/lu_alias_bash
+genShPath=zgen/lu_bash
 genEnvVar=$genShPath/envVarAll
 genEnvAlias=$genShPath/envAliasAll
 genEnvFunc=$genShPath/envFuncAll
@@ -15,11 +15,11 @@ genEnvFunc=$genShPath/envFuncAll
 # check if it is bash on windows
 if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 	# winVer=`cmd /C win_ver.bat`			# works in cygwin/bash, not in GIT/bash
-	envVarSrc=(env_var env_var_win env_var_bash)
+	envVarSrc=(env_var_win env_var_bash env_var)
 	envFuncSrc=(env_func_bash)
 	envAliasSrc=(env_alias env_alias_win)
 else
-	envVarSrc=(env_var env_var_lu env_var_bash)
+	envVarSrc=(env_var_lu env_var_bash env_var)
 	envFuncSrc=(env_func_bash)
 	envAliasSrc=(env_alias env_alias_lu)
 fi
@@ -46,6 +46,8 @@ do
 	    -e 's/^PATH.*/&:${PATH}/' \
 	    -e 's/^/export /' $envFile >> $genEnvVar
 done
+# need PATH be clean, so first assignment should clean
+sed -i -e "0,/:\${PATH}/s///" $genEnvVar
 
 # gen env alias
 for aliasFile in "${envAliasSrc[@]}"

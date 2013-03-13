@@ -50,9 +50,6 @@ MAVEN_HOME	%MY_DEV%#maven
 MAVEN_REPO	%HOME%.m2
 PATH		%M2_HOME%#bin
 
-SVN_HOME	%WIN_PF%#Tortoise#bin
-PATH		%SVN_HOME%
-
 MYSQL_HOME	%MY_DEV%#mysql
 PATH		%MYSQL_HOME%#bin
 
