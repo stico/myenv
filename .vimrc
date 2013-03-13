@@ -101,6 +101,11 @@ inoremap <A-S-J> <Esc>Js<Tab><Esc>
 nnoremap <A-S-J> <Esc>Js<Tab><Esc>
 " if not, the Q will enter Ex mode which seldom use
 map Q gq
+" exchange the */# and g*/g#
+nnoremap * g*
+nnoremap # g#
+nnoremap g* *
+nnoremap g# #
 
 """""""""""""""""""""""""""""" H1 - Mapping - Win Behave (mostly copied from mswin.vim)
 behave mswin
