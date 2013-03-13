@@ -60,6 +60,16 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 	sudo apt-get install -y wine1.5					# TODO: this need maual work comfirm, learn the auto way from the mysql init script
 fi
 
+if [ $(echo "$sys_info" | grep -ic "ubuntu.*precise") == 1 ] ; then
+	# simply add the PPA can not install the latest version
+	wget https://launchpad.net/~cdekter/+archive/ppa/+files/autokey-common_0.90.4-0~precise_all.deb
+	wget https://launchpad.net/~cdekter/+archive/ppa/+files/autokey-qt_0.90.4-0~precise_all.deb
+	sudo apt-get remove autokey
+	sudo apt-get install -y gdebi-core
+	sudo gdebi --n autokey-qt_0.90.4-0~precise_all.deb autokey-common_0.90.4-0~precise_all.deb
+	sudo apt-get install python-qt4-dbus
+	sudo dpkg -i autokey-qt_0.90.4-0~precise_all.deb autokey-common_0.90.4-0~precise_all.deb 
+fi
 
 # Autokey, TODO: seems not necessary, check if this is really used
 #if grep -q 'Autokey' <(echo `gsettings get com.canonical.Unity.Panel systray-whitelist`); then 

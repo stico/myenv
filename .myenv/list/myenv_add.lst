@@ -11,6 +11,7 @@ echo -e $LOC_FSTAB
 echo -e $LOC_FSTABD
 echo -e $LOC_CRONTAB
 echo -e $LOC_CONF_MYSQL
+echo -e $LOC_CONF_SAMBA
 echo -e $MY_ENV_SECU
 echo -e $MY_ENV_ZGEN
 

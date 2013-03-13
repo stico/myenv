@@ -7,6 +7,7 @@ LOC_HOSTS	#etc#hosts
 LOC_FSTAB	#etc#fstab
 LOC_CRONTAB	#etc#crontab
 LOC_CONF_MYSQL	#etc#mysql#my.cnf
+LOC_CONF_SAMBA	#etc#samba#smb.conf
 
 VIM_CONF	%HOME%#.vim
 

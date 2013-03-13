@@ -40,6 +40,9 @@ sudo sed -i -e "/\[mysqld\]/acharacter-set-server=utf8"		/etc/mysql/my.cnf
 sudo service mysql restart
 
 # config database/user
+mysql -uroot -p123456 -e "create database yypay" 
 mysql -uroot -p123456 -e "create database update_server" 
+mysql -uroot -p123456 -e "grant all on *.* to 'yypay'@'%' identified by '123456'" 
+mysql -uroot -p123456 -e "grant all on *.* to 'yypay'@'localhost' identified by '123456'"
 mysql -uroot -p123456 -e "grant all on *.* to 'update_server'@'%' identified by '123456'" 
 mysql -uroot -p123456 -e "grant all on *.* to 'update_server'@'localhost' identified by '123456'"
