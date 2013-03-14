@@ -21,6 +21,7 @@ showresp		"func_show_resp"
 vihosts			"vi %LOC_HOSTS%"
 sshx			"func_ssh_with_jump"
 scpx			"func_scp_with_jump"
+translate		"func_translate"
 #mvn			"mvn -Dmaven.repo.local=${HOME}/.m2/repository"
 
 vimrc			"vi %HOME%/.vimrc"

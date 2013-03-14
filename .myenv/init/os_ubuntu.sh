@@ -40,13 +40,14 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 	sudo add-apt-repository -y ppa:alexx2000/doublecmd		# double commander
 	sudo add-apt-repository -y ppa:tualatrix/ppa			# ubuntu tweak stable
 	sudo add-apt-repository -y ppa:ubuntu-wine/ppa			# wine1.5
+	sudo add-apt-repository -y ppa:byobu/ppa			# byobu
 	#sudo add-apt-repository -y ppa:videolan/stable-daily		# vlc, could use official
 	#sudo apt-get update						# should update since added ppa, disable in debug mode, as just need run it once manually
 
 	sudo apt-get install -y xrdp					# OS with X, xrdp supports windows native remote desktop connection
 	sudo apt-get install -y ibus-table-wubi				# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y virtualbox vim-gnome
-	sudo apt-get install -y doublecmd-gtk
+	sudo apt-get install -y doublecmd-gtk byobu
 	sudo apt-get install -y ubuntu-tweak vlc autokey gitk wmctrl 
 
 	if (( $(dpkg -l | grep -c "google.*chrome") >= 1 )) ; then
