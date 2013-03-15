@@ -16,12 +16,22 @@ source $HOME/.myenv/init/bash.sh
 dloadrbvenv
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
-# init auto complete
+# should not run on cygwin
 if [ "$os_cygwin" = "false" ] ; then
+
+	# init auto complete
 	complete -o nospace -F _scp scpx
 	complete -F _ssh sshx
 	complete -r dd			# alias conflict with /bin/dd, disable its complete
 	#complete -r vi vim gvim unzip	# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
+
+	# set diff prompt for internal machine and external machine 
+	internetIpCount=$(/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p' | grep -v -c '\(172\.\|192\.\|10\.\|127.0.0.1\)')
+	if [ $internetIpCount -ge 1 ] ; then 
+		export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"
+	else 
+		export PS1="\[\e[32m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
+	fi
 fi
 
 # If not running interactively, don't do anything
