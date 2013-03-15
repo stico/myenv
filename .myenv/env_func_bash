@@ -244,19 +244,26 @@ function func_sys_info {
 
 function func_translate { 
 	# usage: func_translate lovely world
+
+	# TODO: parse all contents, e.g. when translate "break"
+	# TODO: record history
+
 	words="" 
 	for word in $@; 
 	do 
 		words="${words}${word} " 
 	done 
 
-	curl	-e "http://translate.google.cn/?hl=en"								\
+	res_raw=`curl -e "http://translate.google.cn/?hl=en"							\
 		-H 'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:11.0) Gecko/20100101 Firefox/11.0'	\
 		-H 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'			\
 		-d "tsel=0&ssel=0&tl=zh_CN&client=t&hl=en&sl=en&sc=1&text=${words}&multires=1&otf=2"		\
-		-s "http://translate.google.cn/translate_a/t"							\
-		| awk -F"," '{printf "%s\n", $1}'	 							\
-		| awk -F"\"" '{print $2}' 
+		-s "http://translate.google.cn/translate_a/t"`
 
-		#| awk -F"," '{printf "%s\n%s\n%s\n", $2,$3,$1}' 						\
+	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
+	#| awk -F"," '{printf "%s\n%s\n%s\n", $2,$3,$1}' 	
+
+	echo $res_raw
+	echo $res_simple
+
 }
