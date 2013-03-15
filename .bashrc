@@ -11,12 +11,7 @@
 [ "$os_cygwin" = "false" -a -f /etc/bash_completion ] && source /etc/bash_completion 	# very slow in cygwin, run it first, init/bash.sh need turn off some completion on cygwin
 SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
 
-# init myenv
-source $HOME/.myenv/init/bash.sh
-dloadrbvenv
-[ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
-
-# should not run on cygwin
+# platform depended operation
 if [ "$os_cygwin" = "false" ] ; then
 
 	# init auto complete
@@ -32,10 +27,17 @@ if [ "$os_cygwin" = "false" ] ; then
 	else 
 		export PS1="\[\e[32m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
 	fi
+else
+	export PS1="\[\e[32m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
 fi
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
+
+# init myenv
+source $HOME/.myenv/init/bash.sh
+dloadrbvenv
+[ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
 stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
