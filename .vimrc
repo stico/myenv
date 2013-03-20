@@ -93,12 +93,9 @@ noremap <C-T> :tabnew<CR>
 " failed to update to use <C-S-T>, seems will override the <C-T>
 " suggest not to use <A-T>, it means alt+shift+t
 noremap <A-t> :tabnew<CR>:e $HOME/Documents/DCB/Collection_Note/allFile_All.txt<CR><CR>:set isfname+=:<CR>
-" for schedule done
-inoremap <A-S-D> <Esc>A<Tab><Tab>done<Esc>5h
-nnoremap <A-S-D> <Esc>A<Tab><Tab>done<Esc>5h
-" for merge with Tab
-inoremap <A-S-J> <Esc>Js<Tab><Esc>
-nnoremap <A-S-J> <Esc>Js<Tab><Esc>
+" for line merge, not cursor after J will either on the insert blank (when vim insert one) or on the 1st char of next line (when already blank on 1st line and no need to insert)
+nnoremap J JgEldw
+nnoremap gJ J
 " if not, the Q will enter Ex mode which seldom use
 map Q gq
 " exchange the */# and g*/g#
@@ -197,8 +194,12 @@ noremap <C-Tab> gt
 inoremap <C-Tab> <Esc>gt
 noremap <C-S-Tab> gT
 inoremap <C-S-Tab> <Esc>gT
+"
+"""""""""""""""""""""""""""""" H1 - Mapping - Jump
 " since <C-I> equals <Tab> and <Tab> can is used 
 nnoremap <C-N> <C-I>
+" since not allowed to jump before saving anyway
+nnoremap <C-O> :w<CR><C-O>
 
 
 """""""""""""""""""""""""""""" H1 - Mapping - Eclipse Simulation

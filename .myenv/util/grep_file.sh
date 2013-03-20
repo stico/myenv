@@ -2,6 +2,7 @@
 
 # TODO
 # - seems can not support grepfile "aaa\|bbb"
+# - seems can not add more options
 
 fileList=.fl_files.txt
 grepResult=.grep_result.txt

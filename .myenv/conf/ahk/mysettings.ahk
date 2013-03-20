@@ -127,6 +127,10 @@ Filter_S_Insert() {
 		sendInput {ALT DOWN}{Space}{ALT UP}{e}{p}
 		;SendInput {RButton}
 	; don't use "" for the window name, otherwise is will no effect
+	} else IfWinActive PowerShell
+	{
+		sendInput {ALT DOWN}{Space}{ALT UP}{e}{p}
+		;SendInput {RButton}
 	} else IfWinActive Command Prompt
 	{
 		sendInput {ALT DOWN}{Space}{ALT UP}{e}{p}
