@@ -341,7 +341,7 @@ ShowHide_TextWindow(TextFilePath, CloseWindow, ForceUTF8, RemoveM, AdditionCmd)
 
 		IfWinNotExist , %TextWindowName%
 		{
-			run %MY_PRO%\A_Text_Vim_7.2_PA-Basic\App\vim\vim72\gVim.exe %TextFilePath%
+			run %MY_PRO%\A_Text_Vim\App\vim\vim73\gVim.exe %TextFilePath%
 			WinWait %TextWindowName%
 			;winset AlwaysOnTop, ON, %TextWindowName%
 			winActivate %TextWindowName%
@@ -383,7 +383,7 @@ ShowExplorer()
 
 QuickOpen_Vim()
 {
-	run %MY_PRO%\A_Text_Vim_7.2_PA-Basic\App\vim\vim72\gVim.exe
+	run %MY_PRO%\A_Text_Vim\App\vim\vim73\gVim.exe
 	;winActivate t.txt
 }
 
@@ -741,7 +741,7 @@ EditTempCopyText()
 	sendInput ^c
 	ClipWait, 2             ; wait until clipboard contains data
 
-	run %MY_PRO%\A_Text_Vim_7.2_PA-Basic\App\vim\vim72\gVim.exe
+	run %MY_PRO%\A_Text_Vim\App\vim\vim73\gVim.exe
 	WinWait [No Name] - GVIM
 	sendInput ^v
 }
@@ -752,7 +752,7 @@ EditTempCutText()
 	sendInput ^x
 	ClipWait, 2             ; wait until clipboard contains data
 
-	run %MY_PRO%\A_Text_Vim_7.2_PA-Basic\App\vim\vim72\gVim.exe
+	run %MY_PRO%\A_Text_Vim\App\vim\vim73\gVim.exe
 	WinWait [No Name] - GVIM
 	sendInput ^v
 }

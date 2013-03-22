@@ -36,6 +36,11 @@ let g:ctrlp_custom_ignore = {
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
+"
+"""""""""""""""""""""""""""""" H1 - Settings - Topic
+" try best to auto save
+au FocusLost * silent! wa
+set autowriteall
 
 
 """""""""""""""""""""""""""""" H1 - Settings - Misc
@@ -50,7 +55,9 @@ set showcmd						" show the cmd in the bottom, like 'dw'
 set nowrap						" wrap/nowrap the line
 set linebreak						" won't break words as wrapping a line, need wrap set
 set cursorline						" highlight current line
+set gdefault						" make substitute g flag default on
 "set cursorcolumn					" highlight current column
+"set relativenumber
 
 """""""""""""""""""""""""""""" H1 - Settings - Search
 set incsearch						" set the increase search
@@ -84,9 +91,16 @@ set whichwrap+=h,l					" make the h/l also
 set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /next line
 
 
+"""""""""""""""""""""""""""""" H1 - Mapping - Disable Useless keys
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+noremap <left> <nop>
+noremap <right> <nop>
+noremap <up> <nop>
+noremap <down> <nop>
+
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
-map <F1> <Esc>
-imap <F1> <Esc>
 noremap <C-T> :tabnew<CR>
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 
