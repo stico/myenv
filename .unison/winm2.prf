@@ -1,8 +1,12 @@
-## Unison preferences file
 root=/home/ouyangzhu/.m2/
 root=/cygdrive/g/backup/os_spec_win/m2_repo/
-fastcheck=yes
+
 perms=0
+#links=false
+fastcheck=yes
+dontchmod=true
+ignorecase=true
+ignoreinodenumbers=true
 
 ignore = Regex .*/.svn
 ignore = Regex .*/.svn/.*
