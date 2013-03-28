@@ -36,9 +36,34 @@ let g:ctrlp_custom_ignore = {
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
-"
-"""""""""""""""""""""""""""""" H1 - Settings - Topic
-" try best to auto save
+
+
+"""""""""""""""""""""""""""""" H1 - Topic - Completion
+set iskeyword+=45			" make "-" as part of word, auto complete (^N^P) use it
+"set iskeyword+=46			" make "." as part of word, auto complete (^N^P) use it
+"inoremap <C-O> <C-X><C-O>		" we have better mapping: use C-Space
+
+" Make Completion behavior like IDE
+" inserts longest common text of all matches; and menu come up even if only one match.
+set completeopt=longest,menuone
+" Enter key will simply select the highlighted menu item, just as <C-Y> does
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" keeps a menu item always highlighted. This way you can keep typing characters to narrow the matches, and the nearest match will be selected so that you can hit Enter at any time to insert it.
+inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+" simulates <C-X><C-O> to bring up the omni completion menu, then it simulates <C-N><C-P> to remove the longest common text, and finally it simulates <Down> again to keep a match highlighted.
+inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+" open omni completion menu closing previous if open and opening new menu without changing the text
+inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+" open user completion menu closing previous if open and opening new menu without changing the text
+inoremap <expr> <S-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-u><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+
+" For Ruby
+let g:rubycomplete_rails = 1
+let g:rubycomplete_buffer_loading = 1
+let g:rubycomplete_classes_in_global = 1
+
+
+"""""""""""""""""""""""""""""" H1 - Topic - auto save
 au FocusLost * silent! wa
 set autowriteall
 
@@ -76,8 +101,6 @@ set viminfo=						" don't want .viminfo everywhere
 set isfname+=32						" make " " as part of filename, gf (goto file) use it
 "set isfname+=44					" make (,) as part of filename, gf (goto file) use it
 set isfname-=:						" make ":" NOT a part of the filename, gf (goto file) use it
-set iskeyword+=45					" make "-" as part of word, auto complete (^N^P) use it
-"set iskeyword+=46					" make "." as part of word, auto complete (^N^P) use it
 
 """""""""""""""""""""""""""""" H1 - Settings - GUI
 set guioptions-=m					" no menu
@@ -191,6 +214,7 @@ nnoremap <A-S-Y> <Esc>"+y$
 nnoremap <CR> o<Esc>
 nnoremap <S-CR> O<Esc>j
 nnoremap <C-CR> i<CR><Esc>
+" note <C-I> equals <Tab>, so <C-I> is also mapped here!
 nnoremap <Tab> i<Tab><Esc>
 nnoremap <S-Tab> $F<Tab>i<Tab><Esc>
 nnoremap <Space> i<Space><Esc>
@@ -208,12 +232,11 @@ noremap <C-Tab> gt
 inoremap <C-Tab> <Esc>gt
 noremap <C-S-Tab> gT
 inoremap <C-S-Tab> <Esc>gT
-"
+
+
 """""""""""""""""""""""""""""" H1 - Mapping - Jump
-" since <C-I> equals <Tab> and <Tab> can is used 
+" <C-I> equals <Tab>, since <Tab> is mapped in normal mode, need another key for function "jump next",  C-N in normal mode is useless, so use it
 nnoremap <C-N> <C-I>
-" since not allowed to jump before saving anyway
-nnoremap <C-O> :w<CR><C-O>
 
 
 """""""""""""""""""""""""""""" H1 - Mapping - Eclipse Simulation
