@@ -1,0 +1,9 @@
+env=$MY_ENV
+pro=$MY_PRO
+dev=$MY_DEV
+doc=$MY_DOC
+dcb=$MY_DOC/DCB
+dcc=$MY_DOC/DCC
+amp=$MY_TMP
+ampdl=$MY_TMP/download
+amptt=$MY_TMP/`date "+%Y-%m-%d"`

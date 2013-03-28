@@ -1,5 +1,43 @@
 #!/bin/bash
 
+function func_tag_text_value {
+	usage="Usage: func_tag_text_value [tag]"
+	[[ -z $1 ]] && echo $usage && return 1
+
+	tags=$MY_ENV_LIST/tags
+	sed -n -e "s/${1}=//p" $tags
+}
+
+function func_tag_eval_value {
+	usage="Usage: func_tag_eval_value [tag]"
+	[[ -z $1 ]] && echo $usage && return 1
+
+	tag_value=`func_tag_text_value $1`
+
+	# not a tag, return itself
+	[[ -z $tag_value ]] && echo $1 && return 0
+
+	# eval value if contains var or cmd substitution, otherwise return itself
+	[ $(echo $tag_value | grep -c '`\|$') -ge 1 ] && eval "echo $tag_value" || echo $tag_value
+}
+
+function func_ls { 
+	# TODO: use history cmd output. 
+	# FOR_DEV: w | !source /home/ouyangzhu/.myenv/env_func_bash; func_ls dev
+	usage="Usage: func_ls [tag] [path]*"
+	[[ -z $1 ]] && echo $usage && return 1
+
+	# get base dir
+	[[ -z "`func_tag_text_value $1`" ]] && base="./" || base="`func_tag_eval_value $1`/"
+
+	# get search str
+	[[ -z "`func_tag_text_value $1`" ]] || shift
+	search=`echo "$*" | sed -e 's/ \|^\|$/.*/g'`
+
+	# find target
+	find $base -iregex $search 
+}
+
 function func_cd { 
 	cd $1
 	shift
@@ -248,17 +286,17 @@ function func_translate {
 	# TODO: parse all contents, e.g. when translate "break"
 	# TODO: record history
 
-	words="" 
-	for word in $@; 
-	do 
-		words="${words}${word} " 
-	done 
+	# might useful fields: ie=UTF-8&oe=UTF-8
+	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
+	then	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=zh-CN&sl=en"	# en > cn
+	else	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=en&sl=zh-CN"	# cn > en	# why become cn > cn !!??
+	fi
 
-	res_raw=`curl -e "http://translate.google.cn/?hl=en"							\
+	res_raw=`curl -e "http://translate.google.cn/?"							\
 		-H 'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:11.0) Gecko/20100101 Firefox/11.0'	\
 		-H 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'			\
-		-d "tsel=0&ssel=0&tl=zh_CN&client=t&hl=en&sl=en&sc=1&text=${words}&multires=1&otf=2"		\
-		-s "http://translate.google.cn/translate_a/t"`
+		-s "http://translate.google.cn/translate_a/t"							\
+		-d "$data"`
 
 	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
 	#| awk -F"," '{printf "%s\n%s\n%s\n", $2,$3,$1}' 	

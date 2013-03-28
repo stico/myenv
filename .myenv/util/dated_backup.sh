@@ -7,7 +7,7 @@ if [[ $# -lt 1 ]]; then echo "$Usage"; exit 1; fi
 srcPath="$*"
 fileName=$(basename $srcPath)
 targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_`uname -n`_"$fileName"
-bakPath=("$MY_DOC/DCB/Google Drive/VERSION_BACKUP")
+bakPath=("$MY_DOC/DCB/DatedBackup")
 success="success"
 
 # if path is a directory, zip it first

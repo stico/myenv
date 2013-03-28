@@ -41,21 +41,27 @@ let g:ctrlp_custom_ignore = {
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 set iskeyword+=45			" make "-" as part of word, auto complete (^N^P) use it
 "set iskeyword+=46			" make "." as part of word, auto complete (^N^P) use it
-"inoremap <C-O> <C-X><C-O>		" we have better mapping: use C-Space
 
 " Make Completion behavior like IDE
 " inserts longest common text of all matches; and menu come up even if only one match.
 set completeopt=longest,menuone
 " Enter key will simply select the highlighted menu item, just as <C-Y> does
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+"inoremap <expr> <C-e> pumvisible() ? "\<C-e>" : "\<C-g>u\<C-e>"
 " keeps a menu item always highlighted. This way you can keep typing characters to narrow the matches, and the nearest match will be selected so that you can hit Enter at any time to insert it.
 inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
-" simulates <C-X><C-O> to bring up the omni completion menu, then it simulates <C-N><C-P> to remove the longest common text, and finally it simulates <Down> again to keep a match highlighted.
-inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+" the IDE way of completion, 2nd line is for terminal mapping
+imap <C-Space> <C-x><C-o>
+imap <C-@> <C-Space>
+
+
 " open omni completion menu closing previous if open and opening new menu without changing the text
-inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
-" open user completion menu closing previous if open and opening new menu without changing the text
-inoremap <expr> <S-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-u><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+"inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+"inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<C-CR>'
+
+" Unknow setting, seems useless
+" simulates <C-X><C-O> to bring up the omni completion menu, then it simulates <C-N><C-P> to remove the longest common text, and finally it simulates <Down> again to keep a match highlighted.
+"inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
 
 " For Ruby
 let g:rubycomplete_rails = 1
@@ -69,6 +75,7 @@ set autowriteall
 
 
 """""""""""""""""""""""""""""" H1 - Settings - Misc
+set dictionary+=/usr/share/dict/words			" for dictionary auto complete (<C-x><C-k>)
 set nocompatible					" very important for vim, since we are using vim, not vi
 set nobackup						" won't leave additional file(s) after close VIM
 set nowritebackup					" default is :set writebackup, will keep a backup file while file is being worked. Once VIM is closed; the backup will vanish.
