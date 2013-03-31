@@ -41,7 +41,7 @@ let g:ctrlp_custom_ignore = {
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 set iskeyword+=45			" make "-" as part of word, auto complete (^N^P) use it
 "set iskeyword+=46			" make "." as part of word, auto complete (^N^P) use it
-hi PmenuSel ctermbg=Cyan guibg=LightCyan guifg=LightGrey	" TODO: find better colors
+hi PmenuSel ctermbg=Cyan guibg=LightCyan guifg=LightBlue	" TODO: find better colors
 
 """" Make Completion behavior like IDE
 " inserts longest common text of all matches
