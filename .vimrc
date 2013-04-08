@@ -93,6 +93,7 @@ set gdefault						" make substitute g flag default on
 set incsearch						" set the increase search
 set hlsearch						" highlighting the last used search pattern.
 set ignorecase						" useful when using ^n, ^p
+set smartcase						" become case sensitive when have uppercase in search string
 set infercase						" won't change exist case for ^n, need ignorecase open
 
 """""""""""""""""""""""""""""" H1 - Settings - Encoding
@@ -123,10 +124,6 @@ set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
-noremap <left> <nop>
-noremap <right> <nop>
-noremap <up> <nop>
-noremap <down> <nop>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 noremap <C-T> :tabnew<CR>

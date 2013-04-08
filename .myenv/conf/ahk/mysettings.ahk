@@ -54,6 +54,8 @@ $^+q::		Filter_C_S_q_Eclipse()
 $^+e::		Filter_C_S_e_Eclipse()
 $^+TAB::	Filter_C_S_Tab_Excel_Console_Eclipse_FreeCommander()
 $^TAB::		Filter_C_Tab_Excel_Console_Eclipse_FreeCommander()
+$^PgDn::	Filter_C_PgDn_Foxit()
+$^PgUp::	Filter_C_PgUp_Foxit()
 $^d::		Filter_C_d_Cmd_Console_Outlook()
 $Insert::	Filter_Insert()
 $+Insert::	Filter_S_Insert()
@@ -385,6 +387,28 @@ QuickOpen_Vim()
 {
 	run %MY_PRO%\A_Text_Vim\App\vim\vim73\gVim.exe
 	;winActivate t.txt
+}
+
+Filter_C_PgDn_Foxit()
+{
+	IfWinActive, Foxit Reader
+	{
+		send {CTRL DOWN}{Tab}{CTRL UP}
+	} else 
+	{
+		send {CTRL DOWN}{PgDn}{CTRL UP}
+	}
+}
+
+Filter_C_PgUp_Foxit()
+{
+	IfWinActive, Foxit Reader
+	{
+		send {CTRL DOWN}{SHIFT DOWN}{TAB}{SHIFT UP}{CTRL UP}
+	} else 
+	{
+		send {CTRL DOWN}{PgUp}{CTRL UP}
+	}
 }
 
 Filter_C_Tab_Excel_Console_Eclipse_FreeCommander()

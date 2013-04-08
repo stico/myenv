@@ -26,6 +26,7 @@
 !/.msmtprc
 !/.inputrc
 !/.screenrc
+!/.vrapperrc
 !/.tmux.conf
 !/.gitignore
 !/.dir_colors

@@ -98,3 +98,6 @@ FIGNORE		.svn
 
 		# cause byobu not change the window title
 BYOBU_NO_TITLE	1
+
+		# more compatible for grep --color, the default one is: "ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36"
+GREP_COLORS	ms=31:mc=31:sl=:cx=:fn=35:ln=32:bn=32:se=36

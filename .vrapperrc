@@ -1,0 +1,16 @@
+" NOTE, you might need put a link in C:\User\ouyangzhu, even the $HOME is set
+set ignorecase
+set smartcase
+set smartindent
+set autoindent
+set globalregisters
+set regexsearch
+set hlsearch
+set incsearch
+set cursorline
+set saney		" Y will yank to line end, not whole line
+set visualmouse		" auto enter visual mode when mouse select
+set autochdir		" help for :e command to edit files
+
+nmap <Enter> o<Esc>
+nmap <Space> i<Space><Esc>
