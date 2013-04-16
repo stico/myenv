@@ -60,8 +60,8 @@ return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; mail 
 ;:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; yangpeng@yy.com
-:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; panleiming@yy.com; wangqitao@yy.com; wuhaoqing@yy.com; duanyunfeng@yy.com
-:*:ffmlintern::sunxiaodi@yy.com; zengmeng@yy.com; huangdijie@yy.com; jiangchengyan@yy.com; lianghairui@yy.com; luozhixin@yy.com; wuhaoqing@yy.com
+;:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; panleiming@yy.com; wangqitao@yy.com; wuhaoqing@yy.com; duanyunfeng@yy.com
+:*:ffmlintern::xiaoweiteng@yy.com; wenziheng@yy.com; yinhongliang@yy.com; wangke@yy.com
 :*:ffmyenvinit::curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv_lu_ro.sh | bash
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Deprecated

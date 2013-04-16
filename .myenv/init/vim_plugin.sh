@@ -34,3 +34,6 @@ done
 echo "Updating pathogen by copy"
 [ -e $VIM_CONF/autoload ] && mv $VIM_CONF/autoload /tmp/autoload_bak_`date "+%Y%m%d_%H%M%S"`
 cp -R $VIM_CONF/bundle/vim-pathogen/autoload/ $VIM_CONF/
+
+# other notes
+echo "=== NOTE: conque is installed manaully"
