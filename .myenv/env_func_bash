@@ -22,20 +22,32 @@ function func_tag_eval_value {
 }
 
 function func_ls { 
-	# TODO: use history cmd output. 
 	# FOR_DEV: w | !source /home/ouyangzhu/.myenv/env_func_bash; func_ls dev
+
 	usage="Usage: func_ls [tag] [path]*"
 	[[ -z $1 ]] && echo $usage && return 1
 
-	# get base dir
-	[[ -z "`func_tag_text_value $1`" ]] && base="./" || base="`func_tag_eval_value $1`/"
+	# TODO: how to distiguish ll/ls/lla etc
 
-	# get search str
-	[[ -z "`func_tag_text_value $1`" ]] || shift
-	search=`echo "$*" | sed -e 's/ \|^\|$/.*/g'`
+	# TODO: Avoid Filename_Expansion
 
-	# find target
-	find $base -iregex $search 
+	# TODO: For Cmd History: ls the cmd output dir?
+
+	# For Tag: translate tag
+	base="./"
+	if [[ -n "`func_tag_text_value $1`" ]] ;then 
+		base="`func_tag_eval_value $1`/"
+		shift
+	fi
+	pathPattern=`echo "$*" | sed -e '/^$/q;s/ /*\//g;s/$/*/'`
+
+	echo ------------------------------------"$base/$pathPattern"
+	ls -lhtrF --color=auto $base/$pathPattern
+
+	# Tmp Cmd
+	#search=`echo "$*" | sed -e '/^$/q;s/ \|^\|$/.*/g'`
+	#[[ -n $search ]] && search="-iregex $search"
+	#find $base $search 
 }
 
 function func_cd { 

@@ -19,6 +19,7 @@
 # FILE
 !/.vimrc
 !/.netrc
+!/.rvmrc
 !/.cshrc
 !/.bashrc
 !/.curlrc
