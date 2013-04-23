@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# this file is used by login shell
-# so only show things you want to see in login, and other thiings in .bashrc
+# this file is used by login shell, so only show things you want to see in login, and other thiings in .bashrc
 if [ -f ~/.bashrc ]; then
    source ~/.bashrc
 fi
+
+# for login shell we not want this variable set
+export DISPLAY=
 
 # following is for key auth
 #SSHAGENT=/usr/bin/ssh-agent
@@ -13,5 +15,3 @@ fi
 #	eval `$SSHAGENT $SSHAGENTARGS`
 #	trap "kill $SSH_AGENT_PID" 0
 #fi
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME//.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
