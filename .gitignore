@@ -1,7 +1,7 @@
-# make the ignore become include, the starting / is important
+# DEFAULT, make the ignore become include, the starting / is important
 /*
 
-# DIR, need 2 line for one dir
+# INCLUDE, DIR, need 2 line for one dir
 !/.vim/
 !/.vim/*
 !/.fonts/
@@ -11,12 +11,15 @@
 !/vimfiles/
 !/vimfiles/*
 
-# only some file in sub dir
+# INCLUDE, only some file in sub dir
 !/.unison/
 /.unison/*
 !/.unison/*.prf
+!/.w3m/
+!/.w3m/*
+/.w3m/history
 
-# FILE
+# INCLUDE, FILE
 !/.vimrc
 !/.netrc
 !/.rvmrc
