@@ -13,8 +13,8 @@
 
 # only some file in sub dir
 !/.unison/
-/.unison/*
-!/.unison/*.prf
+#/.unison/*
+#!/.unison/*.prf
 
 # FILE
 !/.vimrc
