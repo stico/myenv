@@ -1,0 +1,354 @@
+# A sample of ~/.w3m/keymap (vim)
+#
+# Ctrl  : C-, ^
+# Escape: ESC-, M-, ^[
+# Space : SPC, ' '
+# Tab   : TAB, ^i, ^I
+# Delete: DEL, ^?
+# Up    : UP, ^[[A
+# Down  : DOWN, ^[[B
+# Right : RIGHT, ^[[C
+# Left  : LEFT, ^[[D
+# vim :set fdm=marker noet
+# invalidate defaults {{{
+# 取消預設 keybinding。
+keymap C-@  NULL
+keymap C-a  NULL
+keymap C-b  NULL
+keymap C-e  NULL
+keymap C-f  NULL
+keymap C-g  NULL
+keymap C-h  NULL
+keymap TAB  NULL
+keymap C-j  NULL
+keymap C-k  NULL
+keymap C-l  NULL
+keymap C-m  NULL
+keymap C-n  NULL
+keymap C-p  NULL
+keymap C-q  NULL
+keymap C-r  NULL
+keymap C-s  NULL
+keymap C-t  NULL
+keymap C-u  NULL
+keymap C-v  NULL
+keymap C-w  NULL
+keymap C-z  NULL
+
+keymap SPC  NULL
+keymap !  NULL
+keymap \"  NULL
+keymap #  NULL
+keymap $  NULL
+keymap (  NULL
+keymap )  NULL
+keymap +  NULL
+keymap ,  NULL
+keymap -  NULL
+keymap .  NULL
+keymap /  NULL
+keymap :  NULL
+keymap ";"  NULL
+keymap <  NULL
+keymap =  NULL
+keymap >  NULL
+keymap ?  NULL
+keymap @  NULL
+keymap B  NULL
+keymap D  NULL
+keymap E  NULL
+keymap F  NULL
+keymap G  NULL
+keymap H  NULL
+keymap I  NULL
+keymap J  NULL
+keymap K  NULL
+keymap L  NULL
+keymap M  NULL
+keymap N  NULL
+keymap Q  NULL
+keymap R  NULL
+keymap S  NULL
+keymap T  NULL
+keymap U  NULL
+keymap V  NULL
+keymap W  NULL
+keymap Z  NULL
+keymap [  NULL
+keymap ]  NULL
+keymap \^  NULL
+keymap a  NULL
+keymap b  NULL
+keymap c  NULL
+keymap g  NULL
+keymap h  NULL
+keymap i  NULL
+keymap j  NULL
+keymap k  NULL
+keymap l  NULL
+keymap m  NULL
+keymap n  NULL
+keymap o  NULL
+keymap q  NULL
+keymap r  NULL
+keymap s  NULL
+keymap u  NULL
+keymap v  NULL
+keymap w  NULL
+keymap z  NULL
+keymap {  NULL
+keymap |  NULL
+keymap }  NULL
+
+keymap M-TAB  NULL
+keymap M-C-j  NULL
+keymap M-C-m  NULL
+
+keymap M-:  NULL
+keymap M-<  NULL
+keymap M->  NULL
+keymap M-I  NULL
+keymap M-M  NULL
+keymap M-W  NULL
+keymap M-a  NULL
+keymap M-b  NULL
+keymap M-c  NULL
+keymap M-e  NULL
+keymap M-g  NULL
+keymap M-k  NULL
+keymap M-l  NULL
+keymap M-m  NULL
+keymap M-n  NULL
+keymap M-o  NULL
+keymap M-p  NULL
+keymap M-s  NULL
+keymap M-t  NULL
+keymap M-u  NULL
+keymap M-v  NULL
+keymap M-w  NULL
+
+keymap UP  NULL
+keymap DOWN  NULL
+keymap RIGHT  NULL
+keymap LEFT  NULL
+
+keymap M-[E  NULL
+keymap M-[L  NULL
+keymap M-[Z  NULL
+
+keymap M-[1~  NULL
+keymap M-[2~  NULL
+keymap M-[4~  NULL
+keymap M-[5~  NULL
+keymap M-[6~  NULL
+keymap M-[28~  NULL
+
+# }}}
+
+# Page/Cursor motion {{{
+keymap C-f NEXT_PAGE
+# pentadactyl-like
+keymap SPC NEXT_PAGE
+keymap C-b PREV_PAGE
+keymap l MOVE_RIGHT
+keymap h MOVE_LEFT
+keymap C-d MOVE_DOWN
+keymap C-u MOVE_UP
+#keymap  MOVE_RIGHT1
+#keymap  MOVE_LEFT1
+keymap j MOVE_DOWN1
+keymap k MOVE_UP1
+keymap C-y DOWN
+keymap C-e UP
+keymap zH SHIFT_LEFT
+keymap zL SHIFT_RIGHT
+keymap zh LEFT
+keymap zl RIGHT
+keymap 0 LINE_BEGIN
+keymap \^ LINE_BEGIN
+keymap $ LINE_END
+keymap zz CENTER_H
+# self add
+keymap zZ CENTER_V
+#keymap M-g GOTO_LINE
+keymap gg BEGIN
+keymap G END
+keymap w NEXT_WORD
+keymap b PREV_WORD
+# emacs-like
+keymap C-a LINK_BEGIN
+keymap C-e LINK_END
+keymap TAB NEXT_LINK
+# pentadactyl-like, maybe change to ]l
+keymap ] NEXT_LINK
+keymap M-TAB NEXT_LINK
+# pentadactyl-like, maybe change to [l
+keymap [ PREV_LINK
+# pentadactyl-like
+keymap f MOVE_LIST_MENU
+#keymap  NEXT_RIGHT
+#keymap  NEXT_LEFT
+#keymap  NEXT_DOWN
+#keymap  NEXT_UP
+#keymap  NEXT_RIGHT_DOWN
+#keymap  NEXT_LEFT_UP
+keymap C-o UNDO
+keymap C-i REDO
+#}}}
+
+# Hyperlink operation {{{
+keymap C-m GOTO_LINK
+keymap C-j GOTO_LINK
+# original-setting
+keymap C-t TAB_LINK
+#keymap M-C-j SAVE_LINK
+#keymap M-C-m SAVE_LINK
+# original-setting
+keymap I VIEW_IMAGE
+#keymap M-I SAVE_IMAGE
+#keymap  SUBMIT
+# peek curl url
+keymap c PEEK 
+#keymap u PEEK_LINK
+# original-setting
+keymap i PEEK_IMG 
+keymap gC-g INFO
+keymap C-g LINE_INFO
+# automark url use w3m setting
+#keymap : MARK_URL
+#keymap ";" MARK_WORD
+#keymap M-: MARK_MID
+#keymap F FRAME
+#keymap M EXTERN
+#keymap M-M EXTERN_LINK
+#keymap L LIST
+# pentadactyl-like
+keymap F LIST_MENU
+# }}}
+
+# File/Stream operation {{{
+#keymap :o GOTO
+keymap o GOTO
+keymap O GOTO_RELATIVE
+#keymap :t TAB_GOTO
+keymap t TAB_GOTO
+keymap T TAB_GOTO_RELATIVE
+#keymap :r LOAD
+keymap @ READ_SHELL
+keymap # PIPE_SHELL
+keymap | PIPE_BUF
+# }}}
+
+# Buffer operation {{{
+#keymap B BACK
+keymap L NEXT
+keymap H PREV
+#keymap :his SELECT_MENU
+keymap ,be SELECT
+keymap gf VIEW
+#keymap :w SAVE
+#keymap :W PRINT
+# self add: edit mode, or use i/I?
+keymap e EDIT
+#keymap S SAVE_SCREEN
+keymap E EDIT_SCREEN
+keymap r RELOAD
+#keymap  RESHAPE
+keymap C-l REDRAW
+#keymap  DISPLAY_IMAGE
+#keymap  STOP_IMAGE
+# }}}
+
+# Tab operation {{{
+# TODO may change to C-tC-t
+#keymap C-t NEW_TAB
+#keymap C-w CLOSE_TAB
+keymap d CLOSE_TAB
+keymap D CLOSE_TAB
+keymap gt NEXT_TAB
+keymap gT PREV_TAB
+#keymap b TAB_MENU
+#keymap :buffer TAB_MENU
+# TODO may change to C-tl
+keymap C-wl TAB_RIGHT
+keymap C-wC-l TAB_RIGHT
+keymap C-wh TAB_LEFT
+keymap C-wC-h TAB_LEFT
+# }}}
+
+# Boookmark operation {{{
+# confilct to TAB_MENU
+#keymap :bmarks VIEW_BOOKMARK
+keymap a ADD_BOOKMARK
+keymap A ADD_BOOKMARK
+#keymap M-b BOOKMARK
+# }}}
+
+# Search {{{
+keymap / SEARCH
+keymap ? SEARCH_BACK
+keymap n SEARCH_NEXT
+keymap N SEARCH_PREV
+keymap C-r ISEARCH_BACK
+keymap C-s ISEARCH
+# }}}
+
+# Dcitionary look-up {{{
+# TODO see README.dict
+#keymap M-w DICT_WORD
+#keymap M-W DICT_WORD_AT
+# }}}
+
+# Mark operation {{{
+# TODO knowing how to use this feature
+# FIXME confilct with menu
+keymap m MARK
+# self add
+keymap C-n NEXT_MARK
+keymap C-p PREV_MARK
+# self add
+keymap \" REG_MARK
+# }}}
+
+# Miscellany {{{
+# self add
+# ranger-like: gx to go other position
+keymap : MENU
+# self add
+#keymap :map ? HELP
+# self add
+#keymap :pref OPTIONS
+#keymap C-k COOKIE
+#keymap :ver VERSION
+#keymap C-h HISTORY
+# plugin-like
+#keymap ,be HISTORY
+#keymap :dl DOWNLOAD_LIST
+#keymap  CHARSET
+#keymap  DEFAULT_CHARSET
+# pentadactyl-like: :dia console
+#keymap :mes MSGS
+#keymap m MOUSE_TOGGLE
+#keymap C-w WRAP_TOGGLE
+#keymap :: COMMAND
+# self configured i3-like: open dmenu
+keymap M-c COMMAND
+#keymap  ALARM
+#keymap M-o SET_OPTION
+#keymap  SETENV
+#keymap :map DEFINE_KEY
+# pentadactyl-like :rehash
+#keymap :source REINIT
+keymap ! SHELL
+keymap C-c INTERRUPT
+#keymap :q QUIT
+keymap ZZ QUIT
+keymap ZQ EXIT
+keymap C-z SUSPEND
+# }}}
+
+# User defined keymaps {{{
+# goto homepage
+keymap gh GOTO https://www.google.com/
+keymap gH TAB_GOTO https://www.google.com/
+# }}}
