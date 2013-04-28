@@ -10,6 +10,13 @@ let loaded_settings_of_stico = 1
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 
+"""""""""""""""""""""""""""""" H1 - Input Method
+" Note: this only works with compile option +xim in GUI version
+if has("gui_running")
+	set imactivatekey=S-C-space
+	inoremap <ESC> <ESC>:set iminsert=0<CR>
+endif
+
 """""""""""""""""""""""""""""" H1 - Syntax
 syntax on						" switch syntax highlighting on
 if has('gui_running')

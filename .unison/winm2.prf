@@ -1,5 +1,5 @@
 root=/home/ouyangzhu/.m2/
-root=/cygdrive/g/backup/os_spec_win/m2_repo/
+root=/cygdrive/f/backup/os_spec_win/m2_repo/
 
 perms=0
 #links=false

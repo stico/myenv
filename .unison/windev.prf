@@ -1,5 +1,5 @@
 root=/home/ouyangzhu/dev/
-root=/cygdrive/g/backup/os_spec_win/dev/
+root=/cygdrive/f/backup/os_spec_win/dev/
 
 perms=0
 #links=false
