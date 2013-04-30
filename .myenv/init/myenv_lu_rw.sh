@@ -26,3 +26,7 @@ mkdir -p ~/.ssh ~/.myenv/secu ~/.myenv/secure
 [ -e "$ssh_bak" ] && cp -rf $ssh_bak/* ~/.ssh/ || echo "ERROR: failed to restore files in .ssh/"
 [ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ || echo "INFO: .myenv/secu/ not exist, not restored"
 [ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ || echo "INFO: .myenv/secure/ not exist, not restored"
+
+# 4) update github remote
+git remote rm github
+git remote add github "stico_github:stico/myenv.git"
