@@ -1,12 +1,8 @@
 #!/bin/bash
 
-apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
-apt_update_ago=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
 git_myenv_name=myenv
-git_myenv_addr=https://github.com/stico/myenv.git
-
-
-[ -e $apt_update_stamp ] && (( $apt_update_ago > 86400 )) && sudo apt-get update || echo "INFO: last 'apt-get update' was $apt_update_ago seconds ago, skip this time"
+#git_myenv_addr=https://github.com/stico/myenv.git
+git_myenv_addr=git@github.com:stico/myenv.git
 
 sudo apt-get install -y git subversion
 sudo apt-get install -y tree zip unzip
@@ -23,6 +19,8 @@ function init_with_git {
 		mv ~/$git_myenv_name/* ~
 		mv ~/$git_myenv_name/.* ~
 		rm -rf ~/$git_myenv_name/
+		cd ~
+		git remote add github $git_myenv_addr
 	fi
 }
 
@@ -43,4 +41,4 @@ function init_without_git {
 }
 
 (command -v git &> /dev/null) && init_with_git || init_without_git
-echo "INFO: myenv init success, you need to re-login shell!"
+echo "INFO: myenv init success, invoke a new shell for you!"
