@@ -2,6 +2,8 @@
 # Test failed on cygwin with some small error report on yaml configure (2013-01-17)
 # Ref: http://blog.developwithpassion.com/2012/03/30/installing-rvm-with-cygwin-on-windows/
 
+echo "ERROR: in dev, not really work yet, disable this line to continue"
+
 [ -e ~/.rvm ] && echo "ERROR: ~/.rvm already exist, if want reinstall, remove it" && exit
 
 devtool_cmd=osx_or_cygwin_kick_off

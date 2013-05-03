@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dated_bak_dir=$HOME/Documents/DCB/DatedBackup
-myenv_init_ro=~/.myenv/init/myenv_lu_ro.sh
+myenv_init_ro=~/.myenv/init/myenv.ro.LU.sh
 
 # 1) init from github
 [ ! -e $myenv_init_ro ] && echo "ERROR: $myenv_init_ro not exist, pls check!" && exit 1

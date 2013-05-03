@@ -6,9 +6,43 @@
 
 # Variables
 chrome_stable='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
-apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
-apt_update_ago=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
 apt_source=/etc/apt/sources.list
+
+echo "############################################################ APT SRC UPDATE"
+#TODO "NOT IMPL YET !"
+
+echo "############################################################ APT-GET UPDATE"
+apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
+apt_update_stamp2=/tmp/update-success-stamp
+apt_update_ago=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
+apt_update_ago2=$(( `date +%s` - `stat -c %Y $apt_update_stamp2` ))
+[ -e $apt_update_stamp ] && (( $apt_update_ago > 86400 ))				&&	\
+[ -e $apt_update_stamp2 ] && (( $apt_update_ago2 > 86400 ))				&&	\
+sudo apt-get update && touch $apt_update_stamp2						||	\
+echo "INFO: last update was $apt_update_ago/$apt_update_ago2 seconds ago, skip..."
+
+echo "############################################################ MK DOC LINK"
+home_doc_path="$HOME/Documents"
+(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 ))	&& \
+echo "$home_doc_path is not empty, exit!" && exit 1
+[[ -e $home_doc_path ]] && rmdir $home_doc_path
+ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+(( `echo $ext_doc_path | wc -l` == 1 ))			&& \
+ln -s $ext_doc_path $home_doc_path			|| \
+echo "Failed to find Documents dir in /ext, exit!"
+
+echo "############################################################ SETUP MYENV"
+sudo apt-get -y install unzip
+./myenv.rw.LU.sh
+
+echo "############################################################ MK DEV/PROGRAM LINK"
+
+
+echo "############################################################ INSTALL SOFT"
+sudo apt-get -y install aptitude
+ins_cmd=aptitude
+
+exit
 
 
 # Pre-condition/pre-work
@@ -29,7 +63,7 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu") == 1 ] ; then
 	sudo apt-get install -y python-software-properties		# for cmd add-apt-repository 
 	sudo apt-get install -y software-properties-common		# for cmd add-apt-repository 
 	sudo apt-get install -y git subversion mercurial		# dev tools
-	sudo apt-get install -y tmux terminator autossh			# dev tools
+	sudo apt-get install -y tmux terminator autossh w3m		# dev tools
 	sudo apt-get install -y debconf-utils				# help auto select when install software (like mysql, wine, etc)
 	sudo apt-get install -y linux-headers-`uname -r`		# for what?
 fi

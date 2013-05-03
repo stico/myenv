@@ -63,7 +63,7 @@ return
 ;:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; panleiming@yy.com; wangqitao@yy.com; wuhaoqing@yy.com; duanyunfeng@yy.com
 :*:ffmlpay::jiangnan@yy.com; duanyunfeng@yy.com; wujiabao@yy.com; wangfei1@yy.com; wuhaoqing@yy.com; xieyuanxi@yy.com; xiaoweiteng@yy.com; wenziheng@yy.com; yinhongliang1@yy.com; wangke@yy.com
 :*:ffmlintern::xiaoweiteng@yy.com; wenziheng@yy.com; yinhongliang1@yy.com; wangke@yy.com
-:*:ffmyenvinit::curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv_lu_ro.sh | bash
+:*:ffmyenvinit::curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh | bash
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Deprecated
 ;::jws::JAX-WS
