@@ -476,6 +476,9 @@ Filter_C_S_Tab_Excel_Console_Eclipse_FreeCommander()
 
 Filter_S_LButton_Taskbar()
 {
+	; Shift Right Click on taskbar icon will create a new soft instance
+	; Shift Middle Click also
+
 	MouseGetPos,,, win		; Get window under mouse.
 	; If this window is the taskbar,  mode:="", otherwise mode:="{Blind}".
 	mode :=  WinExist("ahk_class Shell_TrayWnd ahk_id " win) ? "" : "{Blind}"
