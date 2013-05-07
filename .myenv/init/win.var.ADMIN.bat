@@ -1,5 +1,13 @@
 @ECHO OFF
 
+REM Some pre-condtion and reminder
+ECHO Press enter if you already: 
+ECHO 1. set HOME var manually 
+ECHO 2. updated machine/vm power plan 
+ECHO 3. run this script as Administrator
+ECHO Otherwise terminate it
+PAUSE
+
 REM log record, in case need some rollback
 ECHO Start to set env, before setting record: PATH=%PATH% >> zgen\win_gen.log
 

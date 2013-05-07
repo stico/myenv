@@ -49,6 +49,7 @@ RButton::	Window_Drag()
 ^RButton::	Window_Resize()
 
 ; to prevent catch cmd send by itself, use $ prefix for cmd
+$+LButton::	Filter_S_LButton_Taskbar()
 $^+w::		Filter_C_S_w_Chrome()
 $^+q::		Filter_C_S_q_Eclipse()
 $^+e::		Filter_C_S_e_Eclipse()
@@ -472,6 +473,16 @@ Filter_C_S_Tab_Excel_Console_Eclipse_FreeCommander()
 ;		send {CTRL DOWN}{PgUp}{CTRL UP}
 ;	}
 ;}
+
+Filter_S_LButton_Taskbar()
+{
+	MouseGetPos,,, win		; Get window under mouse.
+	; If this window is the taskbar,  mode:="", otherwise mode:="{Blind}".
+	mode :=  WinExist("ahk_class Shell_TrayWnd ahk_id " win) ? "" : "{Blind}"
+	Send %mode%{LButton Down}	; Click  down, filtering out Shift if mode="".
+	KeyWait LButton			; Wait for button to be  physically released.
+	Send %mode%{LButton Up}		; Click up.
+}
 
 Filter_C_S_w_Chrome()
 {
