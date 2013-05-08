@@ -1,24 +1,81 @@
 #!/bin/bash
 
-function func_tag_text_value {
-	usage="Usage: func_tag_text_value [tag]"
-	[[ -z $1 ]] && echo $usage && return 1
+#function func_tag_text_value {
+#	usage="Usage: func_tag_text_value [tag]"
+#	[[ -z $1 ]] && echo $usage && return 1
+#
+#	tags=$MY_ENV_LIST/tags
+#	sed -n -e "s/${1}=//p" $tags
+#}
 
+function func_tag_value {
+	# empty parameter, empty output
+	[ -z "$*" ] && return 1
+
+	# contain no-tag char, return itself
+	[ $(echo "$*" | grep -c "/\| ") -ge 1 ] && echo $* && return 0
+
+	# check tag
 	tags=$MY_ENV_LIST/tags
-	sed -n -e "s/${1}=//p" $tags
-}
-
-function func_tag_eval_value {
-	usage="Usage: func_tag_eval_value [tag]"
-	[[ -z $1 ]] && echo $usage && return 1
-
-	tag_value=`func_tag_text_value $1`
+	tag_value=`sed -n -e "s/${1}=//p" $tags`
 
 	# not a tag, return itself
 	[[ -z $tag_value ]] && echo $1 && return 0
 
 	# eval value if contains var or cmd substitution, otherwise return itself
 	[ $(echo $tag_value | grep -c '`\|$') -ge 1 ] && eval "echo $tag_value" || echo $tag_value
+}
+
+function func_select_line {
+	usage="Usage: func_select_line [result_var_name] [lines]"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	# need use variable to "return" result
+	result_var_name=$1
+	eval $result_var_name=""
+	shift
+
+	# empty parameter, empty output
+	[ -z "$*" ] && return 1
+	
+	targets_lines=$(echo "$*" | wc -l)
+	[ $(echo "$*" | wc -l) -eq 1 ] && echo $* && return 0
+	[ $(echo "$*" | wc -l) -gt 20 ] && echo "ERROR: to much line candidates ($targets_lines), pls check" && echo "$*" | sed -n -e '1,20p' && return 1
+
+	echo "$*" | cat -n
+	echo "NOT SINGLE CANDIDATES, PLS SELECT ONE:"
+	read -e selection
+	user_selection=`echo "$*" | sed -n -e "${selection}p"`
+	eval $result_var_name=$user_selection
+}
+
+function func_find {
+	usage="Usage: func_find [result_var_name] [base] [pattern]"
+	[ $# -lt 3 ] && echo $usage && return 1
+
+	# need use variable to "return" result
+	result_var_name=$1
+	eval $result_var_name=""
+	shift
+
+	# variables
+	base=$1
+	shift
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+
+	# TODO: use .fl_files.txt improve performance ???
+
+	targets=`find -P "$base" -iregex "$search" | sed -e "/^$/d"`
+	targets_lines=$(echo "$targets" | wc -l)
+	if [ -z "$targets" ] ; then					# not found, follow links maybe works
+		targets=`find -L "$base" -iregex "$search" | sed -e "/^$/d"`
+	fi
+	echo ------------------------------------"complex, base=$base, search=$search"
+	echo ------------------------------------"cmd=find -P $base -iregex $search"
+	echo ------------------------------------"targets=$targets, lines="`echo "$targets" | wc -l`
+
+	[ -z "$targets" ] && return 1					# not found, return
+	func_select_line $result_var_name "$targets"
 }
 
 function func_ls { 
@@ -33,7 +90,7 @@ function func_ls {
 
 	# TODO: For Cmd History: ls the cmd output dir?
 
-	# For Tag: translate tag
+	# Translate tag
 	base="./"
 	if [[ -n "`func_tag_text_value $1`" ]] ;then 
 		base="`func_tag_eval_value $1`/"
@@ -48,6 +105,20 @@ function func_ls {
 	#search=`echo "$*" | sed -e '/^$/q;s/ \|^\|$/.*/g'`
 	#[[ -n $search ]] && search="-iregex $search"
 	#find $base $search 
+}
+
+function func_cd_ts {
+	
+	[ -z "$*" ] && cd && echo ===================================="simple cd, no param" && return
+
+	base="$1"
+	base_eval="`func_tag_value $1`"
+	[ -n "${base_eval}" ] && base=${base_eval}
+	shift
+	[ -z "$*" ] && cd $base && echo ===================================="only base, base=$base" && return
+
+	func_find cd_target $base $*
+	cd `dirname $cd_target`
 }
 
 function func_cd { 
