@@ -39,10 +39,9 @@ function func_select_line {
 	[ -z "$*" ] && return 1
 	
 	targets_lines=$(echo "$*" | wc -l)
-	[ $(echo "$*" | wc -l) -eq 1 ] && echo $* && return 0
-	[ $(echo "$*" | wc -l) -gt 20 ] && echo "ERROR: to much line candidates ($targets_lines), pls check" && echo "$*" | sed -n -e '1,20p' && return 1
+	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
 
-	echo "$*" | cat -n
+	echo "$*" | sed -n -e "1,20p;21s/.*/(!!! WARNING: more result suppressed, $targets_lines in total. !!!)/p" | cat -n
 	echo "NOT SINGLE CANDIDATES, PLS SELECT ONE:"
 	read -e selection
 	user_selection=`echo "$*" | sed -n -e "${selection}p"`
@@ -50,32 +49,51 @@ function func_select_line {
 }
 
 function func_find {
-	usage="Usage: func_find [result_var_name] [base] [pattern]"
-	[ $# -lt 3 ] && echo $usage && return 1
+	# TODO: use .fl_files.txt improve performance ???
+
+	usage="Usage: func_find [result_var_name] [find_type] [base] [pattern]"
+	[ $# -lt 4 ] && echo $usage && return 1
 
 	# need use variable to "return" result
 	result_var_name=$1
+	find_type=$2
+	shift;shift
 	eval $result_var_name=""
-	shift
 
-	# variables
-	base=$1
-	shift
-	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-
-	# TODO: use .fl_files.txt improve performance ???
-
-	targets=`find -P "$base" -iregex "$search" | sed -e "/^$/d"`
-	targets_lines=$(echo "$targets" | wc -l)
-	if [ -z "$targets" ] ; then					# not found, follow links maybe works
-		targets=`find -L "$base" -iregex "$search" | sed -e "/^$/d"`
-	fi
-	echo ------------------------------------"complex, base=$base, search=$search"
-	echo ------------------------------------"cmd=find -P $base -iregex $search"
-	echo ------------------------------------"targets=$targets, lines="`echo "$targets" | wc -l`
-
-	[ -z "$targets" ] && return 1					# not found, return
+	targets=`func_find_type $find_type $*`
 	func_select_line $result_var_name "$targets"
+}
+
+function func_find_type {
+	usage="Usage: func_find_type [find_type] [base] [pattern]"
+	[ $# -lt 3 ] && echo $usage && return 1
+
+	find_type=$1
+	base=$2
+	shift;shift
+
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	targets=`find -P "$base" -iregex "$search" -xtype $find_type | sed -e "/^$/d"`				# 1st try, not follow links
+	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type $find_type | sed -e "/^$/d"`	# not found, follow links maybe works
+	[ -z "$targets" ] && return 1										# not found, return
+
+	echo "$targets"
+}
+
+function func_cd_ts {
+	
+	# Must use "\cd", avoiding infinite loop when "alias cd=func_cd_ts"
+	[ -z "$*" ] && \cd && return
+
+	base="$1"
+	base_eval="`func_tag_value $1`"
+	[ -n "${base_eval}" ] && base=${base_eval}
+	shift
+	[ -z "$*" ] && \cd $base && return
+
+	func_find result_target d $base $*
+	[ -d $result_target ] && \cd $result_target || \cd `dirname $result_target`
+	ll
 }
 
 function func_ls { 
@@ -105,20 +123,6 @@ function func_ls {
 	#search=`echo "$*" | sed -e '/^$/q;s/ \|^\|$/.*/g'`
 	#[[ -n $search ]] && search="-iregex $search"
 	#find $base $search 
-}
-
-function func_cd_ts {
-	
-	[ -z "$*" ] && cd && echo ===================================="simple cd, no param" && return
-
-	base="$1"
-	base_eval="`func_tag_value $1`"
-	[ -n "${base_eval}" ] && base=${base_eval}
-	shift
-	[ -z "$*" ] && cd $base && echo ===================================="only base, base=$base" && return
-
-	func_find cd_target $base $*
-	cd `dirname $cd_target`
 }
 
 function func_cd { 
