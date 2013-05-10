@@ -234,6 +234,19 @@ inoremap <C-Del> <Esc>ldwi
 inoremap <C-Backspace> <Esc>ldbi
 noremap <C-Left> b
 noremap <C-Right> w
+" visual selection
+nnoremap <S-Right> vl
+nnoremap <C-S-Right> ve
+nnoremap <S-Left> lvh
+nnoremap <C-S-Left> lvb
+inoremap <S-Right> <ESC>lvl
+inoremap <C-S-Right> <ESC>lve
+inoremap <S-Left> <ESC>lvh
+inoremap <C-S-Left> <ESC>lvb
+vnoremap <S-Right> l
+vnoremap <C-S-Right> e
+vnoremap <S-Left> h
+vnoremap <C-S-Left> b
 " y in visual mode also copy to clipboard
 vnoremap y "+y
 vnoremap d "+d

@@ -41,7 +41,7 @@ function func_select_line {
 	targets_lines=$(echo "$*" | wc -l)
 	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
 
-	echo "$*" | sed -n -e "1,20p;21s/.*/(!!! WARNING: more result suppressed, $targets_lines in total. !!!)/p" | cat -n
+	func_head 20 "$*" | cat -n
 	echo "NOT SINGLE CANDIDATES, PLS SELECT ONE:"
 	read -e selection
 	user_selection=`echo "$*" | sed -n -e "${selection}p"`
@@ -81,19 +81,42 @@ function func_find_type {
 }
 
 function func_cd_ts {
-	
+	# TODO: why cygwin need source again to make it works
+
 	# Must use "\cd", avoiding infinite loop when "alias cd=func_cd_ts"
-	[ -z "$*" ] && \cd && return
+	[ -z "$*" ] && \cd && return 0
 
 	base="$1"
 	base_eval="`func_tag_value $1`"
 	[ -n "${base_eval}" ] && base=${base_eval}
 	shift
-	[ -z "$*" ] && \cd $base && return
+	[ -z "$*" ] && \cd $base && func_head_cmd 20 ll && return 0
 
 	func_find result_target d $base $*
 	[ -d $result_target ] && \cd $result_target || \cd `dirname $result_target`
-	ll
+	func_head_cmd 20 ll
+}
+
+function func_head_cmd {
+	usage="Usage: func_head_cmd [show_lines] [cmd]"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	show_lines=$1
+	shift
+
+	cmd_result=`eval "$*"`
+	func_head $show_lines "$cmd_result"
+}
+
+function func_head {
+	usage="Usage: func_head_cmd [show_lines] [text]"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	show_lines=$1
+	shift
+
+	total_lines=$(echo "$*" | wc -l)
+	echo "$*" | sed -n -e "1,${show_lines}p;21s/.*/(!!! WARNING: more lines suppressed, $total_lines in total. !!!)/p"
 }
 
 function func_ls { 
@@ -126,10 +149,10 @@ function func_ls {
 }
 
 function func_cd { 
-	cd $1
+	\cd $1
 	shift
 	for path in $@ ; do
-		cd *${path}* || return 1
+		\cd *${path}* || return 1
 		shift
 	done
 
@@ -150,7 +173,7 @@ function func_mkdir_cd {
 
 	mkdir -p "$@" 				&&
 	# why need such complex eval?
-	eval cd "\"\$$#\""
+	eval \cd "\"\$$#\""
 }
 
 function func_cd_tmp_today { 
@@ -176,26 +199,26 @@ function func_git_pull {
 	usage="Usage: func_git_pull [code_base]"
 	[[ -z $1 ]] && echo $usage && return 1
 
-	cd $1		 			&&
+	\cd $1		 			&&
 	git pull github master 			&&
 	git status	 			&&
-	cd -
+	\cd -
 }
 
 function func_git_status { 
 	usage="Usage: func_git_status [code_base]"
 	[[ -z $1 ]] && echo $usage && return 1
 
-	cd $1					&&	
+	\cd $1					&&	
 	git status 	
-	cd -
+	\cd -
 }
 
 function func_git_commit_push { 
 	usage="Usage: func_git_commit_push [code_base] [comment]"
 	[[ -z $1 || -z $2 ]] && echo $usage && return 1
 
-	cd $1					&& 
+	\cd $1					&& 
 	git pull github master			&&
 	git add .				&&
 	shift					&&
@@ -203,18 +226,18 @@ function func_git_commit_push {
 	git push github				&&
 	git status 				&&
 	bash $MY_ENV_LIST/myenv_gen.sh		&&
-	cd - 
+	\cd - 
 }
 
 function func_e_grep { 
 	usage="Usage: func_e_grep [pattern]"
 	[[ -z $1 ]] && echo $usage && return 1
 
-	cd $HOME
+	\cd $HOME
 	cat $MY_ENV_ZGEN/myenv.lst | xargs grep -i "$1" > .grep_result.txt
 	grep -i --color "$1" .grep_result.txt
 	# this not work when $1 has grouping "\(\)": eval grepi "$1" .grep_result.txt
-	cd -
+	\cd -
 }
 
 function func_ssh_with_jump {
