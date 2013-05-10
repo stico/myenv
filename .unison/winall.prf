@@ -19,7 +19,13 @@ path = ECB
 path = ECE
 path = ECS
 path = os_spec_lu
-path = os_spec_win
+path = os_spec_win/dev/code_dw
+path = os_spec_win/dev/code_repo
+path = os_spec_win/dev/code_misc
+path = os_spec_win/dev/eclipse_plugins
+path = os_spec_win/dev/eclipse-3.7.1-jee_x64
+path = os_spec_win/dev/eclipse-4.2.2_x64
+path = os_spec_win/dev/nginx_workspace
 
 
 ################################################################################
