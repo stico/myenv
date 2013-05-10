@@ -49,7 +49,6 @@ RButton::	Window_Drag()
 ^RButton::	Window_Resize()
 
 ; to prevent catch cmd send by itself, use $ prefix for cmd
-$+LButton::	Filter_S_LButton_Taskbar()
 $^+w::		Filter_C_S_w_Chrome()
 $^+q::		Filter_C_S_q_Eclipse()
 $^+e::		Filter_C_S_e_Eclipse()
@@ -58,6 +57,9 @@ $^TAB::		Filter_C_Tab_Excel_Console_Eclipse_FreeCommander()
 $^PgDn::	Filter_C_PgDn_Foxit()
 $^PgUp::	Filter_C_PgUp_Foxit()
 $^d::		Filter_C_d_Cmd_Console_Outlook()
+$+LButton::	Filter_S_LButton_Taskbar()
+$+MButton::	Filter_S_MButton_Taskbar()
+$MButton::	Filter_MButton_Taskbar()
 $Insert::	Filter_Insert()
 $+Insert::	Filter_S_Insert()
 $f1::		Filter_F1_Vim()
@@ -485,6 +487,33 @@ Filter_S_LButton_Taskbar()
 	Send %mode%{LButton Down}	; Click  down, filtering out Shift if mode="".
 	KeyWait LButton			; Wait for button to be  physically released.
 	Send %mode%{LButton Up}		; Click up.
+}
+
+Filter_S_MButton_Taskbar()
+{
+	; Shift Right Click on taskbar icon will create a new soft instance
+	; Shift Middle Click also
+
+	MouseGetPos,,, win		; Get window under mouse.
+	; If this window is the taskbar,  mode:="", otherwise mode:="{Blind}".
+	mode :=  WinExist("ahk_class Shell_TrayWnd ahk_id " win) ? "" : "{Blind}"
+	Send %mode%{MButton Down}	; Click  down, filtering out Shift if mode="".
+	KeyWait MButton			; Wait for button to be  physically released.
+	Send %mode%{MButton Up}		; Click up.
+}
+
+Filter_MButton_Taskbar()
+{
+	; Shift Right Click on taskbar icon will create a new soft instance
+	; Middle Click also
+
+	; If this window is the taskbar,  mode:="", otherwise mode:="{Blind}".
+	MouseGetPos,,, win		; Get window under mouse.
+	if WinExist("ahk_class Shell_TrayWnd ahk_id " win) 
+	{
+	} else {
+		send {MButton}
+	}
 }
 
 Filter_C_S_w_Chrome()
