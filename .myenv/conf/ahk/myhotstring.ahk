@@ -5,7 +5,9 @@
 ; !!!	ff	all use prefix "ff", reason 1) already used for ffdate, which could used by one hand
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; misc
-:*:ffbrstico::BR//Stico
+; not work on Chinese
+;:*:ffbr::BR//欧阳柱
+:*:ffpay::pay.duowan.com
 :*:ffip::
 (
 /sbin/ifconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
@@ -58,7 +60,7 @@ FormatTime, CurrentDateTime,, yyyy-MM-dd_HH-mm-ss
 SendInput %CurrentDateTime%
 return
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; mail 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Maillist
 ;:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; yangpeng@yy.com
 ;:*:ffmlrecharge::jiangnan@yy.com; longchao@yy.com; gongzichao@yy.com; panleiming@yy.com; wangqitao@yy.com; wuhaoqing@yy.com; duanyunfeng@yy.com
 :*:ffmlpay::jiangnan@yy.com; duanyunfeng@yy.com; wujiabao@yy.com; wangfei1@yy.com; wuhaoqing@yy.com; xieyuanxi@yy.com; xiaoweiteng@yy.com; wenziheng@yy.com; yinhongliang1@yy.com; wangke@yy.com

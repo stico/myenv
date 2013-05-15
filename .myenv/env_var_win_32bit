@@ -1,2 +1,2 @@
 # Additional settings, will override those in env_var_win
-JAVA_HOME	%MY_DEV%#jdk1.6.0_22
+#JAVA_HOME	%MY_DEV%#jdk1.6.0_22

@@ -2,10 +2,10 @@
 
 dated_bak_dir=$HOME/Documents/DCB/DatedBackup
 myenv_init_ro=~/.myenv/init/myenv.ro.LU.sh
+myenv_init_ro_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh
 
-# 1) init from github
-[ ! -e $myenv_init_ro ] && echo "ERROR: $myenv_init_ro not exist, pls check!" && exit 1
-bash $myenv_init_ro 
+# 1) init from readonly version
+[ -e $myenv_init_ro ] && bash $myenv_init_ro || curl $myenv_init_ro_url | bash
 
 # 2) check 
 [ -e ~/.ssh/config ] && echo "ERROR: ~/.ssh already have content, pls check!" && exit 1
