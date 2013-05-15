@@ -18,3 +18,4 @@ echo -e $MY_ENV_ZGEN
 # path/file
 /.ssh/
 /.subversion/
+/.m2/settings.xml

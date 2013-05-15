@@ -4,6 +4,11 @@ dev=$MY_DEV
 doc=$MY_DOC
 dcb=$MY_DOC/DCB
 dcc=$MY_DOC/DCC
+dcd=$MY_DOC/DCD
+
 amp=$MY_TMP
+tmp=$MY_TMP
 ampdl=$MY_TMP/download
+tmpdl=$MY_TMP/download
 amptt=$MY_TMP/`date "+%Y-%m-%d"`
+tmptt=$MY_TMP/`date "+%Y-%m-%d"`
