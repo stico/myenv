@@ -12,7 +12,7 @@ function init_with_git {
 
 	cd ~
 	if [ -e ~/.git ] ; then
-		echo "INFO: myenv repository alread exist, simple update it"
+		echo "INFO: myenv repository already exist, just update it"
 		git pull
 	else
 		git clone $git_myenv_addr
@@ -22,10 +22,13 @@ function init_with_git {
 		cd ~
 		git remote add github $git_myenv_addr
 	fi
+	echo "INFO: myenv init success, invoke a new shell for you!"
 }
 
 function init_without_git {
-	echo "INFO: git command NOT exist, use zip way"
+	echo "Git not found, init myenv will not able to update, continue (N) [Y/N]?"
+	read -e continue
+	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up myenv init!" && return 1
 	
 	tmp_dir=/tmp/myenv_tmp_init
 	dir_name=myenv-master
@@ -38,7 +41,7 @@ function init_without_git {
 	unzip $pkg_name
 	mv -f $tmp_dir/$dir_name/* ~
 	mv -f $tmp_dir/$dir_name/.* ~
+	echo "INFO: myenv init success, invoke a new shell for you!"
 }
 
 (command -v git &> /dev/null) && init_with_git || init_without_git
-echo "INFO: myenv init success, invoke a new shell for you!"

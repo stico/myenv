@@ -12,7 +12,10 @@ function func_tag_value {
 	# empty parameter, empty output
 	[ -z "$*" ] && return 1
 
-	# contain no-tag char, return itself
+	# NO translation, probably path, translate will also cause problem
+	[ "$*" = "." -o "$*" = ".." ] && echo $* && return 0
+
+	# NO translation, contain no-tag char
 	[ $(echo "$*" | grep -c "/\| ") -ge 1 ] && echo $* && return 0
 
 	# check tag
@@ -81,7 +84,7 @@ function func_find_type {
 }
 
 function func_cd_ts {
-	# TODO: why cygwin need source again to make it works
+	# TODO: why need source again to make it works
 
 	# Must use "\cd", avoiding infinite loop when "alias cd=func_cd_ts"
 	[ -z "$*" ] && \cd && return 0
