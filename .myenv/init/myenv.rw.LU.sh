@@ -1,19 +1,22 @@
 #!/bin/bash
 
-dated_bak_dir=$HOME/Documents/DCB/DatedBackup
-myenv_init_ro=~/.myenv/init/myenv.ro.LU.sh
+# Init dir and var
+[ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 || tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
+mkdir -p $tmp_init_dir
+myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
 myenv_init_ro_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh
+dated_bak_dir=$HOME/Documents/DCB/DatedBackup
 
-# 1) init from readonly version
-[ -e $myenv_init_ro ] && bash $myenv_init_ro || curl $myenv_init_ro_url | bash
+# Init readonly version
+wget -O $myenv_init_ro $myenv_init_ro_url
+[ ! -e $myenv_init_ro ] && echo "$myenv_init_ro not found, init myenv_ro failed!" && exit 1
+bash $myenv_init_ro 
 
-# 2) check 
-[ -e ~/.ssh/config ] && echo "ERROR: ~/.ssh already have content, pls check!" && exit 1
-[ -e ~/.myenv/secu ] && echo "ERROR: ~/.myenv/secu already exist, pls check!" && exit 1
-[ -e ~/.myenv/secure ] && echo "ERROR: ~/.myenv/secure already exist, pls check!" && exit 1
-[ -e $dated_bak_dir ] && echo "ERROR: $dated_bak_dir not exist, not able to find backup package, pls check!" && exit 1
+# Pre check 
+[ -e ~/.ssh/config -o -e ~/.myenv/secu -o -e ~/.myenv/secure ] && echo "~/.ssh or ~/.myenv/secu or ~/.myenv/secure exist, pls check!" && exit 1
+[ ! -e $dated_bak_dir ] && echo "$dated_bak_dir not exist, not able to find backup package, pls check!" && exit 1
 
-# 3) extract .ssh, secu, secure
+# Extract .ssh, secu, secure
 myenv_full_bak=`find $dated_bak_dir -name "*myenv*full*.zip" | tail -1`
 tmp1=${myenv_full_bak%.zip}
 myenv_full_bak_name=${tmp1##*/}
@@ -27,6 +30,6 @@ mkdir -p ~/.ssh ~/.myenv/secu ~/.myenv/secure
 [ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ || echo "INFO: .myenv/secu/ not exist, not restored"
 [ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ || echo "INFO: .myenv/secure/ not exist, not restored"
 
-# 4) update github remote
+# Update github remote
 git remote rm github
 git remote add github "stico_github:stico/myenv.git"
