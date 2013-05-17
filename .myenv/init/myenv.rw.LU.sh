@@ -1,16 +1,17 @@
 #!/bin/bash
 
 # Init dir and var
-[ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 || tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
-mkdir -p $tmp_init_dir
-myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
 myenv_init_ro_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh
+myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
 dated_bak_dir=$HOME/Documents/DCB/DatedBackup
+tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
+[ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 
+mkdir -p $tmp_init_dir
 
 # Init readonly version
 wget -O $myenv_init_ro $myenv_init_ro_url
 [ ! -e $myenv_init_ro ] && echo "$myenv_init_ro not found, init myenv_ro failed!" && exit 1
-bash $myenv_init_ro 
+bash $myenv_init_ro $tmp_init_dir
 
 # Pre check 
 [ -e ~/.ssh/config -o -e ~/.myenv/secu -o -e ~/.myenv/secure ] && echo "~/.ssh or ~/.myenv/secu or ~/.myenv/secure exist, pls check!" && exit 1
