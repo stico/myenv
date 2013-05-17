@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# Init dir and var
-myenv_init_ro_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh
-myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
-dated_bak_dir=$HOME/Documents/DCB/DatedBackup
+# Init tmp dir 
 tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 [ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 
 mkdir -p $tmp_init_dir
+
+# Init var
+myenv_init_ro_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh
+myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
+dated_bak_dir=$HOME/Documents/DCB/DatedBackup
 
 # Init readonly version
 wget -O $myenv_init_ro $myenv_init_ro_url
