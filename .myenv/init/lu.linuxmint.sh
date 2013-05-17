@@ -1,48 +1,134 @@
 #!/bin/bash
 
+#TOOD: update sudoer file
+#TOOD: if Doc link made, will exlt
+
 #TODO: investigate ubuntu tweak
 #TODO: investigate MyUnity
+
+# Common Variable
+tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
+
+# Common Init
+mkdir -p $tmp_init_dir
+
+# Functions
+function func_init_dir {
+	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
+}
+
+function func_init_sudoer {
+	echo ">>> INIT: update /etc/sudoers password setting"
+
+	sudoers=/etc/sudoers
+	sudoers_bak=${sudoers}.bak
+	[ -e $sudoers_bak ] && echo "$sudoers_bak already exist, skip" && return 0
+
+	sudo cp $sudoers $sudoers_bak
+	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
+}
+
+function func_init_apt_update_src {
+	apt_source_list=/etc/apt/sources.list
+	apt_source_list_bak=${apt_source_list}.bak
+
+	echo ">>> INIT: update $apt_source_list"
+	
+	[ -e $apt_source_list_bak ] && echo "$apt_source_list_bak already exist, skip" && return 0
+	sudo cp $apt_source_list $apt_source_list_bak
+	sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/mirrors.163.com/" $apt_source_list
+}
+
+function func_init_apt_update_list {
+	echo ">>> INIT: apt update software list"
+
+	apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
+	apt_update_stamp2=/tmp/update-success-stamp
+
+	[ ! -e $apt_update_stamp2 ] && touch -t 197101020304 $apt_update_stamp2
+	last_update=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
+	last_update2=$(( `date +%s` - `stat -c %Y $apt_update_stamp2` ))
+
+	[ -e $apt_update_stamp ] && (( $last_update > 86400 ))				&& \
+	[ -e $apt_update_stamp2 ] && (( $last_update2 > 86400 ))			&& \
+	echo "updating apt source list..."						&& \
+	sudo apt-get update -qq && touch $apt_update_stamp2				|| \
+	echo "last update was ${last_update}/${last_update2} seconds ago, skip..."
+}
+
+function func_init_link_doc {
+	home_doc_path="$HOME/Documents"
+	echo ">>> INIT: setup links $home_doc_path"
+
+	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
+	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
+
+	[ -d $home_doc_path ] && rmdir $home_doc_path
+	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, exit!" && exit 1
+	ln -s $ext_doc_path $home_doc_path
+}
+
+function func_init_link_dev {
+	home_dev_path="$HOME/dev"
+	echo ">>> INIT: setup links $home_dev_path"
+
+	[ -e $home_dev_path -a -h $home_dev_path ] && echo "dev link already exist, skip" && return 0
+
+	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+	ln -s $ext_doc_path/os_spec_lu/dev $home_dev_path
+}
+
+function func_init_link_pro {
+	home_pro_path="$HOME/program"
+	echo ">>> INIT: setup links $home_pro_path"
+
+	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
+
+	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
+}
+
+function func_init_myenv_rw {
+	echo ">>> INIT: update myenv, support read and write"
+
+	myenv_init_rw=$tmp_init_dir/myenv.rw.LU.sh
+	myenv_init_rw_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.LU.sh 
+
+	echo "downloading $myenv_init_rw_url" && wget -O $myenv_init_rw -q $myenv_init_rw_url
+	[ ! -e $myenv_init_rw ] && echo "$myenv_init_rw not found, init myenv failed!" && exit 1
+	bash $myenv_init_rw $tmp_init_dir
+}
+
+function func_init_soft_basic {
+	echo ">>> INIT: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
+
+	sudo apt-get install -y aptitude > /dev/null
+	sudo apt-get install -y zip unzip > /dev/null
+	sudo apt-get install -y linux-headers-`uname -r` > /dev/null	# some soft compile need this
+
+	#(! command -v aptitude &> /dev/null) && echo "install aptitude failed, pls check!" && exit 1
+}
+
+
+func_init_dir
+func_init_sudoer
+func_init_soft_basic
+func_init_apt_update_src
+func_init_apt_update_list
+
+func_init_link_doc
+func_init_link_dev
+func_init_link_pro
+func_init_myenv_rw
+
+
+exit
 
 
 # Variables
 chrome_stable='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 apt_source=/etc/apt/sources.list
-
-echo "############################################################ APT SRC UPDATE"
-#TODO "NOT IMPL YET !"
-
-echo "############################################################ APT-GET UPDATE"
-apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
-apt_update_stamp2=/tmp/update-success-stamp
-apt_update_ago=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
-apt_update_ago2=$(( `date +%s` - `stat -c %Y $apt_update_stamp2` ))
-[ -e $apt_update_stamp ] && (( $apt_update_ago > 86400 ))				&&	\
-[ -e $apt_update_stamp2 ] && (( $apt_update_ago2 > 86400 ))				&&	\
-sudo apt-get update && touch $apt_update_stamp2						||	\
-echo "INFO: last update was $apt_update_ago/$apt_update_ago2 seconds ago, skip..."
-
-echo "############################################################ MK DOC LINK"
-home_doc_path="$HOME/Documents"
-(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 ))	&& \
-echo "$home_doc_path is not empty, exit!" && exit 1
-[[ -e $home_doc_path ]] && rmdir $home_doc_path
-ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-(( `echo $ext_doc_path | wc -l` == 1 ))			&& \
-ln -s $ext_doc_path $home_doc_path			|| \
-echo "Failed to find Documents dir in /ext, exit!"
-
-echo "############################################################ SETUP MYENV"
-sudo apt-get -y install unzip
-./myenv.rw.LU.sh
-
-echo "############################################################ MK DEV/PROGRAM LINK"
-
-
-echo "############################################################ INSTALL SOFT"
-sudo apt-get -y install aptitude
-ins_cmd=aptitude
-
-exit
 
 
 # Pre-condition/pre-work
@@ -53,7 +139,7 @@ exit
 
 # Installations
 sys_info=`func_sys_info`
-[ -e $apt_update_stamp ] && (( $apt_update_ago > 86400 )) && sudo apt-get update || echo "INFO: last 'apt-get update' was $apt_update_ago seconds ago, skip this time"
+[ -e $apt_update_stamp ] && (( $last_update > 86400 )) && sudo apt-get update || echo "INFO: last 'apt-get update' was $last_update seconds ago, skip this time"
 if [ $(echo "$sys_info" | grep -ic "ubuntu") == 1 ] ; then
 	echo "INFO: installing software for ubuntu (common)"
 
@@ -65,7 +151,6 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu") == 1 ] ; then
 	sudo apt-get install -y git subversion mercurial		# dev tools
 	sudo apt-get install -y tmux terminator autossh w3m		# dev tools
 	sudo apt-get install -y debconf-utils				# help auto select when install software (like mysql, wine, etc)
-	sudo apt-get install -y linux-headers-`uname -r`		# for what?
 fi
 
 if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
@@ -78,8 +163,7 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 	#sudo add-apt-repository -y ppa:videolan/stable-daily		# vlc, could use official
 	#sudo apt-get update						# should update since added ppa, disable in debug mode, as just need run it once manually
 
-	sudo apt-get install -y xrdp                                    # for win connect to LU, support connection from MS Remote Desktop Client(mstsc) or VNC Viewer (RealVNC)                                                             
-	sudo apt-get install -y rdesktop                                # for LU connect to win
+	sudo apt-get install -y xrdp					# OS with X, xrdp supports windows native remote desktop connection
 	sudo apt-get install -y ibus-table-wubi				# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y virtualbox vim-gnome
 	sudo apt-get install -y doublecmd-gtk byobu
