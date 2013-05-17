@@ -11,7 +11,7 @@ myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
 dated_bak_dir=$HOME/Documents/DCB/DatedBackup
 
 # Init readonly version
-wget -O $myenv_init_ro $myenv_init_ro_url
+echo "downloading $myenv_init_ro_url" && wget -O $myenv_init_ro -q $myenv_init_ro_url
 [ ! -e $myenv_init_ro ] && echo "$myenv_init_ro not found, init myenv_ro failed!" && exit 1
 bash $myenv_init_ro $tmp_init_dir
 
@@ -23,16 +23,21 @@ bash $myenv_init_ro $tmp_init_dir
 myenv_full_bak=`find $dated_bak_dir -name "*myenv*full*.zip" | tail -1`
 tmp1=${myenv_full_bak%.zip}
 myenv_full_bak_name=${tmp1##*/}
-rm -rf /tmp/$myenv_full_bak_name 
-unzip -q $myenv_full_bak -d /tmp
-ssh_bak=`find /tmp/$myenv_full_bak_name -name ".ssh" -type d | tail -1`
-secu_bak=`find /tmp/$myenv_full_bak_name -name "secu" -type d | tail -1`
-secure_bak=`find /tmp/$myenv_full_bak_name -name "secure" -type d | tail -1`
+rm -rf $tmp_init_dir/$myenv_full_bak_name 
+unzip -q $myenv_full_bak -d $tmp_init_dir
+ssh_bak=`find $tmp_init_dir/$myenv_full_bak_name -name ".ssh" -type d | tail -1`
+secu_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secu" -type d | tail -1`
+secure_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secure" -type d | tail -1`
 mkdir -p ~/.ssh ~/.myenv/secu ~/.myenv/secure 
-[ -e "$ssh_bak" ] && cp -rf $ssh_bak/* ~/.ssh/ || echo "ERROR: failed to restore files in .ssh/"
-[ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ || echo "INFO: .myenv/secu/ not exist, not restored"
-[ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ || echo "INFO: .myenv/secure/ not exist, not restored"
+[ -e "$ssh_bak" ] && cp -rf $ssh_bak/* ~/.ssh/ 
+[ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ 
+[ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ 
+
+# Re-check
+[ ! -e ~/.ssh ] && echo "ERROR: ~/.ssh not restored success! pls check!" 
+[ ! -e ~/.myenv/secu -a ! -e ~/.myenv/scure ] && echo "ERROR: both ~/.myenv/secu and ~/.myenv/scure not restored success! pls check!" 
 
 # Update github remote
+cd ~
 git remote rm github
 git remote add github "stico_github:stico/myenv.git"

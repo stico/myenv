@@ -7,8 +7,8 @@ tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 [ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 
 mkdir -p $tmp_init_dir
 
-sudo apt-get install -y git subversion
-sudo apt-get install -y tree zip unzip
+sudo aptitude install -y git subversion > /dev/null
+sudo aptitude install -y tree zip unzip > /dev/null
 
 function init_with_git {
 	echo "INFO: git command exist, use git way"
@@ -31,9 +31,10 @@ function init_without_git {
 	
 	dir_name=myenv-master
 	pkg_name=master.zip
+	pkg_url=http://github.com/stico/myenv/archive/$pkg_name
 
 	cd $tmp_init_dir
-	wget http://github.com/stico/myenv/archive/$pkg_name
+	echo "downloading $pkg_url" && wget -q $pkg_url
 	unzip $pkg_name
 	mv -f $tmp_init_dir/$dir_name/* ~
 	mv -f $tmp_init_dir/$dir_name/.* ~
