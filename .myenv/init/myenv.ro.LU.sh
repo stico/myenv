@@ -11,17 +11,12 @@ function init_with_git {
 	echo "INFO: git command exist, use git way"
 
 	cd ~
-	if [ -e ~/.git ] ; then
-		echo "INFO: myenv repository already exist, just update it"
-		git pull
-	else
-		git clone $git_myenv_addr
-		mv ~/$git_myenv_name/* ~
-		mv ~/$git_myenv_name/.* ~
-		rm -rf ~/$git_myenv_name/
-		cd ~
-		git remote add github $git_myenv_addr
-	fi
+	git clone $git_myenv_addr
+	mv ~/$git_myenv_name/* ~
+	mv ~/$git_myenv_name/.* ~
+	rm -rf ~/$git_myenv_name/
+	cd ~
+	git remote add github $git_myenv_addr
 	echo "INFO: myenv init success, invoke a new shell for you!"
 }
 
@@ -44,4 +39,5 @@ function init_without_git {
 	echo "INFO: myenv init success, invoke a new shell for you!"
 }
 
+[ -e ~/.git ] && echo "myenv repository already exist, skip..." && exit 0
 (command -v git &> /dev/null) && init_with_git || init_without_git
