@@ -7,8 +7,8 @@ tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 [ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 
 mkdir -p $tmp_init_dir
 
-sudo aptitude install -y git subversion > /dev/null
-sudo aptitude install -y tree zip unzip > /dev/null
+sudo apt-get install -y git subversion > /dev/null
+sudo apt-get install -y tree zip unzip > /dev/null
 
 function init_with_git {
 	echo "INFO: git command exist, use git way"
