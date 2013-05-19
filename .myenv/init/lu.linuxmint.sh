@@ -100,6 +100,22 @@ function func_init_myenv_rw {
 	bash $myenv_init_rw $tmp_init_dir
 }
 
+function func_init_soft_termial {
+	echo ">>> INIT: install software, usable in terminal"
+
+	sudo apt-get install -y zip unzip expect unison openssh-server 	> /dev/null	# basic tools
+	sudo apt-get install -y aptitude				> /dev/null	# basic tools
+	sudo apt-get install -y build-essential make gcc cmake		> /dev/null	# build tools
+	sudo apt-get install -y samba smbfs				> /dev/null	# samba
+	sudo apt-get install -y python-software-properties		> /dev/null	# for cmd add-apt-repository 
+	sudo apt-get install -y software-properties-common		> /dev/null	# for cmd add-apt-repository 
+	sudo apt-get install -y git subversion mercurial		> /dev/null	# dev tools
+	sudo apt-get install -y tmux terminator autossh w3m		> /dev/null	# dev tools
+	sudo apt-get install -y debconf-utils				> /dev/null	# help auto select when install software (like mysql, wine, etc)
+	sudo apt-get install -y linux-headers-`uname -r` > /dev/null	> /dev/null	# some soft compile need this
+
+}
+
 function func_init_soft_basic {
 	echo ">>> INIT: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
@@ -111,17 +127,21 @@ function func_init_soft_basic {
 }
 
 
+# Init - basic
 func_init_dir
 func_init_sudoer
 func_init_soft_basic
 func_init_apt_update_src
 func_init_apt_update_list
 
+# Init - myenv
 func_init_link_doc
 func_init_link_dev
 func_init_link_pro
 func_init_myenv_rw
 
+# Init - 
+func_init_soft_termial
 
 exit
 
@@ -129,7 +149,6 @@ exit
 # Variables
 chrome_stable='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 apt_source=/etc/apt/sources.list
-
 
 # Pre-condition/pre-work
 [ ! -e ~/.myenv/env_func_bash ] && echo "ERROR: .myenv not exist !" && exit 1
@@ -139,19 +158,6 @@ apt_source=/etc/apt/sources.list
 
 # Installations
 sys_info=`func_sys_info`
-[ -e $apt_update_stamp ] && (( $last_update > 86400 )) && sudo apt-get update || echo "INFO: last 'apt-get update' was $last_update seconds ago, skip this time"
-if [ $(echo "$sys_info" | grep -ic "ubuntu") == 1 ] ; then
-	echo "INFO: installing software for ubuntu (common)"
-
-	sudo apt-get install -y zip unzip expect unison openssh-server 	# basic tools
-	sudo apt-get install -y build-essential make gcc cmake		# build tools
-	sudo apt-get install -y samba smbfs				# samba
-	sudo apt-get install -y python-software-properties		# for cmd add-apt-repository 
-	sudo apt-get install -y software-properties-common		# for cmd add-apt-repository 
-	sudo apt-get install -y git subversion mercurial		# dev tools
-	sudo apt-get install -y tmux terminator autossh w3m		# dev tools
-	sudo apt-get install -y debconf-utils				# help auto select when install software (like mysql, wine, etc)
-fi
 
 if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 	echo "INFO: installing software for ubuntu (desktop)"

@@ -34,9 +34,12 @@ fi
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# Init rvm (ruby) env, which hacks command "cd", should run before init myenv
+[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && source /home/ouyangzhu/.rvm/scripts/rvm
+[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
+
 # init myenv
 source $HOME/.myenv/init/bash.sh
-dloadrbvenv
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
 stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)

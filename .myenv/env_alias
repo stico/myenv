@@ -10,7 +10,7 @@
 sshp			"%MY_ENV_SECU%#script_sshp.sh"
 
 # Alias - Misc
-cd			"func_cd_ts"
+cd			"func_cd"
 
 wl			"wc -l"
 df			"df -h"
@@ -91,11 +91,11 @@ gfjava			"bash grep_file.sh java"
 gfproperties		"bash grep_file.sh properties"
 
 			# note, there are some addition work to gen cd_*, check the gen script for detail
-cd2			"func_cd_ts ../.."
-cd3			"func_cd_ts ../../.."
-cd4			"func_cd_ts ../../../.."
-cd5			"func_cd_ts ../../../../.."
-cd6			"func_cd_ts ../../../../../.."
+cd2			"func_cd ../.."
+cd3			"func_cd ../../.."
+cd4			"func_cd ../../../.."
+cd5			"func_cd ../../../../.."
+cd6			"func_cd ../../../../../.."
 cdpay			"func_cd %MY_DEV%/code_dw/yypay_trunk"
 cdpayweb		"func_cd %MY_DEV%/code_dw/yypay_trunk/yypay-web"
 cdpaytest		"func_cd %MY_DEV%/code_dw/yypay_trunk/yypay-test"

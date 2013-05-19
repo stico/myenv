@@ -83,21 +83,36 @@ function func_find_type {
 	echo "$targets"
 }
 
-function func_cd_ts {
+function func_cd_tmp_today { 
+	# so could evaluate the date every time
+	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
+}
+
+function func_cd {
 	# TODO: why need source again to make it works
 
-	# Must use "\cd", avoiding infinite loop when "alias cd=func_cd_ts"
 	[ -z "$*" ] && \cd && return 0
 
 	base="$1"
 	base_eval="`func_tag_value $1`"
 	[ -n "${base_eval}" ] && base=${base_eval}
 	shift
-	[ -z "$*" ] && \cd $base && func_head_cmd 20 ll && return 0
+	[ -z "$*" ] && func_cd_conditional $base && return 0
 
 	func_find result_target d $base $*
-	[ -d $result_target ] && \cd $result_target || \cd `dirname $result_target`
-	func_head_cmd 20 ll
+	[ -d $result_target ] && func_cd_conditional $result_target || func_cd_conditional `dirname $result_target`
+}
+
+function func_cd_conditional {
+	usage="Usage: func_cd_conditional [target]"
+	[ $# -lt 1 ] && echo $usage && return 1
+	
+	# use rvm's cd function if needed (note, the func_rvm_cd is hacked in .bashrc
+	[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
+
+	# otherwise just cd, use "\cd" to avoid infinite loop, since cd is hacked
+	\cd "$*"
+	func_head_cmd 10 ll
 }
 
 function func_head_cmd {
@@ -119,7 +134,7 @@ function func_head {
 	shift
 
 	total_lines=$(echo "$*" | wc -l)
-	echo "$*" | sed -n -e "1,${show_lines}p;21s/.*/(!!! WARNING: more lines suppressed, $total_lines in total. !!!)/p"
+	echo "$*" | sed -n -e "1,${show_lines}p;21s/.*/( ...... WARN: more lines suppressed, $total_lines total ...... )/p"
 }
 
 function func_ls { 
@@ -151,18 +166,6 @@ function func_ls {
 	#find $base $search 
 }
 
-function func_cd { 
-	\cd $1
-	shift
-	for path in $@ ; do
-		\cd *${path}* || return 1
-		shift
-	done
-
-	eval ll
-	# might have more hack in future
-}
-
 function func_ip {
 	/sbin/ifconfig 									\
 	| grep -B1 "inet addr" 								\
@@ -177,11 +180,6 @@ function func_mkdir_cd {
 	mkdir -p "$@" 				&&
 	# why need such complex eval?
 	eval \cd "\"\$$#\""
-}
-
-function func_cd_tmp_today { 
-	# so could evaluate the date every time
-	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
 }
 
 function func_show_resp { 
@@ -330,8 +328,8 @@ function func_scp_with_jump {
 }
 
 function func_sys_info { 
-	# format: <os_name>          _<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
-	# exampe: ubuntu/cygwin/win  _12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm		_precise
+	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
+	# exampe: ubuntu/linuxmint/cygwin/win	_12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm	_precise
 
 	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
 
@@ -366,6 +364,7 @@ function func_sys_info {
 		else								os_type="server"
 		fi
 	elif [ "$os_name" = "cygwin" -o "$os_name" = "mingw" ] ; then		os_type="desktop"
+	elif [ "$os_name" = "linuxmint" ] ; then				os_type="desktop"
 	else									os_type="unknown"
 	fi
 
