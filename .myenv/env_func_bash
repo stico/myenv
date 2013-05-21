@@ -83,11 +83,6 @@ function func_find_type {
 	echo "$targets"
 }
 
-function func_cd_tmp_today { 
-	# so could evaluate the date every time
-	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
-}
-
 function func_cd {
 	# TODO: why need source again to make it works
 
@@ -101,6 +96,11 @@ function func_cd {
 
 	func_find result_target d $base $*
 	[ -d $result_target ] && func_cd_conditional $result_target || func_cd_conditional `dirname $result_target`
+}
+
+function func_cd_tmp_today { 
+	# so could evaluate the date every time
+	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
 }
 
 function func_cd_conditional {
@@ -124,6 +124,89 @@ function func_head_cmd {
 
 	cmd_result=`eval "$*"`
 	func_head $show_lines "$cmd_result"
+}
+
+function func_gen_filelist {
+	# TODO: if possible to identify the dir (suffix /)
+	# TODO: check if has write permintion before gen?
+	# TODO: if path is home or above, should not gen filelist?
+	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
+
+	usage="Usage: func_gen_filelist [base] [fl_name]"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	base=$1
+	filelist=$2
+	[ -e $base/$filelist ] && return 0
+
+	echo "$filelist not exist, create it..."
+	find $base -type f > $1/$filelist
+}
+
+function func_gen_filelist_myenv {
+
+	filelist=$HOME/.fl_me.txt
+
+	[ -e $filelist ] && return 0
+
+	cat $MY_ENV_ZGEN/myenv.lst > $filelist				# override
+	for add_path in $HOME/.ssh $MY_ENV/SECU $MY_ENV/SECURE ; do
+		[ -e $add_path ] && find $add_path -type f >> $filelist	# append
+	done
+}
+
+function func_gen_grep_result {
+
+	# TODO
+	# - seems can not support grepfile "aaa\|bbb"
+	# - seems can not add more options
+
+	usage="Usage: func_gen_grep_result [base] [suffix] [search]*"
+	[ $# -lt 3 ] && echo $usage && return 1
+
+	base=$1
+	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
+	shift;shift
+
+	filelist=.fl_me.txt
+	grep_result=.grep_me.txt
+
+	func_gen_filelist $base $filelist
+
+	# we treat path in search text as .
+	search_string="$*"
+	search=${search_string//\\/.}
+
+	# Jump to base, since the filelist is using relative path
+	\cd $base
+	grep $suffix'$' $filelist	| \
+	# Step: remove files not need to grep (for "grepfile")
+	sed -e "/\/.svn\//d" 		| \
+	sed -e "/\/.hg\//d" 		| \
+	sed -e "/\/.git\//d"		| \
+	sed -e "/\/.lnk\//d"		| \
+	sed -e "/\/.metadata\//d"	| \
+	sed -e "/\/.class$\//d"		| \
+	sed -e "/.grep_result.txt/d"	| \
+	sed -e "/.grep_me.txt/d"	| \
+	sed -e "/\/.jar$\//d"		| \
+	# Step: special removal, the target is mvn, but might cause miss-hit!
+	sed -e "/\/target\//d"		| \
+	# Step: remove the fileist itself
+	sed -e "/$filelist$/d"		| \
+	# Step: grep result, -I is not match binary files
+	xargs --delimiter="\n" grep -I -i "$search" | tee $grep_result | grep --color -i "$search"
+
+	# Jump back
+	\cd -
+}
+
+function func_gen_grep_result_myenv { 
+	usage="Usage: func_gen_grep_result_myenv [search]*"
+	[ $# -lt 1 ] && echo $usage && return 1
+
+	func_gen_filelist_myenv 
+	func_gen_grep_result $HOME ALL "$*"
 }
 
 function func_head {
@@ -228,17 +311,6 @@ function func_git_commit_push {
 	git status 				&&
 	bash $MY_ENV_LIST/myenv_gen.sh		&&
 	\cd - 
-}
-
-function func_e_grep { 
-	usage="Usage: func_e_grep [pattern]"
-	[[ -z $1 ]] && echo $usage && return 1
-
-	\cd $HOME
-	cat $MY_ENV_ZGEN/myenv.lst | xargs grep -i "$1" > .grep_result.txt
-	grep -i --color "$1" .grep_result.txt
-	# this not work when $1 has grouping "\(\)": eval grepi "$1" .grep_result.txt
-	\cd -
 }
 
 function func_ssh_with_jump {

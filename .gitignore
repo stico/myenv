@@ -50,6 +50,10 @@
 /.myenv/secure_*/
 
 # IGNORE, for those really not needed, or for secure reason
+*/.fl_files.txt
+*/.grep_result.txt
+*/.fl_me.txt
+*/.grep_me.txt
 /.myenv/zgen/
 /.myenv/conf/autokey/autokey.log
 /.myenv/conf/autokey/autokey.pid
@@ -59,8 +63,6 @@
 /.myenv/conf/doublecmd/searchhistory.txt
 /.myenv/conf/doublecmd/replacehistory.txt
 /.vim/.netrwhist
-/.myenv/.fl_files.txt
-/.myenv/.grep_result.txt
 /.myenv/gVim.exe.stackdump
 /.myenv/bash.exe.stackdump
 /.vim/autoload/pathogen.vim

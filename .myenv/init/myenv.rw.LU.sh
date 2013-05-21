@@ -41,3 +41,5 @@ mkdir -p ~/.ssh ~/.myenv/secu ~/.myenv/secure
 cd ~
 git remote rm github
 git remote add github "stico_github:stico/myenv.git"
+git config --global user.name stico
+git config --global user.email ouyzhu@gmail.com
