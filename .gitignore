@@ -52,6 +52,7 @@
 # IGNORE, for those really not needed, or for secure reason
 */.fl_files.txt
 */.grep_result.txt
+*/.dl_me.txt
 */.fl_me.txt
 */.grep_me.txt
 /.myenv/zgen/

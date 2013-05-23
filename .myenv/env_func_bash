@@ -9,6 +9,8 @@
 #}
 
 function func_tag_value {
+	# DESC: translate a tag value, or return itself if not a tag
+
 	# empty parameter, empty output
 	[ -z "$*" ] && return 1
 
@@ -51,9 +53,24 @@ function func_select_line {
 	eval $result_var_name=$user_selection
 }
 
-function func_find {
-	# TODO: use .fl_files.txt improve performance ???
+function func_find_cache {
+	# NOTE: must keep interface consistency with func_find
+	usage="Usage: func_find [result_var_name] [find_type] [base] [pattern]"
+	[ $# -lt 4 ] && echo $usage && return 1
 
+	# need use variable to "return" result
+	result_var_name=$1
+	find_type=$2
+	shift;shift
+	eval $result_var_name=""
+
+	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
+	targets=`func_find_type_cache $find_type $*`
+	func_select_line $result_var_name "$targets"
+}
+
+function func_find {
+	# NOTE: must keep interface consistency with func_find_cache
 	usage="Usage: func_find [result_var_name] [find_type] [base] [pattern]"
 	[ $# -lt 4 ] && echo $usage && return 1
 
@@ -67,7 +84,31 @@ function func_find {
 	func_select_line $result_var_name "$targets"
 }
 
+function func_find_type_cache {
+	# NOTE: must keep interface consistency with func_find_type
+	usage="Usage: func_find_type [find_type] [base] [pattern]"
+	[ $# -lt 3 ] && echo $usage && return 1
+
+	find_type=$1
+	base=$2
+	shift;shift
+
+	if [ "$find_type" = "d" ] ; then
+		list_file=".dl_me.txt" 
+		func_gen_dirlist $base $list_file
+	else
+		list_file=".fl_me.txt"
+		func_gen_filelist $base $list_file
+	fi
+
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	targets=`cat $list_file | sed -e "/^$/d" | grep "$search"`
+
+	echo "$targets"
+}
+
 function func_find_type {
+	# NOTE: must keep interface consistency with func_find_type_cache
 	usage="Usage: func_find_type [find_type] [base] [pattern]"
 	[ $# -lt 3 ] && echo $usage && return 1
 
@@ -83,18 +124,37 @@ function func_find_type {
 	echo "$targets"
 }
 
+#function func_cd {
+#	# TODO: why need source again to make it works
+#
+#	[ -z "$*" ] && \cd && return 0
+#
+#	base="$1"
+#	base_eval="`func_tag_value $1`"
+#	[ -n "${base_eval}" ] && base=${base_eval}
+#	shift
+#	[ -z "$*" ] && func_cd_conditional $base && return 0
+#
+#	#func_find result_target d $base $*			# (2013-05-23) works, non cache version	
+#	func_find_cache result_target d $base $*
+#	[ -d $result_target ] && func_cd_conditional $result_target || func_cd_conditional `dirname $result_target`
+#}
+
 function func_cd {
 	# TODO: why need source again to make it works
 
+	# shortcut - home
 	[ -z "$*" ] && \cd && return 0
 
-	base="$1"
-	base_eval="`func_tag_value $1`"
-	[ -n "${base_eval}" ] && base=${base_eval}
-	shift
-	[ -z "$*" ] && func_cd_conditional $base && return 0
+	# shortcut - only one parameter
+	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && func_cd_conditional $tag_eval && return 0
 
-	func_find result_target d $base $*
+	# otherwise need search
+	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
+
+	#func_find result_target d $base $*			# (2013-05-23) works, non cache version	
+	func_find_cache result_target d $base $*
 	[ -d $result_target ] && func_cd_conditional $result_target || func_cd_conditional `dirname $result_target`
 }
 
@@ -132,6 +192,8 @@ function func_gen_filelist {
 	# TODO: if path is home or above, should not gen filelist?
 	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
 
+	# NOTE: must keep interface consistency with func_gen_dirlist
+	# DESC: only gen file list
 	usage="Usage: func_gen_filelist [base] [fl_name]"
 	[ $# -lt 2 ] && echo $usage && return 1
 
@@ -139,8 +201,22 @@ function func_gen_filelist {
 	filelist=$2
 	[ -e $base/$filelist ] && return 0
 
-	echo "$filelist not exist, create it..."
-	find $base -type f > $1/$filelist
+	echo "$base/$filelist not exist, create it..." 1>&2
+	find $base -type f > $base/$filelist
+}
+
+function func_gen_dirlist {
+	# NOTE: must keep interface consistency with func_gen_filelist
+	# DESC: only gen dir list
+	usage="Usage: func_gen_dirlist [base] [dl_name]"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	base=$1
+	dirlist=$2
+	[ -e $base/$dirlist ] && return 0
+
+	echo "$base/$dirlist not exist, create it..." 1>&2
+	find -L $base -type d > $base/$dirlist
 }
 
 function func_gen_filelist_myenv {

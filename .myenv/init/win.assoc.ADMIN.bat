@@ -38,7 +38,7 @@ assoc .zip=%ft_compressed%
 
 
 REM ftype %ft_pdf%=%MY_PRO%\A_Text_PDF_FoxitReader_5.0.1_PA-Basic\FoxitReaderPortable.exe "%%1"
-ftype %ft_pdf%=%MY_PRO%\A_Text_PDF_FoxitReader_5.0.1_PA-Basic\App\Foxit Reader\Foxit Reader.exe "%%1"
+ftype %ft_pdf%=%MY_PRO%\foxitReader_6.0.2.0413_PA\App\Foxit Reader\Foxit Reader.exe "%%1"
 ftype %ft_ahk%=%MY_PRO%\A_System_AutoHotkey_1.0.48.00_Official-Basic\AutoHotkey.exe "%%1"
 ftype %ft_txt%=%MY_PRO%\A_Text_Vim\App\vim\vim73\gvim.exe "%%1"
 ftype %ft_compressed%=%MY_PRO%\A_System_7-Zip_9.20_PA-Basic\App\7-Zip\7zFM.exe "%%1"
