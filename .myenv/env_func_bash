@@ -46,7 +46,7 @@ function func_select_line {
 	targets_lines=$(echo "$*" | wc -l)
 	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
 
-	func_head 20 "$*" | cat -n
+	func_head 20 "$*" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"
 	echo "NOT SINGLE CANDIDATES, PLS SELECT ONE:"
 	read -e selection
 	user_selection=`echo "$*" | sed -n -e "${selection}p"`
@@ -142,15 +142,16 @@ function func_cd {
 	# shortcut - home
 	[ -z "$*" ] && \cd && return 0
 
-	# shortcut - only one parameter
+	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
-	[ $# -eq 1 ] && func_cd_conditional $tag_eval && return 0
+	[ $# -eq 1 ] && [ -e $tag_eval ] && func_cd_conditional $tag_eval && return 0
 
 	# otherwise need search
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
 	#func_find result_target d $base $*			# (2013-05-23) works, non cache version	
 	func_find_cache result_target d $base $*
+	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist! pls check"
 	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
 }
 
@@ -197,8 +198,11 @@ function func_gen_filelist {
 	filelist=$2
 	[ -e $base/$filelist ] && return 0
 
+	# make the path relative to the base, for better compitability
 	echo "$base/$filelist not exist, create it..." 1>&2
-	find $base -type f > $base/$filelist
+	\cd $base
+	find ./ -type f > $filelist
+	\cd -
 }
 
 function func_gen_dirlist {
@@ -211,13 +215,16 @@ function func_gen_dirlist {
 	dirlist=$2
 	[ -e $base/$dirlist ] && return 0
 
+	# make the path relative to the base, for better compitability
 	echo "$base/$dirlist not exist, create it..." 1>&2
-	find -L $base -type d > $base/$dirlist
+	\cd $base
+	find -L ./ -type d > $base/$dirlist
+	\cd -
 }
 
 function func_gen_filelist_myenv {
 
-	filelist=$HOME/.fl_me.txt
+	filelist=$MY_ENV/.fl_me.txt
 
 	[ -e $filelist ] && return 0
 
