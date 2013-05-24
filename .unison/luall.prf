@@ -2,8 +2,11 @@
 root=/home/ouyangzhu/Documents
 rootalias = //homelap//home/ouyangzhu/Documents -> //X200S_LU//Documents
 rootalias = //homelap//ext/home_data/Documents -> //X200S_LU//Documents
-root=/media/ouyangzhu/22D0B554D0B52F43/backup
-rootalias = //homelap//media/ouyangzhu/22D0B554D0B52F43/backup -> //MHD//Documents
+
+#root=/media/ouyangzhu/22D0B554D0B52F43/backup
+root=/media/22D0B554D0B52F43/backup
+#rootalias = //homelap//media/ouyangzhu/22D0B554D0B52F43/backup -> //MHD//Documents
+rootalias = //homelap//media/22D0B554D0B52F43/backup -> //MHD//Documents
 
 fastcheck=yes
 perms=0

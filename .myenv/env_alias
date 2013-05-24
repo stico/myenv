@@ -68,14 +68,14 @@ egitcommitpush		"func_git_commit_push %HOME%"
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list 
-l			"ls -hF --color=auto"
-ls			"ls -hF --color=auto"
-la			"ls -A"
-ll			"ls -lh"
-lla			"ls -lhA"
-llt			"ls -lhtr"
-lld			"ls -lh | grep '^d'"
-llf			"ls -lh | grep -v '^d'"
+l			"\ls -hF --color=auto"
+ls			"\ls -hF --color=auto"
+la			"\ls -A"
+ll			"\ls -lh"
+lla			"\ls -lhA"
+llt			"\ls -lhtr"
+lld			"\ls -lh | grep '^d'"
+llf			"\ls -lh | grep -v '^d'"
 
 			# Head: g - grep 
 grep			"grep --color"
