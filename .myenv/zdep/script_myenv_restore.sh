@@ -41,8 +41,8 @@ fi
 
 
 # change privilege, might have a complain, which is ok
-sudo chmod 700 -R *
-chmod 700 -R *
+# sudo chmod 700 -R *
+# chmod 700 -R *
 
 
 # mv new files to $HOME
@@ -58,4 +58,5 @@ while read line ; do
 done < ${restoreList}
 
 echo "Restore finished"
-ls -ltr $HOME
+ls -lhtr $HOME/.bashrc $HOME/.backupMyenv.bat
+

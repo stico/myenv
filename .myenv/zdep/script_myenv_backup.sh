@@ -29,6 +29,11 @@ while read line ; do
 	fi
 done < ${backupList}
 
+#echo "--> Insure security related files not packed"
+#rm -rf $backupDir/.myenv/secu
+#findSecuFile=`find $backupDir -regex ".*\(script_sshp\|env_alias_secu\|/ssh/.*pub\).*"`
+#[ ${#findSecuFile} != 0 ] && echo "there are secu files in back dir ($findSecuFile), will not backup, pls check!" && exit
+
 echo "--> Create package and clean up tmp directory"
 zip -rq $backupFile $backupDir
 
@@ -67,8 +72,8 @@ elif [ "$CUR_OS" == "$CUR_OS_WIN" ] ; then
 	echo "Coping backup file $backupFile to $backupPath_Latest/$fileName_Latest"
 	cp $backupFile $backupPath_Latest/$fileName_Latest
 
-	echo "ls -l $backupPath_History"
-	ls -ltr $backupPath_History
+	echo "ls -lhtr $backupPath_History"
+	ls -lhtr $backupPath_History | tail -5
 else
 	echo "Can not identify os type, pls set the env var!"
 fi
@@ -76,3 +81,4 @@ fi
 # cleanup
 rm -Rf $backupDir
 rm -f $backupFile
+

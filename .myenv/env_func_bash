@@ -177,8 +177,10 @@ function func_vi_conditional {
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
 		# non-cygwin env: original path style + front job. 
 
-		# cmd is different in term and gui
-		[ -z "$DISPLAY" ] && vi_cmd=vim || vi_cmd=gvim
+		# use gvim when GUI running and gvim available, otherwise use vim if available, otherwise vi
+		[ -n "$DISPLAY" ] && (command -v gvim &> /dev/null) && vi_cmd=gvim 
+		[ -z "$vi_cmd" ] && (command -v vim &> /dev/null) && vi_cmd=vim
+		[ -z "$vi_cmd" ] && vi_cmd=vi
 
 		# why? sees direct use "vim" will not trigger the "vim" alias which could cause infinite loop
 		# note: seems in ubuntu gui, not need "&" to make it background job
@@ -331,7 +333,7 @@ function func_head {
 	shift
 
 	total_lines=$(echo "$*" | wc -l)
-	echo "$*" | sed -n -e "1,${show_lines}p;21s/.*/( ...... WARN: more lines suppressed, $total_lines total ...... )/p"
+	echo "$*" | sed -n -e "1,${show_lines}p;${show_lines}s/.*/( ...... WARN: more lines suppressed, $total_lines total ...... )/p"
 }
 
 function func_ls { 
