@@ -138,40 +138,25 @@ function func_find_type {
 #	[ -d $result_target ] && func_cd_conditional $result_target || func_cd_conditional `dirname $result_target`
 #}
 
-function func_vi_path_conv {
-	# DESC: the win version vim need win style path
-
-	# non-cygwin env, use original style
-	[ $(func_sys_info | grep -c "^cygwin") = 0 ] && echo "$*" && return 0
-
-	# cygwin use win style path
-	cygpath -w "$*"
-}
-
 function func_vi {
-	# TODO: when the vi quit, will show a job exit report line, how to suppress it?
-
-	# choose cmd for term and gui
-	[ -n "$DISPLAY" ] && vi_cmd=vim || vi_cmd=gvim
-
 	# shortcut - open a new one
-	[ -z "$*" ] && (\\$vi_cmd &>/dev/null &) && return 0
+	[ -z "$*" ] && func_vi_conditional && return 0
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
-	[ $# -eq 1 ] && (\\$vi_cmd `func_vi_path_conv "$tag_eval"` &>/dev/null &) && return 0
+	[ $# -eq 1 ] && func_vi_conditional "$tag_eval" && return 0
 
 	# otherwise need search
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
 	#func_find result_target f $base $*			# (2013-05-23) works, non cache version	
 	func_find_cache result_target f $base $*
-	\\$vi_cmd `func_vi_path_conv "$base/$result_target"` &>/dev/null &
+	func_vi_conditional "$base/$result_target"
 }
 
 function func_cd {
 	# shortcut - home
-	[ -z "$*" ] && \cd && return 0
+	[ -z "$*" ] && func_cd_conditional && return 0
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
@@ -186,21 +171,36 @@ function func_cd {
 	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
 }
 
-function func_cd_tmp_today { 
-	# so could evaluate the date every time
-	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
+function func_vi_conditional {
+	# TODO: in cygwin, start/quit will cause a job start/end message, how to temproarily suppress it?
+
+	# cmd: choose cmd for term and gui
+	[ -n "$DISPLAY" ] && vi_cmd=vim || vi_cmd=gvim
+
+	# non-cygwin env: original path style + front job. cygwin env: win style path + background job
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+		\\$vi_cmd "$*" 
+	else
+		[ -z "$*" ] && target="" || target=`cygpath -w "$*"`
+		\\$vi_cmd $target &
+	fi
 }
 
 function func_cd_conditional {
-	usage="Usage: func_cd_conditional [target]"
-	[ $# -lt 1 ] && echo $usage && return 1
-	
+	# shortcut - home
+	[ -z "$*" ] && \cd && return 0
+
 	# use rvm's cd function if needed (note, the func_rvm_cd is hacked in .bashrc
 	[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
 
 	# otherwise just cd, use "\cd" to avoid infinite loop, since cd is hacked
 	\cd "$*"
 	func_head_cmd 10 ll
+}
+
+function func_cd_tmp_today { 
+	# so could evaluate the date every time
+	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
 }
 
 function func_head_cmd {
