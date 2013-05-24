@@ -174,15 +174,19 @@ function func_cd {
 function func_vi_conditional {
 	# TODO: in cygwin, start/quit will cause a job start/end message, how to temproarily suppress it?
 
-	# cmd: choose cmd for term and gui
-	[ -n "$DISPLAY" ] && vi_cmd=vim || vi_cmd=gvim
-
-	# non-cygwin env: original path style + front job. cygwin env: win style path + background job
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
-		\\$vi_cmd "$*" 
+		# non-cygwin env: original path style + front job. 
+
+		# cmd is different in term and gui
+		[ -z "$DISPLAY" ] && vi_cmd=vim || vi_cmd=gvim
+
+		# why? sees direct use "vim" will not trigger the "vim" alias which could cause infinite loop
+		# note: seems in ubuntu gui, not need "&" to make it background job
+		$vi_cmd "$*" 
 	else
+		# cygwin env: win style path + background job
 		[ -z "$*" ] && target="" || target=`cygpath -w "$*"`
-		\\$vi_cmd $target &
+		\\gvim $target &
 	fi
 }
 
