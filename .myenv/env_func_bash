@@ -86,7 +86,7 @@ function func_find {
 
 function func_find_type_cache {
 	# NOTE: must keep interface consistency with func_find_type
-	usage="Usage: func_find_type [find_type] [base] [pattern]"
+	usage="Usage: func_find_type_cache [find_type] [base] [pattern]"
 	[ $# -lt 3 ] && echo $usage && return 1
 
 	find_type=$1
@@ -138,13 +138,44 @@ function func_find_type {
 #	[ -d $result_target ] && func_cd_conditional $result_target || func_cd_conditional `dirname $result_target`
 #}
 
+function func_vi_path_conv {
+	# DESC: the win version vim need win style path
+
+	# non-cygwin env, use original style
+	[ $(func_sys_info | grep -c "^cygwin") = 0 ] && echo "$*" && return 0
+
+	# cygwin use win style path
+	cygpath -w "$*"
+}
+
+function func_vi {
+	# TODO: when the vi quit, will show a job exit report line, how to suppress it?
+
+	# choose cmd for term and gui
+	[ -n "$DISPLAY" ] && vi_cmd=vim || vi_cmd=gvim
+
+	# shortcut - open a new one
+	[ -z "$*" ] && (\\$vi_cmd &>/dev/null &) && return 0
+
+	# shortcut - only one parameter, and exist
+	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && (\\$vi_cmd `func_vi_path_conv "$tag_eval"` &>/dev/null &) && return 0
+
+	# otherwise need search
+	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
+
+	#func_find result_target f $base $*			# (2013-05-23) works, non cache version	
+	func_find_cache result_target f $base $*
+	\\$vi_cmd `func_vi_path_conv "$base/$result_target"` &>/dev/null &
+}
+
 function func_cd {
 	# shortcut - home
 	[ -z "$*" ] && \cd && return 0
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
-	[ $# -eq 1 ] && [ -e $tag_eval ] && func_cd_conditional $tag_eval && return 0
+	[ $# -eq 1 ] && [ -d $tag_eval ] && func_cd_conditional $tag_eval && return 0
 
 	# otherwise need search
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
@@ -285,7 +316,7 @@ function func_gen_grep_result_myenv {
 	[ $# -lt 1 ] && echo $usage && return 1
 
 	func_gen_filelist_myenv 
-	func_gen_grep_result $HOME ALL "$*"
+	func_gen_grep_result $MY_ENV ALL "$*"
 }
 
 function func_head {
