@@ -11,7 +11,7 @@ myenv_init_ro=$tmp_init_dir/myenv.ro.LU.sh
 dated_bak_dir=$HOME/Documents/DCB/DatedBackup
 
 # Init readonly version
-echo "downloading $myenv_init_ro_url" && wget -O $myenv_init_ro -q $myenv_init_ro_url
+[ ! -e $myenv_init_ro ] && echo "downloading $myenv_init_ro_url" && wget -O $myenv_init_ro -q $myenv_init_ro_url
 [ ! -e $myenv_init_ro ] && echo "$myenv_init_ro not found, init myenv_ro failed!" && exit 1
 bash $myenv_init_ro $tmp_init_dir
 

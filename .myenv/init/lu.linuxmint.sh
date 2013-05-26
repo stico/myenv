@@ -95,9 +95,20 @@ function func_init_myenv_rw {
 	myenv_init_rw=$tmp_init_dir/myenv.rw.LU.sh
 	myenv_init_rw_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.LU.sh 
 
-	echo "downloading $myenv_init_rw_url" && wget -O $myenv_init_rw -q $myenv_init_rw_url
-	[ ! -e $myenv_init_rw ] && echo "$myenv_init_rw not found, init myenv failed!" && exit 1
+	[ ! -e "$myenv_init_rw" ] && echo "downloading $myenv_init_rw_url" && wget -O $myenv_init_rw -q $myenv_init_rw_url
+	[ ! -e "$myenv_init_rw" ] && echo "$myenv_init_rw not found, init myenv failed!" && exit 1
 	bash $myenv_init_rw $tmp_init_dir
+}
+
+function func_init_soft_gui {
+	[ -z "$DISPLAY" ] && echo ">>> INIT: seems non-gui os, will not install soft works in gui" && return 0
+
+	echo ">>> INIT: install software that works in gui"
+	
+	sudo apt-get install -y vlc					> /dev/null
+
+	#TODO - should update config together!
+	sudo apt-get install -y doublecmd-gtk byobu
 }
 
 function func_init_soft_termial {
@@ -140,7 +151,8 @@ func_init_link_dev
 func_init_link_pro
 func_init_myenv_rw
 
-# Init - 
+# Init - soft
+func_init_soft_gui
 func_init_soft_termial
 
 exit
@@ -166,14 +178,12 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 	sudo add-apt-repository -y ppa:tualatrix/ppa			# ubuntu tweak stable
 	sudo add-apt-repository -y ppa:ubuntu-wine/ppa			# wine1.5
 	sudo add-apt-repository -y ppa:byobu/ppa			# byobu
-	#sudo add-apt-repository -y ppa:videolan/stable-daily		# vlc, could use official
 	#sudo apt-get update						# should update since added ppa, disable in debug mode, as just need run it once manually
 
 	sudo apt-get install -y xrdp					# OS with X, xrdp supports windows native remote desktop connection
 	sudo apt-get install -y ibus-table-wubi				# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
-	sudo apt-get install -y virtualbox vim-gnome
-	sudo apt-get install -y doublecmd-gtk byobu
-	sudo apt-get install -y ubuntu-tweak vlc autokey gitk wmctrl 
+	sudo apt-get install -y vim-gnome
+	sudo apt-get install -y ubuntu-tweak autokey gitk wmctrl 
 
 	if (( $(dpkg -l | grep -c "google.*chrome") >= 1 )) ; then
 		sudo apt-get install -y libnspr4-0d libcurl3		# for chrome 
@@ -204,3 +214,7 @@ fi
 #	echo "Adding 'Autokey' to Unity panel whitelist." ; 
 #	gsettings set com.canonical.Unity.Panel systray-whitelist "`echo \`gsettings get com.canonical.Unity.Panel systray-whitelist | tr -d ]\`,\'Autokey\']`";  
 #fi
+
+# Deprecated
+#sudo add-apt-repository -y ppa:videolan/stable-daily		# vlc, could use official
+#sudo apt-get install -y virtualbox vim-gnome
