@@ -18,7 +18,7 @@ function func_init_dir {
 }
 
 function func_init_sudoer {
-	echo ">>> INIT: update /etc/sudoers password setting"
+	echo ">>> INIT `date "+%H:%M:%S"`: update /etc/sudoers password setting"
 
 	sudoers=/etc/sudoers
 	sudoers_bak=${sudoers}.bak
@@ -32,7 +32,7 @@ function func_init_apt_update_src {
 	apt_source_list=/etc/apt/sources.list
 	apt_source_list_bak=${apt_source_list}.bak
 
-	echo ">>> INIT: update $apt_source_list"
+	echo ">>> INIT `date "+%H:%M:%S"`: update $apt_source_list"
 	
 	[ -e $apt_source_list_bak ] && echo "$apt_source_list_bak already exist, skip" && return 0
 	sudo cp $apt_source_list $apt_source_list_bak
@@ -40,7 +40,7 @@ function func_init_apt_update_src {
 }
 
 function func_init_apt_update_list {
-	echo ">>> INIT: apt update software list"
+	echo ">>> INIT `date "+%H:%M:%S"`: apt update software list"
 
 	apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
 	apt_update_stamp2=/tmp/update-success-stamp
@@ -58,7 +58,7 @@ function func_init_apt_update_list {
 
 function func_init_link_doc {
 	home_doc_path="$HOME/Documents"
-	echo ">>> INIT: setup links $home_doc_path"
+	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_doc_path"
 
 	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
 	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
@@ -71,7 +71,7 @@ function func_init_link_doc {
 
 function func_init_link_dev {
 	home_dev_path="$HOME/dev"
-	echo ">>> INIT: setup links $home_dev_path"
+	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
 
 	[ -e $home_dev_path -a -h $home_dev_path ] && echo "dev link already exist, skip" && return 0
 
@@ -81,7 +81,7 @@ function func_init_link_dev {
 
 function func_init_link_pro {
 	home_pro_path="$HOME/program"
-	echo ">>> INIT: setup links $home_pro_path"
+	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
 
 	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
 
@@ -90,7 +90,7 @@ function func_init_link_pro {
 }
 
 function func_init_myenv_rw {
-	echo ">>> INIT: update myenv, support read and write"
+	echo ">>> INIT `date "+%H:%M:%S"`: update myenv, support read and write"
 
 	myenv_init_rw=$tmp_init_dir/myenv.rw.LU.sh
 	myenv_init_rw_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.LU.sh 
@@ -101,18 +101,18 @@ function func_init_myenv_rw {
 }
 
 function func_init_soft_gui {
-	[ -z "$DISPLAY" ] && echo ">>> INIT: seems non-gui os, will not install soft works in gui" && return 0
+	[ -z "$DISPLAY" ] && echo ">>> INIT `date "+%H:%M:%S"`: seems non-gui os, will not install soft works in gui" && return 0
 
-	echo ">>> INIT: install software that works in gui"
+	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
 	
-	sudo apt-get install -y vlc					> /dev/null
+	sudo apt-get install -y vlc rdesktop				> /dev/null
 
 	#TODO - should update config together!
-	sudo apt-get install -y doublecmd-gtk byobu
+	#sudo apt-get install -y doublecmd-gtk byobu
 }
 
 function func_init_soft_termial {
-	echo ">>> INIT: install software, usable in terminal"
+	echo ">>> INIT `date "+%H:%M:%S"`: install software, usable in terminal"
 
 	sudo apt-get install -y zip unzip expect unison openssh-server 	> /dev/null	# basic tools
 	sudo apt-get install -y aptitude				> /dev/null	# basic tools
@@ -128,7 +128,7 @@ function func_init_soft_termial {
 }
 
 function func_init_soft_basic {
-	echo ">>> INIT: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
+	echo ">>> INIT `date "+%H:%M:%S"`: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
 	sudo apt-get install -y aptitude > /dev/null
 	sudo apt-get install -y zip unzip > /dev/null
