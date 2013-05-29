@@ -1,7 +1,10 @@
 me=$MY_ENV
 env=$MY_ENV
+ahk=$MY_ENV/conf/ahk
+
 pro=$MY_PRO
 dev=$MY_DEV
+
 doc=$MY_DOC
 dcb=$MY_DOC/DCB
 dcc=$MY_DOC/DCC
@@ -9,7 +12,12 @@ dcd=$MY_DOC/DCD
 
 amp=$MY_TMP
 tmp=$MY_TMP
-ampdl=$MY_TMP/download
-tmpdl=$MY_TMP/download
-amptt=$MY_TMP/`date "+%Y-%m-%d"`
-tmptt=$MY_TMP/`date "+%Y-%m-%d"`
+dl=$MY_TMP/download
+tt=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
+
+
+# Deprecated
+#ampdl=$MY_TMP/download
+#tmpdl=$MY_TMP/download
+#amptt=$MY_TMP/`date "+%Y-%m-%d"`
+#tmptt=$MY_TMP/`date "+%Y-%m-%d"`
