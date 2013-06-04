@@ -1,14 +1,16 @@
+pro=$MY_PRO
+
 me=$MY_ENV
 env=$MY_ENV
 ahk=$MY_ENV/conf/ahk
 
-pro=$MY_PRO
 dev=$MY_DEV
+dw=$MY_DEV/code_dw
 
 doc=$MY_DOC
 dcb=$MY_DOC/DCB
 dcc=$MY_DOC/DCC
-dcd=$MY_DOC/DCD
+
 
 amp=$MY_TMP
 tmp=$MY_TMP

@@ -176,6 +176,8 @@ function func_vi {
 }
 
 function func_cd {
+	# TODO: seems cd to a rvm project will make this invalidated!
+
 	# shortcut - home
 	[ -z "$*" ] && func_cd_conditional && return 0
 
