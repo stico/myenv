@@ -40,6 +40,8 @@ function func_init_apt_update_src {
 }
 
 function func_init_apt_update_list {
+	# TODO: if ppa updated, this need be forced, how to?
+
 	echo ">>> INIT `date "+%H:%M:%S"`: apt update software list"
 
 	apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
@@ -111,6 +113,12 @@ function func_init_soft_gui {
 	#sudo apt-get install -y doublecmd-gtk byobu
 }
 
+function func_init_soft_ppa {
+	echo ">>> INIT `date "+%H:%M:%S"`: add ppa for latest software"
+
+	sudo add-apt-repository -y ppa:gnome-terminator			> /dev/null	# terminator
+}
+
 function func_init_soft_termial {
 	echo ">>> INIT `date "+%H:%M:%S"`: install software, usable in terminal"
 
@@ -141,6 +149,7 @@ function func_init_soft_basic {
 # Init - basic
 func_init_dir
 func_init_sudoer
+func_init_soft_ppa
 func_init_soft_basic
 func_init_apt_update_src
 func_init_apt_update_list
