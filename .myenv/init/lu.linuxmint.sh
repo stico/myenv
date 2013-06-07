@@ -107,7 +107,20 @@ function func_init_soft_gui {
 
 	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
 	
-	sudo apt-get install -y vlc rdesktop				> /dev/null
+	sudo apt-get install -y vlc rdesktop			> /dev/null
+	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
+
+	# Install Chrome
+	if (( $(dpkg -l | grep -c "google.*chrome") <= 0 )) ; then
+		chrome_url='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
+		chrome_tmp=/tmp/${chrome_url##*/} 
+
+		sudo apt-get install -y libnspr4-0d libcurl3	> /dev/null	# for chrome 
+		rm -f $chrome_tmp
+		wget ${chrome_url} -O $chrome_tmp 
+		[ -e $chrome_tmp ] && sudo dpkg -i $chrome_tmp		# will show error on ubuntu desktop 12.04
+		[ -e $chrome_tmp ] && [ "$?" -ne 0 ] && sudo apt-get -f install			# if error happen, this will force to install
+	fi
 
 	#TODO - should update config together!
 	#sudo apt-get install -y doublecmd-gtk byobu
@@ -116,31 +129,31 @@ function func_init_soft_gui {
 function func_init_soft_ppa {
 	echo ">>> INIT `date "+%H:%M:%S"`: add ppa for latest software"
 
-	sudo add-apt-repository -y ppa:gnome-terminator			> /dev/null	# terminator
+	sudo apt-get install -y python-software-properties	> /dev/null	# for cmd add-apt-repository 
+	sudo apt-get install -y software-properties-common	> /dev/null	# for cmd add-apt-repository 
+
+	sudo add-apt-repository -y ppa:gnome-terminator		> /dev/null	# terminator
 }
 
 function func_init_soft_termial {
 	echo ">>> INIT `date "+%H:%M:%S"`: install software, usable in terminal"
 
-	sudo apt-get install -y zip unzip expect unison openssh-server 	> /dev/null	# basic tools
-	sudo apt-get install -y aptitude				> /dev/null	# basic tools
-	sudo apt-get install -y build-essential make gcc cmake		> /dev/null	# build tools
-	sudo apt-get install -y samba smbfs				> /dev/null	# samba
-	sudo apt-get install -y python-software-properties		> /dev/null	# for cmd add-apt-repository 
-	sudo apt-get install -y software-properties-common		> /dev/null	# for cmd add-apt-repository 
-	sudo apt-get install -y git subversion mercurial		> /dev/null	# dev tools
-	sudo apt-get install -y tmux terminator autossh w3m		> /dev/null	# dev tools
-	sudo apt-get install -y debconf-utils				> /dev/null	# help auto select when install software (like mysql, wine, etc)
-	sudo apt-get install -y linux-headers-`uname -r` > /dev/null	> /dev/null	# some soft compile need this
+	sudo apt-get install -y expect unison openssh-server 	> /dev/null	# basic tools
+	sudo apt-get install -y build-essential make gcc cmake	> /dev/null	# build tools
+	sudo apt-get install -y samba smbfs			> /dev/null	# samba
+	sudo apt-get install -y git subversion mercurial	> /dev/null	# dev tools
+	sudo apt-get install -y tmux terminator autossh w3m	> /dev/null	# dev tools
+	sudo apt-get install -y debconf-utils			> /dev/null	# help auto select when install software (like mysql, wine, etc)
+	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
 
 }
 
 function func_init_soft_basic {
 	echo ">>> INIT `date "+%H:%M:%S"`: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
-	sudo apt-get install -y aptitude > /dev/null
-	sudo apt-get install -y zip unzip > /dev/null
-	sudo apt-get install -y linux-headers-`uname -r` > /dev/null	# some soft compile need this
+	sudo apt-get install -y aptitude			> /dev/null
+	sudo apt-get install -y zip unzip			> /dev/null
+	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
 
 	#(! command -v aptitude &> /dev/null) && echo "install aptitude failed, pls check!" && exit 1
 }
@@ -168,7 +181,6 @@ exit
 
 
 # Variables
-chrome_stable='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 apt_source=/etc/apt/sources.list
 
 # Pre-condition/pre-work
@@ -190,17 +202,8 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 	#sudo apt-get update						# should update since added ppa, disable in debug mode, as just need run it once manually
 
 	sudo apt-get install -y xrdp					# OS with X, xrdp supports windows native remote desktop connection
-	sudo apt-get install -y ibus-table-wubi				# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y vim-gnome
 	sudo apt-get install -y ubuntu-tweak autokey gitk wmctrl 
-
-	if (( $(dpkg -l | grep -c "google.*chrome") >= 1 )) ; then
-		sudo apt-get install -y libnspr4-0d libcurl3		# for chrome 
-		rm -f /tmp/${chrome_stable##*/} 
-		wget ${chrome_stable} -O /tmp/${chrome_stable##*/}
-		sudo dpkg -i /tmp/${chrome_stable##*/}			# will show error on ubuntu desktop 12.04
-		if [ "$?" -ne 0 ] ; then sudo apt-get -f install; fi	# if error happen, this will force to install
-	fi
 
 	sudo apt-get install -y wine1.5					# TODO: this need maual work comfirm, learn the auto way from the mysql init script
 fi

@@ -71,7 +71,7 @@ function func_find_type_cache {
 	fi
 
 	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-	targets=`cat $base/$list_file | sed -e "/^$/d" | grep "$search"`
+	targets=`cat $base/$list_file | sed -e "/^$/d" | grep -i "$search"`
 
 	echo "$targets"
 }

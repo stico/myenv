@@ -1,0 +1,1 @@
+rdesktop -uouyangzhu -f -r clipboard:PRIMARYCLIPBOARD -r disk:R_Amp=/home/ouyangzhu/amp,R_Doc=/home/ouyangzhu/Documents -r sound:local 172.19.51.196
