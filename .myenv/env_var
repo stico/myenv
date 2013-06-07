@@ -56,7 +56,9 @@ PATH		%NODE_HOME%#bin
 
 RUBY_HOME	%MY_DEV%#ruby
 PATH		%RUBY_HOME%#bin
+
 RVM_HOME	%HOME%.rvm
+PATH		%RVM_HOME%#bin
 
 PYTHON_HOME	%MY_DEV%#python
 PATH		%PYTHON_HOME%#bin

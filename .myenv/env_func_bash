@@ -125,8 +125,6 @@ function func_find {
 }
 
 function func_vi_conditional {
-	# TODO: in cygwin, start/quit will cause a job start/end message, how to temproarily suppress it?
-
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
 		# non-cygwin env: original path style + front job. 
 
@@ -135,14 +133,12 @@ function func_vi_conditional {
 		[ -z "$vi_cmd" ] && (command -v vim &> /dev/null) && vi_cmd=vim
 		[ -z "$vi_cmd" ] && vi_cmd=vi
 
-		# why? sees direct use "vim" will not trigger the "vim" alias which could cause infinite loop
+		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
 		# note: seems in ubuntu gui, not need "&" to make it background job
 		$vi_cmd "$*" 
 	else
 		# cygwin env: win style path + background job
 		[ -z "$*" ] && target="" || target=`cygpath -w "$*"`
-		
-		#TODO: how to suppress the job output?
 		( \\gvim $target & ) &> /dev/null
 	fi
 }
@@ -176,8 +172,6 @@ function func_vi {
 }
 
 function func_cd {
-	# TODO: seems cd to a rvm project will make this invalidated!
-
 	# shortcut - home
 	[ -z "$*" ] && func_cd_conditional && return 0
 
@@ -241,7 +235,6 @@ function func_head_cmd {
 
 function func_gen_list {
 	# TODO: make a conversion of $type+l_me.txt ?
-	# TODO: if path is home or above, should not gen filelist?
 	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
 
 	usage="Usage: func_gen_list [find_type (f,file;d,dir)] [base] [fl_name]"
@@ -255,7 +248,7 @@ function func_gen_list {
 	# make the path relative to the base, for better compitability
 	echo "$base/$listfile not exist, create it..." 1>&2
 	\cd $base &> /dev/null
-	find -L ./ -type $find_type > $listfile
+	[ -w ./ ] && find -L ./ -type $find_type > $listfile || echo "ERROR: no write permisson for $PWD!"
 	\cd - &> /dev/null
 }
 
