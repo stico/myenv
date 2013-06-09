@@ -29,6 +29,7 @@ endif
 """""""""""""""""""""""""""""" H1 - Plugins
 call pathogen#infect()
 
+let g:solarized_italic = 0				" 0 to set comment font NOT use italic
 colorscheme solarized
 
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default

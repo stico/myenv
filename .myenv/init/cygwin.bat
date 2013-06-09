@@ -28,13 +28,14 @@ SET ins_pkg_basic_2=ping,renameutils,readline,shutdown,tcl,tcl-tk,wget,wput
 SET ins_pkg_basic_3=unison2.45,unzip,zip,man,bzip2,patch
 SET ins_pkg_basic=%ins_pkg_basic_1%,%ins_pkg_basic_2%,%ins_pkg_basic_3%
 
+SET ins_pkg_xserver=xorg-server,xinit,xorg-docs,X-start-menu-icons,xhost
 SET ins_pkg_build=gcc,gcc-core,gcc-g++,gdb,make
 SET ins_pkg_mail=ssmtp,mutt
 SET ins_pkg_git=git,git-completion,git-gui,gitk,stgit,git-svn
 
 SET ins_pkg_test=autossh
 
-SET ins_pkgs=%ins_pkg_basic%,%ins_pkg_test%,%ins_pkg_build%,%ins_pkg_mail%,%ins_pkg_git%
+SET ins_pkgs=%ins_pkg_basic%,%ins_pkg_test%,%ins_pkg_xserver%,%ins_pkg_build%,%ins_pkg_mail%,%ins_pkg_git%
 
 
 REM ----------------------------------------------------------------------------

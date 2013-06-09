@@ -1,41 +1,49 @@
 [global_config]
-  title_transmit_bg_color = "#91aff5"
   dbus = True
   inactive_color_offset = 0.77
+  title_transmit_bg_color = "#91aff5"
 [keybindings]
-  cycle_prev = F1
-  next_tab = <Ctrl>Tab
-  close_window = F1
-  group_tab = F1
-  resize_left = <Ctrl><Shift>Left
-  rotate_ccw = F1
-  go_right = <Ctrl><Shift>l
+  # TODO: how to key bind the _ and |
+  # INFO: set key to '' seems will use default, set all need disable key to F1 is better
+  # INFO: for list the keynames, google "gdkkeyuni.c" "gtk.gdk keyname table",
+  # ------------------- Font size ------------------
+  zoom_in = <Ctrl>plus
+  zoom_out = <Ctrl>minus
+  zoom_normal = <Ctrl>0
+  # ------------------- Tab ------------------
   new_tab = <Ctrl>T
-  resize_right = <Ctrl><Shift>Right
+  next_tab = <Ctrl>Tab
+  prev_tab = <Ctrl><Shift>Tab
+  # ------------------- Window ------------------
+  go_up = <Ctrl><Shift>k
+  go_down = <Ctrl><Shift>j
+  go_left = <Ctrl><Shift>h
+  go_right = <Ctrl><Shift>l
+  cycle_prev = F1
+  cycle_next = F1
+  go_prev = F1
+  split_vert = <Ctrl>bar
+  split_horiz = <Ctrl>underscore
+  resize_up = <Ctrl><Shift>Up
   resize_down = <Ctrl><Shift>Down
+  resize_left = <Ctrl><Shift>Left
+  resize_right = <Ctrl><Shift>Right
   toggle_zoom = <Ctrl>m
   scaled_zoom = <Ctrl><Shift>m
-  zoom_in = <Ctrl>plus
-  group_all = F1
-  prev_tab = <Ctrl><Shift>Tab
-  split_vert = <Ctrl>bar
-  ungroup_all = F1
-  ungroup_tab = F1
-  cycle_next = F1
-  zoom_out = <Ctrl>minus
-  go_prev = F1
-  close_term = F1
-  new_terminator = F1
-  go_left = <Ctrl><Shift>h
-  copy = F1
-  paste = <Shift>Insert
-  go_up = <Ctrl><Shift>k
-  resize_up = <Ctrl><Shift>Up
   rotate_cw = F1
-  split_horiz = <Ctrl>underscore
-  zoom_normal = <Ctrl>0
-  go_down = <Ctrl><Shift>j
+  rotate_ccw = F1
+  close_term = F1
+  close_window = F1
+  # ------------------- Grouping (disabled, select it in GUI) ------------------
+  group_tab = F1
+  ungroup_tab = F1
+  group_all = F1
+  ungroup_all = F1
+  # ------------------- Misc ------------------
+  copy = F1
   new_window = F1
+  new_terminator = F1
+  paste = <Shift>Insert
 [profiles]
   [[default]]
     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
@@ -43,8 +51,8 @@
     background_image = None
     scrollback_lines = 5000
     use_system_font = False
-    foreground_color = "#839496"
     copy_on_selection = True
+    foreground_color = "#839496"
     background_color = "#073642"
   [[solarized-dark]]
     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
