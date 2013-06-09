@@ -142,10 +142,14 @@ function func_init_soft_termial {
 	sudo apt-get install -y build-essential make gcc cmake	> /dev/null	# build tools
 	sudo apt-get install -y samba smbfs			> /dev/null	# samba
 	sudo apt-get install -y git subversion mercurial	> /dev/null	# dev tools
-	sudo apt-get install -y tmux terminator autossh w3m	> /dev/null	# dev tools
+	sudo apt-get install -y tmux autossh w3m		> /dev/null	# dev tools
 	sudo apt-get install -y debconf-utils			> /dev/null	# help auto select when install software (like mysql, wine, etc)
 	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
 
+	terminator_conf=~/.config/terminator
+	terminator_conf_me=$MY_ENV/conf/terminator
+	[ -e $terminator_conf_me -a ! -e $terminator_conf ] && ln -s $terminator_conf_me $terminator_conf
+	sudo apt-get install -y terminator			> /dev/null	# dev tools
 }
 
 function func_init_soft_basic {
