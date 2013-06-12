@@ -1,0 +1,78 @@
+exit
+
+# NOTE: this is for linuxmint
+# TODO: how to upgrade wine?
+
+Wine
+	Inbox
+		Wine uses a virtual C: drive in your home directory's .wine/drive_c subdirectory
+		if env var WINEPREFIX is set, wine uses it to find the .wine directory.
+
+		If need run internet based application like a browser in WINE, you need to have a package called "Wine Gecko".
+
+	Note
+		odd num version: bi-week beta
+		even num version: stable
+
+		AppDB: records of soft on wine
+	
+	Install
+		need remove old version first!
+
+
+
+################################################## Resource
+http://sourceforge.net/projects/wine/files/Source/wine-1.6-rc1.tar.bz2		# source
+http://mirrors.ibiblio.org/wine/source/1.6/wine-1.6-rc1.tar.bz2			# alternative source 
+git clone git://source.winehq.org/git/wine.git /tmp/wine-git			# for dev! git repo. (2013-06-12) around 175MB of data, the size of the complete WineHQ repository.
+
+
+################################################## Install (trying)
+#apt_src=/etc/apt/sources.list
+#os_code=`cat /etc/lsb-release | sed -n -e "s/DISTRIB_CODENAME=//p"`
+#echo "deb http://ppa.launchpad.net/ubuntu-wine/ppa/ubuntu ${os_code} main" >> $apt_src
+
+sudo add-apt-repository ppa:ubuntu-wine/ppa
+sudo apt-get update
+sudo apt-get install wine1.5				# beta version, seems better
+sudo apt-get install wine1.6				# not ready yet
+
+
+
+
+################################################## Compile
+
+# Var
+wine_ver=1.6
+wine_src_ver=wine-1.6-rc1
+wine_src_dir=$MY_PRO/wine_`date "+%Y%m%d_%H%M%S"`_src
+wine_src_addr=http://sourceforge.net/projects/wine/files/Source/${wine_src_ver}.tar.bz2
+apt_src=/etc/apt/sources.list
+os_code=`cat /etc/lsb-release | sed -n -e "s/DISTRIB_CODENAME=//p"`
+
+# Install dep, add apt src and ppa
+[ ! -e ${apt_src}.bak.forWineOnLM ] && cp ${apt_src}{,.bak.forWineOnLM}
+echo "deb-src http://archive.ubuntu.com/ubuntu/ ${os_code} main restricted universe multiverse" >> $apt_src
+sudo add-apt-repository ppa:ubuntu-wine/ppa
+sudo apt-get update
+sudo apt-get build-dep wine${wine_ver}-amd64 
+
+	# Install dep, option 2
+	#wget http://winezeug.googlecode.com/svn/trunk/install-wine-deps.sh	# this addr is from official site
+	#sudo bash install-wine-deps.sh
+
+# Get source code
+mkdir -p $wine_src_dir
+cd $wine_src_dir
+wget $wine_src_addr
+tar xvjf ${wine_src_ver}.tar.bz2
+cd ${wine_src_ver}
+
+# Compile source code
+./configure
+make depend
+make
+sudo make install					# never run Wine as root, but need install with root
+
+# Uninstall
+sudo make uninstall					# NOT remove config. should run in same src dir you install wine

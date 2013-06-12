@@ -102,6 +102,17 @@ function func_init_myenv_rw {
 	bash $myenv_init_rw $tmp_init_dir
 }
 
+function func_init_soft_manual_needed {
+	echo "Now need install soft with manual op (like accept agreement), continue (N) [Y/N]?"
+	read -e continue                                                                                           
+	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
+
+	# need accept some agreement
+	wine_ver=wine1.5-amd64
+	echo "INFO: installing $wine_ver, which need downloads and taks long time"
+	sudo apt-get install -y $wine_ver 
+}
+
 function func_init_soft_gui {
 	[ -z "$DISPLAY" ] && echo ">>> INIT `date "+%H:%M:%S"`: seems non-gui os, will not install soft works in gui" && return 0
 
@@ -110,7 +121,13 @@ function func_init_soft_gui {
 	sudo apt-get install -y vlc rdesktop			> /dev/null
 	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 
-	# Install Chrome
+	# Terminator
+	terminator_conf=~/.config/terminator
+	terminator_conf_me=$MY_ENV/conf/terminator
+	[ -e $terminator_conf_me -a ! -e $terminator_conf ] && ln -s $terminator_conf_me $terminator_conf
+	sudo apt-get install -y terminator			> /dev/null	# dev tools
+	
+	# Chrome
 	if (( $(dpkg -l | grep -c "google.*chrome") <= 0 )) ; then
 		chrome_url='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 		chrome_tmp=/tmp/${chrome_url##*/} 
@@ -144,6 +161,7 @@ function func_init_soft_ppa {
 	sudo apt-get install -y software-properties-common	> /dev/null	# for cmd add-apt-repository 
 
 	func_add_apt_repo ppa:gnome-terminator
+	func_add_apt_repo ppa:ubuntu-wine/ppa
 }
 
 function func_init_soft_termial {
@@ -156,11 +174,6 @@ function func_init_soft_termial {
 	sudo apt-get install -y tmux autossh w3m		> /dev/null	# dev tools
 	sudo apt-get install -y debconf-utils			> /dev/null	# help auto select when install software (like mysql, wine, etc)
 	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
-
-	terminator_conf=~/.config/terminator
-	terminator_conf_me=$MY_ENV/conf/terminator
-	[ -e $terminator_conf_me -a ! -e $terminator_conf ] && ln -s $terminator_conf_me $terminator_conf
-	sudo apt-get install -y terminator			> /dev/null	# dev tools
 }
 
 function func_init_soft_basic {
@@ -206,6 +219,8 @@ func_init_soft_termial
 # Init - config
 func_config_gnome_keying
 
+# Last - manual stuff
+func_init_soft_manual_needed
 
 exit
 
