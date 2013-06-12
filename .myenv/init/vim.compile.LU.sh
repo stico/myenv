@@ -2,13 +2,13 @@
 
 # Var
 vim_source=/tmp/vim_src_hg
-vim_target=~/program/vim_73_compile
+vim_target=~/program/vim-7.3_`date "+%Y%m%d"`			# path must be fixed, otherwise vim can not load files in runtime
 mak_file=${vim_source}/src/Make_mvc.mak
 
 # Prepare
 sudo apt-get build-dep vim
-sudo apt-get install -y libncurses5-dev
-# note: seems libncursesw5-dev not work
+#sudo apt-get install -y # seem installed
+sudo apt-get install -y libgtk2.0-dev libx11-dev xorg-dev	# for linuxmint (otherwise reports not GUI support and no gvim created)
 # more: libgtk2.0-dev libx11-dev xorg-dev
 # more? exuberant-ctags rake python-dev git-core wget sed ack-grep 
 mkdir -p $vim_source; cd $vim_source 
@@ -18,9 +18,9 @@ mkdir -p $vim_source; cd $vim_source
 # Compile
 make distclean		# for configure 
 make clean		# for build
-# CFLAGS to avoid the -g flag. 
-#CFLAGS="-O2" LDFLAGS="-static" ./configure \		# cause "no terminal library found"
-#env CFLAGS="-O2" LDFLAGS="-static" ./configure \	# cause "no terminal library found"
+
+#CFLAGS="-O2" LDFLAGS="-static" ./configure \			# CFLAGS to avoid the -g flag. Failed: cause "no terminal library found", install libncurses5-dev/libncursesw5-dev not works since already installed
+#env CFLAGS="-O2" LDFLAGS="-static" ./configure \		# CFLAGS to avoid the -g flag. Failed: cause "no terminal library found", install libncurses5-dev/libncursesw5-dev not works since already installed
 # TODO: how to make link the vim statically?
 ./configure \
 --prefix=$vim_target \
@@ -33,11 +33,13 @@ make clean		# for build
 --enable-xim
 #more: --enable-perlinterp --enable-python3interp --enable-tclinterp --enable-rubyinterp
 
-sed -i 's/^RUBY_VER = .*/RUBY_VER = 19/'		$mak_file
-sed -i 's/^RUBY_VER_LONG = .*/RUBY_VER_LONG = 1.9/'	$mak_file
+sed -i 's/^RUBY_VER = .*/RUBY_VER = 19/' $mak_file
+sed -i 's/^RUBY_VER_LONG = .*/RUBY_VER_LONG = 1.9/' $mak_file
 
 #make -j 3	# use 3 cpu core to compile
 make install
 
 # record the compile options
 cp $MY_ENV/init/`basename $0` $vim_target 
+
+# TODO: 2013-06-12: why the compiled vim start mode is REPLACE?

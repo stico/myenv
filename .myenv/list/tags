@@ -10,6 +10,15 @@ dw=$MY_DEV/code_dw
 doc=$MY_DOC
 dcb=$MY_DOC/DCB
 dcc=$MY_DOC/DCC
+dcd=$MY_DOC/DCD
+dcm=$MY_DOC/DCM
+dco=$MY_DOC/DCO
+ecb=$MY_DOC/ECB
+ece=$MY_DOC/ECE
+ech=$MY_DOC/ECH
+ecs=$MY_DOC/ECS
+ecz=$MY_DOC/ECZ
+fcz=$MY_DOC/FCZ
 
 noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
 

@@ -115,6 +115,8 @@ function func_init_soft_gui {
 		chrome_url='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 		chrome_tmp=/tmp/${chrome_url##*/} 
 
+		[ $(netstat -an | grep ":1984.*LISTEN" | wc -l) -ge 1 ] && export http_proxy="127.0.0.1:1984" && export https_proxy="127.0.0.1:1984"
+
 		sudo apt-get install -y libnspr4-0d libcurl3	> /dev/null	# for chrome 
 		rm -f $chrome_tmp
 		wget ${chrome_url} -O $chrome_tmp 
@@ -126,13 +128,22 @@ function func_init_soft_gui {
 	#sudo apt-get install -y doublecmd-gtk byobu
 }
 
+function func_add_apt_repo {
+	apt_repo=$1
+
+	# all added ppa could be found in /etc/apt/sources.list.d/ 
+	[ $(ls /etc/apt/sources.list.d/ | grep -c ${apt_repo##*:}) -ge 1 ] && echo "INFO: $apt_repo already added, skip" && return 0
+
+	sudo add-apt-repository -y $apt_repo			&> /dev/null
+}
+
 function func_init_soft_ppa {
 	echo ">>> INIT `date "+%H:%M:%S"`: add ppa for latest software"
 
 	sudo apt-get install -y python-software-properties	> /dev/null	# for cmd add-apt-repository 
 	sudo apt-get install -y software-properties-common	> /dev/null	# for cmd add-apt-repository 
 
-	sudo add-apt-repository -y ppa:gnome-terminator		> /dev/null	# terminator
+	func_add_apt_repo ppa:gnome-terminator
 }
 
 function func_init_soft_termial {
