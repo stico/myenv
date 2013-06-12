@@ -173,6 +173,17 @@ function func_init_soft_basic {
 	#(! command -v aptitude &> /dev/null) && echo "install aptitude failed, pls check!" && exit 1
 }
 
+function func_config_gnome_keying {
+	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
+	dt_type=XFCE
+	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
+	[ ! -e ${gnome_keying_desktop}.bak ] && sudo cp ${gnome_keying_desktop}{,.bak}
+	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
+		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
+	else 
+		echo "INFO: $gnome_keying_desktop already contains $dt_type, ignore"
+	fi
+}
 
 # Init - basic
 func_init_dir
@@ -191,6 +202,10 @@ func_init_myenv_rw
 # Init - soft
 func_init_soft_gui
 func_init_soft_termial
+
+# Init - config
+func_config_gnome_keying
+
 
 exit
 
