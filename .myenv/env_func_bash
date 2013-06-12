@@ -147,6 +147,15 @@ function func_cd_conditional {
 	# shortcut - home
 	[ -z "$*" ] && \cd && return 0
 
+	# shortcut - last dir
+	if [ "-" = "$*" ] ; then
+		\cd - 
+		# TODO: (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
+		[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd .
+		return 0
+	fi
+
+	# TODO: (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
 	# use rvm's cd function if needed (note, the func_rvm_cd is hacked in .bashrc
 	[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
 
@@ -173,7 +182,7 @@ function func_vi {
 
 function func_cd {
 	# shortcut - home
-	[ -z "$*" ] && func_cd_conditional && return 0
+	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
