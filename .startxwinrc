@@ -1,0 +1,5 @@
+# NOTE: not need set DISPLAY here, since already set
+
+# TODO: seems need xhost add to AC everytime, how to avoid?
+xhost + 172.19.103.99
+

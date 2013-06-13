@@ -27,6 +27,7 @@
 !/.bashrc
 !/.curlrc
 !/.muttrc
+!/.XWinrc
 !/.msmtprc
 !/.inputrc
 !/.screenrc
@@ -34,6 +35,7 @@
 !/.tmux.conf
 !/.gitignore
 !/.dir_colors
+!/.startxwinrc
 !/.bash_profile
 !/.gitattributes
 !/.backupMyenv.sh

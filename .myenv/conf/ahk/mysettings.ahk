@@ -48,7 +48,7 @@ RButton::	Window_Drag()
 ^RButton::	Window_Resize()
 
 ; to prevent catch cmd send by itself, use $ prefix for cmd
-$^!w::		Filter_C_A_w_YY()
+;$^!w::		Filter_C_A_w_YY()
 $^+w::		Filter_C_S_w_Chrome()
 $^+q::		Filter_C_S_q_Eclipse()
 $^+e::		Filter_C_S_e_Eclipse()

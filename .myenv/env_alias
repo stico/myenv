@@ -12,6 +12,7 @@ sshp			"%MY_ENV_SECU%#script_sshp.sh"
 # Alias - Misc
 cd			"func_cd"
 vi			"func_vi"
+terminator		"func_terminator"
 #vim			"func_vi"	# seems this will confuse the test "(command -v vim &> /dev/null) && echo vim installed"
 
 wl			"wc -l"

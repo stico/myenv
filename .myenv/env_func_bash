@@ -339,10 +339,16 @@ function func_head {
 }
 
 function func_ip {
-	/sbin/ifconfig 									\
-	| grep -B1 "inet addr" 								\
-	| awk '{ if($1=="inet"){print $2}else if($2=="Link"){ printf "%s:", $1}}'	\
-	| awk -F: '{ print $1 ": " $3 }'; 
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+		# non-cygwin env: ifconfig
+		/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
+		/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
+	else
+		# seem directly pipe the output of ipconfig is very slow
+		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
+		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
+		#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
+	fi
 }
 
 function func_mkdir_cd { 
@@ -486,6 +492,19 @@ function func_scp_with_jump {
 		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test2/test
 		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test/t1 ~/amp/2012-11-01/test1
 		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
+}
+
+function func_terminator { 
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+		# non-cygwin env: original program
+		terminator $*
+	else
+		startxwin &> /dev/null	# just ensure X server started
+		raw_data=$(ipconfig)
+		local_ip=`echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p" | head -1`
+		# both --maximise/--fullscreen are not really work
+		ssh workvm "DISPLAY=$local_ip:0.0 terminator --geometry=1910x1010+0+0 &> /dev/null &" &> /dev/null
+	fi
 }
 
 function func_sys_info { 
