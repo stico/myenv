@@ -40,6 +40,11 @@ let g:ctrlp_custom_ignore = {
 	\ 'link': 'some_bad_symbolic_links',
 	\ }
 
+" disable the creation
+" Option 1
+let g:netrw_dirhistmax=0
+" Option 2
+" au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
 
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 

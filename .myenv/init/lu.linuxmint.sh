@@ -67,7 +67,7 @@ function func_init_link_doc {
 
 	[ -d $home_doc_path ] && rmdir $home_doc_path
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, exit!" && exit 1
+	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, exit!" || exit 1
 	ln -s $ext_doc_path $home_doc_path
 }
 
@@ -106,11 +106,6 @@ function func_init_soft_manual_needed {
 	echo "Now need install soft with manual op (like accept agreement), continue (N) [Y/N]?"
 	read -e continue                                                                                           
 	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
-
-	# need accept some agreement
-	wine_ver=wine1.5-amd64
-	echo "INFO: installing $wine_ver, which need downloads and taks long time"
-	sudo apt-get install -y $wine_ver 
 }
 
 function func_init_soft_gui {
@@ -161,7 +156,6 @@ function func_init_soft_ppa {
 	sudo apt-get install -y software-properties-common	> /dev/null	# for cmd add-apt-repository 
 
 	func_add_apt_repo ppa:gnome-terminator
-	func_add_apt_repo ppa:ubuntu-wine/ppa
 }
 
 function func_init_soft_termial {
@@ -242,15 +236,12 @@ if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
 
 	sudo add-apt-repository -y ppa:alexx2000/doublecmd		# double commander
 	sudo add-apt-repository -y ppa:tualatrix/ppa			# ubuntu tweak stable
-	sudo add-apt-repository -y ppa:ubuntu-wine/ppa			# wine1.5
 	sudo add-apt-repository -y ppa:byobu/ppa			# byobu
 	#sudo apt-get update						# should update since added ppa, disable in debug mode, as just need run it once manually
 
 	sudo apt-get install -y xrdp					# OS with X, xrdp supports windows native remote desktop connection
 	sudo apt-get install -y vim-gnome
 	sudo apt-get install -y ubuntu-tweak autokey gitk wmctrl 
-
-	sudo apt-get install -y wine1.5					# TODO: this need maual work comfirm, learn the auto way from the mysql init script
 fi
 
 if [ $(echo "$sys_info" | grep -ic "ubuntu.*precise") == 1 ] ; then

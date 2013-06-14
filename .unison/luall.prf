@@ -26,6 +26,8 @@ path=os_spec_lu
 path=os_spec_win
 
 # regex to ignore
+ignore=Regex .*/.fl_me.txt
+ignore=Regex .*/.dl_me.txt
 ignore=Name temp.*
 ignore=Name *~
 ignore=Name ~*
