@@ -60,12 +60,87 @@
     foreground_color = "#002b36"
 [layouts]
   [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+      #profile = solarized-dark
     [[[child1]]]
       type = Terminal
       parent = window0
       profile = default
-    #profile = solarized-dark
-    [[[window0]]]
+  [[t2h]]
+    [[[child0]]]
       type = Window
+      order = 0
       parent = ""
+    [[[child1]]]
+      type = VPaned
+      order = 0
+      parent = child0
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child1
+      command = "ping 8.8.8.8"
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child1
+      command = "ping 4.2.2.1"
+  [[t2v]]
+    [[[child0]]]
+      type = Window
+      order = 0
+      parent = ""
+    [[[child1]]]
+      type = HPaned
+      order = 0
+      parent = child0
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child1
+      command = "ping 8.8.8.8"
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child1
+      command = "ping 4.2.2.1"
+  [[t4]]
+    [[[child0]]]
+      type = Window
+      order = 0
+      parent = ""
+    [[[child1]]]
+      type = VPaned
+      order = 0
+      parent = child0
+    [[[child2]]]
+      type = HPaned
+      order = 0
+      parent = child1
+    [[[child3]]]
+      type = HPaned
+      order = 1
+      parent = child1
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child2
+      command = "ping 8.8.8.8"
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child2
+      command = "ping 4.2.2.1"
+    [[[terminal3]]]
+      type = Terminal
+      order = 0
+      parent = child3
+      command = "top"
+    [[[terminal4]]]
+      type = Terminal
+      order = 1
+      parent = child3
+      command = "ping localhost"
 [plugins]

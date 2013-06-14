@@ -1,10 +1,3 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =8
-let g:netrw_dirhist_1='/ext/home_vmdk/dev/code_dw/yypay_trunk/yypay-test/lib/yypay-test'
-let g:netrw_dirhist_2='/home/ouyangzhu/.vim'
-let g:netrw_dirhist_3='/home/ouyangzhu/.vim/bundle'
-let g:netrw_dirhist_4='/home/ouyangzhu/.vim/bundle/conque'
-let g:netrw_dirhist_5='/ext/home_vmdk/dev/code_dw/yypay_trunk/yypay-web'
-let g:netrw_dirhist_6='/home/ouyangzhu'
-let g:netrw_dirhist_7='/home'
-let g:netrw_dirhist_8='/home/ouyangzhu/.myenv/init'
+let g:netrw_dirhist_cnt =1
+let g:netrw_dirhist_1='/home/ouyangzhu/.myenv/conf/terminator'

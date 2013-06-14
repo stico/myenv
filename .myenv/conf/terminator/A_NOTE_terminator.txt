@@ -5,6 +5,14 @@ Config
 	Note
 		terminator will rewrite the config file, so DO NOT update the file manually!
 
+	layouts
+		command			init cmd, but window closed if send C-c
+		type		
+			Terminal	the single terminal 
+			HPaned/VPaned	Horizon/Vertical split window
+			Window		the whole window
+			(Window may not have parent. Others must specify a parent)
+
 	keybindings
 		for list the keynames, google "gdkkeyuni.c" "gtk.gdk keyname table",
 		if want disable shortcut, set key to '' seems will use default, set to F1 is better
