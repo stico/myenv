@@ -45,6 +45,9 @@ source $HOME/.myenv/init/bash.sh
 # Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
 rvm use ruby-1.9.3-p327@global --default
 
+# call functions
+func_ssh_agent_init
+
 stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
 
