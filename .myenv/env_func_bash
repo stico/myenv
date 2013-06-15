@@ -297,8 +297,9 @@ function func_gen_grep_result {
 	func_gen_list f $base $filelist
 
 	# we treat path in search text as .
-	search_string="$*"
-	search=${search_string//\\/.}
+	options=`echo "$*" | sed -e "s/^.*\"//;s/^.*'//;s/^[^-]* -/ -/;"`	# first " -" not in " or '
+	search_string=`echo "$*" | sed -e "s/$options//;"`			# remove all options
+	search=${search_string//\\/.}						# make the path sep compatible
 
 	# Jump to base, since the filelist is using relative path
 	\cd $base
@@ -318,7 +319,8 @@ function func_gen_grep_result {
 	# Step: remove the fileist itself
 	sed -e "/$filelist$/d"		| \
 	# Step: grep result, -I is not match binary files
-	xargs --delimiter="\n" grep -I -i "$search" | tee $grep_result | grep --color -i "$search"
+	#xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | grep --color -i "$search"
+	xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
 
 	# Jump back
 	\cd -
