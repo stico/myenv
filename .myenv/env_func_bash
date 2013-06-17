@@ -186,6 +186,8 @@ function func_vi {
 }
 
 function func_cd {
+	# TODO: seem using "../paygat" will fail, possbile to make it work?
+
 	# shortcut - home
 	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
 
@@ -296,10 +298,27 @@ function func_gen_grep_result {
 
 	func_gen_list f $base $filelist
 
+	# Get search string and options
+		# Case need handle
+		# no options, just search string
+		# "-" or " -" in search string
+		# multiple options with values
+
+		# Option 1
+		# TODO: can not support multiple option, like " -a a -b b"
+		# TODO: option is whole string if no option there
+		#parameters="$*"
+		#options=${parameters/#* -/ -}
+		#search=${parameters/% -*/}
+
+		# Option 2
+		# TODO: can not support multiple option, like " -a a -b b", since sed not support non-greedy regex
+		# TODO: how to avoid " -" in quoted string, since " or ' is not there after pipe
+		options=`echo "$*" | sed -e '/ -/!d;s/^.* -/ -/'`		# first " -" not in " or '
+		search=`echo "$*" | sed -e "s/$options//;"`			# remove all options
+
 	# we treat path in search text as .
-	options=`echo "$*" | sed -e "s/^.*\"//;s/^.*'//;s/^[^-]* -/ -/;"`	# first " -" not in " or '
-	search_string=`echo "$*" | sed -e "s/$options//;"`			# remove all options
-	search=${search_string//\\/.}						# make the path sep compatible
+	search=${search//\\/.}							# make the path sep compatible
 
 	# Jump to base, since the filelist is using relative path
 	\cd $base
@@ -321,6 +340,10 @@ function func_gen_grep_result {
 	# Step: grep result, -I is not match binary files
 	#xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | grep --color -i "$search"
 	xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
+
+	#echo -----$options
+	#echo -----$search
+	#echo xargs --delimiter="\n" grep -I -i $options "$search" 
 
 	# Jump back
 	\cd -
