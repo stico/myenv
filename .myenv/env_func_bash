@@ -314,8 +314,8 @@ function func_gen_grep_result {
 		# Option 2
 		# TODO: can not support multiple option, like " -a a -b b", since sed not support non-greedy regex
 		# TODO: how to avoid " -" in quoted string, since " or ' is not there after pipe
-		options=`echo "$*" | sed -e '/ -/!d;s/^.* -/ -/'`		# first " -" not in " or '
-		search=`echo "$*" | sed -e "s/$options//;"`			# remove all options
+		options=`echo "$*" | sed -e '/ -/!d;s/^.* -/ -/'`					# first " -" not in " or '
+		search=`[ -z "$options" ] && echo "$*" || echo "$*" | sed -e "s/$options//;"`		# remove all options, $options empty will cause sed have error
 
 	# we treat path in search text as .
 	search=${search//\\/.}							# make the path sep compatible
