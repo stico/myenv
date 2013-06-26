@@ -8,6 +8,8 @@
 ; not work on Chinese
 ;:*:ffbr::BR//欧阳柱
 :*:ffpay::pay.duowan.com
+:*:fftpay::payplf-tpay.yy.com
+:*:ffgate::payplf-gate.yy.com
 :*:ffip::
 (
 /sbin/ifconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'

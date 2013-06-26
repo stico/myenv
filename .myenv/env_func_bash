@@ -19,15 +19,22 @@ function func_tag_value {
 	# not a tag, return itself
 	[ -z "$tag_value" ] && echo $1 && return 0
 
+	# eval
+	func_eval $tag_value
+}
+
+function func_eval {
+	usage="Usage: func_eval [str]"
+	[ $# -lt 1 ] && echo $usage && return 1
+
+	str=$*
 	# eval value if contains var or cmd substitution, otherwise return itself
-	if [ $(echo $tag_value | grep -c '`\|$') -ge 1 ] ; then
-
+	if [ $(echo $str | grep -c '`\|$') -ge 1 ] ; then
 		# remove starting and trailing quotes, otherwise eval will fail
-		#tag_value=`echo $tag_value | sed -e "s/^['\"]//;s/['\"]$//"`		
-
-		eval echo $tag_value
+		#tag=`echo $str | sed -e "s/^['\"]//;s/['\"]$//"`		
+		eval echo $str
 	else
-		echo $tag_value
+		echo $str
 	fi
 }
 
@@ -622,7 +629,8 @@ function func_sys_info {
 }
 
 function func_translate { 
-	# usage: func_translate lovely world
+	usage="Usage: func_translate [words]"
+	[ $# -lt 1 ] && echo $usage && return 1
 
 	# TODO: parse all contents, e.g. when translate "break"
 	# TODO: record history
@@ -642,7 +650,104 @@ function func_translate {
 	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
 	#| awk -F"," '{printf "%s\n%s\n%s\n", $2,$3,$1}' 	
 
-	echo $res_raw
 	echo $res_simple
+	echo $res_raw
+	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/zgen/history_translate.txt
+}
 
+function func_me_fl_gen { 
+	src_git=$HOME/.git
+	src_add=$MY_ENV/list/myenv_fl_add.lst
+	target=$MY_ENV/list/myenv_fl_git1.lst
+	target_small=$MY_ENV/list/myenv_fl_git2.lst
+
+	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists, pls check!" && exit 1
+
+	echo -e "INFO: Generating myenv file list to: ` dirname $target`"
+	\cd $HOME && git ls-files > $target; \cd -
+	sed -e "s/\/.*//;" $target | sort -u > $target_small
+}
+
+function func_backup_dated { 
+	Usage="Usage: bash dated_backup <single_file_or_dir>"
+	[ $# -ne 1 ] && echo "$Usage" && return 1
+
+	srcPath="$*"
+	fileName=$(basename $srcPath)
+	targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_`uname -n`_"$fileName"
+	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/ampext/backup")
+
+	# if path is a directory, zip it first
+	if [[ -d "$srcPath" ]]; then
+		# need update the var to packed ones
+		targetFile=$targetFile.zip 
+		packFile=$MY_TMP/$targetFile
+		echo -e "INFO: Creating zip file for backup: $packFile"
+		zip -rq "$packFile" "$srcPath"
+		srcPath="$packFile"
+	fi
+
+	for path in "${bakPath[@]}"
+	do
+		if [ -e "$path" ]; then
+			[ $(cp "$srcPath" "$path/$targetFile") ] && echo -e "INFO: backup to `ls -lh \"$path/$targetFile\"`"
+			copied=$success
+		else
+			echo -e "WARN: Path not exist: $path" 
+		fi
+	done
+
+	[[ -e $packFile ]] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
+	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup, pls check it !\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+}
+
+function func_backup_listed { 
+	# TODO: merge with dated_backup?
+	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/list/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
+
+	usage="Usage: bash func_backup_listed <tag> <filelists>*"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	tmp_dir=$MY_TMP/$1
+	[ -e $tmp_dir ] && rm -rf $tmp_dir
+	mkdir -p $tmp_dir
+	shift
+	source=$*
+
+	for fl in $source ; do 
+		[ ! -e $fl ] && echo -e "WARN: file list ($fl) not exist, pls check!" && continue
+		sub_name=`basename ${fl}`
+		sub_dir=$tmp_dir/${sub_name%%.*}
+		mkdir $sub_dir
+
+		sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
+			# eval path, check empty value
+			[ -n "$line" ] && candidate=`func_eval $line` || continue
+			[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $line, pls check!" && continue
+
+			# Try $HOME as base (myenv backup need this for git listed files)
+			[ -e "$HOME/$candidate" ] && cp --no-preserve=all -R "$HOME/$candidate" $sub_dir && continue
+			[ -e "$candidate" ] && cp --no-preserve=all -R "$candidate" $sub_dir || continue
+		done
+
+		# dirty check 1, for myenv bak, change its ACL, otherwise can not open/delete that dir
+		dirty_dir=fstab.d
+		[ -e $sub_dir/$dirty_dir ] && 					\
+			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir &&	\
+			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir/*
+
+		# dirty check 2, for myenv bak, not want the .unison log file 
+		[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm
+	done
+
+	func_backup_dated $tmp_dir
+	rm -rf $tmp_dir
+
+	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/.fl_me.txt 
+	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/.fl_me.txt 
+	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/.fl_me.txt 
+
+	#bash $MY_ENV/list/myenv_gen.sh
+	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
+	#$MY_ENV/util/listed_backup.sh
 }
