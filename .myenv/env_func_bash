@@ -668,12 +668,23 @@ function func_me_fl_gen {
 	sed -e "s/\/.*//;" $target | sort -u > $target_small
 }
 
+function func_delete_dated { 
+	Usage="Usage: func_delete_dated <single_file_or_dir>"
+	[ $# -ne 1 ] && echo "$Usage" && return 1
+
+	# the path might have blank, so use $*, and embrace with "" (many place used this)
+	targetDir=$MY_TMP/`date "+%Y-%m-%d"`
+
+	[[ ! -e $targetDir ]] && mkdir $targetDir
+	mv "$@" $targetDir
+}
+
 function func_backup_dated { 
-	Usage="Usage: bash dated_backup <single_file_or_dir>"
+	Usage="Usage: func_backup_dated <single_file_or_dir>"
 	[ $# -ne 1 ] && echo "$Usage" && return 1
 
 	srcPath="$*"
-	fileName=$(basename $srcPath)
+	fileName=$(basename "$srcPath")
 	targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_`uname -n`_"$fileName"
 	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/ampext/backup")
 
@@ -690,10 +701,11 @@ function func_backup_dated {
 	for path in "${bakPath[@]}"
 	do
 		if [ -e "$path" ]; then
-			[ $(cp "$srcPath" "$path/$targetFile") ] && echo -e "INFO: backup to `ls -lh \"$path/$targetFile\"`"
+			cp "$srcPath" "$path/$targetFile"
+			[ -e "$path/$targetFile" ] && echo -e "INFO: backup success: `ls -lh \"$path/$targetFile\"`" 
 			copied=$success
 		else
-			echo -e "WARN: Path not exist: $path" 
+			echo -e "WARN: backup failed, path not exist ($path)" 
 		fi
 	done
 
