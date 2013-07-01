@@ -632,8 +632,10 @@ function func_translate {
 	usage="Usage: func_translate [words]"
 	[ $# -lt 1 ] && echo $usage && return 1
 
-	# TODO: parse all contents, e.g. when translate "break"
-	# TODO: record history
+	# check history
+	history_translate=$MY_ENV/zgen/history_translate.txt
+	history_translate_txt=`grep "^$*" -A 1 $history_translate`
+	[ -n "$history_translate_txt" ] && echo $history_translate_txt && return 0
 
 	# might useful fields: ie=UTF-8&oe=UTF-8
 	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
@@ -652,7 +654,7 @@ function func_translate {
 
 	echo $res_simple
 	echo $res_raw
-	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/zgen/history_translate.txt
+	echo -e "$*\t$res_simple\n\t$res_raw" >> $history_translate
 }
 
 function func_me_fl_gen { 
