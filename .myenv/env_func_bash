@@ -20,11 +20,11 @@ function func_tag_value {
 	[ -z "$tag_value" ] && echo $1 && return 0
 
 	# eval
-	func_eval $tag_value
+	func_tag_eval $tag_value
 }
 
-function func_eval {
-	usage="Usage: func_eval [str]"
+function func_tag_eval {
+	usage="Usage: func_tag_eval [str]"
 	[ $# -lt 1 ] && echo $usage && return 1
 
 	str=$*
@@ -36,6 +36,25 @@ function func_eval {
 	else
 		echo $str
 	fi
+}
+
+function func_path_eval {
+	usage="Usage: func_path_eval [result_var_name] [pathstr]"
+	[ $# -lt 2 ] && echo $usage && return 1
+
+	# need use variable to "return" result
+	result_var_name=$1
+	eval $result_var_name=""
+	shift
+	pathstr="$*"
+
+	# eval path, check empty value
+	[ -n "$pathstr" ] && candidate=`func_tag_value $pathstr`
+	[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $pathstr, pls check!" && return 1
+
+	# Try $HOME as base (myenv backup need this for git listed files)
+	[ -e "$HOME/$candidate" ] && eval $result_var_name="$HOME/$candidate" && return 0
+	[ -e "$candidate" ] && eval $result_var_name="$candidate" && return 0
 }
 
 function func_select_line {
@@ -275,16 +294,33 @@ function func_gen_list {
 	\cd - &> /dev/null
 }
 
-function func_gen_list_myenv {
+function func_me_fl_gen_grep {
 
 	filelist=$MY_ENV/.fl_me.txt
 
 	[ -e $filelist ] && return 0
-
-	cat $MY_ENV_ZGEN/myenv.lst > $filelist				# override
-	for add_path in $HOME/.ssh $MY_ENV/SECU $MY_ENV/SECURE ; do
-		[ -e $add_path ] && find $add_path -type f >> $filelist	# append
+	echo -e "INFO: Generating full file list to: $filelist"
+	sed -e "s/^/..\//" $target > $filelist
+	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
+		func_path_eval candidate $line
+		[ -f "$candidate" ] && echo "$candidate" >> $filelist 
+		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist 
 	done
+}
+
+function func_me_fl_gen { 
+	src_git=$HOME/.git
+	src_add=$MY_ENV/list/myenv_fl_add.lst
+	target=$MY_ENV/list/myenv_fl_git1.lst
+	target_small=$MY_ENV/list/myenv_fl_git2.lst
+
+	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists, pls check!" && exit 1
+
+	echo -e "INFO: Generating git file list to: $target"
+	\cd $HOME && git ls-files > $target; \cd - &> /dev/null
+
+	echo -e "INFO: Generating git compact file list to: $target_small"
+	sed -e "s/\/.*//;" $target | sort -u > $target_small
 }
 
 function func_gen_grep_result {
@@ -360,7 +396,7 @@ function func_gen_grep_result_myenv {
 	usage="Usage: func_gen_grep_result_myenv [search]*"
 	[ $# -lt 1 ] && echo $usage && return 1
 
-	func_gen_list_myenv 
+	func_me_fl_gen_grep
 	func_gen_grep_result $MY_ENV ALL "$*"
 }
 
@@ -657,19 +693,6 @@ function func_translate {
 	echo -e "$*\t$res_simple\n\t$res_raw" >> $history_translate
 }
 
-function func_me_fl_gen { 
-	src_git=$HOME/.git
-	src_add=$MY_ENV/list/myenv_fl_add.lst
-	target=$MY_ENV/list/myenv_fl_git1.lst
-	target_small=$MY_ENV/list/myenv_fl_git2.lst
-
-	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists, pls check!" && exit 1
-
-	echo -e "INFO: Generating myenv file list to: ` dirname $target`"
-	\cd $HOME && git ls-files > $target; \cd -
-	sed -e "s/\/.*//;" $target | sort -u > $target_small
-}
-
 function func_delete_dated { 
 	Usage="Usage: func_delete_dated <single_file_or_dir>"
 	[ $# -ne 1 ] && echo "$Usage" && return 1
@@ -734,15 +757,17 @@ function func_backup_listed {
 		sub_dir=$tmp_dir/${sub_name%%.*}
 		mkdir $sub_dir
 
+		# TODO duplicated code block - start - evalfl1
 		sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
 			# eval path, check empty value
-			[ -n "$line" ] && candidate=`func_eval $line` || continue
+			[ -n "$line" ] && candidate=`func_tag_eval $line` || continue
 			[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $line, pls check!" && continue
 
 			# Try $HOME as base (myenv backup need this for git listed files)
 			[ -e "$HOME/$candidate" ] && cp --no-preserve=all -R "$HOME/$candidate" $sub_dir && continue
 			[ -e "$candidate" ] && cp --no-preserve=all -R "$candidate" $sub_dir || continue
 		done
+		# TODO duplicated code block - end - evalfl1
 
 		# dirty check 1, for myenv bak, change its ACL, otherwise can not open/delete that dir
 		dirty_dir=fstab.d
