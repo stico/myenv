@@ -45,8 +45,6 @@ dd			"ddelete"
 db			"dbackup"
 
 			# Head: d - dev 
-dcd			"func_cd %MY_DEV%"
-dwcd			"func_cd %MY_DEV%/code_dw"
 dloadpyvenv		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
 dloadrbvenv		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm"
 dgitpullrepo		"func_git_pull %MY_CODE_REPO%"
@@ -55,6 +53,7 @@ dgitcommitpushrepo	"func_git_commit_push %MY_CODE_REPO%"
 
 			# Head: e - myenv 
 egf			"func_gen_grep_result_myenv"
+eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
 ebackup			"func_me_fl_gen; func_backup_listed myenv_full %MY_ENV%/list/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
 eload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 ehostsupdate		"sudo -E bash hosts_append.sh"
