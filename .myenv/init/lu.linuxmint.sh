@@ -67,7 +67,7 @@ function func_init_link_doc {
 
 	[ -d $home_doc_path ] && rmdir $home_doc_path
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, exit!" || exit 1
+	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
 	ln -s $ext_doc_path $home_doc_path
 }
 
@@ -76,8 +76,10 @@ function func_init_link_dev {
 	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
 
 	[ -e $home_dev_path -a -h $home_dev_path ] && echo "dev link already exist, skip" && return 0
+	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
 
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
 	ln -s $ext_doc_path/os_spec_lu/dev $home_dev_path
 }
 
@@ -86,8 +88,10 @@ function func_init_link_pro {
 	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
 
 	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
+	(( `ls $home_pro_path 2>/dev/null | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
 
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
 	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
 }
 
@@ -149,7 +153,7 @@ function func_add_apt_repo {
 	sudo add-apt-repository -y $apt_repo			&> /dev/null
 }
 
-function func_init_soft_ppa {
+function func_init_apt_update_ppa {
 	echo ">>> INIT `date "+%H:%M:%S"`: add ppa for latest software"
 
 	sudo apt-get install -y python-software-properties	> /dev/null	# for cmd add-apt-repository 
@@ -196,10 +200,10 @@ function func_config_gnome_keying {
 # Init - basic
 func_init_dir
 func_init_sudoer
-func_init_soft_ppa
-func_init_soft_basic
 func_init_apt_update_src
+func_init_apt_update_ppa
 func_init_apt_update_list
+func_init_soft_basic
 
 # Init - myenv
 func_init_link_doc
