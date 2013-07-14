@@ -99,6 +99,7 @@ set nowrap						" wrap/nowrap the line
 set linebreak						" won't break words as wrapping a line, need wrap set
 set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
+"set shell=bash\ --login				" make :! will source .bashrc everytime
 "set cursorcolumn					" highlight current column
 "set relativenumber
 
@@ -139,6 +140,7 @@ nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
+noremap <F11> :!source $MY_ENV/env_func_bash; func_run_file %:p <Enter>
 noremap <C-T> :tabnew<CR>
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 
@@ -298,20 +300,6 @@ command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
 command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
 
-command! -nargs=* RInCmd		:wa | :silent	! cmd.exe		<args> "%:p" & pause
-command! -nargs=* RInBash		:wa | :silent	! bash			<args> "%:p" & pause
-command! -nargs=* RInRuby               :wa |		! bundle exec ruby	<args> "%:p"
-command! -nargs=* RInPython		:wa | :silent	! python		<args> "%:p" & pause
-command! -nargs=* RInGroovy		:wa | :silent	! groovy		<args> "%:p" & pause
-
-"autocmd BufNewFile,BufReadPost *.sh map <buffer> <F11> :pwd
-autocmd Filetype sh map <buffer> <F11> :RInBash<Enter>
-autocmd Filetype ruby map <buffer> <F11> :RInRuby<Enter>
-autocmd Filetype groovy map <buffer> <F11> :RInGroovy<Enter>
-autocmd Filetype python map <buffer> <F11> :RInPython<Enter>
-autocmd Filetype dosbatch map <buffer> <F11> :RInCmd<Enter>
-
-
 """""""""""""""""""""""""""""" H1 - Script
 
 " Deprecated - cmd g*/g# already did this
@@ -452,3 +440,16 @@ endif
 "	"au BufEnter <buffer> hi Comment	ctermfg=DarkGrey guifg=DarkGrey		" need this way to override the hi defined by filetype specifiy one
 "	"au FileType *	hi Comment	cterm=italic ctermfg=DarkCyan gui=italic guifg=DarkCyan " seems better than line above, as could match filetype  
 "	au FileType *	hi Comment	ctermbg=Grey ctermfg=DarkCyan guibg=LightGrey guifg=DarkCyan " seems better than line above, as could match filetype  
+"
+"Deprecated as moved the logic into bash function
+"command! -nargs=* RInCmd		:wa | :silent	! cmd.exe		<args> "%:p" & pause
+"command! -nargs=* RInBash		:wa | :silent	! bash			<args> "%:p" & pause
+"command! -nargs=* RInRuby               :wa |		! bundle exec ruby	<args> "%:p"
+"command! -nargs=* RInPython		:wa | :silent	! python		<args> "%:p" & pause
+"command! -nargs=* RInGroovy		:wa | :silent	! groovy		<args> "%:p" & pause
+"autocmd Filetype sh map <buffer> <F11> :RInBash<Enter>
+"autocmd Filetype ruby map <buffer> <F11> :RInRuby<Enter>
+"autocmd Filetype groovy map <buffer> <F11> :RInGroovy<Enter>
+"autocmd Filetype python map <buffer> <F11> :RInPython<Enter>
+"autocmd Filetype dosbatch map <buffer> <F11> :RInCmd<Enter>
+

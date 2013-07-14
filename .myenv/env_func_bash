@@ -790,3 +790,35 @@ function func_backup_listed {
 	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
 	#$MY_ENV/util/listed_backup.sh
 }
+
+function func_run_file_java {
+	file=$1
+	file_name=`basename $file`
+	tmp_dir=`func_tag_value tt`
+
+	cp -f $file $tmp_dir || return 1
+	\cd $tmp_dir &> /dev/null
+	rm ${file_name/.java/.class} &> /dev/null
+	javac $file_name
+	java -cp . ${file_name%.java}
+}
+
+function func_run_file {
+	usage="Usage: bash func_run_file <file>"
+	[ $# -lt 1 ] && echo $usage && return 1
+	
+	file=$1
+	[ ! -e "$file" ] && echo "ERROR: $file not exist, pls check!" && return 1
+
+	if [[ "$file" = *.java ]] ; then
+		func_run_file_java $file 
+	elif [[ "$file" = *.rb ]] ; then	ruby $file;
+	elif [[ "$file" = *.sh ]] ; then	bash $file;
+	elif [[ "$file" = *.py ]] ; then	python $file;
+	elif [[ "$file" = *.bat ]] ; then	cmd $file;
+	elif [[ "$file" = *.exe ]] ; then	cmd $file;
+	elif [[ "$file" = *.groovy ]] ; then	groovy $file;
+	else
+		echo "ERROR: can not run file $file, pls check!"
+	fi
+}
