@@ -1,18 +1,19 @@
 #!/bin/bash
 
 # Command: rm /tmp/lu.linuxmint.sh ; wget -O /tmp/lu.linuxmint.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/lu.linuxmint.sh && bash /tmp/lu.linuxmint.sh 
+# Verified: LM 13 (2013-04-16), but updated after that
+# Verified: LM 15 (2013-07-16), only not found smbfs to install
 
+#TODO: all > /dev/null to log file instead, "tee -a" will be useful
 #TODO: investigate ubuntu tweak
 #TODO: investigate MyUnity
 
 # Common Variable
 tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 
-# Common Init
-mkdir -p $tmp_init_dir
-
 # Functions
 function func_init_dir {
+	mkdir -p $tmp_init_dir
 	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
 	[ -e /ext/ ] && sudo chown -R ouyangzhu:ouyangzhu /ext/
 }
