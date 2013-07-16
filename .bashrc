@@ -17,7 +17,7 @@ if [ "$os_cygwin" = "false" ] ; then
 	# init auto complete
 	complete -o nospace -F _scp scpx
 	complete -F _ssh sshx
-	complete -r dd			# alias conflict with /bin/dd, disable its complete
+	`complete | grep -q " dd$"` && complete -r dd			# Check before remove, since alias conflict with /bin/dd, disable /bin/dd complete. 
 	#complete -r vi vim gvim unzip	# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
 
 	# set diff prompt for internal machine and external machine 
