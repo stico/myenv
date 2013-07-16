@@ -1,0 +1,18 @@
+root=/home/ouyangzhu/.m2/
+root=/cygdrive/f/backup/os_spec_win/m2_repo/
+
+perms=0
+#links=false
+fastcheck=yes
+dontchmod=true
+ignorecase=true
+ignoreinodenumbers=true
+
+ignore = Regex .*/.svn
+ignore = Regex .*/.svn/.*
+ignore = Regex .*/.settings
+ignore = Regex .*/.settings/.*
+ignore = Regex code_.*/target
+ignore = Regex code_.*/target/.*
+
+ignore = Path repository/.cache

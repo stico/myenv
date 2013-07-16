@@ -1,0 +1,11 @@
+root=/home/ouyangzhu/program/
+root=/cygdrive/f/backup/os_spec_win/program/
+
+perms=0
+#links=false
+fastcheck=yes
+dontchmod=true
+ignorecase=true
+ignoreinodenumbers=true
+
+ignore = Name *_SyncIgnore

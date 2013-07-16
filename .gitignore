@@ -15,6 +15,7 @@
 !/.unison/
 /.unison/*
 !/.unison/*.prf
+!/.unison/deprecated
 !/.w3m/
 !/.w3m/*
 /.w3m/history
