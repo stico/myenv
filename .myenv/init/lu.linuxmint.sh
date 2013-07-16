@@ -12,10 +12,20 @@
 tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 
 # Functions
+function func_pre_check {
+	# use exit here!
+	[ ! -e /ext/ ] && echo "ERROR: /ext not exist, pls check!" && exit 1
+}
+
 function func_init_dir {
+	sudo chown -R ouyangzhu:ouyangzhu /ext/ 
+
 	mkdir -p $tmp_init_dir
+	mkdir -p /ext/home_data/Documents
 	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
-	[ -e /ext/ ] && sudo chown -R ouyangzhu:ouyangzhu /ext/
+	
+	home_doc=$HOME/Documents
+	[ ! -h $home_doc ] && rmdir $home_doc &> /dev/null && ln -s /ext/home_data/Documents $home_doc
 }
 
 function func_init_sudoer {
@@ -59,42 +69,42 @@ function func_init_apt_update_list {
 	echo "last update was ${last_update}/${last_update2} seconds ago, skip..."
 }
 
-function func_init_link_doc {
-	home_doc_path="$HOME/Documents"
-	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_doc_path"
-
-	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
-	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
-
-	[ -d $home_doc_path ] && rmdir $home_doc_path
-	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
-	ln -s $ext_doc_path $home_doc_path
-}
-
-function func_init_link_dev {
-	home_dev_path="$HOME/dev"
-	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
-
-	[ -e $home_dev_path -a -h $home_dev_path ] && echo "$home_dev_path link already exist, skip" && return 0
-	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
-
-	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
-	ln -s $ext_doc_path/os_spec_lu/dev $home_dev_path
-}
-
-function func_init_link_pro {
-	home_pro_path="$HOME/program"
-	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
-
-	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
-	(( `ls $home_pro_path 2>/dev/null | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
-
-	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
-	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
-}
+#function func_init_link_doc {
+#	home_doc_path="$HOME/Documents"
+#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_doc_path"
+#
+#	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
+#	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
+#
+#	[ -d $home_doc_path ] && rmdir $home_doc_path
+#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+#	ln -s $ext_doc_path $home_doc_path
+#}
+#
+#function func_init_link_dev {
+#	home_dev_path="$HOME/dev"
+#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
+#
+#	[ -e $home_dev_path -a -h $home_dev_path ] && echo "$home_dev_path link already exist, skip" && return 0
+#	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
+#
+#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+#	ln -s $ext_doc_path/os_spec_lu/dev $home_dev_path
+#}
+#
+#function func_init_link_pro {
+#	home_pro_path="$HOME/program"
+#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
+#
+#	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
+#	(( `ls $home_pro_path 2>/dev/null | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
+#
+#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+#	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
+#}
 
 function func_init_link {
 	target_path="$HOME/$1"
@@ -107,7 +117,6 @@ function func_init_link {
 	[ ! -e "$ext_doc_path" ] && echo "Failed to find Documents dir in /ext, skip!" && return 1
 
 	[ -n "$2" ] && sub_path=/$2
-	[ -d $target_path ] && rmdir $target_path
 	ln -s ${ext_doc_path}${sub_path} $target_path
 }
 
@@ -221,6 +230,9 @@ function func_config_gnome_keying {
 	fi
 }
 
+# Init - pre conditions
+func_pre_check 
+
 # Init - basic
 func_init_dir
 func_init_sudoer
@@ -230,7 +242,6 @@ func_init_apt_update_list
 func_init_soft_basic
 
 # Init - myenv
-func_init_link Documents
 func_init_link dev os_spec_lu/dev
 func_init_link program os_spec_lu/program 
 #func_init_link_doc

@@ -1,33 +1,40 @@
 ################################################################################
-# ROOT: value of root should NOT end with "/"
+# ROOT
+# 	- value of root should NOT end with "/"
+# 	- root is the real path ($REAL_PATH), which should exist
+# 	- rootalias is the mapping, from //$HOSTNAME//$REAL_PATH to Alias
 ################################################################################
+
+# Local
 root=/home/ouyangzhu/Documents
-rootalias = //workpc//home/ouyangzhu/Documents -> //PC_WIN//Documents
-root=/cygdrive/g/backup
-rootalias = //workpc//cygdrive/g/backup -> //MHD//Documents
+rootalias = //workpc//home/ouyangzhu/Documents -> //LOCAL//Documents
+
+# External
+root=ssh://172.19.51.123/Documents
+rootalias = //workpcII//ssh://172.19.51.123/Documents -> //EXTERNAL//Documents
 
 
 ################################################################################
 # PATH: the -path cmd option not support glob
 ################################################################################
-path = DCB
-path = DCC
-path = DCD
-path = DCM
-path = DCO
-path = ECB
-path = ECE
-path = ECS
+#path = DCB
+#path = DCC
+#path = DCD
+#path = DCM
+#path = DCO
+#path = ECB
+#path = ECE
+#path = ECS
 path = os_spec_lu
-path = os_spec_win/m2_repo
-path = os_spec_win/program
-path = os_spec_win/dev/code_dw
-path = os_spec_win/dev/code_repo
-path = os_spec_win/dev/code_misc
-path = os_spec_win/dev/eclipse_plugins
-path = os_spec_win/dev/eclipse-3.7.1-jee_x64
-path = os_spec_win/dev/eclipse-4.2.2_x64
-path = os_spec_win/dev/nginx_workspace
+#path = os_spec_win/m2_repo
+#path = os_spec_win/program
+#path = os_spec_win/dev/code_dw
+#path = os_spec_win/dev/code_repo
+#path = os_spec_win/dev/code_misc
+#path = os_spec_win/dev/eclipse_plugins
+#path = os_spec_win/dev/eclipse-3.7.1-jee_x64
+#path = os_spec_win/dev/eclipse-4.2.2_x64
+#path = os_spec_win/dev/nginx_workspace
 
 
 ################################################################################
