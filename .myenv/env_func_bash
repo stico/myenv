@@ -483,14 +483,18 @@ function func_git_commit_push {
 
 function func_ssh_agent_init {
 	# do nothing if already set
-	[ -n "$SSH_AUTH_SOCK" ] && echo "INFO: ssh agent already exist: $SSH_AUTH_SOCK" && return 0
+	# The unison remote style can not accept .bashrc have output
+	#[ -n "$SSH_AUTH_SOCK" ] && echo "INFO: ssh agent already exist: $SSH_AUTH_SOCK" && return 0
 
 	ssh_agent_cmd="ssh-agent -s"
 	ssh_agent_env_tmp=~/.ssh/ssh_agent_env_tmp
 
 	# reuse if already started
 	. "${ssh_agent_env_tmp}" &> /dev/null
-	ps -ef | grep "${SSH_AGENT_PID}" | grep ssh-agent | grep -v grep > /dev/null && echo "INFO: reuse exist agent: $SSH_AUTH_SOCK" && return 0
+
+	# The unison remote style can not accept .bashrc have output
+	#ps -ef | grep "${SSH_AGENT_PID}" | grep ssh-agent | grep -v grep > /dev/null && echo "INFO: reuse exist agent: $SSH_AUTH_SOCK" && return 0
+	ps -ef | grep "${SSH_AGENT_PID}" | grep ssh-agent | grep -v grep > /dev/null && return 0
 
 	# start a new one
 	echo -e "INFO: Initialising new SSH agent...\n"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # make it simple, we works under the .myenv dir
-cd $HOME/.myenv
+\cd $HOME/.myenv
 
 # var 
 genShPath=zgen/lu_bash

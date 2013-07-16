@@ -43,7 +43,9 @@ source $HOME/.myenv/init/bash.sh
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 
 # Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
-rvm use ruby-1.9.3-p327@global --default
+# The unison remote style can not accept .bashrc have output
+#rvm use ruby-1.9.3-p327@global --default
+rvm use ruby-1.9.3-p327@global --default &> /dev/null
 
 # call functions
 func_ssh_agent_init
