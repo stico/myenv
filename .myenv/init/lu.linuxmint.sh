@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#TOOD: update sudoer file
-#TOOD: if Doc link made, will exlt
+# Command: rm /tmp/lu.linuxmint.sh ; wget -O /tmp/lu.linuxmint.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/lu.linuxmint.sh && bash /tmp/lu.linuxmint.sh 
 
 #TODO: investigate ubuntu tweak
 #TODO: investigate MyUnity
@@ -22,8 +21,8 @@ function func_init_sudoer {
 
 	sudoers=/etc/sudoers
 	sudoers_bak=${sudoers}.bak
-	[ -e $sudoers_bak ] && echo "$sudoers_bak already exist, skip" && return 0
 
+	[ -e $sudoers_bak ] && echo "$sudoers_bak already exist, skip" && return 0
 	sudo cp $sudoers $sudoers_bak
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
 }
@@ -75,7 +74,7 @@ function func_init_link_dev {
 	home_dev_path="$HOME/dev"
 	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
 
-	[ -e $home_dev_path -a -h $home_dev_path ] && echo "dev link already exist, skip" && return 0
+	[ -e $home_dev_path -a -h $home_dev_path ] && echo "$home_dev_path link already exist, skip" && return 0
 	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
 
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
@@ -93,6 +92,20 @@ function func_init_link_pro {
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
 	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
 	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
+}
+
+function func_init_link {
+	target_path="$HOME/$1"
+	echo ">>> INIT `date "+%H:%M:%S"`: setup link $target_path"
+
+	[ -e $target_path -a -h $target_path ] && echo "$target_path link already exist, skip" && return 0
+	(( `ls $target_path 2>/dev/null | wc -l` != 0 )) && echo "$target_path is not empty, pls check!" && return 0
+
+	[ -d $target_path ] && rmdir $target_path
+	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+	[ -n "$2" ] && sub_path=/$2
+	ln -s ${ext_doc_path}${sub_path} $target_path
 }
 
 function func_init_myenv_rw {
@@ -117,8 +130,17 @@ function func_init_soft_gui {
 
 	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
 	
-	sudo apt-get install -y vlc rdesktop			> /dev/null
+	sudo apt-get install -y xrdp rdesktop			> /dev/null	# xrdp: supports windows native remote desktop connection. rdesktop: use to connect to remote desktop (including windows)
 	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
+	sudo apt-get install -y vlc byobu			> /dev/null	# byobu is a better tmux
+
+	#func_add_apt_repo ppa:tualatrix/ppa					# ubuntu tweak stable
+	#sudo apt-get install -y ubuntu-tweak			> /dev/null	# not test yet
+
+	#sudo apt-get install -y autokey autokey gitk wmctrl 	> /dev/null	# (2013-05) auto key is conflict with terminator, try manually
+
+	#TODO - should update config together!
+	#sudo apt-get install -y doublecmd-gtk byobu
 
 	# Terminator
 	terminator_conf=~/.config/terminator
@@ -139,9 +161,6 @@ function func_init_soft_gui {
 		[ -e $chrome_tmp ] && sudo dpkg -i $chrome_tmp		# will show error on ubuntu desktop 12.04
 		[ -e $chrome_tmp ] && [ "$?" -ne 0 ] && sudo apt-get -f install			# if error happen, this will force to install
 	fi
-
-	#TODO - should update config together!
-	#sudo apt-get install -y doublecmd-gtk byobu
 }
 
 function func_add_apt_repo {
@@ -160,6 +179,8 @@ function func_init_apt_update_ppa {
 	sudo apt-get install -y software-properties-common	> /dev/null	# for cmd add-apt-repository 
 
 	func_add_apt_repo ppa:gnome-terminator
+	func_add_apt_repo ppa:alexx2000/doublecmd				# double commander
+	func_add_apt_repo ppa:byobu/ppa						# byobu
 }
 
 function func_init_soft_termial {
@@ -206,9 +227,12 @@ func_init_apt_update_list
 func_init_soft_basic
 
 # Init - myenv
-func_init_link_doc
-func_init_link_dev
-func_init_link_pro
+func_init_link doc
+func_init_link dev os_spec_lu/dev
+func_init_link program os_spec_lu/program 
+#func_init_link_doc
+#func_init_link_dev
+#func_init_link_pro
 func_init_myenv_rw
 
 # Init - soft
@@ -223,31 +247,13 @@ func_init_soft_manual_needed
 
 exit
 
+################################################################################
 
 # Variables
 apt_source=/etc/apt/sources.list
 
-# Pre-condition/pre-work
-[ ! -e ~/.myenv/env_func_bash ] && echo "ERROR: .myenv not exist !" && exit 1
-(( $(grep -c "http://cn" $apt_source) < 1 )) && echo "ERROR: $apt_source are using non 'http://cn' sources!" && exit 1
-. ~/.myenv/env_func_bash
-
-
 # Installations
 sys_info=`func_sys_info`
-
-if [ $(echo "$sys_info" | grep -ic "ubuntu.*desktop") == 1 ] ; then
-	echo "INFO: installing software for ubuntu (desktop)"
-
-	sudo add-apt-repository -y ppa:alexx2000/doublecmd		# double commander
-	sudo add-apt-repository -y ppa:tualatrix/ppa			# ubuntu tweak stable
-	sudo add-apt-repository -y ppa:byobu/ppa			# byobu
-	#sudo apt-get update						# should update since added ppa, disable in debug mode, as just need run it once manually
-
-	sudo apt-get install -y xrdp					# OS with X, xrdp supports windows native remote desktop connection
-	sudo apt-get install -y vim-gnome
-	sudo apt-get install -y ubuntu-tweak autokey gitk wmctrl 
-fi
 
 if [ $(echo "$sys_info" | grep -ic "ubuntu.*precise") == 1 ] ; then
 	# simply add the PPA can not install the latest version
@@ -270,4 +276,5 @@ fi
 
 # Deprecated
 #sudo add-apt-repository -y ppa:videolan/stable-daily		# vlc, could use official
-#sudo apt-get install -y virtualbox vim-gnome
+#sudo apt-get install -y virtualbox
+#sudo apt-get install -y vim-gnome
