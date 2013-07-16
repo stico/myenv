@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Init tmp dir 
-tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
-[ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 
+[ -n "$1" -a -d "$1" ] && tmp_init_dir=$1 || tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 mkdir -p $tmp_init_dir
 
 # Init var

@@ -14,6 +14,7 @@ mkdir -p $tmp_init_dir
 # Functions
 function func_init_dir {
 	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
+	[ -e /ext/ ] && sudo chown -R ouyangzhu:ouyangzhu /ext/
 }
 
 function func_init_sudoer {
@@ -101,10 +102,11 @@ function func_init_link {
 	[ -e $target_path -a -h $target_path ] && echo "$target_path link already exist, skip" && return 0
 	(( `ls $target_path 2>/dev/null | wc -l` != 0 )) && echo "$target_path is not empty, pls check!" && return 0
 
-	[ -d $target_path ] && rmdir $target_path
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+	[ ! -e "$ext_doc_path" ] && echo "Failed to find Documents dir in /ext, skip!" && return 1
+
 	[ -n "$2" ] && sub_path=/$2
+	[ -d $target_path ] && rmdir $target_path
 	ln -s ${ext_doc_path}${sub_path} $target_path
 }
 
@@ -115,7 +117,7 @@ function func_init_myenv_rw {
 	myenv_init_rw_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.LU.sh 
 
 	[ ! -e "$myenv_init_rw" ] && echo "downloading $myenv_init_rw_url" && wget -O $myenv_init_rw -q $myenv_init_rw_url
-	[ ! -e "$myenv_init_rw" ] && echo "$myenv_init_rw not found, init myenv failed!" && exit 1
+	[ ! -e "$myenv_init_rw" ] && echo "$myenv_init_rw not found, init myenv failed!" && return 1
 	bash $myenv_init_rw $tmp_init_dir
 }
 
@@ -227,7 +229,7 @@ func_init_apt_update_list
 func_init_soft_basic
 
 # Init - myenv
-func_init_link doc
+func_init_link Documents
 func_init_link dev os_spec_lu/dev
 func_init_link program os_spec_lu/program 
 #func_init_link_doc
