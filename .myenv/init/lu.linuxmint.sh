@@ -210,6 +210,7 @@ function func_init_soft_termial {
 function func_init_soft_basic {
 	echo ">>> INIT `date "+%H:%M:%S"`: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
+	sudo apt-get -y dist-upgrade				> /dev/null
 	sudo apt-get install -y aptitude			> /dev/null
 	sudo apt-get install -y openssh-server			> /dev/null
 	sudo apt-get install -y zip unzip			> /dev/null
