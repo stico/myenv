@@ -14,7 +14,9 @@ tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 # Functions
 function func_pre_check {
 	# use exit here!
+
 	[ ! -e /ext/ ] && echo "ERROR: /ext not exist, pls check!" && exit 1
+	[ "`whoami`" != "ouyangzhu" ] && echo "ERROR: username is not ouyangzhu, pls check!" && exit 1
 }
 
 function func_init_dir {
@@ -138,6 +140,14 @@ function func_init_soft_manual_needed {
 }
 
 function func_init_soft_gui {
+	# TODO - to learn
+		#func_add_apt_repo ppa:tualatrix/ppa					# ubuntu tweak stable
+		#sudo apt-get install -y ubuntu-tweak			> /dev/null	# not test yet
+	# TODO - (2013-05) auto key is conflict with terminator, try manually
+		#sudo apt-get install -y autokey autokey gitk wmctrl 	> /dev/null
+	# TODO - should update config together!
+		#sudo apt-get install -y doublecmd-gtk byobu
+
 	[ -z "$DISPLAY" ] && echo ">>> INIT `date "+%H:%M:%S"`: seems non-gui os, will not install soft works in gui" && return 0
 
 	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
@@ -146,13 +156,10 @@ function func_init_soft_gui {
 	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y vlc byobu			> /dev/null	# byobu is a better tmux
 
-	#func_add_apt_repo ppa:tualatrix/ppa					# ubuntu tweak stable
-	#sudo apt-get install -y ubuntu-tweak			> /dev/null	# not test yet
-
-	#sudo apt-get install -y autokey autokey gitk wmctrl 	> /dev/null	# (2013-05) auto key is conflict with terminator, try manually
-
-	#TODO - should update config together!
-	#sudo apt-get install -y doublecmd-gtk byobu
+	# Virtualbox
+	sudo apt-get install -y virtualbox-nonfree
+	sudo apt-get install -y virtualbox-guest-additions-iso
+	sudo usermod -a -G vboxusers ouyangzhu			# for functions like USB to work correctly
 
 	# Terminator
 	terminator_conf=~/.config/terminator
@@ -204,13 +211,14 @@ function func_init_soft_termial {
 	sudo apt-get install -y git subversion mercurial	> /dev/null	# dev tools
 	sudo apt-get install -y tmux autossh w3m		> /dev/null	# dev tools
 	sudo apt-get install -y debconf-utils			> /dev/null	# help auto select when install software (like mysql, wine, etc)
-	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
 }
 
 function func_init_soft_basic {
 	echo ">>> INIT `date "+%H:%M:%S"`: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
 	sudo apt-get -y dist-upgrade				> /dev/null
+
+	sudo apt-get install -y dkms
 	sudo apt-get install -y aptitude			> /dev/null
 	sudo apt-get install -y openssh-server			> /dev/null
 	sudo apt-get install -y zip unzip			> /dev/null
@@ -262,6 +270,8 @@ func_init_soft_manual_needed
 
 exit
 
+################################################################################
+(logout and login)
 ################################################################################
 
 # Variables
