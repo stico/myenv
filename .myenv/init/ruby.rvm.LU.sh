@@ -14,8 +14,13 @@ sudo apt-get install -y git libsqlite3-dev nodejs
 echo "source ~/.rvm/scripts/rvm" >> ~/.bashrc
 source ~/.rvm/scripts/rvm
 command rvm autolibs enable
-command rvm install ruby-1.9.3-p327 --docs
-rvm use ruby-1.9.3-p327@global --default
+
+#command rvm install ruby-1.9.3-p327 --docs
+#rvm use ruby-1.9.3-p327@global --default
+command rvm install ruby-2.0.0-p247 --docs
+rvm use ruby-2.0.0-p247@global --default
+
 source ~/.rvm/scripts/rvm
-#gem install rails
-#rvm docs generate
+
+gem install rails
+rvm docs generate

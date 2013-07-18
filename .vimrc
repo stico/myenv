@@ -157,8 +157,10 @@ nnoremap * g*
 nnoremap # g#
 nnoremap g* *
 nnoremap g# #
+
+" ! hijack <Esc> seems a bad idea, makes some vim starts in REPLACE mode!
 " quick way for no highlight, originally want to set noh after substitution, but seems no better way
-nnoremap <Esc> :silent noh<Bar>echo<CR>
+" nnoremap <Esc> :silent noh<Bar>echo<CR>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Win Behave (mostly copied from mswin.vim)
 behave mswin

@@ -603,18 +603,49 @@ function func_terminator {
 	fi
 }
 
+function func_sys_info_os_len {
+	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+
+	# Note, cygwin is usually 32bit
+	if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then		echo "64bit"
+	elif [ $(echo $uname_info | grep -ic "i[3-6]86") -eq 1 ] ; then		echo "32bit"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info_os_ver {
+	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release
+	elif [ "$os_name" = "cygwin" ] ; then					uname -r | sed -e "s/(.*//"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info_os_type {
+	if [ "$os_name" = "ubuntu" ] && (command -v dpkg &> /dev/null) ; then 
+		if (dpkg -l ubuntu-desktop &> /dev/null) ; then			echo "desktop"
+		else								echo "server"
+		fi
+	elif [ "$os_name" = "cygwin" -o "$os_name" = "mingw" ] ; then		echo "desktop"
+	elif [ "$os_name" = "linuxmint" ] ; then				echo "desktop"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info_os_name {
+	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+
+	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release
+	elif [ $(echo $uname_info | grep -ic "cygwin") -eq 1 ] ; then		echo "cygwin"
+	elif [ $(echo $uname_info | grep -ic "mingw") -eq 1 ] ; then		echo "mingw"
+	else									echo "unknown"
+	fi
+}
+
 function func_sys_info { 
 	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
 	# exampe: ubuntu/linuxmint/cygwin/win	_12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm	_precise
 
-	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
-
-	# os_name
-	if [ -e /etc/lsb-release ] ; then					os_name=`sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release`
-	elif [ $(echo $uname_info | grep -ic "cygwin") -eq 1 ] ; then		os_name="cygwin"
-	elif [ $(echo $uname_info | grep -ic "mingw") -eq 1 ] ; then		os_name="mingw"
-	else									os_name="unknown"
-	fi
+	os_name=`func_sys_info_os_name`
 
 	# use cache if cached, need os_name to distiguish cygwin/mingw
 	if [ -n $MY_ENV_ZGEN ] ; then						cache_file=$MY_ENV_ZGEN/sys_info_${os_name}
@@ -622,29 +653,9 @@ function func_sys_info {
 	fi
 	[ -e $cache_file ] && cat $cache_file && return
 
-	# os_ver
-	if [ -e /etc/lsb-release ] ; then					os_ver=`sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release`
-	elif [ "$os_name" = "cygwin" ] ; then					os_ver=`uname -r | sed -e "s/(.*//"`
-	else									os_ver="unknown"
-	fi
-	
-	# os_len, note, cygwin is usually 32bit
-	if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then		os_len="64bit"
-	elif [ $(echo $uname_info | grep -ic "i[3-6]86") -eq 1 ] ; then		os_len="32bit"
-	else									os_len="unknown"
-	fi
-
-	# os_type
-	if [ "$os_name" = "ubuntu" ] && (command -v dpkg &> /dev/null) ; then 
-		if (dpkg -l ubuntu-desktop &> /dev/null) ; then			os_type="desktop"
-		else								os_type="server"
-		fi
-	elif [ "$os_name" = "cygwin" -o "$os_name" = "mingw" ] ; then		os_type="desktop"
-	elif [ "$os_name" = "linuxmint" ] ; then				os_type="desktop"
-	else									os_type="unknown"
-	fi
-
-	# hostname
+	os_ver=`func_sys_info_os_ver`
+	os_len=`func_sys_info_os_len`
+	os_type=`func_sys_info_os_type`
 	hostname=`hostname`
 
 	# addInfo

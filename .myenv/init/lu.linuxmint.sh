@@ -13,14 +13,20 @@ tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 
 # Functions
 function func_pre_check {
-	# use exit here!
+	echo ">>> INIT `date "+%H:%M:%S"`: pre condition check"
 
+	# use exit here!
 	[ ! -e /ext/ ] && echo "ERROR: /ext not exist, pls check!" && exit 1
 	[ "`whoami`" != "ouyangzhu" ] && echo "ERROR: username is not ouyangzhu, pls check!" && exit 1
 }
 
 function func_init_dir {
-	sudo chown -R ouyangzhu:ouyangzhu /ext/ 
+	echo ">>> INIT `date "+%H:%M:%S"`: init basic directories"
+
+	# Ensure /ext owner
+	expect_owner=ouyangzhu:ouyangzhu
+	real_owner=`ls -l / | grep ext | awk '{print $3":"$4}'`
+	[ "$real_owner" != "$expect_owner" ] && sudo chown -R $expect_owner /ext/ 
 
 	mkdir -p $tmp_init_dir
 	mkdir -p /ext/home_data/Documents
@@ -135,6 +141,8 @@ function func_init_myenv_rw {
 
 function func_init_soft_manual_needed {
 	echo "Now need install soft with manual op (like accept agreement), continue (N) [Y/N]?"
+	return 0
+
 	read -e continue                                                                                           
 	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
 }
@@ -221,7 +229,7 @@ function func_init_soft_basic {
 	sudo apt-get install -y dkms
 	sudo apt-get install -y aptitude			> /dev/null
 	sudo apt-get install -y openssh-server			> /dev/null
-	sudo apt-get install -y zip unzip			> /dev/null
+	sudo apt-get install -y zip unzip curl			> /dev/null
 	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
 
 	#(! command -v aptitude &> /dev/null) && echo "install aptitude failed, pls check!" && exit 1
