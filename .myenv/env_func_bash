@@ -832,6 +832,7 @@ function func_run_file {
 	elif [[ "$file" = *.py ]] ; then	python $file;
 	elif [[ "$file" = *.bat ]] ; then	cmd $file;
 	elif [[ "$file" = *.exe ]] ; then	cmd $file;
+	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File ${file//\\/\/}
 	elif [[ "$file" = *.groovy ]] ; then	groovy $file;
 	else
 		echo "ERROR: can not run file $file, pls check!"
