@@ -1,4 +1,6 @@
-# https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.ps1
+# Download: https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.ps1
+# Run: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy RemoteSigned -F E:/amp/myenv.rw.ps1
+
 # Var
 $me_dir = "E:"
 $tmp_dir = "E:\amp\myenv_init"
@@ -39,5 +41,5 @@ Copy-Item $ssh_dir.FullName $tmp_dir\myenv -Recurse
 Copy-Item $secu_dir.FullName $tmp_dir\myenv\.myenv -Recurse
 
 # Finally, copy to home dir
-Copy-Item $tmp_dir\myenv\* $me_dir -Recurse
-Write-Output "Myenv init success!"
+Copy-Item $tmp_dir\myenv\* $me_dir\ -Recurse
+if (Test-Path $me_dir\.git) {Write-Output "Myenv init success!"} else {Write-Output "ERROR: Myenv init failed, pls check!"}
