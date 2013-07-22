@@ -47,6 +47,10 @@ function func_init_sudoer {
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
 }
 
+function func_init_bak_user {
+	grep "^ouyangzhu2:" /etc/passwd -q || sudo useradd -m -s /bin/bash -g sudo ouyangzhu2
+}
+
 function func_init_apt_update_src {
 	apt_source_list=/etc/apt/sources.list
 	apt_source_list_bak=${apt_source_list}.bak
@@ -140,9 +144,10 @@ function func_init_myenv_rw {
 }
 
 function func_init_soft_manual_needed {
-	echo "Now need install soft with manual op (like accept agreement), continue (N) [Y/N]?"
+	echo "Remember to set passwd for backup user account!"
 	return 0
 
+	echo "Now need install soft with manual op (like accept agreement), continue (N) [Y/N]?"
 	read -e continue                                                                                           
 	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
 }
@@ -253,6 +258,7 @@ func_pre_check
 # Init - basic
 func_init_dir
 func_init_sudoer
+func_init_bak_user
 func_init_apt_update_src
 func_init_apt_update_ppa
 func_init_apt_update_list

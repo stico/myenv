@@ -159,14 +159,14 @@ function func_vi_conditional {
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
 		# non-cygwin env: original path style + front job. 
 
-		# use gvim when GUI running and gvim available, otherwise use vim if available, otherwise vi
+		# use gvim when GUI running and gvim available, otherwise vim if available, otherwise vi
 		[ -n "$DISPLAY" ] && (command -v gvim &> /dev/null) && vi_cmd=gvim 
 		[ -z "$vi_cmd" ] && (command -v vim &> /dev/null) && vi_cmd=vim
 		[ -z "$vi_cmd" ] && vi_cmd=vi
 
 		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
 		# note: seems in ubuntu gui, not need "&" to make it background job
-		$vi_cmd "$*" 
+		$vi_cmd $* 
 	else
 		# cygwin env: win style path + background job
 		[ -z "$*" ] && target="" || target=`cygpath -w "$*"`
@@ -203,12 +203,17 @@ function func_vi {
 	tag_eval="`func_tag_value $1`"
 	[ $# -eq 1 ] && func_vi_conditional "$tag_eval" && return 0
 
-	# otherwise need search
+	# set base, evaluated tag or just ./
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
+	# find target
 	#func_find result_target f $base $*			# (2013-05-23) works, non cache version	
 	func_find_cache result_target f $base $*
-	func_vi_conditional "$base/$result_target"
+
+	# use original paramters if no target found
+	[ -n "$result_target" ] && param="$base/$result_target" || param=$*
+
+	func_vi_conditional $param
 }
 
 function func_cd {
