@@ -185,6 +185,11 @@ function func_init_soft_gui {
 	sudo apt-get install -y xrdp rdesktop			> /dev/null	# xrdp: supports windows native remote desktop connection. rdesktop: use to connect to remote desktop (including windows)
 	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y vlc byobu			> /dev/null	# byobu is a better tmux
+	sudo apt-get install -y bum             		> /dev/null	# boot-up-manager
+
+
+	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
+	sudo apt-get install --reinstall pulseaudio pulseaudio-utils pavucontrol
 
 	# Virtualbox
 	sudo apt-get install -y virtualbox-nonfree
