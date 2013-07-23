@@ -47,8 +47,24 @@ function func_init_sudoer {
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
 }
 
-function func_init_bak_user {
-	grep "^ouyangzhu2:" /etc/passwd -q || sudo useradd -m -s /bin/bash -g sudo ouyangzhu2
+func_init_config_xfce {
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
+
+	# without this, the Tab key not work in xrdp connection
+	config_keys=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+	sudo cp ${config_keys}{,.bak}
+	sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
+
+	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
+	dt_type=XFCE
+	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
+	[ ! -e ${gnome_keying_desktop}.bak ] && sudo cp ${gnome_keying_desktop}{,.bak}
+	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
+		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
+	else 
+		echo "INFO: $gnome_keying_desktop already contains $dt_type, ignore"
+	fi
+
 }
 
 function func_init_apt_update_src {
@@ -144,12 +160,13 @@ function func_init_myenv_rw {
 }
 
 function func_init_soft_manual_needed {
-	echo "Remember to set passwd for backup user account!"
-	return 0
-
-	echo "Now need install soft with manual op (like accept agreement), continue (N) [Y/N]?"
+	echo ">>> INIT `date "+%H:%M:%S"`: Following steps need manual op (like set password, accept agreement), continue (N) [Y/N]?"
 	read -e continue                                                                                           
 	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
+
+	echo " add a backup user, remember to change its password which already have record!"
+	(( `grep -c "^ouyangzhu2:" /etc/passwd` >= 1 )) && sudo useradd -m -s /bin/bash -g sudo ouyangzhu2 && sudo passwd ouyangzhu2
+
 }
 
 function func_init_soft_gui {
@@ -240,25 +257,12 @@ function func_init_soft_basic {
 	#(! command -v aptitude &> /dev/null) && echo "install aptitude failed, pls check!" && exit 1
 }
 
-function func_config_gnome_keying {
-	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
-	dt_type=XFCE
-	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
-	[ ! -e ${gnome_keying_desktop}.bak ] && sudo cp ${gnome_keying_desktop}{,.bak}
-	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
-		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
-	else 
-		echo "INFO: $gnome_keying_desktop already contains $dt_type, ignore"
-	fi
-}
-
 # Init - pre conditions
 func_pre_check 
 
 # Init - basic
 func_init_dir
 func_init_sudoer
-func_init_bak_user
 func_init_apt_update_src
 func_init_apt_update_ppa
 func_init_apt_update_list
@@ -277,7 +281,7 @@ func_init_soft_gui
 func_init_soft_termial
 
 # Init - config
-func_config_gnome_keying
+func_init_config_xfce
 
 # Last - manual stuff
 func_init_soft_manual_needed
