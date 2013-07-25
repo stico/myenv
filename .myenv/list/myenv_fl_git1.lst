@@ -105,6 +105,7 @@
 .myenv/conf/foxit/foxit.desktop
 .myenv/conf/foxit/foxit_icon.png
 .myenv/conf/foxit/wine_foxit5
+.myenv/conf/jdownloader/JDownloader.bat
 .myenv/conf/terminator/A_NOTE_terminator.txt
 .myenv/conf/terminator/config
 .myenv/conf/terminator/config.bak.2013-06-09
@@ -135,6 +136,7 @@
 .myenv/init/lu.ubuntu.sh
 .myenv/init/myenv.ro.LU.sh
 .myenv/init/myenv.rw.LU.sh
+.myenv/init/myenv.rw.WIN.ps1
 .myenv/init/mysql.LU.sh
 .myenv/init/ruby.compile.LU.sh
 .myenv/init/ruby.rvm.CYG.sh
@@ -230,13 +232,15 @@
 .screenrc
 .startxwinrc
 .tmux.conf
+.unison/cs_workpc_workpcII_all.prf
 .unison/default.prf
+.unison/deprecated/luspec.prf
+.unison/deprecated/windev.prf
+.unison/deprecated/winm2.prf
+.unison/deprecated/winpro.prf
+.unison/fs_workpcII_all.prf
 .unison/luall.prf
-.unison/luspec.prf
 .unison/winall.prf
-.unison/windev.prf
-.unison/winm2.prf
-.unison/winpro.prf
 .vim/.netrwhist
 .vim/autoload/pathogen.vim
 .vim/bundle/MultipleSearch/autoload/MultipleSearch.vim

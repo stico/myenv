@@ -301,15 +301,19 @@ function func_gen_list {
 
 function func_me_fl_gen_grep {
 
-	filelist=$MY_ENV/.fl_me.txt
+	filelist_all=$MY_ENV/.fl_me.txt
+	filelist_git=$MY_ENV/list/myenv_fl_git1.lst
 
-	[ -e $filelist ] && return 0
-	echo -e "INFO: Generating full file list to: $filelist"
-	sed -e "s/^/..\//" $target > $filelist
+	[ -e $filelist_all ] && return 0
+
+	echo -e "INFO: Generating full file list to: $filelist_all"
+	[ ! -e $filelist_git ] && func_me_fl_gen
+
+	sed -e "s/^/..\//" $filelist_git > $filelist_all
 	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
 		func_path_eval candidate $line
-		[ -f "$candidate" ] && echo "$candidate" >> $filelist 
-		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist 
+		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
+		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
 	done
 }
 
@@ -367,6 +371,7 @@ function func_gen_grep_result {
 
 	# we treat path in search text as .
 	search=${search//\\/.}							# make the path sep compatible
+	search=${search//\//.}							# make the sed (tput) coloring works
 
 	# Jump to base, since the filelist is using relative path
 	\cd $base
