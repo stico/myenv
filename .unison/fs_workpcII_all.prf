@@ -1,1 +1,66 @@
-# set name for this file
+# the root value should NOT end with "/"
+root=/home/ouyangzhu/Documents
+rootalias = //homelap//home/ouyangzhu/Documents -> //X200S_LU//Documents
+rootalias = //homelap//ext/home_data/Documents -> //X200S_LU//Documents
+
+#root=/media/ouyangzhu/22D0B554D0B52F43/backup
+#root=/media/22D0B554D0B52F43/backup
+root=/media/ouyangzhu/22D0B554D0B52F43/backup
+#rootalias = //homelap//media/ouyangzhu/22D0B554D0B52F43/backup -> //MHD//Documents
+rootalias = //homelap//media/22D0B554D0B52F43/backup -> //MHD//Documents
+
+# Paths to synchronize
+path=DCB
+path=DCC
+path=DCD
+path=DCM
+path=DCO
+path=ECB
+path=ECE
+path=ECH
+path=ECS
+path=ECZ
+path=FCB
+path=os_spec_lu/dev/code_dw
+path=os_spec_win/m2_repo
+path=os_spec_win/program
+path=os_spec_win/dev/code_dw
+path=os_spec_win/dev/code_repo
+path=os_spec_win/dev/code_misc
+path=os_spec_win/dev/eclipse_plugins
+path=os_spec_win/dev/eclipse-3.7.1-jee_x64
+path=os_spec_win/dev/eclipse-4.2.2_x64
+path=os_spec_win/dev/nginx_workspace
+
+################################################################################
+# SETTINGS
+################################################################################
+perms=0
+fastcheck=yes
+dontchmod=true
+ignorecase=true
+ignoreinodenumbers=true
+#links=false
+
+
+################################################################################
+# IGNORE: verified works. Regex seem not need suffix ".*" to match the whole name
+################################################################################
+ignore = Regex .*/.fl_me.txt
+ignore = Regex .*/.dl_me.txt
+ignore = Regex .*/.fl_files.txt
+ignore = Regex .*/.grep_result.txt
+ignore = Regex DC./SyncToy_.*.dat
+ignore = Regex EC./SyncToy_.*.dat
+ignore = Regex os_spec_.*/dev/mysql
+ignore = Regex os_spec_.*/dev/mysql-5.5.11-win32
+ignore = Regex os_spec_.*/dev/z_deprecated
+ignore = Regex os_spec_.*/dev/eclipse_ws.*
+ignore = Regex os_spec_.*/dev/.*/.settings
+ignore = Regex os_spec_.*/dev/code_.*/target
+ignore = Regex os_spec_.*/dev/jdk1.6.0_30_x64_src
+ignore = Regex os_spec_.*/m2_repo/repository/.cache
+ignore = Regex os_spec_.*/program/.*[dD]itto.*/Ditto.db
+ignore = Regex os_spec_win/program/A_System_Cygwin_1.7.17/tmp/.*
+ignore = Regex os_spec_win/program/A_System_Ditto_3.18.46.0_x64/Ditto.Settings
+ignore = Regex os_spec_win/program/A_System_FindAndRunRobot_2.77.02_Official-Basic/FarrTroubleshooting.log

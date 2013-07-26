@@ -10,6 +10,8 @@
 !/.myenv/*
 !/vimfiles/
 !/vimfiles/*
+!/.screenlayout/
+!/.screenlayout/*
 
 # INCLUDE, only some file in sub dir
 !/.unison/
@@ -46,8 +48,8 @@
 !/.restoreMyenv.bat
 
 # IGNORE, for secure reason
-#/.subversion/
-#/.ssh/
+/.ssh/
+/.subversion/
 /.myenv/secu/
 /.myenv/secu_*/
 /.myenv/secure/

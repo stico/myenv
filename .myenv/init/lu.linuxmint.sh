@@ -97,43 +97,6 @@ function func_init_apt_update_list {
 	echo "last update was ${last_update}/${last_update2} seconds ago, skip..."
 }
 
-#function func_init_link_doc {
-#	home_doc_path="$HOME/Documents"
-#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_doc_path"
-#
-#	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
-#	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
-#
-#	[ -d $home_doc_path ] && rmdir $home_doc_path
-#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
-#	ln -s $ext_doc_path $home_doc_path
-#}
-#
-#function func_init_link_dev {
-#	home_dev_path="$HOME/dev"
-#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
-#
-#	[ -e $home_dev_path -a -h $home_dev_path ] && echo "$home_dev_path link already exist, skip" && return 0
-#	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
-#
-#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
-#	ln -s $ext_doc_path/os_spec_lu/dev $home_dev_path
-#}
-#
-#function func_init_link_pro {
-#	home_pro_path="$HOME/program"
-#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
-#
-#	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
-#	(( `ls $home_pro_path 2>/dev/null | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
-#
-#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
-#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
-#	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
-#}
-
 function func_init_link {
 	target_path="$HOME/$1"
 	echo ">>> INIT `date "+%H:%M:%S"`: setup link $target_path"
@@ -186,7 +149,7 @@ function func_init_soft_gui {
 	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y vlc byobu			> /dev/null	# byobu is a better tmux
 	sudo apt-get install -y bum             		> /dev/null	# boot-up-manager
-
+	sudo apt-get install -y arandr             		> /dev/null	# set the screen layout, e.g for dual screen
 
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
 	sudo apt-get install --reinstall pulseaudio pulseaudio-utils pavucontrol
@@ -275,6 +238,7 @@ func_init_soft_basic
 
 # Init - myenv
 func_init_link dev os_spec_lu/dev
+func_init_link .m2 os_spec_lu/m2_repo
 func_init_link program os_spec_lu/program 
 #func_init_link_doc
 #func_init_link_dev
@@ -326,3 +290,41 @@ fi
 #sudo add-apt-repository -y ppa:videolan/stable-daily		# vlc, could use official
 #sudo apt-get install -y virtualbox
 #sudo apt-get install -y vim-gnome
+
+
+#function func_init_link_doc {
+#	home_doc_path="$HOME/Documents"
+#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_doc_path"
+#
+#	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
+#	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
+#
+#	[ -d $home_doc_path ] && rmdir $home_doc_path
+#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+#	ln -s $ext_doc_path $home_doc_path
+#}
+#
+#function func_init_link_dev {
+#	home_dev_path="$HOME/dev"
+#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
+#
+#	[ -e $home_dev_path -a -h $home_dev_path ] && echo "$home_dev_path link already exist, skip" && return 0
+#	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
+#
+#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+#	ln -s $ext_doc_path/os_spec_lu/dev $home_dev_path
+#}
+#
+#function func_init_link_pro {
+#	home_pro_path="$HOME/program"
+#	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
+#
+#	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
+#	(( `ls $home_pro_path 2>/dev/null | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
+#
+#	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
+#	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
+#	ln -s $ext_doc_path/os_spec_lu/program $home_pro_path
+#}
