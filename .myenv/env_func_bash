@@ -771,7 +771,7 @@ function func_backup_listed {
 	[ $# -lt 2 ] && echo $usage && return 1
 
 	tmp_dir=$MY_TMP/$1
-	[ -e $tmp_dir ] && rm -rf $tmp_dir
+	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
 	mkdir -p $tmp_dir
 	shift
 	source=$*
@@ -801,10 +801,11 @@ function func_backup_listed {
 			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir/*
 
 		# dirty check 2, for myenv bak, not want the .unison log file 
-		[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm
+		[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm &> /dev/null
 	done
 
 	func_backup_dated $tmp_dir
+	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
 	rm -rf $tmp_dir
 
 	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/.fl_me.txt 
