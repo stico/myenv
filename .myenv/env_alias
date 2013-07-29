@@ -13,6 +13,8 @@ sshp			"%MY_ENV_SECU%#script_sshp.sh"
 cd			"func_cd"
 vi			"func_vi"
 terminator		"func_terminator"
+eclipse			"/home/ouyangzhu/dev/eclipse/eclipse &"
+clipit			"clipit &"
 #vim			"func_vi"	# seems this will confuse the test "(command -v vim &> /dev/null) && echo vim installed"
 
 wl			"wc -l"

@@ -1,4 +1,0 @@
-# TODO: base=/data/mysql mysqld --defaults=${base}/my.cnf --basedir=/usr --datadir=${base} --log-error=${base}/log/error.log --pid-file=${base}/mysql.pid --socket=${base}/mysql.sock
-sudo service mysql start
-
-# mysql -uroot -p123456
