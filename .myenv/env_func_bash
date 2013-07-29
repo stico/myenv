@@ -487,7 +487,7 @@ function func_git_commit_push {
 	git commit -a -m "$*" 			&&
 	git push github				&&
 	git status 				&&
-	bash $MY_ENV_LIST/myenv_gen.sh		&&
+	func_me_fl_gen				&&
 	\cd - 
 }
 
@@ -812,7 +812,7 @@ function func_backup_listed {
 	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/.fl_me.txt 
 	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/.fl_me.txt 
 
-	#bash $MY_ENV/list/myenv_gen.sh
+	#func_me_fl_gen	
 	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
 	#$MY_ENV/util/listed_backup.sh
 }
