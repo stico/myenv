@@ -236,15 +236,19 @@ function func_cd {
 }
 
 function func_ls { 
-	# shortcut - ls current dir
-	[ -z "$*" ] && eval ll && return 0
+	# TODO: seem using "../paygat" will fail, possbile to make it work?
+
+	# shortcut - home
+	[ -z "$*" -o "-" = "$*" ] && func_ls_conditional "$*" && return 0
+
+	# shortcut - only one parameter, and exist
+	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && [ -d $tag_eval ] && func_ls_conditional $tag_eval && return 0
 
 	# FOR_DEV: w | !source /home/ouyangzhu/.myenv/env_func_bash; func_ls dev
 
 	# TODO: how to distiguish ll/ls/lla etc
-
 	# TODO: Avoid Filename_Expansion
-
 	# TODO: For Cmd History: ls the cmd output dir?
 
 	# Translate tag
