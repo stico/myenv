@@ -79,6 +79,7 @@
 .myenv/conf/autokey/data/Sample/List_Menu.py
 .myenv/conf/autokey/data/Sample/Phrase_from_selection.py
 .myenv/conf/autokey/data/Sample/Selection_Test.py
+.myenv/conf/clipit/clipitrc
 .myenv/conf/dircolors-basic/dir_colors
 .myenv/conf/dircolors-solarized
 .myenv/conf/doublecmd_lu/README
@@ -106,6 +107,12 @@
 .myenv/conf/foxit/foxit_icon.png
 .myenv/conf/foxit/wine_foxit5
 .myenv/conf/jdownloader/JDownloader.bat
+.myenv/conf/mysql/conf.mysql.origin.5.5.28.cnf
+.myenv/conf/mysql/conf.mysql_global.5.5.28.cnf
+.myenv/conf/mysql/conf.mysql_me.cnf
+.myenv/conf/mysql/ctrl.mysql_me
+.myenv/conf/mysql/init.compile.LU.sh
+.myenv/conf/mysql/init.install.LU.sh
 .myenv/conf/terminator/A_NOTE_terminator.txt
 .myenv/conf/terminator/config
 .myenv/conf/terminator/config.bak.2013-06-09
@@ -114,7 +121,7 @@
 .myenv/ctrl/mongo-start-server.sh
 .myenv/ctrl/mongo-stop-server.sh
 .myenv/ctrl/mongo.txt
-.myenv/ctrl/mysql
+.myenv/ctrl/mysql_me
 .myenv/ctrl/redis_6379
 .myenv/env_alias
 .myenv/env_alias_lu
@@ -137,7 +144,7 @@
 .myenv/init/myenv.ro.LU.sh
 .myenv/init/myenv.rw.LU.sh
 .myenv/init/myenv.rw.WIN.ps1
-.myenv/init/mysql.LU.sh
+.myenv/init/mysql.install.LU.sh
 .myenv/init/ruby.compile.LU.sh
 .myenv/init/ruby.rvm.CYG.sh
 .myenv/init/ruby.rvm.LU.sh
@@ -233,15 +240,15 @@
 .screenrc
 .startxwinrc
 .tmux.conf
-.unison/cs_workpc_workpcII_all.prf
 .unison/default.prf
+.unison/deprecated/cs_workpc_workpcII_all.prf
 .unison/deprecated/luspec.prf
+.unison/deprecated/winall.prf
 .unison/deprecated/windev.prf
 .unison/deprecated/winm2.prf
 .unison/deprecated/winpro.prf
+.unison/fs_homelap_all.prf
 .unison/fs_workpcII_all.prf
-.unison/luall.prf
-.unison/winall.prf
 .vim/.netrwhist
 .vim/autoload/pathogen.vim
 .vim/bundle/MultipleSearch/autoload/MultipleSearch.vim
