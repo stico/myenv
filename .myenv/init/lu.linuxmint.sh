@@ -159,6 +159,10 @@ function func_init_soft_gui {
 	sudo apt-get install -y virtualbox-guest-additions-iso
 	sudo usermod -a -G vboxusers ouyangzhu			# for functions like USB to work correctly
 
+	# clipit
+	sudo apt-get install -y clipit
+	ln -s ~/.myenv/conf/clipit ~/.config/clipit
+
 	# Terminator
 	terminator_conf=~/.config/terminator
 	terminator_conf_me=$MY_ENV/conf/terminator

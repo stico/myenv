@@ -26,11 +26,13 @@ rm -rf $tmp_init_dir/$myenv_full_bak_name
 unzip -q $myenv_full_bak -d $tmp_init_dir
 ssh_bak=`find $tmp_init_dir/$myenv_full_bak_name -name ".ssh" -type d | tail -1`
 secu_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secu" -type d | tail -1`
-secure_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secure" -type d | tail -1`
+smbcr_bak=`find $tmp_init_dir/$myenv_full_bak_name -name ".smbcredentials" -type d | tail -1`
+#secure_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secure" -type d | tail -1`
 mkdir -p ~/.ssh ~/.myenv/secu ~/.myenv/secure 
 [ -e "$ssh_bak" ] && cp -rf $ssh_bak/* ~/.ssh/ 
 [ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ 
-[ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ 
+[ -e "$smbcr_bak" ] && cp -rf $secu_bak/* ~/
+#[ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ 
 
 # Re-check
 [ ! -e ~/.ssh ] && echo "ERROR: ~/.ssh not restored success! pls check!" 

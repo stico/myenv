@@ -37,6 +37,7 @@ Copy-Item $myenv_bak.FullName .
 & $zip_cmd x $myenv_bak.FullName.split("\")[-1] > zip.log
 $ssh_dir=@(Get-ChildItem -Path $path -Include ".ssh" -Recurse | Where-Object { $_.PSIsContainer })[-1]
 $secu_dir=@(Get-ChildItem -Path $path -Include "secu" -Recurse | Where-Object { $_.PSIsContainer })[-1]
+#$smbcr_dir=@(Get-ChildItem -Path $path -Include ".smbcredentials" -Recurse | Where-Object { $_.PSIsContainer })[-1]	# not used in windows
 Copy-Item $ssh_dir.FullName $tmp_dir\myenv -Recurse
 Copy-Item $secu_dir.FullName $tmp_dir\myenv\.myenv -Recurse
 

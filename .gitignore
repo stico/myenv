@@ -54,6 +54,7 @@
 /.myenv/secu_*/
 /.myenv/secure/
 /.myenv/secure_*/
+/.smbcredentials
 
 # IGNORE, for those really not needed, or for secure reason
 .fl_files.txt

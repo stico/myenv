@@ -16,6 +16,7 @@
 .restoreMyenv.bat
 .restoreMyenv.sh
 .rvmrc
+.screenlayout
 .screenrc
 .startxwinrc
 .tmux.conf

@@ -229,6 +229,7 @@
 .restoreMyenv.bat
 .restoreMyenv.sh
 .rvmrc
+.screenlayout/workpcII.sh
 .screenrc
 .startxwinrc
 .tmux.conf
