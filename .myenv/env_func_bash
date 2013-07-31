@@ -24,7 +24,7 @@ function func_tag_value {
 }
 
 function func_tag_eval {
-	usage="Usage: func_tag_eval [str]"
+	usage="Usage: $FUNCNAME [str]"
 	[ $# -lt 1 ] && echo $usage && return 1
 
 	str=$*
@@ -39,7 +39,7 @@ function func_tag_eval {
 }
 
 function func_path_eval {
-	usage="Usage: func_path_eval [result_var_name] [pathstr]"
+	usage="Usage: $FUNCNAME [result_var_name] [pathstr]"
 	[ $# -lt 2 ] && echo $usage && return 1
 
 	# need use variable to "return" result
@@ -58,7 +58,7 @@ function func_path_eval {
 }
 
 function func_select_line {
-	usage="Usage: func_select_line [result_var_name] [shortest|userselect] [lines]"
+	usage="Usage: $FUNCNAME [result_var_name] [shortest|userselect] [lines]"
 	[ $# -lt 3 ] && echo $usage && return 1
 
 	# need use variable to "return" result
@@ -86,7 +86,7 @@ function func_select_line {
 
 function func_find_type_cache {
 	# NOTE: must keep interface consistency with func_find_type
-	usage="Usage: func_find_type_cache [find_type (f,file;d,dir)] [base] [pattern]"
+	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]"
 	[ $# -lt 3 ] && echo $usage && return 1
 
 	find_type=$1
@@ -109,7 +109,7 @@ function func_find_type_cache {
 
 function func_find_type {
 	# NOTE: must keep interface consistency with func_find_type_cache
-	usage="Usage: func_find_type [find_type (f,file;d,dir)] [base] [pattern]"
+	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]"
 	[ $# -lt 3 ] && echo $usage && return 1
 
 	find_type=$1
@@ -126,7 +126,7 @@ function func_find_type {
 
 function func_find_cache {
 	# NOTE: must keep interface consistency with func_find
-	usage="Usage: func_find [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
+	usage="Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
 	[ $# -lt 4 ] && echo $usage && return 1
 
 	# need use variable to "return" result
@@ -142,7 +142,7 @@ function func_find_cache {
 
 function func_find {
 	# NOTE: must keep interface consistency with func_find_cache
-	usage="Usage: func_find [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
+	usage="Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
 	[ $# -lt 4 ] && echo $usage && return 1
 
 	# need use variable to "return" result
@@ -274,7 +274,7 @@ function func_cd_tmp_today {
 }
 
 function func_head_cmd {
-	usage="Usage: func_head_cmd [show_lines] [cmd]"
+	usage="Usage: $FUNCNAME [show_lines] [cmd]"
 	[ $# -lt 2 ] && echo $usage && return 1
 
 	show_lines=$1
@@ -288,7 +288,7 @@ function func_gen_list {
 	# TODO: make a conversion of $type+l_me.txt ?
 	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
 
-	usage="Usage: func_gen_list [find_type (f,file;d,dir)] [base] [fl_name]"
+	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [fl_name]"
 	[ $# -lt 3 ] && echo $usage && return 1
 
 	find_type=$1
@@ -342,7 +342,7 @@ function func_gen_grep_result {
 	# - seems can not support grepfile "aaa\|bbb"
 	# - seems can not add more options
 
-	usage="Usage: func_gen_grep_result [base] [suffix] [search]*"
+	usage="Usage: $FUNCNAME [base] [suffix] [search]*"
 	[ $# -lt 3 ] && echo $usage && return 1
 
 	base=$1
@@ -407,7 +407,7 @@ function func_gen_grep_result {
 }
 
 function func_gen_grep_result_myenv { 
-	usage="Usage: func_gen_grep_result_myenv [search]*"
+	usage="Usage: $FUNCNAME [search]*"
 	[ $# -lt 1 ] && echo $usage && return 1
 
 	func_me_fl_gen_grep
@@ -415,7 +415,7 @@ function func_gen_grep_result_myenv {
 }
 
 function func_head {
-	usage="Usage: func_head_cmd [show_lines] [text]"
+	usage="Usage: $FUNCNAME [show_lines] [text]"
 	[ $# -lt 2 ] && echo $usage && return 1
 
 	show_lines=$1
@@ -439,7 +439,7 @@ function func_ip {
 }
 
 function func_mkdir_cd { 
-	usage="Usage: func_mkdir_cd [path]"
+	usage="Usage: $FUNCNAME [path]"
 	[[ -z $1 ]] && echo $usage && return 1
 
 	mkdir -p "$@" 				&&
@@ -448,7 +448,7 @@ function func_mkdir_cd {
 }
 
 function func_show_resp { 
-	usage="Usage: func_show_resp [url]"
+	usage="Usage: $FUNCNAME [url]"
 	[[ -z $1 ]] && echo $usage && return 1
 
 	echo "sending request to: $1"
@@ -462,7 +462,7 @@ function func_show_resp {
 }
 
 function func_git_pull { 
-	usage="Usage: func_git_pull [code_base]"
+	usage="Usage: $FUNCNAME [code_base]"
 	[[ -z $1 ]] && echo $usage && return 1
 
 	\cd $1		 			&&
@@ -472,7 +472,7 @@ function func_git_pull {
 }
 
 function func_git_status { 
-	usage="Usage: func_git_status [code_base]"
+	usage="Usage: $FUNCNAME [code_base]"
 	[[ -z $1 ]] && echo $usage && return 1
 
 	\cd $1					&&	
@@ -481,7 +481,7 @@ function func_git_status {
 }
 
 function func_git_commit_push { 
-	usage="Usage: func_git_commit_push [code_base] [comment]"
+	usage="Usage: $FUNCNAME [code_base] [comment]"
 	[[ -z $1 || -z $2 ]] && echo $usage && return 1
 
 	\cd $1					&& 
@@ -519,7 +519,7 @@ function func_ssh_agent_init {
 }
 
 function func_ssh_with_jump {
-	usage="Usage: func_ssh_with_jump [target]"
+	usage="Usage: $FUNCNAME [target]"
 	[[ -z $1 ]] && echo $usage && return 1
 
 	ip_addr=`getent hosts $1 | sed "s/\s\+.*$//"`
@@ -537,7 +537,7 @@ function func_ssh_with_jump {
 }
 
 function func_scp_with_jump {
-	usage="Usage: func_scp_with_jump [source] [target]"
+	usage="Usage: $FUNCNAME [source] [target]"
 	[[ -z $1 || -z $2 ]] && echo $usage && return 1
 
 	PORT=32200
@@ -694,7 +694,7 @@ function func_sys_info {
 }
 
 function func_translate { 
-	usage="Usage: func_translate [words]"
+	usage="Usage: $FUNCNAME [words]"
 	[ $# -lt 1 ] && echo $usage && return 1
 
 	# check history
@@ -771,7 +771,7 @@ function func_backup_listed {
 	# TODO: merge with dated_backup?
 	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/list/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
 
-	usage="Usage: bash func_backup_listed <tag> <filelists>*"
+	usage="Usage: $FUNCNAME <tag> <filelists>*"
 	[ $# -lt 2 ] && echo $usage && return 1
 
 	tmp_dir=$MY_TMP/$1
@@ -834,7 +834,7 @@ function func_run_file_java {
 }
 
 function func_run_file {
-	usage="Usage: bash func_run_file <file>"
+	usage="Usage: $FUNCNAME <file>"
 	[ $# -lt 1 ] && echo $usage && return 1
 	
 	file=$1

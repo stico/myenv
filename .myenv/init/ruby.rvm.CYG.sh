@@ -25,3 +25,4 @@ sed -i -e "s/:cygwin.*=>.*,/:cygwin => 'E:\\\\program\\\\A_System_Cygwin\\\\Cygw
 sed -i -e "s/.*rvm_install_some_rubies/#&/" $devtool_cmd
 ./$devtool_cmd
 
+# TODO: update rvm source to taobao

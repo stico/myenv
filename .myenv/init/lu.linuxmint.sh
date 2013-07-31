@@ -28,12 +28,17 @@ function func_init_dir {
 	real_owner=`ls -l / | grep ext | awk '{print $3":"$4}'`
 	[ "$real_owner" != "$expect_owner" ] && sudo chown -R $expect_owner /ext/ 
 
+	home_data=$HOME/data
+	home_doc=$HOME/Documents
+	ext_home_data=/ext/home_data/data
+	ext_home_doc=/ext/home_data/Documents
+
 	mkdir -p $tmp_init_dir
-	mkdir -p /ext/home_data/Documents
+	mkdir -p $ext_home_doc $ext_home_data
 	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
 	
-	home_doc=$HOME/Documents
-	[ ! -h $home_doc ] && rmdir $home_doc &> /dev/null && ln -s /ext/home_data/Documents $home_doc
+	[ ! -h $home_doc ] && rmdir $home_doc &> /dev/null && ln -s $ext_home_doc $home_doc
+	[ ! -h $home_data ] && rmdir $home_data &> /dev/null && ln -s $ext_home_data $home_doc
 }
 
 function func_init_sudoer {

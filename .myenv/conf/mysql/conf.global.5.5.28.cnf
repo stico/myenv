@@ -1,3 +1,8 @@
+################################################################################
+# NOTE: based on the original version, updates:
+# 	1) add encoding related fields
+# 	2) listen to 0.0.0.0
+################################################################################
 #
 # The MySQL database server configuration file.
 #
