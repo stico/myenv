@@ -4,12 +4,13 @@
 # Verified: LM 13 (2013-04-16), but updated after that
 # Verified: LM 15 (2013-07-16), only not found smbfs to install
 
-#TODO: all > /dev/null to log file instead, "tee -a" will be useful
+#TODO: all >> $tmp_init_log to log file instead, "tee -a" will be useful
 #TODO: investigate ubuntu tweak
 #TODO: investigate MyUnity
 
 # Common Variable
 tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
+tmp_init_log=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`/init.log
 
 # Functions
 function func_pre_check {
@@ -37,8 +38,8 @@ function func_init_dir {
 	mkdir -p $ext_home_doc $ext_home_data
 	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
 	
-	[ ! -h $home_doc ] && rmdir $home_doc &> /dev/null && ln -s $ext_home_doc $home_doc
-	[ ! -h $home_data ] && rmdir $home_data &> /dev/null && ln -s $ext_home_data $home_doc
+	[ ! -h $home_doc ] && rmdir $home_doc &>> $tmp_init_log && ln -s $ext_home_doc $home_doc
+	[ ! -h $home_data ] && rmdir $home_data &>> $tmp_init_log && ln -s $ext_home_data $home_doc
 }
 
 function func_init_sudoer {
@@ -52,7 +53,7 @@ function func_init_sudoer {
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
 }
 
-func_init_config_xfce {
+function func_init_config_xfce {
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
 
 	# without this, the Tab key not work in xrdp connection
@@ -107,7 +108,7 @@ function func_init_link {
 	echo ">>> INIT `date "+%H:%M:%S"`: setup link $target_path"
 
 	[ -e $target_path -a -h $target_path ] && echo "$target_path link already exist, skip" && return 0
-	(( `ls $target_path 2>/dev/null | wc -l` != 0 )) && echo "$target_path is not empty, pls check!" && return 0
+	(( `ls $target_path 2>> $tmp_init_log | wc -l` != 0 )) && echo "$target_path is not empty, pls check!" && return 0
 
 	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
 	[ ! -e "$ext_doc_path" ] && echo "Failed to find Documents dir in /ext, skip!" && return 1
@@ -140,9 +141,9 @@ function func_init_soft_manual_needed {
 function func_init_soft_gui {
 	# TODO - to learn
 		#func_add_apt_repo ppa:tualatrix/ppa					# ubuntu tweak stable
-		#sudo apt-get install -y ubuntu-tweak			> /dev/null	# not test yet
+		#sudo apt-get install -y ubuntu-tweak			>> $tmp_init_log	# not test yet
 	# TODO - (2013-05) auto key is conflict with terminator, try manually
-		#sudo apt-get install -y autokey autokey gitk wmctrl 	> /dev/null
+		#sudo apt-get install -y autokey autokey gitk wmctrl 	>> $tmp_init_log
 	# TODO - should update config together!
 		#sudo apt-get install -y doublecmd-gtk byobu
 
@@ -150,19 +151,22 @@ function func_init_soft_gui {
 
 	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
 	
-	sudo apt-get install -y xrdp rdesktop			> /dev/null	# xrdp: supports windows native remote desktop connection. rdesktop: use to connect to remote desktop (including windows)
-	sudo apt-get install -y ibus-table-wubi			> /dev/null	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
-	sudo apt-get install -y vlc byobu			> /dev/null	# byobu is a better tmux
-	sudo apt-get install -y bum             		> /dev/null	# boot-up-manager
-	sudo apt-get install -y arandr             		> /dev/null	# set the screen layout, e.g for dual screen
+	sudo apt-get install -y xrdp rdesktop			>> $tmp_init_log	# xrdp: supports windows native remote desktop connection. rdesktop: use to connect to remote desktop (including windows)
+	sudo apt-get install -y ibus-table-wubi			>> $tmp_init_log	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
+	sudo apt-get install -y vlc byobu			>> $tmp_init_log	# byobu is a better tmux
+	sudo apt-get install -y bum             		>> $tmp_init_log	# boot-up-manager
+	sudo apt-get install -y arandr             		>> $tmp_init_log	# set the screen layout, e.g for dual screen
 
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
-	sudo apt-get install --reinstall pulseaudio pulseaudio-utils pavucontrol
+	sudo apt-get install -y pulseaudio pulseaudio-utils	>> $tmp_init_log
+	sudo apt-get install -y pavucontrol			>> $tmp_init_log
 
-	# Virtualbox
-	sudo apt-get install -y virtualbox-nonfree
-	sudo apt-get install -y virtualbox-guest-additions-iso
-	sudo usermod -a -G vboxusers ouyangzhu			# for functions like USB to work correctly
+	# Virtualbox, the command will reinstall+install virtualbox, need to avoid
+	if (! command -v aptitude &>> $tmp_init_log) ; then
+		sudo apt-get install -y virtualbox-nonfree
+		sudo apt-get install -y virtualbox-guest-additions-iso
+		sudo usermod -a -G vboxusers ouyangzhu			# for functions like USB to work correctly
+	fi
 
 	# clipit
 	sudo apt-get install -y clipit
@@ -172,20 +176,35 @@ function func_init_soft_gui {
 	terminator_conf=~/.config/terminator
 	terminator_conf_me=$MY_ENV/conf/terminator
 	[ -e $terminator_conf_me -a ! -e $terminator_conf ] && ln -s $terminator_conf_me $terminator_conf
-	sudo apt-get install -y terminator			> /dev/null	# dev tools
+	sudo apt-get install -y terminator			>> $tmp_init_log	# dev tools
 	
 	# Chrome
 	if (( $(dpkg -l | grep -c "google.*chrome") <= 0 )) ; then
 		chrome_url='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 		chrome_tmp=/tmp/${chrome_url##*/} 
+		chrome_local=`find ~/Documents/ECS/chrome -name "*chrome*deb" -type f | tail -1`
 
+		# try to use proxy 
 		[ $(netstat -an | grep ":1984.*LISTEN" | wc -l) -ge 1 ] && export http_proxy="127.0.0.1:1984" && export https_proxy="127.0.0.1:1984"
 
-		sudo apt-get install -y libnspr4-0d libcurl3	> /dev/null	# for chrome 
+		# install dependency
+		sudo apt-get install -y libnspr4-0d libcurl3	>> $tmp_init_log	# for chrome 
+
+		# download
 		rm -f $chrome_tmp
 		wget ${chrome_url} -O $chrome_tmp 
-		[ -e $chrome_tmp ] && sudo dpkg -i $chrome_tmp		# will show error on ubuntu desktop 12.04
-		[ -e $chrome_tmp ] && [ "$?" -ne 0 ] && sudo apt-get -f install			# if error happen, this will force to install
+		chrome_tmp_size=`ls -l $chrome_tmp | cut -d" " -f5`
+
+		# download version first, otherwise local version
+		if [ -e "$chrome_tmp" ] && [ "$chrome_tmp_size" -ne 0 ] ; then
+			sudo dpkg -i $chrome_tmp			# will show error on ubuntu desktop 12.04
+			[ "$?" -ne 0 ] && sudo apt-get -f install	# if error happen, this will force to install
+		elif [ -e "$chrome_local" ] ; then
+			sudo dpkg -i $chrome_local
+			[ "$?" -ne 0 ] && sudo apt-get -f install	# if error happen, this will force to install
+		else
+			echo "ERROR: failed to install chrome!"
+		fi
 	fi
 }
 
@@ -195,14 +214,14 @@ function func_add_apt_repo {
 	# all added ppa could be found in /etc/apt/sources.list.d/ 
 	[ $(ls /etc/apt/sources.list.d/ | grep -c ${apt_repo##*:}) -ge 1 ] && echo "INFO: $apt_repo already added, skip" && return 0
 
-	sudo add-apt-repository -y $apt_repo			&> /dev/null
+	sudo add-apt-repository -y $apt_repo			&>> $tmp_init_log
 }
 
 function func_init_apt_update_ppa {
 	echo ">>> INIT `date "+%H:%M:%S"`: add ppa for latest software"
 
-	sudo apt-get install -y python-software-properties	> /dev/null	# for cmd add-apt-repository 
-	sudo apt-get install -y software-properties-common	> /dev/null	# for cmd add-apt-repository 
+	sudo apt-get install -y python-software-properties	>> $tmp_init_log	# for cmd add-apt-repository 
+	sudo apt-get install -y software-properties-common	>> $tmp_init_log	# for cmd add-apt-repository 
 
 	func_add_apt_repo ppa:gnome-terminator
 	func_add_apt_repo ppa:alexx2000/doublecmd				# double commander
@@ -212,26 +231,26 @@ function func_init_apt_update_ppa {
 function func_init_soft_termial {
 	echo ">>> INIT `date "+%H:%M:%S"`: install software, usable in terminal"
 
-	sudo apt-get install -y expect unison openssh-server 	> /dev/null	# basic tools
-	sudo apt-get install -y build-essential make gcc cmake	> /dev/null	# build tools
-	sudo apt-get install -y samba smbfs			> /dev/null	# samba
-	sudo apt-get install -y git subversion mercurial	> /dev/null	# dev tools
-	sudo apt-get install -y tmux autossh w3m		> /dev/null	# dev tools
-	sudo apt-get install -y debconf-utils			> /dev/null	# help auto select when install software (like mysql, wine, etc)
+	sudo apt-get install -y expect unison openssh-server 	>> $tmp_init_log	# basic tools
+	sudo apt-get install -y build-essential make gcc cmake	>> $tmp_init_log	# build tools
+	sudo apt-get install -y samba smbfs			>> $tmp_init_log	# samba
+	sudo apt-get install -y git subversion mercurial	>> $tmp_init_log	# dev tools
+	sudo apt-get install -y tmux autossh w3m		>> $tmp_init_log	# dev tools
+	sudo apt-get install -y debconf-utils			>> $tmp_init_log	# help auto select when install software (like mysql, wine, etc)
 }
 
 function func_init_soft_basic {
 	echo ">>> INIT `date "+%H:%M:%S"`: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
-	sudo apt-get -y dist-upgrade				> /dev/null
+	sudo apt-get -y dist-upgrade				>> $tmp_init_log
 
-	sudo apt-get install -y dkms
-	sudo apt-get install -y aptitude			> /dev/null
-	sudo apt-get install -y openssh-server			> /dev/null
-	sudo apt-get install -y zip unzip curl			> /dev/null
-	sudo apt-get install -y linux-headers-`uname -r`	> /dev/null	# some soft compile need this
+	sudo apt-get install -y dkms				>> $tmp_init_log
+	sudo apt-get install -y aptitude			>> $tmp_init_log
+	sudo apt-get install -y openssh-server			>> $tmp_init_log
+	sudo apt-get install -y zip unzip curl			>> $tmp_init_log
+	sudo apt-get install -y linux-headers-`uname -r`	>> $tmp_init_log	# some soft compile need this
 
-	#(! command -v aptitude &> /dev/null) && echo "install aptitude failed, pls check!" && exit 1
+	#(! command -v aptitude &>> $tmp_init_log) && echo "install aptitude failed, pls check!" && exit 1
 }
 
 # Init - pre conditions
@@ -264,6 +283,7 @@ func_init_config_xfce
 # Last - manual stuff
 func_init_soft_manual_needed
 
+echo "All logs goes to $tmp_init_log"
 exit
 
 ################################################################################
@@ -306,7 +326,7 @@ fi
 #	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_doc_path"
 #
 #	[ -e $home_doc_path -a -h $home_doc_path ] && echo "$home_doc_path link already exist, skip" && return 0
-#	(( `ls $home_doc_path 2>/dev/null | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
+#	(( `ls $home_doc_path 2> $tmp_init_log | wc -l` != 0 )) && echo "$home_doc_path is not empty, pls check!" && return 0
 #
 #	[ -d $home_doc_path ] && rmdir $home_doc_path
 #	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
@@ -319,7 +339,7 @@ fi
 #	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_dev_path"
 #
 #	[ -e $home_dev_path -a -h $home_dev_path ] && echo "$home_dev_path link already exist, skip" && return 0
-#	(( `ls $home_dev_path 2>/dev/null | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
+#	(( `ls $home_dev_path 2>> $tmp_init_log | wc -l` != 0 )) && echo "$home_dev_path is not empty, pls check!" && return 0
 #
 #	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
 #	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1
@@ -331,7 +351,7 @@ fi
 #	echo ">>> INIT `date "+%H:%M:%S"`: setup links $home_pro_path"
 #
 #	[ -e $home_pro_path -a -h $home_pro_path ] && echo "$home_pro_path link already exist, skip" && return 0
-#	(( `ls $home_pro_path 2>/dev/null | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
+#	(( `ls $home_pro_path 2>> $tmp_init_log | wc -l` != 0 )) && echo "$home_pro_path is not empty, pls check!" && return 0
 #
 #	ext_doc_path=`find /ext/ -maxdepth 3 -type d -name "Documents"`
 #	(( `echo $ext_doc_path | wc -l` == 1 ))	|| echo "Failed to find Documents dir in /ext, skip!" || return 1

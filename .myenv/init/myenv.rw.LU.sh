@@ -18,21 +18,24 @@ bash $myenv_init_ro $tmp_init_dir
 [ -e ~/.ssh/config -o -e ~/.myenv/secu -o -e ~/.myenv/secure ] && echo "~/.ssh or ~/.myenv/secu or ~/.myenv/secure exist, pls check!" && exit 1
 [ ! -e $dated_bak_dir ] && echo "$dated_bak_dir not exist, not able to find backup package, pls check!" && exit 1
 
-# Extract .ssh, secu, secure
+# Find the backup
 myenv_full_bak=`find $dated_bak_dir -name "*myenv*full*.zip" | tail -1`
+[ ! -e "$myenv_full_bak" ] && echo "ERROR: $myenv_full_bak not exist, pls check!" && exit 1
+
+# Extract .ssh, secu, secure
 tmp1=${myenv_full_bak%.zip}
 myenv_full_bak_name=${tmp1##*/}
 rm -rf $tmp_init_dir/$myenv_full_bak_name 
 unzip -q $myenv_full_bak -d $tmp_init_dir
-ssh_bak=`find $tmp_init_dir/$myenv_full_bak_name -name ".ssh" -type d | tail -1`
-secu_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secu" -type d | tail -1`
-smbcr_bak=`find $tmp_init_dir/$myenv_full_bak_name -name ".smbcredentials" -type d | tail -1`
-#secure_bak=`find $tmp_init_dir/$myenv_full_bak_name -name "secure" -type d | tail -1`
-mkdir -p ~/.ssh ~/.myenv/secu ~/.myenv/secure 
+
+# Find and copy
+ssh_bak=`find $tmp_init_dir -name ".ssh" -type d | tail -1`
+secu_bak=`find $tmp_init_dir -name "secu" -type d | tail -1`
+smbcr_bak=`find $tmp_init_dir -name ".smbcredentials" -type d | tail -1`
+mkdir -p ~/.ssh ~/.myenv/secu
 [ -e "$ssh_bak" ] && cp -rf $ssh_bak/* ~/.ssh/ 
 [ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ 
 [ -e "$smbcr_bak" ] && cp -rf $secu_bak/* ~/
-#[ -e "$secure_bak" ] && cp -rf $secure_bak/* ~/.myenv/secure/ 
 
 # Re-check
 [ ! -e ~/.ssh ] && echo "ERROR: ~/.ssh not restored success! pls check!" 
