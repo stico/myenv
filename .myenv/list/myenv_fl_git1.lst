@@ -107,11 +107,12 @@
 .myenv/conf/foxit/foxit_icon.png
 .myenv/conf/foxit/wine_foxit5
 .myenv/conf/jdownloader/JDownloader.bat
-.myenv/conf/mysql/conf.mysql.origin.5.5.28.cnf
-.myenv/conf/mysql/conf.mysql_global.5.5.28.cnf
+.myenv/conf/mysql/conf.global.5.5.28.cnf
 .myenv/conf/mysql/conf.mysql_me.cnf
-.myenv/conf/mysql/ctrl.mysql_me
+.myenv/conf/mysql/conf.origin.5.5.28.cnf
+.myenv/conf/mysql/ctrl.mysql_me.sh
 .myenv/conf/mysql/init.compile.LU.sh
+.myenv/conf/mysql/init.extract.LU.sh
 .myenv/conf/mysql/init.install.LU.sh
 .myenv/conf/terminator/A_NOTE_terminator.txt
 .myenv/conf/terminator/config
@@ -144,7 +145,7 @@
 .myenv/init/myenv.ro.LU.sh
 .myenv/init/myenv.rw.LU.sh
 .myenv/init/myenv.rw.WIN.ps1
-.myenv/init/mysql.install.LU.sh
+.myenv/init/mysql
 .myenv/init/ruby.compile.LU.sh
 .myenv/init/ruby.rvm.CYG.sh
 .myenv/init/ruby.rvm.LU.sh

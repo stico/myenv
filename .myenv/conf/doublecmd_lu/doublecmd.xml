@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<doublecmd DCVersion="0.5.4 beta" ConfigVersion="1">
+<?xml version="1.0" encoding="utf-8"?>
+<doublecmd DCVersion="0.5.6 beta" ConfigVersion="7">
   <Configuration Save="True">
     <UseConfigInProgramDir>False</UseConfigInProgramDir>
   </Configuration>
@@ -39,6 +39,11 @@
     <UseInvertedSelection>False</UseInvertedSelection>
     <InactivePanelBrightness>96</InactivePanelBrightness>
     <UseFrameCursor>False</UseFrameCursor>
+    <FreeSpaceIndicator>
+      <ForeColor>0</ForeColor>
+      <BackColor>16777215</BackColor>
+      <UseGradient>True</UseGradient>
+    </FreeSpaceIndicator>
   </Colors>
   <Plugins>
     <DsxPlugins/>
@@ -122,7 +127,7 @@
       </WfxPlugin>
     </WfxPlugins>
     <WlxPlugins>
-      <WlxPlugin>
+      <WlxPlugin Enabled="True">
         <Name>wlxMplayer</Name>
         <Path>%commander_path%/plugins/wlx/WlxMplayer/wlxMplayer.wlx</Path>
         <DetectString>(EXT="MPG")|(EXT="AVI")|(EXT="MPEG")|(EXT="FLV")</DetectString>
@@ -133,13 +138,12 @@
     <POFileName>doublecmd.en.po</POFileName>
   </Language>
   <Behaviours>
+    <GoToRoot>False</GoToRoot>
     <RunInTerminal>xterm -e sh -c</RunInTerminal>
     <RunTerminal>xterm</RunTerminal>
-    <OnlyOneAppInstance>False</OnlyOneAppInstance>
+    <OnlyOneAppInstance>True</OnlyOneAppInstance>
     <LynxLike>True</LynxLike>
-    <SortCaseSensitive>False</SortCaseSensitive>
-    <SortNatural>False</SortNatural>
-    <ShortFileSizeFormat>True</ShortFileSizeFormat>
+    <FileSizeFormat>0</FileSizeFormat>
     <MinimizeToTray>False</MinimizeToTray>
     <AlwaysShowTrayIcon>False</AlwaysShowTrayIcon>
     <Mouse>
@@ -156,23 +160,26 @@
     <ShowSystemFiles>True</ShowSystemFiles>
     <ListFilesInThread>True</ListFilesInThread>
     <LoadIconsSeparately>True</LoadIconsSeparately>
+    <DelayLoadingTabs>True</DelayLoadingTabs>
+    <HighlightUpdatedFiles>True</HighlightUpdatedFiles>
     <DriveBlackList/>
+    <DriveBlackListUnmounted>False</DriveBlackListUnmounted>
   </Behaviours>
   <Tools>
     <Viewer Enabled="True">
-      <Path>/usr/bin/gview</Path>
+      <Path>/home/ouyangzhu/program/vim/bin/gvim</Path>
       <Parameters/>
       <RunInTerminal>False</RunInTerminal>
       <KeepTerminalOpen>False</KeepTerminalOpen>
     </Viewer>
     <Editor Enabled="True">
-      <Path>/usr/bin/gvim</Path>
+      <Path>/home/ouyangzhu/program/vim/bin/gvim</Path>
       <Parameters/>
       <RunInTerminal>False</RunInTerminal>
       <KeepTerminalOpen>False</KeepTerminalOpen>
     </Editor>
     <Differ Enabled="True">
-      <Path>/usr/bin/gvimdiff</Path>
+      <Path>/home/ouyangzhu/program/vim/bin/gvimdiff</Path>
       <Parameters/>
       <RunInTerminal>False</RunInTerminal>
       <KeepTerminalOpen>False</KeepTerminalOpen>
@@ -180,9 +187,9 @@
   </Tools>
   <Fonts>
     <Main>
-      <Name>default</Name>
+      <Name>Microsoft YaHei Mono</Name>
       <Size>10</Size>
-      <Style>1</Style>
+      <Style>0</Style>
     </Main>
     <Editor>
       <Name>Monospace</Name>
@@ -214,13 +221,16 @@
     <ButtonBar Enabled="False">
       <FlatIcons>False</FlatIcons>
       <ButtonHeight>24</ButtonHeight>
-      <SmallIconSize>16</SmallIconSize>
-      <SmallIcons>False</SmallIcons>
+      <IconSize>16</IconSize>
     </ButtonBar>
     <DriveBar1>False</DriveBar1>
     <DriveBar2>True</DriveBar2>
     <DriveBarFlat>True</DriveBarFlat>
-    <DriveMenuButton>False</DriveMenuButton>
+    <DrivesListButton Enabled="False">
+      <ShowLabel>True</ShowLabel>
+      <ShowFileSystem>True</ShowFileSystem>
+      <ShowFreeSpace>True</ShowFreeSpace>
+    </DrivesListButton>
     <DirectoryTabs>True</DirectoryTabs>
     <CurrentDirectory>True</CurrentDirectory>
     <TabHeader>True</TabHeader>
@@ -235,6 +245,7 @@
     <ProgressInMenuBar>False</ProgressInMenuBar>
     <PanelOfOperationsInBackground>True</PanelOfOperationsInBackground>
     <HorizontalFilePanels>False</HorizontalFilePanels>
+    <ShortFormatDriveInfo>True</ShortFormatDriveInfo>
   </Layout>
   <FileOperations>
     <BufferSize>524288</BufferSize>
@@ -255,7 +266,14 @@
       <FileExists>0</FileExists>
       <DirectoryExists>0</DirectoryExists>
       <CheckFreeSpace>True</CheckFreeSpace>
+      <SetPropertyError>0</SetPropertyError>
+      <ReserveSpace>False</ReserveSpace>
+      <CopyAttributes>True</CopyAttributes>
+      <CopyTime>True</CopyTime>
+      <CopyOwnership>True</CopyOwnership>
     </Options>
+    <ProgressKind>0</ProgressKind>
+    <Confirmations>15</Confirmations>
   </FileOperations>
   <Tabs>
     <Options>913</Options>
@@ -263,33 +281,15 @@
     <Position>0</Position>
     <OpenedTabs>
       <Left>
-        <ActiveTab>1</ActiveTab>
+        <ActiveTab>3</ActiveTab>
         <Tab>
           <FileView Type="columns">
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/.wine/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting/>
-            </ColumnsView>
-          </FileView>
-          <Caption>*Desktop</Caption>
-          <Options>2</Options>
-          <LockPath>/home/ouyangzhu/Desktop/</LockPath>
-        </Tab>
-        <Tab>
-          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
@@ -325,35 +325,10 @@
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/AUDIO/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/A_TODO/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/XIAO_JI/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
@@ -367,26 +342,6 @@
                   <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/VERSION_BACKUP/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOLEARN_DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Article/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/A_TODO/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
@@ -398,26 +353,300 @@
                   <Path>/home/ouyangzhu/Documents/DCC/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
                   <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/program/</Path>
                 </Paths>
               </Entry>
             </History>
             <ColumnsView>
               <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting>
-                <Sort>
-                  <Column>0</Column>
-                  <Direction>1</Direction>
-                </Sort>
-              </Sorting>
             </ColumnsView>
           </FileView>
-          <Caption>*Google Drive</Caption>
           <Options>2</Options>
-          <LockPath>/home/ouyangzhu/Documents/DCB/Google Drive/</LockPath>
+          <LockPath>/home/ouyangzhu/program/</LockPath>
+          <Title>pro</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Desktop/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/vimfiles/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/program/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/dev/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/dev/</LockPath>
+          <Title>dev</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Desktop/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/vimfiles/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/program/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/dev/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Desktop/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/Desktop/</LockPath>
+          <Title>DT</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Desktop/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/vimfiles/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Downloads/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/program/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/dev/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Desktop/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/dev/</Path>
+                  <Path>/home/ouyangzhu/dev/code_dw/</Path>
+                  <Path>/home/ouyangzhu/dev/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/dev/code_dw/</LockPath>
+          <Title>code_dw</Title>
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>3</ActiveTab>
+        <ActiveTab>8</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
@@ -426,9 +655,8 @@
                 <Paths>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
+                  <Path>/ext/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
                   <Path>/ext/</Path>
                   <Path>/</Path>
                   <Path>/home/</Path>
@@ -439,29 +667,38 @@
                   <Path>/home/ouyangzhu/.myenv/conf/</Path>
                   <Path>/home/ouyangzhu/.myenv/conf/foxit/</Path>
                   <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/SoftwareConf/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/SoftwareConf/Font/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
                 </Paths>
               </Entry>
             </History>
             <ColumnsView>
               <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting/>
             </ColumnsView>
           </FileView>
-          <Caption>*Home</Caption>
           <Options>2</Options>
-          <LockPath>/home/ouyangzhu/</LockPath>
+          <LockPath>/home/ouyangzhu/Documents/</LockPath>
+          <Title>Doc</Title>
         </Tab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
+                  <Path>/ext/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
                   <Path>/ext/</Path>
                   <Path>/</Path>
                   <Path>/home/</Path>
@@ -470,7 +707,6 @@
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/Documents/FCZ/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/record/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/Documents/DCO/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
@@ -478,17 +714,23 @@
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/Documents/DCO/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/.myenv/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/.myenv/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/.fonts/</Path>
+                  <Path>/home/ouyangzhu/</Path>
                 </Paths>
               </Entry>
             </History>
             <ColumnsView>
               <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting/>
             </ColumnsView>
           </FileView>
-          <Caption>*Doc</Caption>
           <Options>2</Options>
-          <LockPath>/home/ouyangzhu/Documents/</LockPath>
+          <LockPath>/home/ouyangzhu/.myenv/</LockPath>
+          <Title>Env</Title>
         </Tab>
         <Tab>
           <FileView Type="columns">
@@ -498,9 +740,8 @@
                 <Paths>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
+                  <Path>/ext/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
                   <Path>/ext/</Path>
                   <Path>/</Path>
                   <Path>/home/</Path>
@@ -519,10 +760,8 @@
             </History>
             <ColumnsView>
               <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting/>
             </ColumnsView>
           </FileView>
-          <Caption>*DCB</Caption>
           <Options>2</Options>
           <LockPath>/home/ouyangzhu/Documents/DCB/</LockPath>
         </Tab>
@@ -534,9 +773,8 @@
                 <Paths>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
+                  <Path>/ext/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
                   <Path>/ext/</Path>
                   <Path>/</Path>
                   <Path>/home/</Path>
@@ -633,10 +871,7 @@
                   <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/Book/</Path>
@@ -646,8 +881,6 @@
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/Documents/ECB/</Path>
                   <Path>/home/ouyangzhu/Documents/ECB/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/Z/小鸡/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/Z/</Path>
                   <Path>/home/ouyangzhu/Documents/ECB/</Path>
                   <Path>/home/ouyangzhu/Documents/ECB/Z/</Path>
                   <Path>/home/ouyangzhu/Documents/ECB/</Path>
@@ -656,36 +889,36 @@
                   <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
                   <Path>/home/ouyangzhu/Documents/FCZ/</Path>
                   <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/vmware/</Path>
-                  <Path>/home/ouyangzhu/vmware/w7vm/</Path>
-                  <Path>/home/ouyangzhu/vmware/</Path>
-                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/VirtualBox VMs/</Path>
                   <Path>/home/ouyangzhu/VirtualBox VMs/xpvm/</Path>
                   <Path>/home/ouyangzhu/VirtualBox VMs/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
                 </Paths>
               </Entry>
             </History>
             <ColumnsView>
               <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting/>
             </ColumnsView>
           </FileView>
-          <Caption>*DCC</Caption>
           <Options>2</Options>
           <LockPath>/home/ouyangzhu/Documents/DCC/</LockPath>
         </Tab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
+                  <Path>/ext/</Path>
                   <Path>/boot/</Path>
-                  <Path>/ext/home_partition/</Path>
                   <Path>/ext/</Path>
                   <Path>/</Path>
                   <Path>/home/</Path>
@@ -699,10 +932,6 @@
                   <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-03/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/amp/download/</Path>
@@ -710,57 +939,281 @@
                   <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/autokey_learning/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-03/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/misc/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/misc/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                   <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/misc/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/Documents/DCD/</LockPath>
+          <Title>DCD</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/misc/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-04/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/misc/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-02-08/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</LockPath>
+          <Title>BST</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</LockPath>
+          <Title>PayPlf</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Path>
+                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                 </Paths>
               </Entry>
             </History>
             <ColumnsView>
               <ColumnsSet>MyColumns</ColumnsSet>
-              <Sorting>
-                <Sort>
-                  <Column>0</Column>
-                  <Direction>1</Direction>
-                </Sort>
-              </Sorting>
             </ColumnsView>
           </FileView>
-          <Caption>*amp</Caption>
           <Options>2</Options>
           <LockPath>/home/ouyangzhu/amp/</LockPath>
+          <Title>amp</Title>
+        </Tab>
+        <Tab>
+          <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
+            <History>
+              <Entry Active="True">
+                <FileSource Type="FileSystem"/>
+                <Paths>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/boot/</Path>
+                  <Path>/ext/</Path>
+                  <Path>/</Path>
+                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Path>
+                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/2013-07-31/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
+                </Paths>
+              </Entry>
+            </History>
+            <ColumnsView>
+              <ColumnsSet>MyColumns</ColumnsSet>
+            </ColumnsView>
+          </FileView>
+          <Options>2</Options>
+          <LockPath>/home/ouyangzhu/amp/download/</LockPath>
+          <Title>download</Title>
         </Tab>
       </Right>
     </OpenedTabs>
@@ -779,9 +1232,12 @@
     <Mode>0</Mode>
     <MatchBeginning>True</MatchBeginning>
     <MatchEnding>True</MatchEnding>
+    <Case>1</Case>
+    <Items>2</Items>
   </QuickSearch>
   <QuickFilter Enabled="True">
     <Mode>6</Mode>
+    <AutoHide>True</AutoHide>
   </QuickFilter>
   <Miscellaneous>
     <GridVertLine>False</GridVertLine>
@@ -800,6 +1256,11 @@
     <ShowOverlays>True</ShowOverlays>
     <Size>16</Size>
     <CustomDriveIcons>False</CustomDriveIcons>
+    <Exclude>False</Exclude>
+    <ExcludeDirs/>
+    <ShowInMenus Enabled="False">
+      <Size>16</Size>
+    </ShowInMenus>
   </Icons>
   <IgnoreList Enabled="False">
     <IgnoreListFile>/home/ouyangzhu/.config/doublecmd/ignorelist.txt</IgnoreListFile>
@@ -914,11 +1375,619 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>143</Left>
-      <Top>142</Top>
+      <Left>82</Left>
+      <Top>42</Top>
       <Width>1106</Width>
-      <Height>531</Height>
+      <Height>484</Height>
       <Maximized>False</Maximized>
+      <Splitter>42.0670897552131</Splitter>
     </Position>
   </MainWindow>
+  <Toolbars>
+    <MainToolbar>
+      <Row>
+        <Command>
+          <ID>{FB722B75-9C52-46D7-91A8-A957D4A24E6E}</ID>
+          <Icon>view-refresh</Icon>
+          <Hint>Refresh</Hint>
+          <Command>cm_Refresh</Command>
+        </Command>
+        <Command>
+          <ID>{B52911F3-B77E-42BB-881E-0F1D9BD3A6FE}</ID>
+          <Icon>utilities-terminal</Icon>
+          <Hint>Run terminal</Hint>
+          <Command>cm_RunTerm</Command>
+        </Command>
+        <Command>
+          <ID>{C09DBD3B-FF94-4C55-9843-274F0293D7A9}</ID>
+          <Icon>list-add</Icon>
+          <Hint>Select group...</Hint>
+          <Command>cm_MarkPlus</Command>
+        </Command>
+        <Command>
+          <ID>{ADAC5E4E-4539-477E-AE76-2BFCEC755617}</ID>
+          <Icon>list-remove</Icon>
+          <Hint>Unselect group...</Hint>
+          <Command>cm_MarkMinus</Command>
+        </Command>
+        <Separator/>
+        <Menu>
+          <ID>{13CC521D-2C2D-4049-B1F4-474E4B638E71}</ID>
+          <Icon>go-up</Icon>
+          <Hint>Example of ShowButtonMenu</Hint>
+          <MenuItems>
+            <Command>
+              <ID>{5D9C7ED5-7E0E-4F78-BCE1-E69D1C67DE1B}</ID>
+              <Icon>view-refresh</Icon>
+              <Hint>Refresh</Hint>
+              <Command>cm_Refresh</Command>
+            </Command>
+            <Command>
+              <ID>{B41427FC-A109-4AF7-AEA1-2DCE1341B921}</ID>
+              <Icon>utilities-terminal</Icon>
+              <Hint>Run terminal</Hint>
+              <Command>cm_RunTerm</Command>
+            </Command>
+            <Command>
+              <ID>{B4BF4EEC-DA8D-4880-8410-01359FCE9C19}</ID>
+              <Icon>list-add</Icon>
+              <Hint>Select group...</Hint>
+              <Command>cm_MarkPlus</Command>
+            </Command>
+            <Command>
+              <ID>{E4958E1B-D408-4519-BC8D-8E1628EDA359}</ID>
+              <Icon>list-remove</Icon>
+              <Hint>Unselect group...</Hint>
+              <Command>cm_MarkMinus</Command>
+            </Command>
+            <Separator/>
+            <Menu>
+              <ID>{FE5EA9A9-99C0-4D20-BFFF-32C457280AE3}</ID>
+              <Icon>go-up</Icon>
+              <Hint>Example of ShowButtonMenu</Hint>
+              <MenuItems>
+                <Command>
+                  <ID>{9377C9FF-7163-46FC-8B6C-A7E812403943}</ID>
+                  <Icon>view-refresh</Icon>
+                  <Hint>Refresh</Hint>
+                  <Command>cm_Refresh</Command>
+                </Command>
+                <Command>
+                  <ID>{BFE0591D-BA85-4B6B-8291-4E313D41D494}</ID>
+                  <Icon>utilities-terminal</Icon>
+                  <Hint>Run terminal</Hint>
+                  <Command>cm_RunTerm</Command>
+                </Command>
+                <Command>
+                  <ID>{2E9A2A01-7C74-455F-85F3-1C30DB66FA5B}</ID>
+                  <Icon>list-add</Icon>
+                  <Hint>Select group...</Hint>
+                  <Command>cm_MarkPlus</Command>
+                </Command>
+                <Command>
+                  <ID>{E301B34B-E618-445D-B9F8-102DB2DCBF40}</ID>
+                  <Icon>list-remove</Icon>
+                  <Hint>Unselect group...</Hint>
+                  <Command>cm_MarkMinus</Command>
+                </Command>
+                <Separator/>
+                <Menu>
+                  <ID>{0D149817-B030-45D6-A966-33E5D6A418E9}</ID>
+                  <Icon>go-up</Icon>
+                  <Hint>Example of ShowButtonMenu</Hint>
+                  <MenuItems>
+                    <Command>
+                      <ID>{9F5FE607-DA60-484A-810B-B8D5C5E568B0}</ID>
+                      <Icon>view-refresh</Icon>
+                      <Hint>Refresh</Hint>
+                      <Command>cm_Refresh</Command>
+                    </Command>
+                    <Command>
+                      <ID>{08DAF70C-F024-4C93-9194-63A9819B525B}</ID>
+                      <Icon>utilities-terminal</Icon>
+                      <Hint>Run terminal</Hint>
+                      <Command>cm_RunTerm</Command>
+                    </Command>
+                    <Command>
+                      <ID>{96B9299A-F8AC-4B4C-8CBA-6C186C3411AE}</ID>
+                      <Icon>list-add</Icon>
+                      <Hint>Select group...</Hint>
+                      <Command>cm_MarkPlus</Command>
+                    </Command>
+                    <Command>
+                      <ID>{902C5C0E-2021-4DC3-AC22-2922F1548D3A}</ID>
+                      <Icon>list-remove</Icon>
+                      <Hint>Unselect group...</Hint>
+                      <Command>cm_MarkMinus</Command>
+                    </Command>
+                    <Separator/>
+                    <Menu>
+                      <ID>{50EE6D67-2333-499B-A90B-6289FD171878}</ID>
+                      <Icon>go-up</Icon>
+                      <Hint>Example of ShowButtonMenu</Hint>
+                      <MenuItems>
+                        <Command>
+                          <ID>{6EDC65CF-732E-4008-985A-E4E44F4948F0}</ID>
+                          <Icon>view-refresh</Icon>
+                          <Hint>Refresh</Hint>
+                          <Command>cm_Refresh</Command>
+                        </Command>
+                        <Command>
+                          <ID>{47B2F432-7091-4007-B268-0735A8C27EED}</ID>
+                          <Icon>utilities-terminal</Icon>
+                          <Hint>Run terminal</Hint>
+                          <Command>cm_RunTerm</Command>
+                        </Command>
+                        <Command>
+                          <ID>{B69A5A29-D4A7-4331-B26C-598D1BD06727}</ID>
+                          <Icon>list-add</Icon>
+                          <Hint>Select group...</Hint>
+                          <Command>cm_MarkPlus</Command>
+                        </Command>
+                        <Command>
+                          <ID>{C9D7354E-83D7-450E-B12A-C9E52E982A2B}</ID>
+                          <Icon>list-remove</Icon>
+                          <Hint>Unselect group...</Hint>
+                          <Command>cm_MarkMinus</Command>
+                        </Command>
+                        <Separator/>
+                        <Menu>
+                          <ID>{6E99D18D-5C3F-4043-907A-8C58E2FA93FC}</ID>
+                          <Icon>go-up</Icon>
+                          <Hint>Example of ShowButtonMenu</Hint>
+                          <MenuItems>
+                            <Command>
+                              <ID>{D2ED45A2-EC49-433A-A0A3-97DBAB168F04}</ID>
+                              <Icon>view-refresh</Icon>
+                              <Hint>Refresh</Hint>
+                              <Command>cm_Refresh</Command>
+                            </Command>
+                            <Command>
+                              <ID>{37F50652-6E9D-4EF7-BFEB-84C811A00C67}</ID>
+                              <Icon>utilities-terminal</Icon>
+                              <Hint>Run terminal</Hint>
+                              <Command>cm_RunTerm</Command>
+                            </Command>
+                            <Command>
+                              <ID>{02FCB39D-1776-4919-842F-AE9A56E0A1D0}</ID>
+                              <Icon>list-add</Icon>
+                              <Hint>Select group...</Hint>
+                              <Command>cm_MarkPlus</Command>
+                            </Command>
+                            <Command>
+                              <ID>{41775235-2658-41A3-BD4A-E9C7ACE5B11F}</ID>
+                              <Icon>list-remove</Icon>
+                              <Hint>Unselect group...</Hint>
+                              <Command>cm_MarkMinus</Command>
+                            </Command>
+                            <Separator/>
+                            <Menu>
+                              <ID>{40EAB5DC-A088-487D-A864-CD625020AA41}</ID>
+                              <Icon>go-up</Icon>
+                              <Hint>Example of ShowButtonMenu</Hint>
+                              <MenuItems>
+                                <Command>
+                                  <ID>{CDEAB624-5355-4C43-BF9C-D1557D01BA2A}</ID>
+                                  <Icon>view-refresh</Icon>
+                                  <Hint>Refresh</Hint>
+                                  <Command>cm_Refresh</Command>
+                                </Command>
+                                <Command>
+                                  <ID>{31CDA9F8-DB84-4FDE-85D2-853DB18463ED}</ID>
+                                  <Icon>utilities-terminal</Icon>
+                                  <Hint>Run terminal</Hint>
+                                  <Command>cm_RunTerm</Command>
+                                </Command>
+                                <Command>
+                                  <ID>{93B55508-D965-4211-8CAB-45FC0C415FC7}</ID>
+                                  <Icon>list-add</Icon>
+                                  <Hint>Select group...</Hint>
+                                  <Command>cm_MarkPlus</Command>
+                                </Command>
+                                <Command>
+                                  <ID>{9F1721CD-43F8-4F1B-9CFA-8D3704217D99}</ID>
+                                  <Icon>list-remove</Icon>
+                                  <Hint>Unselect group...</Hint>
+                                  <Command>cm_MarkMinus</Command>
+                                </Command>
+                                <Separator/>
+                                <Menu>
+                                  <ID>{6975FA80-4CE3-4462-9C32-FC414575655E}</ID>
+                                  <Icon>go-up</Icon>
+                                  <Hint>Example of ShowButtonMenu</Hint>
+                                  <MenuItems>
+                                    <Command>
+                                      <ID>{D4720138-3044-4CD3-B3BA-F4EAEE4DDE46}</ID>
+                                      <Icon>view-refresh</Icon>
+                                      <Hint>Refresh</Hint>
+                                      <Command>cm_Refresh</Command>
+                                    </Command>
+                                    <Command>
+                                      <ID>{7441AA5D-3340-480B-8500-297EC85980BE}</ID>
+                                      <Icon>utilities-terminal</Icon>
+                                      <Hint>Run terminal</Hint>
+                                      <Command>cm_RunTerm</Command>
+                                    </Command>
+                                    <Command>
+                                      <ID>{0111F3FD-73C6-4C9D-BE4C-130287CBA010}</ID>
+                                      <Icon>list-add</Icon>
+                                      <Hint>Select group...</Hint>
+                                      <Command>cm_MarkPlus</Command>
+                                    </Command>
+                                    <Command>
+                                      <ID>{D1EFC518-BDA8-4AAC-9033-21311A1614EE}</ID>
+                                      <Icon>list-remove</Icon>
+                                      <Hint>Unselect group...</Hint>
+                                      <Command>cm_MarkMinus</Command>
+                                    </Command>
+                                    <Separator/>
+                                    <Menu>
+                                      <ID>{83610147-B05C-41C3-96A6-F71EC2E84E77}</ID>
+                                      <Icon>go-up</Icon>
+                                      <Hint>Example of ShowButtonMenu</Hint>
+                                      <MenuItems>
+                                        <Command>
+                                          <ID>{02E145B9-4097-4175-B20D-667A8E2C50AE}</ID>
+                                          <Icon>view-refresh</Icon>
+                                          <Hint>Refresh</Hint>
+                                          <Command>cm_Refresh</Command>
+                                        </Command>
+                                        <Command>
+                                          <ID>{77F1574B-9732-4F1A-8877-490AE5027048}</ID>
+                                          <Icon>utilities-terminal</Icon>
+                                          <Hint>Run terminal</Hint>
+                                          <Command>cm_RunTerm</Command>
+                                        </Command>
+                                        <Command>
+                                          <ID>{4FE20B27-D041-4747-944E-1E3E39CD0E1C}</ID>
+                                          <Icon>list-add</Icon>
+                                          <Hint>Select group...</Hint>
+                                          <Command>cm_MarkPlus</Command>
+                                        </Command>
+                                        <Command>
+                                          <ID>{3423E6CA-CAB0-4617-BD52-1BE92C6313A3}</ID>
+                                          <Icon>list-remove</Icon>
+                                          <Hint>Unselect group...</Hint>
+                                          <Command>cm_MarkMinus</Command>
+                                        </Command>
+                                        <Separator/>
+                                        <Menu>
+                                          <ID>{6FAE52D8-9B8C-4391-88A2-0B7CBD9F6635}</ID>
+                                          <Icon>go-up</Icon>
+                                          <Hint>Example of ShowButtonMenu</Hint>
+                                          <MenuItems>
+                                            <Command>
+                                              <ID>{5CAD6F45-5E2F-4343-B3AA-AF02107CF05E}</ID>
+                                              <Icon>view-refresh</Icon>
+                                              <Hint>Refresh</Hint>
+                                              <Command>cm_Refresh</Command>
+                                            </Command>
+                                            <Command>
+                                              <ID>{5F151B26-EE4D-41ED-AF76-C0EF96EF8955}</ID>
+                                              <Icon>utilities-terminal</Icon>
+                                              <Hint>Run terminal</Hint>
+                                              <Command>cm_RunTerm</Command>
+                                            </Command>
+                                            <Command>
+                                              <ID>{766593A9-C88A-4046-9042-B60AC3AD73A1}</ID>
+                                              <Icon>list-add</Icon>
+                                              <Hint>Select group...</Hint>
+                                              <Command>cm_MarkPlus</Command>
+                                            </Command>
+                                            <Command>
+                                              <ID>{EB2F4E40-693B-40A1-8D65-30B24471244F}</ID>
+                                              <Icon>list-remove</Icon>
+                                              <Hint>Unselect group...</Hint>
+                                              <Command>cm_MarkMinus</Command>
+                                            </Command>
+                                            <Separator/>
+                                            <Menu>
+                                              <ID>{50F97443-6913-45BF-AD1C-5E24611DAB19}</ID>
+                                              <Icon>go-up</Icon>
+                                              <Hint>Example of ShowButtonMenu</Hint>
+                                            </Menu>
+                                            <Command>
+                                              <ID>{38B54DAB-53B9-4D70-A4E6-2447DE107DAC}</ID>
+                                              <Icon>package-x-generic</Icon>
+                                              <Hint>Pack files...</Hint>
+                                              <Command>cm_PackFiles</Command>
+                                            </Command>
+                                            <Separator/>
+                                            <Command>
+                                              <ID>{B0FA705C-FF9F-4002-A224-CB8B553372FB}</ID>
+                                              <Icon>system-search</Icon>
+                                              <Hint>Search</Hint>
+                                              <Command>cm_Search</Command>
+                                            </Command>
+                                            <Separator/>
+                                            <Command>
+                                              <ID>{28E2D342-767C-4B08-A9BB-933DB22F0F00}</ID>
+                                              <Icon>go-previous</Icon>
+                                              <Hint>Go to previous entry in history</Hint>
+                                              <Command>cm_ViewHistoryPrev</Command>
+                                            </Command>
+                                            <Command>
+                                              <ID>{E2FDF2A7-E652-4AD5-9076-66F531D95048}</ID>
+                                              <Icon>go-next</Icon>
+                                              <Hint>Go to next entry in history</Hint>
+                                              <Command>cm_ViewHistoryNext</Command>
+                                            </Command>
+                                          </MenuItems>
+                                        </Menu>
+                                        <Command>
+                                          <ID>{77BD39C0-4853-4B4A-81C0-2B51965A15A9}</ID>
+                                          <Icon>package-x-generic</Icon>
+                                          <Hint>Pack files...</Hint>
+                                          <Command>cm_PackFiles</Command>
+                                        </Command>
+                                        <Separator/>
+                                        <Command>
+                                          <ID>{A6A70043-F4C7-4508-8DF6-063315FFA5CE}</ID>
+                                          <Icon>system-search</Icon>
+                                          <Hint>Search</Hint>
+                                          <Command>cm_Search</Command>
+                                        </Command>
+                                        <Separator/>
+                                        <Command>
+                                          <ID>{81B90157-7E18-46E4-ADEE-F9290E1096AE}</ID>
+                                          <Icon>go-previous</Icon>
+                                          <Hint>Go to previous entry in history</Hint>
+                                          <Command>cm_ViewHistoryPrev</Command>
+                                        </Command>
+                                        <Command>
+                                          <ID>{F6521B64-E6C5-4976-A14F-7E905ADF4BA7}</ID>
+                                          <Icon>go-next</Icon>
+                                          <Hint>Go to next entry in history</Hint>
+                                          <Command>cm_ViewHistoryNext</Command>
+                                        </Command>
+                                      </MenuItems>
+                                    </Menu>
+                                    <Command>
+                                      <ID>{5A256367-DDC7-46C5-8575-4EC61D5E4C6B}</ID>
+                                      <Icon>package-x-generic</Icon>
+                                      <Hint>Pack files...</Hint>
+                                      <Command>cm_PackFiles</Command>
+                                    </Command>
+                                    <Separator/>
+                                    <Command>
+                                      <ID>{CCEE3658-C9FD-42C8-AA42-031118779C2E}</ID>
+                                      <Icon>system-search</Icon>
+                                      <Hint>Search</Hint>
+                                      <Command>cm_Search</Command>
+                                    </Command>
+                                    <Separator/>
+                                    <Command>
+                                      <ID>{E996EB6C-9DF9-4292-930E-518774F5085C}</ID>
+                                      <Icon>go-previous</Icon>
+                                      <Hint>Go to previous entry in history</Hint>
+                                      <Command>cm_ViewHistoryPrev</Command>
+                                    </Command>
+                                    <Command>
+                                      <ID>{B8BD21F4-1CD7-43DC-BA73-C0E4688FC657}</ID>
+                                      <Icon>go-next</Icon>
+                                      <Hint>Go to next entry in history</Hint>
+                                      <Command>cm_ViewHistoryNext</Command>
+                                    </Command>
+                                  </MenuItems>
+                                </Menu>
+                                <Command>
+                                  <ID>{4D232AF4-71D7-4845-9860-8C38211F1477}</ID>
+                                  <Icon>package-x-generic</Icon>
+                                  <Hint>Pack files...</Hint>
+                                  <Command>cm_PackFiles</Command>
+                                </Command>
+                                <Separator/>
+                                <Command>
+                                  <ID>{BA18C32D-8AC7-41CD-A4CE-7C6A72CE4845}</ID>
+                                  <Icon>system-search</Icon>
+                                  <Hint>Search</Hint>
+                                  <Command>cm_Search</Command>
+                                </Command>
+                                <Separator/>
+                                <Command>
+                                  <ID>{55864621-1086-414B-89AD-7D9BD7CFC92F}</ID>
+                                  <Icon>go-previous</Icon>
+                                  <Hint>Go to previous entry in history</Hint>
+                                  <Command>cm_ViewHistoryPrev</Command>
+                                </Command>
+                                <Command>
+                                  <ID>{3490AE4B-4EEA-46EE-8AD2-13EC98FBC74B}</ID>
+                                  <Icon>go-next</Icon>
+                                  <Hint>Go to next entry in history</Hint>
+                                  <Command>cm_ViewHistoryNext</Command>
+                                </Command>
+                              </MenuItems>
+                            </Menu>
+                            <Command>
+                              <ID>{8D40AC60-BC76-43D8-9D89-B89E1900E2B9}</ID>
+                              <Icon>package-x-generic</Icon>
+                              <Hint>Pack files...</Hint>
+                              <Command>cm_PackFiles</Command>
+                            </Command>
+                            <Separator/>
+                            <Command>
+                              <ID>{34E51329-3564-41EC-9522-271241BE59EC}</ID>
+                              <Icon>system-search</Icon>
+                              <Hint>Search</Hint>
+                              <Command>cm_Search</Command>
+                            </Command>
+                            <Separator/>
+                            <Command>
+                              <ID>{9F0C2066-DF8E-4A9C-B876-8D7549F47513}</ID>
+                              <Icon>go-previous</Icon>
+                              <Hint>Go to previous entry in history</Hint>
+                              <Command>cm_ViewHistoryPrev</Command>
+                            </Command>
+                            <Command>
+                              <ID>{6A4D5F0B-D165-4B4D-8CCE-79C2F136AE43}</ID>
+                              <Icon>go-next</Icon>
+                              <Hint>Go to next entry in history</Hint>
+                              <Command>cm_ViewHistoryNext</Command>
+                            </Command>
+                          </MenuItems>
+                        </Menu>
+                        <Command>
+                          <ID>{D281D284-F06F-403A-A526-88EC720E6664}</ID>
+                          <Icon>package-x-generic</Icon>
+                          <Hint>Pack files...</Hint>
+                          <Command>cm_PackFiles</Command>
+                        </Command>
+                        <Separator/>
+                        <Command>
+                          <ID>{4AF75A20-C7F8-420E-ADC0-FA3CD633A9BE}</ID>
+                          <Icon>system-search</Icon>
+                          <Hint>Search</Hint>
+                          <Command>cm_Search</Command>
+                        </Command>
+                        <Separator/>
+                        <Command>
+                          <ID>{BB880F92-9D25-47EC-84E4-541B26E60CBD}</ID>
+                          <Icon>go-previous</Icon>
+                          <Hint>Go to previous entry in history</Hint>
+                          <Command>cm_ViewHistoryPrev</Command>
+                        </Command>
+                        <Command>
+                          <ID>{BEAC1B57-7E96-45C9-82E8-3A1E997414CF}</ID>
+                          <Icon>go-next</Icon>
+                          <Hint>Go to next entry in history</Hint>
+                          <Command>cm_ViewHistoryNext</Command>
+                        </Command>
+                      </MenuItems>
+                    </Menu>
+                    <Command>
+                      <ID>{E219DE8B-4140-4E7C-B66D-01DFF6D15095}</ID>
+                      <Icon>package-x-generic</Icon>
+                      <Hint>Pack files...</Hint>
+                      <Command>cm_PackFiles</Command>
+                    </Command>
+                    <Separator/>
+                    <Command>
+                      <ID>{59FD7D1C-52A5-4FEA-BF80-DA58A966B52D}</ID>
+                      <Icon>system-search</Icon>
+                      <Hint>Search</Hint>
+                      <Command>cm_Search</Command>
+                    </Command>
+                    <Separator/>
+                    <Command>
+                      <ID>{EB5446C4-126B-4343-BB92-490E2718B9A6}</ID>
+                      <Icon>go-previous</Icon>
+                      <Hint>Go to previous entry in history</Hint>
+                      <Command>cm_ViewHistoryPrev</Command>
+                    </Command>
+                    <Command>
+                      <ID>{AD4CD6C1-8D0A-4D14-952F-C452E26E5DEC}</ID>
+                      <Icon>go-next</Icon>
+                      <Hint>Go to next entry in history</Hint>
+                      <Command>cm_ViewHistoryNext</Command>
+                    </Command>
+                  </MenuItems>
+                </Menu>
+                <Command>
+                  <ID>{CC2917FA-2B91-4A8A-94F6-53978297B7F9}</ID>
+                  <Icon>package-x-generic</Icon>
+                  <Hint>Pack files...</Hint>
+                  <Command>cm_PackFiles</Command>
+                </Command>
+                <Separator/>
+                <Command>
+                  <ID>{19F8D353-09BD-40BD-9818-64046D1400E3}</ID>
+                  <Icon>system-search</Icon>
+                  <Hint>Search</Hint>
+                  <Command>cm_Search</Command>
+                </Command>
+                <Separator/>
+                <Command>
+                  <ID>{3A4B596F-7B7C-4A89-B7D3-809BF63B5958}</ID>
+                  <Icon>go-previous</Icon>
+                  <Hint>Go to previous entry in history</Hint>
+                  <Command>cm_ViewHistoryPrev</Command>
+                </Command>
+                <Command>
+                  <ID>{52A659D9-AD07-42C4-86DB-0F90674FB265}</ID>
+                  <Icon>go-next</Icon>
+                  <Hint>Go to next entry in history</Hint>
+                  <Command>cm_ViewHistoryNext</Command>
+                </Command>
+              </MenuItems>
+            </Menu>
+            <Command>
+              <ID>{172D68BD-5A2A-4B6E-9912-49D90EC1B3A8}</ID>
+              <Icon>package-x-generic</Icon>
+              <Hint>Pack files...</Hint>
+              <Command>cm_PackFiles</Command>
+            </Command>
+            <Separator/>
+            <Command>
+              <ID>{4CABBB95-B116-45FB-B819-26FED0A27EA2}</ID>
+              <Icon>system-search</Icon>
+              <Hint>Search</Hint>
+              <Command>cm_Search</Command>
+            </Command>
+            <Separator/>
+            <Command>
+              <ID>{E26BAF86-29B1-46E9-9259-573A13816E59}</ID>
+              <Icon>go-previous</Icon>
+              <Hint>Go to previous entry in history</Hint>
+              <Command>cm_ViewHistoryPrev</Command>
+            </Command>
+            <Command>
+              <ID>{4FCBEE69-E8B3-4123-8050-0B748418D30F}</ID>
+              <Icon>go-next</Icon>
+              <Hint>Go to next entry in history</Hint>
+              <Command>cm_ViewHistoryNext</Command>
+            </Command>
+          </MenuItems>
+        </Menu>
+        <Command>
+          <ID>{E55E9F53-800C-4F3A-8757-352A92CCAE31}</ID>
+          <Icon>package-x-generic</Icon>
+          <Hint>Pack files...</Hint>
+          <Command>cm_PackFiles</Command>
+        </Command>
+        <Separator/>
+        <Command>
+          <ID>{CD721CF7-AD98-4950-BD85-C1D03E77D3B2}</ID>
+          <Icon>system-search</Icon>
+          <Hint>Search</Hint>
+          <Command>cm_Search</Command>
+        </Command>
+        <Separator/>
+        <Command>
+          <ID>{66F75D9C-3A6C-4220-9AB5-A13EFCDD05E1}</ID>
+          <Icon>go-previous</Icon>
+          <Hint>Go to previous entry in history</Hint>
+          <Command>cm_ViewHistoryPrev</Command>
+        </Command>
+        <Command>
+          <ID>{9460ECE2-E437-465B-9D95-4BCF6DD757D0}</ID>
+          <Icon>go-next</Icon>
+          <Hint>Go to next entry in history</Hint>
+          <Command>cm_ViewHistoryNext</Command>
+        </Command>
+      </Row>
+    </MainToolbar>
+  </Toolbars>
+  <FilesViews>
+    <Sorting>
+      <CaseSensitivity>0</CaseSensitivity>
+      <NaturalSorting>False</NaturalSorting>
+      <SortFolderMode>0</SortFolderMode>
+      <NewFilesPosition>2</NewFilesPosition>
+      <UpdatedFilesPosition>2</UpdatedFilesPosition>
+    </Sorting>
+  </FilesViews>
+  <Keyboard>
+    <Typing>
+      <Actions>
+        <NoModifier>2</NoModifier>
+        <Alt>3</Alt>
+        <CtrlAlt>3</CtrlAlt>
+      </Actions>
+    </Typing>
+  </Keyboard>
+  <Thumbnails Save="True">
+    <Width>128</Width>
+    <Height>128</Height>
+  </Thumbnails>
+  <UseShellForFileOperations>False</UseShellForFileOperations>
 </doublecmd>

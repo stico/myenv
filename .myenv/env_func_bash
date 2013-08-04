@@ -1,5 +1,17 @@
 #!/bin/bash
 
+function func_date {
+	date "+%Y-%m-%d"
+}
+
+function func_time {
+	date "+%H-%M-%S"
+}
+
+function func_dati {
+	date "+%Y-%m-%d_%H-%M-%S"
+}
+
 function func_tag_value {
 	# DESC: translate a tag value, or return itself if not a tag
 
@@ -270,7 +282,7 @@ function func_ls {
 
 function func_cd_tmp_today { 
 	# so could evaluate the date every time
-	func_mkdir_cd $MY_TMP/`date "+%Y-%m-%d"`	
+	func_mkdir_cd $MY_TMP/`func_date`	
 }
 
 function func_head_cmd {
@@ -545,7 +557,7 @@ function func_scp_with_jump {
 
 	source=$1
 	sourceName=$(basename $source)
-	tmpTransferName=tmp_transfer_`date "+%Y-%m-%d_%H-%M-%S"`_${sourceName}
+	tmpTransferName=tmp_transfer_`func_dati`_${sourceName}
 	target=$2
 	targetDir=$(dirname ${target##*:})
 	targetCmd="mkdir -p $targetDir"
@@ -727,7 +739,7 @@ function func_delete_dated {
 	[ $# -ne 1 ] && echo "$Usage" && return 1
 
 	# the path might have blank, so use $*, and embrace with "" (many place used this)
-	targetDir=$MY_TMP/`date "+%Y-%m-%d"`
+	targetDir=$MY_TMP/`func_date`
 
 	[[ ! -e $targetDir ]] && mkdir $targetDir
 	mv "$@" $targetDir
@@ -739,7 +751,7 @@ function func_backup_dated {
 
 	srcPath="$*"
 	fileName=$(basename "$srcPath")
-	targetFile=`date "+%Y-%m-%d_%H-%M-%S"`_`uname -n`_"$fileName"
+	targetFile=`func_dati`_`uname -n`_"$fileName"
 	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/ampext/backup")
 
 	# if path is a directory, zip it first

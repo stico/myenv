@@ -54,8 +54,12 @@ PATH		%MYSQL_HOME%#bin
 NODE_HOME	%MY_DEV%#node
 PATH		%NODE_HOME%#bin
 
-RUBY_HOME	%MY_DEV%#ruby
-PATH		%RUBY_HOME%#bin
+PHP_HOME	%MY_DEV%#php
+PATH		%PHP_HOME%#bin
+
+#Use rvm version
+#RUBY_HOME	%MY_DEV%#ruby
+#PATH		%RUBY_HOME%#bin
 
 ECLIPSE_HOME	%MY_DEV%#eclipse
 PATH		%ECLIPSE_HOME%
