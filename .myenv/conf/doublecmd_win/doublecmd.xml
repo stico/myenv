@@ -272,7 +272,7 @@
       <CopyTime>True</CopyTime>
       <CopyOwnership>True</CopyOwnership>
     </Options>
-    <ProgressKind>0</ProgressKind>
+    <ProgressKind>2</ProgressKind>
     <Confirmations>15</Confirmations>
   </FileOperations>
   <Tabs>
@@ -281,21 +281,14 @@
     <Position>0</Position>
     <OpenedTabs>
       <Left>
-        <ActiveTab>3</ActiveTab>
+        <ActiveTab>0</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/\program\</Path>
-                  <Path>E:/\program\A_Draw_UML_violet_0.21.1_Official\</Path>
-                  <Path>E:/\program\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\program_local\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\program\</Path>
+                  <Path>E:\\program\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -319,50 +312,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/vimfiles/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/amp/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Software/\</Path>
-                  <Path>E:/Documents/DCB/Software/installer/\</Path>
-                  <Path>E:/Documents/DCB/Software/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCC/OS_LU_Ubuntu/\</Path>
-                  <Path>E:/Documents/DCC/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/Article/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Record/\</Path>
-                  <Path>E:/Documents/DCC/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/FCZ/vm/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:\</Path>
                   <Path>E:\dev\</Path>
                 </Paths>
               </Entry>
@@ -387,55 +336,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/vimfiles/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/amp/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Software/\</Path>
-                  <Path>E:/Documents/DCB/Software/installer/\</Path>
-                  <Path>E:/Documents/DCB/Software/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCC/OS_LU_Ubuntu/\</Path>
-                  <Path>E:/Documents/DCC/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/Article/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Record/\</Path>
-                  <Path>E:/Documents/DCC/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/FCZ/vm/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\dev\</Path>
-                  <Path>E:\</Path>
-                  <Path>C:\</Path>
-                  <Path>C:\Users\</Path>
-                  <Path>C:\Users\ouyangzhu\</Path>
                   <Path>C:\Users\ouyangzhu\Desktop\</Path>
                 </Paths>
               </Entry>
@@ -460,61 +360,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/vimfiles/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/amp/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Software/\</Path>
-                  <Path>E:/Documents/DCB/Software/installer/\</Path>
-                  <Path>E:/Documents/DCB/Software/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCC/OS_LU_Ubuntu/\</Path>
-                  <Path>E:/Documents/DCC/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/Article/\</Path>
-                  <Path>E:/Documents/DCC/Network_Monitoring/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/DCB/\</Path>
-                  <Path>E:/Documents/DCB/Record/\</Path>
-                  <Path>E:/Documents/DCC/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:/Documents/FCZ/vm/\</Path>
-                  <Path>E:/Documents/DCB/Google Drive/\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\dev\</Path>
-                  <Path>E:\</Path>
-                  <Path>C:\</Path>
-                  <Path>C:\Users\</Path>
-                  <Path>C:\Users\ouyangzhu\</Path>
-                  <Path>C:\Users\ouyangzhu\Desktop\</Path>
                   <Path>E:\dev\code_dw\</Path>
-                  <Path>E:\dev\</Path>
-                  <Path>E:\amp\2013-07-30\</Path>
-                  <Path>E:\dev\code_dw\</Path>
-                  <Path>E:\dev\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -528,24 +374,13 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>8</ActiveTab>
+        <ActiveTab>1</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
                   <Path>E:\Documents\</Path>
                 </Paths>
               </Entry>
@@ -564,20 +399,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
+                  <Path>E:\.myenv\conf\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -595,22 +417,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
                   <Path>E:\Documents\DCB\</Path>
                 </Paths>
               </Entry>
@@ -629,24 +435,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCB\</Path>
-                  <Path>E:\Documents\</Path>
                   <Path>E:\Documents\DCC\</Path>
                 </Paths>
               </Entry>
@@ -665,26 +453,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCB\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCC\</Path>
-                  <Path>E:\Documents\</Path>
                   <Path>E:\Documents\DCD\</Path>
                 </Paths>
               </Entry>
@@ -703,29 +471,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCB\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCC\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCD\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
-                  <Path>E:\Documents\DCD\</Path>
                   <Path>E:\Documents\DCD\Ref\</Path>
                 </Paths>
               </Entry>
@@ -744,28 +489,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCB\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCC\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCD\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
                   <Path>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</Path>
                 </Paths>
               </Entry>
@@ -784,35 +507,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCB\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCC\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCD\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
-                  <Path>E:\Documents\DCD\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\amp\</Path>
-                  <Path>E:\amp\2013-07-30\</Path>
                   <Path>E:\amp\</Path>
                 </Paths>
               </Entry>
@@ -831,34 +525,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:/\</Path>
-                  <Path>E:/Documents/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/.myenv/\</Path>
-                  <Path>E:/.myenv/conf/\</Path>
-                  <Path>E:/.myenv/conf/foxit/\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:/\Documents\</Path>
-                  <Path>E:/\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\.myenv\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCB\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCC\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\Documents\DCD\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</Path>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
-                  <Path>E:\Documents\DCD\</Path>
-                  <Path>E:\Documents\</Path>
-                  <Path>E:\</Path>
-                  <Path>E:\amp\</Path>
                   <Path>E:\amp\download\</Path>
                 </Paths>
               </Entry>
@@ -880,7 +546,7 @@
   </Log>
   <History>
     <SearchReplaceHistory Save="True"/>
-    <DirHistory Save="True"/>
+    <DirHistory Save="False"/>
     <CmdLineHistory Save="True"/>
     <FileMaskHistory Save="True"/>
   </History>
