@@ -1,58 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <doublecmd>
   <History>
-    <Navigation>
-      <Item>/home/ouyangzhu/amp/2013-07-31/</Item>
-      <Item>/home/ouyangzhu/amp/download/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/SoftwareConf/Font/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/SoftwareConf/</Item>
-      <Item>/home/ouyangzhu/.fonts/</Item>
-      <Item>/home/ouyangzhu/amp/</Item>
-      <Item>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Item>
-      <Item>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Item>
-      <Item>/home/ouyangzhu/Documents/DCD/</Item>
-      <Item>/home/ouyangzhu/dev/code_dw/</Item>
-      <Item>/home/ouyangzhu/dev/</Item>
-      <Item>/home/ouyangzhu/program/</Item>
-      <Item>/home/ouyangzhu/</Item>
-      <Item>/home/ouyangzhu/Documents/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/</Item>
-      <Item>/home/ouyangzhu/VirtualBox VMs/xpvm/</Item>
-      <Item>/home/ouyangzhu/VirtualBox VMs/</Item>
-      <Item>/home/ouyangzhu/vmware/w7vm/</Item>
-      <Item>/home/ouyangzhu/vmware/</Item>
-      <Item>/home/ouyangzhu/Documents/FCZ/vm/</Item>
-      <Item>/home/ouyangzhu/Documents/FCZ/</Item>
-      <Item>/home/ouyangzhu/Documents/ECB/Z/小鸡/</Item>
-      <Item>/home/ouyangzhu/Documents/ECB/Z/</Item>
-      <Item>/home/ouyangzhu/Documents/ECB/</Item>
-      <Item>/home/ouyangzhu/Documents/DCC/Programming_Python/Book/</Item>
-      <Item>/home/ouyangzhu/Documents/DCC/Programming_Python/</Item>
-      <Item>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Item>
-      <Item>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/A_TODO/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Article/</Item>
-      <Item>/home/ouyangzhu/Documents/DCO/</Item>
-      <Item>/home/ouyangzhu/Documents/DCC/</Item>
-      <Item>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOREAD_DCC_Book/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/TOLEARN_DCC/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/INBOX/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/VERSION_BACKUP/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Record/Todo/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Record/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/lib/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/src/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/shflags-1.0.3/</Item>
-      <Item>/home/ouyangzhu/Documents/DCB/Google Drive/TOREAD/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/装修图案收集及注意事宜/装修小常识/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/装修图案收集及注意事宜/装修图1/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/装修图案收集及注意事宜/家装采购及房屋设计风格/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/装修图案收集及注意事宜/家装图收集/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/窗帘图片集/</Item>
-      <Item>/home/ouyangzhu/amp/2013-02-08/all/</Item>
-    </Navigation>
     <CommandLine>
       <Item>cd ..</Item>
       <Item>ls</Item>

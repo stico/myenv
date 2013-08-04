@@ -272,7 +272,7 @@
       <CopyTime>True</CopyTime>
       <CopyOwnership>True</CopyOwnership>
     </Options>
-    <ProgressKind>0</ProgressKind>
+    <ProgressKind>2</ProgressKind>
     <Confirmations>15</Confirmations>
   </FileOperations>
   <Tabs>
@@ -294,69 +294,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/vimfiles/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/program/</Path>
                 </Paths>
               </Entry>
@@ -381,71 +318,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/vimfiles/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/program/</Path>
-                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/dev/</Path>
                 </Paths>
               </Entry>
@@ -470,73 +342,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/vimfiles/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/program/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/dev/</Path>
-                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/Desktop/</Path>
                 </Paths>
               </Entry>
@@ -561,78 +366,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/vimfiles/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Downloads/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/installer/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Software/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/Article/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Network_Monitoring/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/program/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/dev/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/dev/</Path>
-                  <Path>/home/ouyangzhu/dev/code_dw/</Path>
-                  <Path>/home/ouyangzhu/dev/</Path>
+                  <Path>/home/ouyangzhu/dev/code_dw/cbbs_trunk/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -653,24 +387,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/.myenv/</Path>
-                  <Path>/home/ouyangzhu/.myenv/conf/</Path>
-                  <Path>/home/ouyangzhu/.myenv/conf/foxit/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/SoftwareConf/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/SoftwareConf/Font/</Path>
                   <Path>/home/ouyangzhu/Documents/</Path>
                 </Paths>
               </Entry>
@@ -696,31 +412,6 @@
                 <FileSource Type="FileSystem"/>
                 <Paths>
                   <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCO/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCO/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCO/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/.myenv/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/.myenv/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/.fonts/</Path>
-                  <Path>/home/ouyangzhu/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -738,22 +429,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/Todo/</Path>
                   <Path>/home/ouyangzhu/Documents/DCB/</Path>
                 </Paths>
               </Entry>
@@ -771,127 +446,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/Book/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Mine/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Mine/A_Photo/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Mine/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Mine/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Mine/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/0_Old_Memory/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/0_Old_Memory_School/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Inbox/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/Record_2011-10_毛颖厨具/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/Location_2010-08_华工/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/Location_2009-08_CGC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Z_Timed/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Friends/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2012-01 Web组珠海出游/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2010-06 火炉山聚会/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2010-03 火凤火/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2008-08 公司从化TeamBuilding/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2007-05 小冲生日/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2001-11 田宇星告别/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/me/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/自动化的毕业照/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-06 本科毕业照片/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2006-01 老乡天河公园烧烤/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2006-04 阳朔照片/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2006-04 阳朔照片/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2006-04 阳朔照片/me/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2006-04 阳朔照片/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-10 国庆清远韶关游/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-10 国庆清远韶关游/me/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2004-10 国庆清远韶关游/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/2012-04 东风公园（Parents）/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Design_Patterns/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/Family/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/OS_LU_Ubuntu/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/Programming_Python/Book/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCC/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/Z/</Path>
-                  <Path>/home/ouyangzhu/Documents/ECB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/vm/</Path>
-                  <Path>/home/ouyangzhu/Documents/FCZ/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/VirtualBox VMs/</Path>
-                  <Path>/home/ouyangzhu/VirtualBox VMs/xpvm/</Path>
-                  <Path>/home/ouyangzhu/VirtualBox VMs/</Path>
                   <Path>/home/ouyangzhu/Documents/DCC/</Path>
                 </Paths>
               </Entry>
@@ -915,41 +469,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
                   <Path>/home/ouyangzhu/Documents/DCD/</Path>
                 </Paths>
               </Entry>
@@ -974,42 +493,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
                   <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
                 </Paths>
               </Entry>
@@ -1034,43 +517,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
                   <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Path>
                 </Paths>
               </Entry>
@@ -1095,45 +541,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Path>
-                  <Path>/home/ouyangzhu/</Path>
                   <Path>/home/ouyangzhu/amp/</Path>
                 </Paths>
               </Entry>
@@ -1158,51 +565,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/boot/</Path>
-                  <Path>/ext/</Path>
-                  <Path>/</Path>
-                  <Path>/home/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCB/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/Documents/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</Path>
-                  <Path>/home/ouyangzhu/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
-                  <Path>/home/ouyangzhu/amp/</Path>
-                  <Path>/home/ouyangzhu/amp/2013-07-31/</Path>
                   <Path>/home/ouyangzhu/amp/download/</Path>
                 </Paths>
               </Entry>
@@ -1224,7 +586,7 @@
   </Log>
   <History>
     <SearchReplaceHistory Save="True"/>
-    <DirHistory Save="True"/>
+    <DirHistory Save="False"/>
     <CmdLineHistory Save="True"/>
     <FileMaskHistory Save="True"/>
   </History>
