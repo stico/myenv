@@ -284,11 +284,17 @@
         <ActiveTab>0</ActiveTab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\\program\</Path>
+                  <Path>E:\program\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -297,7 +303,7 @@
             </ColumnsView>
           </FileView>
           <Options>2</Options>
-          <LockPath>E:/\program\</LockPath>
+          <LockPath>E:\program\</LockPath>
           <Title>pro</Title>
         </Tab>
         <Tab>
@@ -374,14 +380,14 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>1</ActiveTab>
+        <ActiveTab>2</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\</Path>
+                  <Path>E:\Documents\DCO\Job_Freshman\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -399,7 +405,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\.myenv\conf\</Path>
+                  <Path>E:\.myenv\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -453,7 +459,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\</Path>
+                  <Path>E:\Documents\DCD\A_General\Freshman\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -471,7 +477,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Ref\</Path>
+                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -489,7 +495,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</Path>
+                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\A_Report\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -552,8 +558,8 @@
   </History>
   <QuickSearch Enabled="True">
     <Mode>0</Mode>
-    <MatchBeginning>True</MatchBeginning>
-    <MatchEnding>True</MatchEnding>
+    <MatchBeginning>False</MatchBeginning>
+    <MatchEnding>False</MatchEnding>
     <Case>1</Case>
     <Items>2</Items>
   </QuickSearch>
@@ -574,7 +580,7 @@
     <Mode>0</Mode>
   </AutoRefresh>
   <Icons>
-    <ShowMode>1</ShowMode>
+    <ShowMode>2</ShowMode>
     <ShowOverlays>True</ShowOverlays>
     <Size>16</Size>
     <CustomDriveIcons>False</CustomDriveIcons>
@@ -697,8 +703,8 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>160</Left>
-      <Top>90</Top>
+      <Left>201</Left>
+      <Top>311</Top>
       <Width>980</Width>
       <Height>412</Height>
       <Maximized>False</Maximized>
@@ -776,7 +782,7 @@
       <Actions>
         <NoModifier>2</NoModifier>
         <Alt>3</Alt>
-        <CtrlAlt>3</CtrlAlt>
+        <CtrlAlt>0</CtrlAlt>
       </Actions>
     </Typing>
   </Keyboard>

@@ -7,10 +7,6 @@
         <Command>cm_Exit</Command>
       </Hotkey>
       <Hotkey>
-        <Shortcut>F1</Shortcut>
-        <Command>cm_About</Command>
-      </Hotkey>
-      <Hotkey>
         <Shortcut>F2</Shortcut>
         <Command>cm_RenameOnly</Command>
       </Hotkey>
@@ -127,10 +123,6 @@
         <Command>cm_RightOpenDrives</Command>
       </Hotkey>
       <Hotkey>
-        <Shortcut>Ctrl+P</Shortcut>
-        <Command>cm_AddPathToCmdLine</Command>
-      </Hotkey>
-      <Hotkey>
         <Shortcut>Ctrl+S</Shortcut>
         <Command>cm_FocusCmdLine</Command>
       </Hotkey>
@@ -165,14 +157,6 @@
       <Hotkey>
         <Shortcut>Ctrl+Down</Shortcut>
         <Command>cm_ShowCmdLineHistory</Command>
-      </Hotkey>
-      <Hotkey>
-        <Shortcut>Ctrl+Enter</Shortcut>
-        <Command>cm_AddFilenameToCmdLine</Command>
-      </Hotkey>
-      <Hotkey>
-        <Shortcut>Ctrl+Shift+Enter</Shortcut>
-        <Command>cm_AddPathAndFilenameToCmdLine</Command>
       </Hotkey>
       <Hotkey>
         <Shortcut>Alt+Left</Shortcut>
@@ -222,10 +206,6 @@
         <Shortcut>Shift+F8</Shortcut>
         <Command>cm_Delete</Command>
         <Param>trashcan=reversesetting</Param>
-      </Hotkey>
-      <Hotkey>
-        <Shortcut>Ctrl+F1</Shortcut>
-        <Command>cm_BriefView</Command>
       </Hotkey>
       <Hotkey>
         <Shortcut>Ctrl+F2</Shortcut>

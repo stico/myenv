@@ -29,7 +29,8 @@ Capslock::Ctrl
 ^!p::		ShowHide_TextWindow("dev\a_workspaces\A_Project.lst", true, false, false, ": set isfname+=:")
 
 ^!x::		ShowHide_Window("E:\program\A_System_ConEmuPack_X\ConEmu.exe", "ahk_class VirtualConsoleClass")
-^!f::		ShowHide_Window("E:\program\A_System_FreeCommander\FreeCommanderPortable.exe", "FreeCommander")
+^!f::		ShowHide_Window("E:\program\doublecmd-0.5.6.x86_64\doublecmd.exe", "Double Commander")
+;^!f::		ShowHide_Window("E:\program\A_System_FreeCommander\FreeCommanderPortable.exe", "FreeCommander")
 ^!e::		ShowHide_Window("E:\dev\eclipse\eclipse.exe", "Eclipse")
 ^!d::		ShowHide_Window("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", "Google Chrome")
 ^!s::		ShowHide_Window("E:\program\A_Network_SecureCRT_6.2.2\SecureCRT.EXE", "SecureCRT")

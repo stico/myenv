@@ -22,8 +22,8 @@
 .tmux.conf
 .unison
 .vim
-vimfiles
 .vimrc
 .vrapperrc
 .w3m
 .XWinrc
+vimfiles
