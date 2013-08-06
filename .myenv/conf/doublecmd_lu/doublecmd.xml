@@ -366,7 +366,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/dev/code_dw/cbbs_trunk/</Path>
+                  <Path>/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -592,8 +592,8 @@
   </History>
   <QuickSearch Enabled="True">
     <Mode>0</Mode>
-    <MatchBeginning>True</MatchBeginning>
-    <MatchEnding>True</MatchEnding>
+    <MatchBeginning>False</MatchBeginning>
+    <MatchEnding>False</MatchEnding>
     <Case>1</Case>
     <Items>2</Items>
   </QuickSearch>
@@ -614,7 +614,7 @@
     <Mode>0</Mode>
   </AutoRefresh>
   <Icons>
-    <ShowMode>1</ShowMode>
+    <ShowMode>2</ShowMode>
     <ShowOverlays>True</ShowOverlays>
     <Size>16</Size>
     <CustomDriveIcons>False</CustomDriveIcons>
@@ -737,8 +737,8 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>82</Left>
-      <Top>42</Top>
+      <Left>478</Left>
+      <Top>418</Top>
       <Width>1106</Width>
       <Height>484</Height>
       <Maximized>False</Maximized>
@@ -1343,7 +1343,7 @@
       <Actions>
         <NoModifier>2</NoModifier>
         <Alt>3</Alt>
-        <CtrlAlt>3</CtrlAlt>
+        <CtrlAlt>0</CtrlAlt>
       </Actions>
     </Typing>
   </Keyboard>
