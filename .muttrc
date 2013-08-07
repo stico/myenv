@@ -1,6 +1,37 @@
+# Mail 163 - Works 2013-08-06 - need .msmtprc
 #set sendmail="/usr/bin/msmtp"
 set sendmail=`which msmtp`
 set use_from=yes
 set realname="myenv_notify"
 set from=myenv_notify@163.com
 set envelope_from=yes
+
+# Mail google - Works 2013-08-06 - alone
+#set imap_user = "ouyzhu@gmail.com"
+##set imap_pass = ""
+#set smtp_url = "smtp://ouyzhu@smtp.gmail.com:587/"
+##set smtp_pass = ""
+#set from = "ouyzhu@gmail.com"
+#set realname = "Ouyang Zhu"
+#set folder = "imaps://imap.gmail.com:993"
+#set spoolfile = "+INBOX"
+#set postponed="+[Gmail]/Drafts"
+#set header_cache=~/.mutt/cache/headers
+#set message_cachedir=~/.mutt/cache/bodies
+#set certificate_file=~/.mutt/certificates
+#set move = no
+
+# Mail 163 - Works 2013-08-06 - alone
+#set imap_user = "myenv_notify@163.com"
+#set imap_pass = "myenv_notify123"
+#set smtp_url = "smtp://myenv_notify@smtp.163.com:25"
+#set smtp_pass = "myenv_notify123"
+#set from = "myenv_notify@163.com"
+#set realname = "myenv_notify"
+#set folder = "imap://imap.163.com:143"
+#set spoolfile = "+INBOX"
+#set postponed="=Drafts"
+#set header_cache=~/.mutt/cache/headers
+#set message_cachedir=~/.mutt/cache/bodies
+#set certificate_file=~/.mutt/certificates
+#set move = no
