@@ -58,7 +58,7 @@ dgitcommitpushrepo	"func_git_commit_push %MY_CODE_REPO%"
 			# Head: e - myenv 
 egf			"func_gen_grep_result_myenv"
 eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
-ebackup			"func_me_fl_gen; func_backup_listed myenv_full %MY_ENV%/list/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
+ebackup			"func_me_fl_gen; func_backup_listed myenv_full %MY_ENV%/zgen/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
 eload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 ehostsupdate		"sudo -E bash hosts_append.sh"
 ecd			"func_cd %MY_ENV%"

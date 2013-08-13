@@ -1,4 +1,4 @@
-
+#!/bin/bash
 source=$MY_DOC/DCB/SoftwareConf/SecureCRT/Config/Sessions
 target=$MY_ENV_SECU/hosts.lst
 

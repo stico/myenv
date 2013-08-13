@@ -318,7 +318,7 @@ function func_gen_list {
 function func_me_fl_gen_grep {
 
 	filelist_all=$MY_ENV/.fl_me.txt
-	filelist_git=$MY_ENV/list/myenv_fl_git1.lst
+	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
 
 	[ -e $filelist_all ] && return 0
 
@@ -336,8 +336,8 @@ function func_me_fl_gen_grep {
 function func_me_fl_gen { 
 	src_git=$HOME/.git
 	src_add=$MY_ENV/list/myenv_fl_add.lst
-	target=$MY_ENV/list/myenv_fl_git1.lst
-	target_small=$MY_ENV/list/myenv_fl_git2.lst
+	target=$MY_ENV/zgen/myenv_fl_git1.lst
+	target_small=$MY_ENV/zgen/myenv_fl_git2.lst
 
 	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists, pls check!" && exit 1
 
@@ -781,7 +781,7 @@ function func_backup_dated {
 
 function func_backup_listed { 
 	# TODO: merge with dated_backup?
-	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/list/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
+	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/zgen/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
 
 	usage="Usage: $FUNCNAME <tag> <filelists>*"
 	[ $# -lt 2 ] && echo $usage && return 1
