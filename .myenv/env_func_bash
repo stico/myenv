@@ -319,6 +319,7 @@ function func_me_fl_gen_grep {
 
 	filelist_all=$MY_ENV/.fl_me.txt
 	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
+	src_add=$MY_ENV/list/myenv_fl_add.lst
 
 	[ -e $filelist_all ] && return 0
 
@@ -408,11 +409,7 @@ function func_gen_grep_result {
 	sed -e "/$filelist$/d"		| \
 	# Step: grep result, -I is not match binary files
 	#xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | grep --color -i "$search"
-	xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
-
-	#echo -----$options
-	#echo -----$search
-	#echo xargs --delimiter="\n" grep -I -i $options "$search" 
+	xargs --delimiter="\n" grep -d skip -I -i $options "$search" | tee $grep_result | sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
 
 	# Jump back
 	\cd -
