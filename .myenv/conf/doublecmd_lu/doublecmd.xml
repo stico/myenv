@@ -254,7 +254,7 @@
     <WipePassNumber>1</WipePassNumber>
     <DropReadOnlyFlag>True</DropReadOnlyFlag>
     <ProcessComments>True</ProcessComments>
-    <RenameSelOnlyName>False</RenameSelOnlyName>
+    <RenameSelOnlyName>True</RenameSelOnlyName>
     <ShowCopyTabSelectPanel>False</ShowCopyTabSelectPanel>
     <UseTrash>True</UseTrash>
     <SkipFileOpError>False</SkipFileOpError>
@@ -342,7 +342,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Desktop/</Path>
+                  <Path>/home/ouyangzhu/.dbus/session-bus/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -366,7 +366,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/</Path>
+                  <Path>/home/ouyangzhu/dev/code_dw/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -380,7 +380,7 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>8</ActiveTab>
+        <ActiveTab>0</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
@@ -411,7 +411,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/</Path>
+                  <Path>/home/ouyangzhu/.myenv/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -493,7 +493,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/A_Report/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -558,14 +558,14 @@
             <Sortings>
               <Sorting>
                 <Direction>1</Direction>
-                <Function>0</Function>
+                <Function>11</Function>
               </Sorting>
             </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/amp/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -800,8 +800,8 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>478</Left>
-      <Top>418</Top>
+      <Left>18</Left>
+      <Top>26</Top>
       <Width>1106</Width>
       <Height>484</Height>
       <Maximized>False</Maximized>
