@@ -33,12 +33,12 @@
     <Foreground>536870912</Foreground>
     <Background>16777215</Background>
     <Background2>16777215</Background2>
-    <Mark>255</Mark>
-    <Cursor>-2147483635</Cursor>
+    <Mark>15780518</Mark>
+    <Cursor>16711680</Cursor>
     <CursorText>-2147483634</CursorText>
-    <UseInvertedSelection>False</UseInvertedSelection>
+    <UseInvertedSelection>True</UseInvertedSelection>
     <InactivePanelBrightness>96</InactivePanelBrightness>
-    <UseFrameCursor>False</UseFrameCursor>
+    <UseFrameCursor>True</UseFrameCursor>
     <FreeSpaceIndicator>
       <ForeColor>0</ForeColor>
       <BackColor>16777215</BackColor>
@@ -140,7 +140,7 @@
   <Behaviours>
     <GoToRoot>False</GoToRoot>
     <RunInTerminal>xterm -e sh -c</RunInTerminal>
-    <RunTerminal>xterm</RunTerminal>
+    <RunTerminal>xfce4-terminal</RunTerminal>
     <OnlyOneAppInstance>True</OnlyOneAppInstance>
     <LynxLike>True</LynxLike>
     <FileSizeFormat>0</FileSizeFormat>
@@ -155,7 +155,7 @@
     </Mouse>
     <AutoFillColumns>False</AutoFillColumns>
     <AutoSizeColumn>1</AutoSizeColumn>
-    <DateTimeFormat>dd.mm.yy</DateTimeFormat>
+    <DateTimeFormat>yyyy/mm/dd hh:mm:ss</DateTimeFormat>
     <CutTextToColumnWidth>True</CutTextToColumnWidth>
     <ShowSystemFiles>True</ShowSystemFiles>
     <ListFilesInThread>True</ListFilesInThread>
@@ -187,28 +187,28 @@
   </Tools>
   <Fonts>
     <Main>
-      <Name>Microsoft YaHei Mono</Name>
+      <Name>Monospace</Name>
       <Size>10</Size>
       <Style>0</Style>
     </Main>
     <Editor>
       <Name>Monospace</Name>
-      <Size>14</Size>
+      <Size>10</Size>
       <Style>0</Style>
     </Editor>
     <Viewer>
       <Name>Monospace</Name>
-      <Size>14</Size>
+      <Size>10</Size>
       <Style>0</Style>
     </Viewer>
     <Log>
       <Name>Monospace</Name>
-      <Size>12</Size>
+      <Size>10</Size>
       <Style>0</Style>
     </Log>
     <ViewerBook>
       <Name>default</Name>
-      <Size>16</Size>
+      <Size>12</Size>
       <Style>1</Style>
     </ViewerBook>
   </Fonts>
@@ -730,6 +730,69 @@
           <Background2>16777215</Background2>
           <MarkColor>255</MarkColor>
           <CursorColor>-2147483635</CursorColor>
+          <CursorText>-2147483634</CursorText>
+        </Column>
+      </Columns>
+    </ColumnsSet>
+    <ColumnsSet>
+      <Name>MyColumns_2</Name>
+      <CustomView>False</CustomView>
+      <CursorBorder Enabled="False">
+        <Color>0</Color>
+      </CursorBorder>
+      <Columns>
+        <Column>
+          <Title>Name</Title>
+          <FuncString>[DC().GETFILENAME{}]</FuncString>
+          <Width>250</Width>
+          <Align>0</Align>
+          <Font>
+            <Name>Monospace</Name>
+            <Size>10</Size>
+            <Style>0</Style>
+          </Font>
+          <Overcolor>True</Overcolor>
+          <TextColor>536870912</TextColor>
+          <Background>16777215</Background>
+          <Background2>16777215</Background2>
+          <MarkColor>15780518</MarkColor>
+          <CursorColor>16711680</CursorColor>
+          <CursorText>-2147483634</CursorText>
+        </Column>
+        <Column>
+          <Title>Size</Title>
+          <FuncString>[DC().GETFILESIZE{}]</FuncString>
+          <Width>70</Width>
+          <Align>1</Align>
+          <Font>
+            <Name>Monospace</Name>
+            <Size>10</Size>
+            <Style>0</Style>
+          </Font>
+          <Overcolor>True</Overcolor>
+          <TextColor>536870912</TextColor>
+          <Background>16777215</Background>
+          <Background2>16777215</Background2>
+          <MarkColor>15780518</MarkColor>
+          <CursorColor>16711680</CursorColor>
+          <CursorText>-2147483634</CursorText>
+        </Column>
+        <Column>
+          <Title>Date</Title>
+          <FuncString>[DC().GETFILETIME{}]</FuncString>
+          <Width>70</Width>
+          <Align>1</Align>
+          <Font>
+            <Name>Monospace</Name>
+            <Size>10</Size>
+            <Style>0</Style>
+          </Font>
+          <Overcolor>True</Overcolor>
+          <TextColor>536870912</TextColor>
+          <Background>16777215</Background>
+          <Background2>16777215</Background2>
+          <MarkColor>15780518</MarkColor>
+          <CursorColor>16711680</CursorColor>
           <CursorText>-2147483634</CursorText>
         </Column>
       </Columns>
@@ -1335,7 +1398,7 @@
       <NaturalSorting>False</NaturalSorting>
       <SortFolderMode>0</SortFolderMode>
       <NewFilesPosition>2</NewFilesPosition>
-      <UpdatedFilesPosition>2</UpdatedFilesPosition>
+      <UpdatedFilesPosition>0</UpdatedFilesPosition>
     </Sorting>
   </FilesViews>
   <Keyboard>
