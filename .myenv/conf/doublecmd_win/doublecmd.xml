@@ -33,12 +33,12 @@
     <Foreground>536870912</Foreground>
     <Background>16777215</Background>
     <Background2>16777215</Background2>
-    <Mark>255</Mark>
-    <Cursor>-2147483635</Cursor>
+    <Mark>15780518</Mark>
+    <Cursor>16711680</Cursor>
     <CursorText>-2147483634</CursorText>
-    <UseInvertedSelection>False</UseInvertedSelection>
-    <InactivePanelBrightness>96</InactivePanelBrightness>
-    <UseFrameCursor>False</UseFrameCursor>
+    <UseInvertedSelection>True</UseInvertedSelection>
+    <InactivePanelBrightness>93</InactivePanelBrightness>
+    <UseFrameCursor>True</UseFrameCursor>
     <FreeSpaceIndicator>
       <ForeColor>0</ForeColor>
       <BackColor>16777215</BackColor>
@@ -140,7 +140,7 @@
   <Behaviours>
     <GoToRoot>False</GoToRoot>
     <RunInTerminal>xterm -e sh -c</RunInTerminal>
-    <RunTerminal>xterm</RunTerminal>
+    <RunTerminal>cmd</RunTerminal>
     <OnlyOneAppInstance>True</OnlyOneAppInstance>
     <LynxLike>True</LynxLike>
     <FileSizeFormat>0</FileSizeFormat>
@@ -155,8 +155,8 @@
     </Mouse>
     <AutoFillColumns>False</AutoFillColumns>
     <AutoSizeColumn>1</AutoSizeColumn>
-    <DateTimeFormat>dd.mm.yy</DateTimeFormat>
-    <CutTextToColumnWidth>True</CutTextToColumnWidth>
+    <DateTimeFormat>yyyy/mm/dd hh:mm:ss</DateTimeFormat>
+    <CutTextToColumnWidth>False</CutTextToColumnWidth>
     <ShowSystemFiles>True</ShowSystemFiles>
     <ListFilesInThread>True</ListFilesInThread>
     <LoadIconsSeparately>True</LoadIconsSeparately>
@@ -187,28 +187,28 @@
   </Tools>
   <Fonts>
     <Main>
-      <Name>Microsoft YaHei Mono</Name>
+      <Name>Monospace</Name>
       <Size>10</Size>
       <Style>0</Style>
     </Main>
     <Editor>
       <Name>Monospace</Name>
-      <Size>14</Size>
+      <Size>10</Size>
       <Style>0</Style>
     </Editor>
     <Viewer>
       <Name>Monospace</Name>
-      <Size>14</Size>
+      <Size>10</Size>
       <Style>0</Style>
     </Viewer>
     <Log>
       <Name>Monospace</Name>
-      <Size>12</Size>
+      <Size>10</Size>
       <Style>0</Style>
     </Log>
     <ViewerBook>
       <Name>default</Name>
-      <Size>16</Size>
+      <Size>10</Size>
       <Style>1</Style>
     </ViewerBook>
   </Fonts>
@@ -254,7 +254,7 @@
     <WipePassNumber>1</WipePassNumber>
     <DropReadOnlyFlag>True</DropReadOnlyFlag>
     <ProcessComments>True</ProcessComments>
-    <RenameSelOnlyName>False</RenameSelOnlyName>
+    <RenameSelOnlyName>True</RenameSelOnlyName>
     <ShowCopyTabSelectPanel>False</ShowCopyTabSelectPanel>
     <UseTrash>True</UseTrash>
     <SkipFileOpError>False</SkipFileOpError>
@@ -281,7 +281,7 @@
     <Position>0</Position>
     <OpenedTabs>
       <Left>
-        <ActiveTab>0</ActiveTab>
+        <ActiveTab>2</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <Sortings>
@@ -332,12 +332,6 @@
         </Tab>
         <Tab>
           <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
@@ -380,14 +374,20 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>2</ActiveTab>
+        <ActiveTab>8</ActiveTab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCO\Job_Freshman\</Path>
+                  <Path>C:\Users\ouyangzhu\Desktop\Interview\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -459,7 +459,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\A_General\Freshman\</Path>
+                  <Path>E:\Documents\DCD\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -477,7 +477,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
+                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\Subyyaccount\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -495,7 +495,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\A_Report\</Path>
+                  <Path>C:\Users\ouyangzhu\Desktop\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -593,7 +593,9 @@
   <IgnoreList Enabled="False">
     <IgnoreListFile>E:/.config/doublecmd/ignorelist.txt</IgnoreListFile>
   </IgnoreList>
-  <DirectoryHotList/>
+  <DirectoryHotList>
+    <HotDir Name="DCB" Path="E:\Documents\DCB\"/>
+  </DirectoryHotList>
   <Viewer>
     <PreviewVisible>False</PreviewVisible>
     <SaveThumbnails>True</SaveThumbnails>
@@ -700,11 +702,74 @@
         </Column>
       </Columns>
     </ColumnsSet>
+    <ColumnsSet>
+      <Name>MyColumns_2</Name>
+      <CustomView>False</CustomView>
+      <CursorBorder Enabled="False">
+        <Color>0</Color>
+      </CursorBorder>
+      <Columns>
+        <Column>
+          <Title>Name</Title>
+          <FuncString>[DC().GETFILENAME{}]</FuncString>
+          <Width>250</Width>
+          <Align>0</Align>
+          <Font>
+            <Name>Monospace</Name>
+            <Size>10</Size>
+            <Style>0</Style>
+          </Font>
+          <Overcolor>True</Overcolor>
+          <TextColor>536870912</TextColor>
+          <Background>16777215</Background>
+          <Background2>16777215</Background2>
+          <MarkColor>15780518</MarkColor>
+          <CursorColor>16711680</CursorColor>
+          <CursorText>-2147483634</CursorText>
+        </Column>
+        <Column>
+          <Title>Size</Title>
+          <FuncString>[DC().GETFILESIZE{}]</FuncString>
+          <Width>70</Width>
+          <Align>1</Align>
+          <Font>
+            <Name>Monospace</Name>
+            <Size>10</Size>
+            <Style>0</Style>
+          </Font>
+          <Overcolor>True</Overcolor>
+          <TextColor>536870912</TextColor>
+          <Background>16777215</Background>
+          <Background2>16777215</Background2>
+          <MarkColor>15780518</MarkColor>
+          <CursorColor>16711680</CursorColor>
+          <CursorText>-2147483634</CursorText>
+        </Column>
+        <Column>
+          <Title>Date</Title>
+          <FuncString>[DC().GETFILETIME{}]</FuncString>
+          <Width>70</Width>
+          <Align>1</Align>
+          <Font>
+            <Name>Monospace</Name>
+            <Size>10</Size>
+            <Style>0</Style>
+          </Font>
+          <Overcolor>True</Overcolor>
+          <TextColor>536870912</TextColor>
+          <Background>16777215</Background>
+          <Background2>16777215</Background2>
+          <MarkColor>15780518</MarkColor>
+          <CursorColor>16711680</CursorColor>
+          <CursorText>-2147483634</CursorText>
+        </Column>
+      </Columns>
+    </ColumnsSet>
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>201</Left>
-      <Top>311</Top>
+      <Left>34</Left>
+      <Top>195</Top>
       <Width>980</Width>
       <Height>412</Height>
       <Maximized>False</Maximized>
@@ -774,7 +839,7 @@
       <NaturalSorting>False</NaturalSorting>
       <SortFolderMode>0</SortFolderMode>
       <NewFilesPosition>2</NewFilesPosition>
-      <UpdatedFilesPosition>2</UpdatedFilesPosition>
+      <UpdatedFilesPosition>0</UpdatedFilesPosition>
     </Sorting>
   </FilesViews>
   <Keyboard>
