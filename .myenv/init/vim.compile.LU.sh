@@ -15,6 +15,7 @@ sys_info=`func_sys_info_os_name``func_sys_info_os_ver`_`func_sys_info_os_len`
 
 # Prepare - dependencies
 sudo apt-get build-dep vim
+sudo apt-get install -y libncurses5-dev libtinfo-dev 
 sudo apt-get install -y libgtk2.0-dev libx11-dev xorg-dev	# for linuxmint (otherwise reports not GUI support and no gvim created)
 								# more: libgtk2.0-dev libx11-dev xorg-dev
 								# more? exuberant-ctags rake python-dev git-core wget sed ack-grep 

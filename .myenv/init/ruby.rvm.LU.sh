@@ -1,6 +1,8 @@
 #!/bin/bash
 #Tested on: ubuntu server 12.04/11.10 (2013-01-18)
 
+ruby_ver=ruby-2.0.0-p247 
+
 [ -e ~/.rvm ] && echo "ERROR: ~/.rvm already exist, if want reinstall, remove it" && exit
 sudo apt-get update
 sudo apt-get install -y git libsqlite3-dev nodejs
@@ -17,8 +19,8 @@ rvm autolibs enable
 
 #rvm install ruby-1.9.3-p327 --docs
 #rvm use ruby-1.9.3-p327@global --default
-rvm install ruby-2.0.0-p247 --docs
-rvm use ruby-2.0.0-p247@global --default
+rvm install $ruby_ver --docs
+rvm use $ruby_ver@global --default
 source ~/.rvm/scripts/rvm
 
 gem sources --remove https://rubygems.org/
