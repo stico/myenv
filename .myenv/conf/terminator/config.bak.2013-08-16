@@ -5,7 +5,6 @@
 [keybindings]
   cycle_prev = F1
   next_tab = <Ctrl>Tab
-  next_tab = <Ctrl>PageDown
   close_window = F1
   group_tab = F1
   resize_left = <Ctrl><Shift>Left
@@ -19,7 +18,6 @@
   zoom_in = <Ctrl>plus
   group_all = F1
   prev_tab = <Ctrl><Shift>Tab
-  prev_tab = <Ctrl>PageUp
   split_vert = <Ctrl>bar
   ungroup_all = F1
   ungroup_tab = F1
