@@ -1,5 +1,9 @@
 #!/bin/bash
 
+COMMON_ENV=env.sh
+COMMON_FUNC=common.func.sh
+COMMON_TPL_SCRIPT=common.tpl.ctrl.sh
+
 function func_pidfile_stop() {
 	usage="USAGE: $FUNCNAME <pidfile> <cmd_stop>"
 	[ "$#" -lt 2 ] && echo $usage && exit 1
@@ -20,6 +24,24 @@ function func_pidfile_stop() {
 	echo "Stopped"
 }
 
+function func_start() {
+	usage="USAGE: $FUNCNAME <base> <start_cmd>"
+	[ "$#" -lt 2 ] && echo $usage && exit 1
+
+	base=$1
+	shift
+	
+	# precheck
+	$base/bin/status.sh &> /dev/null && echo 'ERROR: already running' && exit 1
+
+	# start_cmd
+	eval $*
+
+	# postcheck
+	sleep 1
+	$base/bin/status.sh &> /dev/null && echo 'Started' || echo 'ERROR: seems failed!'
+}
+
 function func_pidfile_status() {
 	usage="USAGE: $FUNCNAME <pidfile>"
 	return_status="Return status: 0 is running, otherwise not running or error"
@@ -32,15 +54,39 @@ function func_pidfile_status() {
 	echo "Not running (pid $(cat $1) not exist)" && return 1
 }
 
-function func_append_bash_script() {
+function func_append_script() {
 	usage="USAGE: $FUNCNAME <path> <content>"
 	[ "$#" -lt 2 ] && echo $usage && exit 1
 	
 	path=$1
 	shift
 
-	[ ! -e "$path" ] && echo "#!/bin/bash" > $path && chmod u+x $path
+	# init script
+	if [ ! -e "$path" ] ; then
+		dir=`dirname $path`
+		cp $MY_ENV/ctrl/$COMMON_TPL_SCRIPT $path
+		[ ! -e "$dir/$COMMON_FUNC" ] && cp $MY_ENV/ctrl/$COMMON_FUNC $dir
+		chmod u+x $path
+	fi
+
 	echo "$*" >> $path
+}
+
+function func_append_readme() {
+	usage="USAGE: $FUNCNAME <base> <content>"
+	[ "$#" -lt 1 ] && echo $usage && exit 1
+
+	base=$1
+	readme=$base/README
+	shift
+
+	if [ ! -e "$path" ] ; then
+		cp $0 $base/z_bak
+		echo "Generation date: `date`" >> $readme
+		echo "Generation script: $0 backuped in $base/z_bak" >> $readme
+	fi
+
+	echo "$*" >> $readme
 }
 
 function func_init_data_dir() {
@@ -48,11 +94,8 @@ function func_init_data_dir() {
 	[ "$#" -lt 1 ] && echo $usage && exit 1
 
 	base=$1
-	cmd_init=$2
 	[ -d "$base" ] && echo "ERROR: $base already exist" && exit 1
-	mkdir -p $base $base/bin $base/conf $base/logs $base/bak
-
-	[ ! -z "$cmd_init" ] && eval "$cmd_init" 
+	mkdir -p $base $base/bin $base/conf $base/logs $base/z_bak $base/data
 }
 
 function func_validate_name() {
@@ -64,10 +107,20 @@ function func_validate_name() {
 }
 
 function func_validate_exist() {
-	usage="USAGE: $FUNCNAME <path>"
+	usage="USAGE: $FUNCNAME <path> <path> ..."
 	[ "$#" -lt 1 ] && echo $usage && exit 1
 	
-	[ ! -e "$1" ] && echo "ERROR: $1 not exist!" && exit 1
+	for path in $@ ; do
+		[ ! -e "$path" ] && echo "ERROR: $path not exist!" && exit 1
+	done
+}
+
+function func_validate_addr() {
+	usage="USAGE: $FUNCNAME <addr>"
+	[ "$#" -lt 1 ] && echo $usage && exit 1
+
+	#echo $1 | egrep '[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}' && echo "ERROR: <addr> ($addr) format not correct" && exit 1
+	echo $1 | egrep '[0-255]{1,3}\.[0-255]{1,3}\.[0-255]{1,3}\.[0-255]{1,3}' && echo "ERROR: <addr> ($addr) format not correct" && exit 1
 }
 
 function func_validate_port() {

@@ -1,55 +1,55 @@
 #!/bin/bash
 
 desc="Generate redis runtime dir"
-usage="USAGE: $0 <port> <name>"
+usage="USAGE: $0 <name> <port(6379)>"
 [ $# -lt 2 ] && echo -e "${desc}\n${usage}" && exit 1
 
-# Var
-port=$1
-name=$2
-base=~/data/redis/$name
+# Var - Config
+name=$1
+port=$2
+parent_base=~/data/redis
+redis_home=$MY_DEV/redis
+redis_conf=$redis_home/redis.conf
+common_func=$MY_ENV/ctrl/common.func.sh
+
+# Var - Count
+base=$parent_base/$name
+data=$base/data
+conf=$base/data/${name}.conf
 pidfile=$base/${name}.pid
 log=$base/logs/${name}.log
-redis_home=$MY_DEV/redis
 cmd_client=$redis_home/bin/redis-cli
 cmd_server=$redis_home/bin/redis-server
 
 # Util
-func=$MY_ENV/ctrl/common.me.func.sh
-[ ! -e $func ] && echo "ERROR: $func not exist" && exit 1 || source $func
+[ ! -e $common_func ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
 
 # Check
 func_validate_name $name
 func_validate_port $port
-func_validate_exist $cmd_client
-func_validate_exist $cmd_server
+func_validate_exist $cmd_client $cmd_server
 
 # Init
 func_init_data_dir $base
-start_opts=" --dir $base --pidfile $pidfile --daemonize yes"
+cp $redis_conf $conf
+
+# Prepare
+read start_opts <<-EOF
+$conf \
+--dir $data \
+--pidfile $pidfile \
+--daemonize yes
+EOF
 start_cmd="$cmd_server $start_opts &>> $log &"
-start_check="$base/bin/status.sh &> /dev/null && echo 'ERROR: already running' && exit 1"
-func_append_bash_script $base/bin/start.sh "$start_check"
-func_append_bash_script $base/bin/start.sh "$start_cmd"
-func_append_bash_script $base/bin/start.sh "sleep 1"
-func_append_bash_script $base/bin/start.sh "$base/bin/status.sh &> /dev/null && echo 'Started'"
-
-start_cli_cmd="$cmd_client -p $port"
-func_append_bash_script $base/bin/start-client.sh "$start_cli_cmd"
-
 stop_cmd="$cmd_client -p $port shutdown"
-stop_func=`type func_pidfile_stop | tail -n +2`
-func_append_bash_script $base/bin/stop.sh "$stop_func"
-func_append_bash_script $base/bin/stop.sh func_pidfile_stop "$pidfile" "$stop_cmd"
+start_cli_cmd="$cmd_client -p $port"
 
-status_cmd=`type func_pidfile_status | tail -n +2`
-func_append_bash_script $base/bin/status.sh "$status_cmd"
-func_append_bash_script $base/bin/status.sh func_pidfile_status "$pidfile"
+# Gen scripts/files
+echo 'export a=b' >> $base/bin/$COMMON_ENV
+func_append_script $base/bin/start.sh		func_start "$base" "'$start_cmd'"		# '' help func_start's output to stdout, since start_cmd usually have ">/>>" inside
+func_append_script $base/bin/stop.sh		func_pidfile_stop "$pidfile" "$stop_cmd"
+func_append_script $base/bin/status.sh		func_pidfile_status "$pidfile"
+func_append_script $base/bin/start-client.sh	"$start_cli_cmd"
 
-cp $0 $base/bak
-echo "Generation date: `date`" >> $base/README 
-echo "Generation command: $0 $*" >> $base/README 
-echo "Note: $0 backuped in $base/bak" >> $base/README 
-echo "See default values in $redis_home/redis.conf" >> $base/conf/README 
-
+func_append_readme $base "Generation command: $0 $*"
 echo "Generation success, at: $base"

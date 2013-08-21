@@ -21,7 +21,11 @@ function func_pre_check {
 	[ "`whoami`" != "ouyangzhu" ] && echo "ERROR: username is not ouyangzhu, pls check!" && exit 1
 }
 
-function func_init_dir {
+function func_init_dir_temp {
+	mkdir -p $tmp_init_dir
+}
+
+function func_init_dir_home {
 	echo ">>> INIT `date "+%H:%M:%S"`: init basic directories"
 
 	# Ensure /ext owner
@@ -34,12 +38,13 @@ function func_init_dir {
 	ext_home_data=/ext/home_data/data
 	ext_home_doc=/ext/home_data/Documents
 
-	mkdir -p $tmp_init_dir
 	mkdir -p $ext_home_doc $ext_home_data
 	mkdir -p ~/amp/download ~/amp/backup ~/amp/delete
 	
-	[ ! -h $home_doc ] && rmdir $home_doc &>> $tmp_init_log && ln -s $ext_home_doc $home_doc
-	[ ! -h $home_data ] && rmdir $home_data &>> $tmp_init_log && ln -s $ext_home_data $home_doc
+	[ ! -e "$ext_home_doc" ] && echo "ERROR: $ext_home_doc not exist!" && exit 1
+	[ ! -e "$ext_home_data" ] && echo "ERROR: $ext_home_data not exist!" && exit 1
+	[ ! -h "$home_doc" ] && rmdir $home_doc &>> $tmp_init_log && ln -s $ext_home_doc $home_doc
+	[ ! -h "$home_data" ] && rmdir $home_data &>> $tmp_init_log && ln -s $ext_home_data $home_doc
 }
 
 function func_init_sudoer {
@@ -147,6 +152,7 @@ function func_init_soft_gui {
 	# TODO - should update config together!
 		#sudo apt-get install -y doublecmd-gtk byobu
 
+	# TODO ! this not works, caused a ubuntu server version installed gui stuff
 	[ -z "$DISPLAY" ] && echo ">>> INIT `date "+%H:%M:%S"`: seems non-gui os, will not install soft works in gui" && return 0
 
 	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
@@ -257,28 +263,29 @@ function func_init_soft_basic {
 func_pre_check 
 
 # Init - basic
-func_init_dir
 func_init_sudoer
+func_init_dir_temp
+func_init_dir_home				# ony for /ext/home_data init
 func_init_apt_update_src
 func_init_apt_update_ppa
 func_init_apt_update_list
 func_init_soft_basic
 
 # Init - myenv
-func_init_link dev os_spec_lu/dev
-func_init_link .m2 os_spec_lu/m2_repo
-func_init_link program os_spec_lu/program 
+func_init_link dev os_spec_lu/dev		# ony for /ext/home_data init
+func_init_link .m2 os_spec_lu/m2_repo		# ony for /ext/home_data init
+func_init_link program os_spec_lu/program 	# ony for /ext/home_data init
 #func_init_link_doc
 #func_init_link_dev
 #func_init_link_pro
 func_init_myenv_rw
 
 # Init - soft
-func_init_soft_gui
+func_init_soft_gui				# only for gui
 func_init_soft_termial
 
 # Init - config
-func_init_config_xfce
+func_init_config_xfce				# only for linuxmint XFCE version
 
 # Last - manual stuff
 func_init_soft_manual_needed
