@@ -80,10 +80,8 @@ function func_append_readme() {
 	readme=$base/README
 	shift
 
-	if [ ! -e "$path" ] ; then
-		cp $0 $base/z_bak
+	if [ ! -e "$readme" ] ; then
 		echo "Generation date: `date`" >> $readme
-		echo "Generation script: $0 backuped in $base/z_bak" >> $readme
 	fi
 
 	echo "$*" >> $readme
@@ -95,7 +93,7 @@ function func_init_data_dir() {
 
 	base=$1
 	[ -d "$base" ] && echo "ERROR: $base already exist" && exit 1
-	mkdir -p $base $base/bin $base/conf $base/logs $base/z_bak $base/data
+	mkdir -p $base $base/bin $base/conf $base/logs $base/data
 }
 
 function func_validate_name() {

@@ -64,6 +64,9 @@ PATH		%PHP_HOME%#bin
 HTTPD_HOME	%MY_DEV%#httpd
 PATH		%HTTPD_HOME%#usr#sbin
 
+NGINX_HOME	%MY_DEV%#nginx
+PATH		%NGINX_HOME%#sbin
+
 ECLIPSE_HOME	%MY_DEV%#eclipse
 PATH		%ECLIPSE_HOME%
 
