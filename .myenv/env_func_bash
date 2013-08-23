@@ -470,6 +470,28 @@ function func_show_resp {
 	| sed -e '/^$/d'
 }
 
+function func_mvn_gen { 
+	usage="Usage: $FUNCNAME [name] [type(war/jar)]"
+	[ $# -lt 2 ] && echo $usage && return 1
+	
+	name=$1
+	type=$2
+	case "$type" in
+	war)
+		#mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+		mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeCatalog=local -DarchetypeGroupId=com.tpl.archetype -DarchetypeArtifactId=tpl-war-archetype -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false
+		mkdir -p $name/src/main/java
+		;;
+	jar)
+		mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+		mkdir -p $name/src/main/resources
+		;;
+	*)
+		echo "ERROR: type must be war/jar"
+		exit 1
+	esac
+}
+
 function func_git_pull { 
 	usage="Usage: $FUNCNAME [code_base]"
 	[[ -z $1 ]] && echo $usage && return 1

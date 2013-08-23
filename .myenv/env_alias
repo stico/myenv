@@ -38,6 +38,7 @@ vimupdateplugin		"bash %MY_ENV_INIT%#vim_plugin.sh"
 # Alias - By Topic (<topic><action><obj/arg>)
 
 svnupdate		'for dir in `find . -maxdepth 1 -type d` ; do \cd $dir > /dev/null; [ ! -e .svn ] && \cd - > /dev/null && continue ; echo "--------> Updating $dir"; svn update | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"; \cd - > /dev/null; done'
+mvngen			"func_mvn_gen"
 
 findname		"find . -name"
 findtype		"find . -type"

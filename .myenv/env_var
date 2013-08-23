@@ -61,6 +61,9 @@ PATH		%PHP_HOME%#bin
 #RUBY_HOME	%MY_DEV%#ruby
 #PATH		%RUBY_HOME%#bin
 
+HTTPD_HOME	%MY_DEV%#httpd
+PATH		%HTTPD_HOME%#usr#sbin
+
 ECLIPSE_HOME	%MY_DEV%#eclipse
 PATH		%ECLIPSE_HOME%
 
@@ -108,10 +111,10 @@ LESSCHARSET	utf-8
 		# for shell, only affects when exit shell. 
 		# You can not control "history in current shell never exceed xxx lines"
 		# HISTSIZE mean how many history commands to keep in current shell
-HISTSIZE	1000
+HISTSIZE	10000
 
 		# HISTFILESIZE mean how many history commands to keep in $HISTFILE after shell exit
-HISTFILESIZE	1000
+HISTFILESIZE	10000
 
 		# ignoredups: remove consecutive duplicate cmd
 		# erasedups: eliminate duplicates across the whole history
