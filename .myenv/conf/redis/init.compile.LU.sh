@@ -21,6 +21,10 @@ mv $redis_dir1 $redis_dir2
 cd $redis_dir2
 make
 mkdir bin
+
+target_link=${redis_dir2%-*}
+[ ! -e "$target_link" ] && ln -s $redis_dir2/ $target_link
+
 echo "INFO: Moving executables into bin dir"
 find src -iregex 'src/redis-[^.]*' -exec cp {} bin \;
 echo "INFO: Redis setup success!"

@@ -125,6 +125,9 @@ $conf_fpm
 [ -e "$target" ] && mkdir -p "$target/share/man" &> /dev/null
 [ -e "$target" ] && cp $source/php.ini-* $target && ln -s $target/php.ini-production $target/php.ini
 
+target_link=${target%-*}
+[ ! -e "$target_link" ] && ln -s $target/ $target_link
+
 exit
 
 EXTENSION_DIR="$HOME/php/share/modules" # all shared modules will be installed in ~/php/share/modules phpize binary will configure it accordingly

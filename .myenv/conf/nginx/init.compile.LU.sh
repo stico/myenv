@@ -31,3 +31,6 @@ make clean
 #--add-module=./modules/ngx_cache_purge
 ./configure --prefix=$target
 [ "$?" -eq 0 ] && make && make install 
+
+target_link=${target%-*}
+[ ! -e "$target_link" ] && ln -s $target/ $target_link

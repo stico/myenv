@@ -83,3 +83,5 @@ else
 	echo "ERROR: compile/install failed!"
 fi
 
+target_link=${target%-*}
+[ ! -e "$target_link" ] && ln -s $target/ $target_link
