@@ -1,6 +1,6 @@
 #!/bin/bash
 
-desc="Generate php runtime dir"
+desc="Generate php-fpm runtime dir"
 usage="USAGE: $0 <name> <port(80)>"
 [ $# -lt 2 ] && echo -e "${desc}\n${usage}" && exit 1
 
@@ -18,6 +18,8 @@ base=$parent_base/$name
 conf=$base/conf/
 pidfile=$base/${name}.pid
 log=$base/logs/${name}.log
+log_slow=$base/logs/${name}.slow.log
+log_error=$base/logs/${name}.error.log
 cmd_server=$php_home/php-fpm
 
 # Util
@@ -32,14 +34,24 @@ func_validate_exist $cmd_server
 func_init_data_dir $base
 cp $php_conf $conf/php.ini
 cp $php_conf_fpm $conf/php-fpm.conf
-
--------------------------------------------------
-exit
+sed -i -e "s/^user = .*/user = $(whoami)/" $conf/php-fpm.conf
+sed -i -e "s/^group = .*/group = $(whoami)/" $conf/php-fpm.conf
+sed -i -e "s/^listen = .*/listen = 0.0.0.0:$port/" $conf/php-fpm.conf
+sed -i -e "s+^;pid = .*+pid = $pidfile+" $conf/php-fpm.conf
+sed -i -e "s+^;chdir = .*+chdir = /data+" $conf/php-fpm.conf
+sed -i -e 's+^;chroot = .*+chroot = $prefix+' $conf/php-fpm.conf
+sed -i -e "s+^;slowlog = .*+slowlog = $log_slow+" $conf/php-fpm.conf
+sed -i -e "s+^;error_log = .*+error_log = $log_error+" $conf/php-fpm.conf
+sed -i -e 's+^;access.log = .*+access.log = logs/$pool.access.log+' $conf/php-fpm.conf
 
 # Prepare
-start_opts="-p $base -c conf/php.ini --fpm-config conf/php-fpm.conf --prefix $base --pid $pidfile --daemonize "
+start_opts="-p $base -c conf/php.ini \
+	--fpm-config conf/php-fpm.conf \
+	--prefix $base \
+	--daemonize"
 start_cmd="$cmd_server $start_opts &>> $log &"
-stop_cmd="$cmd_server $start_opts stop"
+#stop_cmd="$cmd_server $start_opts stop"	# seems not work
+stop_cmd='kill `cat '$pidfile'`'
 
 # Gen scripts/files
 echo 'export a=b' >> $base/bin/$COMMON_ENV
