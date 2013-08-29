@@ -11,11 +11,57 @@ let loaded_settings_of_stico = 1
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 
 """""""""""""""""""""""""""""" H1 - Input Method
-" Note: this only works with compile option +xim in GUI version
-if has("gui_running")
-	set imactivatekey=S-C-space
-	inoremap <ESC> <ESC>:set iminsert=0<CR>
-endif
+" Option 1: FCITX, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
+let g:input_toggle = 0
+function! Fcitx2en()
+   let s:input_status = system("fcitx-remote")
+   if s:input_status == 2
+      let g:input_toggle = 1
+      let l:a = system("fcitx-remote -c")
+   endif
+endfunction
+function! Fcitx2zh()
+   let s:input_status = system("fcitx-remote")
+   if s:input_status != 2 && g:input_toggle == 1
+      let l:a = system("fcitx-remote -o")
+      let g:input_toggle = 0
+   endif
+endfunction
+set ttimeoutlen=150
+call Fcitx2en()
+autocmd InsertLeave * call Fcitx2en()
+autocmd InsertEnter * call Fcitx2zh()
+
+" Option 2: ibus, Need vim-ibus interface for really usable
+" https://github.com/bouzuya/vim-ibus
+" https://github.com/eagle0701/vim-ibus
+" https://github.com/tuvistavie/dot-files/tree/master/.vim/bundle/vim-ibus
+"function! <SID>AC_IBusDisable()
+"    if ibus#is_enabled()
+"        call ibus#disable()
+"        let b:ibustoggle = 1
+"    endif
+"    set timeoutlen=1000
+"endfunction
+"function! <SID>AC_IBusRenable()
+"    if exists("b:ibustoggle")
+"        if b:ibustoggle == 1
+"            call ibus#enable()
+"            let b:ibustoggle = 0
+"            set timeoutlen=100
+"        endif
+"    else
+"        let b:ibustoggle = 0
+"    endif
+"endfunction
+"autocmd InsertLeave call <SID>AC_IBusDisable()
+"autocmd InsertEnter call <SID>AC_IBusRenable()
+
+"Option 3: need +xim, very basic and not really usable
+"if has("gui_running")
+"	set imactivatekey=S-C-space
+"	inoremap <ESC> <ESC>:set iminsert=0<CR>
+"endif
 
 """""""""""""""""""""""""""""" H1 - Syntax
 syntax on						" switch syntax highlighting on

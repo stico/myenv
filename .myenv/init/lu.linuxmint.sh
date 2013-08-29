@@ -158,7 +158,6 @@ function func_init_soft_gui {
 	echo ">>> INIT `date "+%H:%M:%S"`: install software that works in gui"
 	
 	sudo apt-get install -y xrdp rdesktop			>> $tmp_init_log	# xrdp: supports windows native remote desktop connection. rdesktop: use to connect to remote desktop (including windows)
-	sudo apt-get install -y ibus-table-wubi			>> $tmp_init_log	# sudo vi /usr/share/ibus-table/engine/table.py (set "self._chinese_mode = 2", them set hotkey and select input method in ibus preference)
 	sudo apt-get install -y vlc byobu			>> $tmp_init_log	# byobu is a better tmux
 	sudo apt-get install -y bum             		>> $tmp_init_log	# boot-up-manager
 	sudo apt-get install -y arandr             		>> $tmp_init_log	# set the screen layout, e.g for dual screen
@@ -166,6 +165,12 @@ function func_init_soft_gui {
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
 	sudo apt-get install -y pulseaudio pulseaudio-utils	>> $tmp_init_log
 	sudo apt-get install -y pavucontrol			>> $tmp_init_log
+
+	# Chinese Input Method
+	# Still need: manual part: 1) add to autostart, use the /usr/bin/ibus-daemon. 2) set hotkey and in ibus preference 3) select input method in ibus preference
+	sudo apt-get install -y ibus-table-wubi			>> $tmp_init_log	
+	sudo cp /usr/share/ibus-table/engine/table.py{,.bak}
+	sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' /usr/share/ibus-table/engine/table.py
 
 	# Virtualbox, the command will reinstall+install virtualbox, need to avoid
 	if (! command -v aptitude &>> $tmp_init_log) ; then

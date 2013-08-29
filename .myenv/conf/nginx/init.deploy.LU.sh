@@ -12,6 +12,7 @@ nginx_home=$MY_DEV/nginx
 nginx_html=$nginx_home/html
 nginx_conf=$nginx_home/conf/nginx.conf
 nginx_conf_mime=$nginx_home/conf/mime.types
+nginx_conf_fcgi=$nginx_home/conf/fastcgi_params
 common_func=$MY_ENV/ctrl/common.func.sh
 
 # Var - Count
@@ -34,6 +35,7 @@ func_validate_exist $cmd_server
 func_init_data_dir $base
 cp $nginx_conf $conf
 cp $nginx_conf_mime $conf
+cp $nginx_conf_fcgi $conf
 cp -R $nginx_html $base
 sed -i -e "/#error_log\s\+.*.log;/s/#//" $base/conf/nginx.conf 
 sed -i -e "s=#pid\s\+.*=pid `basename ${pidfile}`;=" $base/conf/nginx.conf 

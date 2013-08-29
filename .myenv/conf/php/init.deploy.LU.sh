@@ -45,9 +45,9 @@ sed -i -e "s+^;error_log = .*+error_log = $log_error+" $conf/php-fpm.conf
 sed -i -e 's+^;access.log = .*+access.log = logs/$pool.access.log+' $conf/php-fpm.conf
 
 # Prepare
-start_opts="-p $base -c conf/php.ini \
-	--fpm-config conf/php-fpm.conf \
-	--prefix $base \
+start_opts="-p $base -c conf/php.ini 
+	--fpm-config $conf/php-fpm.conf 
+	--prefix $base 
 	--daemonize"
 start_cmd="$cmd_server $start_opts &>> $log &"
 #stop_cmd="$cmd_server $start_opts stop"	# seems not work

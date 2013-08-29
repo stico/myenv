@@ -1,4 +1,5 @@
 pro=$MY_PRO
+data=$HOME/data
 
 me=$MY_ENV
 env=$MY_ENV
@@ -6,6 +7,10 @@ ahk=$MY_ENV/conf/ahk
 
 dev=$MY_DEV
 dw=$MY_DEV/code_dw
+
+amp=$MY_TMP
+tmp=$MY_TMP
+dl=$MY_TMP/download
 
 doc=$MY_DOC
 dcb=$MY_DOC/DCB
@@ -22,11 +27,7 @@ fcz=$MY_DOC/FCZ
 
 noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
 
-amp=$MY_TMP
-tmp=$MY_TMP
-dl=$MY_TMP/download
 tt=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
-
 
 # Deprecated
 #ampdl=$MY_TMP/download
