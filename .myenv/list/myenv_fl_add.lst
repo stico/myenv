@@ -22,6 +22,7 @@ $MY_DEV/eclipse/eclipse.ini
 /VirtualBox\ VMs
 /.m2/settings.xml
 /.config/autostart/
+/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
 
 # TODO: backup script will mix it with /.config/autostart/
 /etc/xdg/autostart/

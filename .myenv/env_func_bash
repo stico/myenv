@@ -204,7 +204,7 @@ function func_cd_conditional {
 
 	# otherwise just cd, use "\cd" to avoid infinite loop, since cd is hacked
 	\cd "$*"
-	func_head_cmd 10 ll
+	func_head_cmd 30 ll
 }
 
 function func_vi {

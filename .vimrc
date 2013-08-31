@@ -10,6 +10,12 @@ let loaded_settings_of_stico = 1
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 
+"""""""""""""""""""""""""""""" H1 - OS spec
+if has('gui_running') && has('unix')
+	set lines=25 columns=100
+	set guifont=XHei\ Mono\ 11
+endif
+
 """""""""""""""""""""""""""""" H1 - Input Method
 " Option 1: FCITX, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
 let g:input_toggle = 0
@@ -70,7 +76,6 @@ if has('gui_running')
 else
     set background=dark
 endif
-
 
 """""""""""""""""""""""""""""" H1 - Plugins
 call pathogen#infect()
@@ -366,7 +371,7 @@ if has("autocmd") && !exists("autocommands_loaded")
   augroup vimrcEx					" add to a group, and clean the previous cmds
   au!
 
-  autocmd FileType text setlocal textwidth=78		" set width 78 if type is text
+  "autocmd FileType text setlocal textwidth=78		" set width 78 if type is text
 
   autocmd BufReadPost *					" goto the last position last edit before quit
     \ if line("'\"") > 0 && line("'\"") <= line("$") |

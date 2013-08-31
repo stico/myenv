@@ -58,6 +58,8 @@ shopt -s histappend	# append to the history file, don't overwrite it
 shopt -s histreedit	# puts a failed history substitution back on the command line for re-editing
 #shopt -s histverify	# (caution to use it, since most system not use it, train yourself that way) puts the command to be executed after a substitution on command line as if you had typed it
 
+# INFINALITY FONT RENDERING CONFIG
+[ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh
 
 ########################## Below are just copied from example file
 

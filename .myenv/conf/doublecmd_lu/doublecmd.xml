@@ -281,7 +281,7 @@
     <Position>0</Position>
     <OpenedTabs>
       <Left>
-        <ActiveTab>3</ActiveTab>
+        <ActiveTab>0</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <Sortings>
@@ -342,7 +342,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/.dbus/session-bus/</Path>
+                  <Path>/home/ouyangzhu/Desktop/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -380,7 +380,7 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>0</ActiveTab>
+        <ActiveTab>8</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
@@ -493,7 +493,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/A_Report/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -565,7 +565,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -800,8 +800,8 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>275</Left>
-      <Top>179</Top>
+      <Left>451</Left>
+      <Top>485</Top>
       <Width>1106</Width>
       <Height>484</Height>
       <Maximized>False</Maximized>

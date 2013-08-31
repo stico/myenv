@@ -1,3 +1,4 @@
+# Settngs for fcitx input method 
 export XMODIFIERS=@im=fcitx
 export QT_IM_MODULE=xim
 export GTK_IM_MODULE=xim

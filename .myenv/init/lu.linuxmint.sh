@@ -141,6 +141,18 @@ function func_init_soft_manual_needed {
 	echo " add a backup user, remember to change its password which already have record!"
 	(( `grep -c "^ouyangzhu2:" /etc/passwd` >= 1 )) && sudo useradd -m -s /bin/bash -g sudo ouyangzhu2 && sudo passwd ouyangzhu2
 
+	# Infinality
+	echo " Infinality which improve font rendering, need some mannal check, pls install it manually"
+	# Note 1: this is for better font rendering, seems really better
+	# Note 2: (On linuxmint 15 XFCE), after this need startx manually, following cmd after apt-get install is doing this
+	#         Also make sure this line is in .bashrc: [ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh
+	# sudo add-apt-repository ppa:no1wantdthisname/ppa
+	# sudo apt-get update
+	# sudo apt-get upgrade
+	# sudo apt-get install fontconfig-infinality
+	# sudo mv /etc/profile.d/infinality-settings.sh /etc/infinality-settings.sh
+	# sudo chmod a+rx /etc/infinality-settings.sh
+
 }
 
 function func_init_soft_gui {
@@ -161,12 +173,26 @@ function func_init_soft_gui {
 	sudo apt-get install -y vlc byobu			>> $tmp_init_log	# byobu is a better tmux
 	sudo apt-get install -y bum             		>> $tmp_init_log	# boot-up-manager
 	sudo apt-get install -y arandr             		>> $tmp_init_log	# set the screen layout, e.g for dual screen
+	sudo apt-get install -y ttf-mscorefonts-installer	>> $tmp_init_log	# MS fonts
 
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
 	sudo apt-get install -y pulseaudio pulseaudio-utils	>> $tmp_init_log
 	sudo apt-get install -y pavucontrol			>> $tmp_init_log
 
-	# Chinese Input Method
+	# Chinese Input Method - Fcitx
+	sudo apt-get install -y fcitx-table-wbpy
+
+	# Fonts
+	font_sys=/usr/share/fonts/fontfiles
+	font_home=/ext/home_data/Documents/DCB/SoftwareConf/Font/
+	if [ -d "$font_home" ] ; then
+		sudo mkdir -p $font_sys	&> /dev/null
+		[ ! -e "$font_sys/XHei.TTC" ] && sudo cp XHei.TTC  $font_sys		# for vim 
+		[ ! -e "$font_sys/MSYHMONO.ttf" ] && sudo cp MSYHMONO.ttf $font_sys
+		fc-cache -fv								# update fonts 
+	fi
+
+	# Chinese Input Method - Ibus
 	# Still need: manual part: 1) add to autostart, use the /usr/bin/ibus-daemon. 2) set hotkey and in ibus preference 3) select input method in ibus preference
 	sudo apt-get install -y ibus-table-wubi			>> $tmp_init_log	
 	sudo cp /usr/share/ibus-table/engine/table.py{,.bak}
