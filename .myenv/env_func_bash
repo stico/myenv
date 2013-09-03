@@ -12,6 +12,17 @@ function func_dati {
 	date "+%Y-%m-%d_%H-%M-%S"
 }
 
+function func_bak_file {
+	usage="Usage: $FUNCNAME [filename]"
+	[ $# -lt 1 ] && echo $usage && return 1
+
+	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
+	
+	target=${1}.bak_$(func_dati)
+	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
+	[ -w "$(dirname ${1})" ] && cp "$1" $target || sudo cp "$1" $target 
+}
+
 function func_tag_value {
 	# DESC: translate a tag value, or return itself if not a tag
 
@@ -646,6 +657,27 @@ function func_terminator {
 		# both --maximise/--fullscreen are not really work
 		ssh workvm "DISPLAY=$local_ip:0.0 terminator --geometry=1910x1010+0+0 --title Gnome-Terminator&> /dev/null &" &> /dev/null
 	fi
+}
+
+function func_sys_net {
+	usage="Usage: $FUNCNAME [interface] [interval]"
+	[ $# -lt 1 ] && echo "$usage, interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') && return 1
+
+	interface=$1
+	sleep_time=${2-2}
+	rx_before=$(ifconfig $interface | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
+	tx_before=$(ifconfig $interface | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
+	while : ; do
+		sleep $sleep_time
+		rx_after=$(ifconfig $interface | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
+		tx_after=$(ifconfig $interface | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
+		rx_result=$(( (rx_after-rx_before)*8/$sleep_time ))
+		tx_result=$(( (tx_after-tx_before)*8/$sleep_time ))
+		echo -e "$(date "+%Y-%m-%d %H:%M:%S") IN: ${rx_result}/$(( ${rx_result}/1000 )) bps/kbps,\tOUT: ${tx_result}/$(( ${tx_result}/1000 )) bps/kbps"
+
+		rx_before=$rx_after
+		tx_before=$tx_after
+	done
 }
 
 function func_sys_info_os_len {

@@ -12,7 +12,31 @@
 tmp_init_dir=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`
 tmp_init_log=/tmp/os_init/`date "+%Y%m%d_%H%M%S"`/init.log
 
-# Functions
+# Functions - Util
+function func_dati {
+	date "+%Y-%m-%d_%H-%M-%S"
+}
+
+function func_bak_file {
+	usage="Usage: $FUNCNAME [filename]"
+	[ $# -lt 1 ] && echo $usage && return 1
+
+	[ ! -e "${1}" ] && echo "ERROR: $1 not exist" && exit 1
+	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
+	
+	target=${1}.bak_$(func_dati)
+	[ -w "$(dirname ${1})" ] && cp "$1" $target || sudo cp "$1" $target 
+}
+
+function func_bak_file_virgin {
+	usage="Usage: $FUNCNAME [filename]"
+	[ $# -lt 1 ] && echo $usage && return 1
+
+	sudo ls ${1}.bak* &> /dev/null && echo "backup already exist for ${1}, skip" && return 1
+	func_bak_file ${1}
+}
+
+# Functions - Action
 function func_pre_check {
 	echo ">>> INIT `date "+%H:%M:%S"`: pre condition check"
 
@@ -30,7 +54,7 @@ function func_init_dir_home {
 
 	# Ensure /ext owner
 	expect_owner=ouyangzhu:ouyangzhu
-	real_owner=`ls -l / | grep ext | awk '{print $3":"$4}'`
+	real_owner=`ls -l / | sed -e "/->/d" | grep ext | awk '{print $3":"$4}'`
 	[ "$real_owner" != "$expect_owner" ] && sudo chown -R $expect_owner /ext/ 
 
 	home_data=$HOME/data
@@ -51,61 +75,70 @@ function func_init_sudoer {
 	echo ">>> INIT `date "+%H:%M:%S"`: update /etc/sudoers password setting"
 
 	sudoers=/etc/sudoers
-	sudoers_bak=${sudoers}.bak
+	func_bak_file_virgin ${sudoers} || return 0
 
-	[ -e $sudoers_bak ] && echo "$sudoers_bak already exist, skip" && return 0
-	sudo cp $sudoers $sudoers_bak
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
 }
 
-function func_init_config_xfce {
+function func_init_config_xfce_key {
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
 
-	# without this, the Tab key not work in xrdp connection
 	config_keys=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-	sudo cp ${config_keys}{,.bak}
-	sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
+	func_bak_file_virgin ${config_keys} || return 0
 
+	# without this, the Tab key not work in xrdp connection
+	sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
+}
+
+function func_init_config_xfce_keyring {
 	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
 	dt_type=XFCE
 	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
-	[ ! -e ${gnome_keying_desktop}.bak ] && sudo cp ${gnome_keying_desktop}{,.bak}
+	func_bak_file_virgin ${gnome_keying_desktop} || return 0
+
 	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
 		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
 	else 
 		echo "INFO: $gnome_keying_desktop already contains $dt_type, ignore"
 	fi
-
 }
 
 function func_init_apt_update_src {
-	apt_source_list=/etc/apt/sources.list
-	apt_source_list_bak=${apt_source_list}.bak
+	src_files=( /etc/apt/sources.list /etc/apt/sources.list.d/official-package-repositories.list )
 
-	echo ">>> INIT `date "+%H:%M:%S"`: update $apt_source_list"
-	
-	[ -e $apt_source_list_bak ] && echo "$apt_source_list_bak already exist, skip" && return 0
-	sudo cp $apt_source_list $apt_source_list_bak
-	sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/mirrors.163.com/" $apt_source_list
+	for src_file in "${src_files[@]}"; do 
+		echo ">>> INIT `date "+%H:%M:%S"`: update $src_file"
+		func_bak_file_virgin $src_file || return 0
+		sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/mirrors.163.com/" $src_file
+	done
+}
+
+function func_init_apt_upgrade {
+	echo ">>> INIT `date "+%H:%M:%S"`: apt upgrade"
+
+	apt_upgrade_stamp=/tmp/apt-upgrade-success-stamp
+	[ ! -e $apt_upgrade_stamp ] && touch -t 197101020304 $apt_upgrade_stamp
+
+	last_stamp=$(( `date +%s` - `stat -c %Y $apt_upgrade_stamp` ))
+
+	[ -e $apt_update_stamp ] && (( $last_stamp > 86400 ))				&& \
+	sudo apt-get -y dist-upgrade >> $tmp_init_log && touch $apt_update_stamp	|| \
+	echo "last update was ${last_stamp} seconds ago, skip..."
 }
 
 function func_init_apt_update_list {
 	# TODO: if ppa updated, this need be forced, how to?
-
 	echo ">>> INIT `date "+%H:%M:%S"`: apt update software list"
 
-	apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
-	apt_update_stamp2=/tmp/update-success-stamp
+	apt_update_stamp=/tmp/apt-update-success-stamp
+	[ ! -e $apt_update_stamp ] && touch -t 197101020304 $apt_update_stamp
 
-	[ ! -e $apt_update_stamp2 ] && touch -t 197101020304 $apt_update_stamp2
-	last_update=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
-	last_update2=$(( `date +%s` - `stat -c %Y $apt_update_stamp2` ))
+	last_stamp=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
 
-	[ -e $apt_update_stamp ] && (( $last_update > 86400 ))				&& \
-	[ -e $apt_update_stamp2 ] && (( $last_update2 > 86400 ))			&& \
+	[ -e $apt_update_stamp ] && (( $last_stamp > 86400 ))				&& \
 	echo "updating apt source list..."						&& \
-	sudo apt-get update -qq && touch $apt_update_stamp2				|| \
-	echo "last update was ${last_update}/${last_update2} seconds ago, skip..."
+	sudo apt-get update -qq >> $tmp_init_log && touch $apt_update_stamp		|| \
+	echo "last update was ${last_stamp} seconds ago, skip..."
 }
 
 function func_init_link {
@@ -125,6 +158,8 @@ function func_init_link {
 function func_init_myenv_rw {
 	echo ">>> INIT `date "+%H:%M:%S"`: update myenv, support read and write"
 
+	[ -e "$MY_ENV/init/myenv.rw.LU.sh" ] && echo "$MY_ENV/init/myenv.rw.LU.sh already exist, skip" && return 0
+
 	myenv_init_rw=$tmp_init_dir/myenv.rw.LU.sh
 	myenv_init_rw_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.rw.LU.sh 
 
@@ -132,6 +167,30 @@ function func_init_myenv_rw {
 	[ ! -e "$myenv_init_rw" ] && echo "$myenv_init_rw not found, init myenv failed!" && return 1
 	bash $myenv_init_rw $tmp_init_dir
 }
+
+function func_init_soft_manual_infinality {
+	echo ">>> INIT `date "+%H:%M:%S"`: install infinality which improve font rendering, need some mannal check, pls install it manually"
+
+	setting_file=/etc/infinality-settings.sh
+	[ -e "$setting_file" ] && echo "$setting_file already exist" && return 0
+
+	# Note 1: this is for better font rendering, seems really better
+	# Note 2: (On linuxmint 15 XFCE), after this need startx manually, following cmd after apt-get install is doing this
+	#         Also make sure this line is in .bashrc: [ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh
+	sudo add-apt-repository -y ppa:no1wantdthisname/ppa
+	sudo apt-get update
+	sudo apt-get upgrade
+	sudo apt-get install fontconfig-infinality
+	sudo mv /etc/profile.d/infinality-settings.sh $setting_file
+	sudo chmod a+rx /etc/infinality-settings.sh
+
+	echo "Need logout to take effect, logout (N) [Y/N]?"
+	read -e continue                                                                                           
+	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
+	( command -v xfce4-session-logout &> /dev/null ) && xfce4-session-logout
+	( command -v gnome-session-quit &> /dev/null ) && gnome-session-quit
+	# what command for kde?
+} 
 
 function func_init_soft_manual_needed {
 	echo ">>> INIT `date "+%H:%M:%S"`: Following steps need manual op (like set password, accept agreement), continue (N) [Y/N]?"
@@ -141,18 +200,10 @@ function func_init_soft_manual_needed {
 	echo " add a backup user, remember to change its password which already have record!"
 	(( `grep -c "^ouyangzhu2:" /etc/passwd` >= 1 )) && sudo useradd -m -s /bin/bash -g sudo ouyangzhu2 && sudo passwd ouyangzhu2
 
-	# Infinality
-	echo " Infinality which improve font rendering, need some mannal check, pls install it manually"
-	# Note 1: this is for better font rendering, seems really better
-	# Note 2: (On linuxmint 15 XFCE), after this need startx manually, following cmd after apt-get install is doing this
-	#         Also make sure this line is in .bashrc: [ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh
-	# sudo add-apt-repository ppa:no1wantdthisname/ppa
-	# sudo apt-get update
-	# sudo apt-get upgrade
-	# sudo apt-get install fontconfig-infinality
-	# sudo mv /etc/profile.d/infinality-settings.sh /etc/infinality-settings.sh
-	# sudo chmod a+rx /etc/infinality-settings.sh
+	func_init_soft_manual_infinality
 
+	# Need comfirm the dialog
+	#sudo apt-get install -y --force-yes ttf-mscorefonts-installer
 }
 
 function func_init_soft_gui {
@@ -173,41 +224,41 @@ function func_init_soft_gui {
 	sudo apt-get install -y vlc byobu			>> $tmp_init_log	# byobu is a better tmux
 	sudo apt-get install -y bum             		>> $tmp_init_log	# boot-up-manager
 	sudo apt-get install -y arandr             		>> $tmp_init_log	# set the screen layout, e.g for dual screen
-	sudo apt-get install -y ttf-mscorefonts-installer	>> $tmp_init_log	# MS fonts
 
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
 	sudo apt-get install -y pulseaudio pulseaudio-utils	>> $tmp_init_log
 	sudo apt-get install -y pavucontrol			>> $tmp_init_log
 
 	# Chinese Input Method - Fcitx
-	sudo apt-get install -y fcitx-table-wbpy
+	sudo apt-get install -y fcitx-table-wbpy		>> $tmp_init_log
 
 	# Fonts
 	font_sys=/usr/share/fonts/fontfiles
 	font_home=/ext/home_data/Documents/DCB/SoftwareConf/Font/
 	if [ -d "$font_home" ] ; then
 		sudo mkdir -p $font_sys	&> /dev/null
-		[ ! -e "$font_sys/XHei.TTC" ] && sudo cp XHei.TTC  $font_sys		# for vim 
-		[ ! -e "$font_sys/MSYHMONO.ttf" ] && sudo cp MSYHMONO.ttf $font_sys
-		fc-cache -fv								# update fonts 
+		[ ! -e "$font_sys/XHei.TTC" ] && sudo cp $font_home/XHei.TTC $font_sys		# for vim 
+		[ ! -e "$font_sys/MSYHMONO.ttf" ] && sudo cp $font_home/MSYHMONO.ttf $font_sys
+		sudo chmod -R 755 $font_sys
+		fc-cache -fv					>> $tmp_init_log		# update fonts 
 	fi
 
 	# Chinese Input Method - Ibus
 	# Still need: manual part: 1) add to autostart, use the /usr/bin/ibus-daemon. 2) set hotkey and in ibus preference 3) select input method in ibus preference
+	ibus_table=/usr/share/ibus-table/engine/table.py
 	sudo apt-get install -y ibus-table-wubi			>> $tmp_init_log	
-	sudo cp /usr/share/ibus-table/engine/table.py{,.bak}
-	sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' /usr/share/ibus-table/engine/table.py
+	func_bak_file_virgin $ibus_table && sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' $ibus_table
 
 	# Virtualbox, the command will reinstall+install virtualbox, need to avoid
-	if (! command -v aptitude &>> $tmp_init_log) ; then
+	if (! command -v virtualbox &> /dev/null ) ; then
 		sudo apt-get install -y virtualbox-nonfree
 		sudo apt-get install -y virtualbox-guest-additions-iso
 		sudo usermod -a -G vboxusers ouyangzhu			# for functions like USB to work correctly
 	fi
 
 	# clipit
-	sudo apt-get install -y clipit
-	ln -s ~/.myenv/conf/clipit ~/.config/clipit
+	sudo apt-get install -y clipit				>> $tmp_init_log
+	[ ! -e ~/.config/clipit ] && ln -s ~/.myenv/conf/clipit ~/.config/clipit
 
 	# Terminator
 	terminator_conf=~/.config/terminator
@@ -270,7 +321,7 @@ function func_init_soft_termial {
 
 	sudo apt-get install -y expect unison openssh-server 	>> $tmp_init_log	# basic tools
 	sudo apt-get install -y build-essential make gcc cmake	>> $tmp_init_log	# build tools
-	sudo apt-get install -y samba smbfs			>> $tmp_init_log	# samba
+	sudo apt-get install -y samba				>> $tmp_init_log	# samba
 	sudo apt-get install -y git subversion mercurial	>> $tmp_init_log	# dev tools
 	sudo apt-get install -y tmux autossh w3m		>> $tmp_init_log	# dev tools
 	sudo apt-get install -y debconf-utils			>> $tmp_init_log	# help auto select when install software (like mysql, wine, etc)
@@ -279,8 +330,7 @@ function func_init_soft_termial {
 function func_init_soft_basic {
 	echo ">>> INIT `date "+%H:%M:%S"`: install basic softwares, aptitude/zip/unzip/linux-headers, etc"
 
-	sudo apt-get -y dist-upgrade				>> $tmp_init_log
-
+	func_init_apt_upgrade
 	sudo apt-get install -y dkms				>> $tmp_init_log
 	sudo apt-get install -y aptitude			>> $tmp_init_log
 	sudo apt-get install -y openssh-server			>> $tmp_init_log
@@ -289,6 +339,9 @@ function func_init_soft_basic {
 
 	#(! command -v aptitude &>> $tmp_init_log) && echo "install aptitude failed, pls check!" && exit 1
 }
+
+# tmp test
+#return 0
 
 # Init - pre conditions
 func_pre_check 
@@ -316,12 +369,14 @@ func_init_soft_gui				# only for gui
 func_init_soft_termial
 
 # Init - config
-func_init_config_xfce				# only for linuxmint XFCE version
+func_init_config_xfce_key			# only for linuxmint XFCE version
+func_init_config_xfce_keyring			# only for linuxmint XFCE version
 
 # Last - manual stuff
 func_init_soft_manual_needed
 
 echo "All logs goes to $tmp_init_log"
+
 exit
 
 ################################################################################
