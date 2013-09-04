@@ -14,7 +14,7 @@ sudo apt-get install -y wmctrl tk xbindkeys
 
 source $func_common
 func_bak_file $keyconf_xfce_target
-rm $keyconf_xfce_target
+mv -f $keyconf_xfce_target /tmp/
 cp $keyconf_xfce_source $keyconf_xfce_target
 
 

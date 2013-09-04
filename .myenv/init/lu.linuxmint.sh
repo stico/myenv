@@ -80,14 +80,28 @@ function func_init_sudoer {
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' $sudoers
 }
 
+function func_init_config_xfce_app {
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE applications config"
+
+	source_path=~/.myenv/conf/xfce/applications/
+	target_path=~/.local/share/applications/
+	func_bak_file_virgin ${target_path}/defaults.list || return 0
+	mv -f ${target_path}/defaults.list /tmp/
+	cp $source_path/* $target_path/* >> $tmp_init_log
+}
+
 function func_init_config_xfce_key {
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
 
-	config_keys=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-	func_bak_file_virgin ${config_keys} || return 0
-
+	source_path=~/.myenv/conf/xfce/xfce4-keyboard-shortcuts.xml
+	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+	func_bak_file_virgin ${target_path} || return 0
+	mv -f $target_path /tmp/
+	cp $source_path $target_path >> $tmp_init_log
+	
+	echo " NOTE: update XFCE shortscuts need restart to take effect!"
 	# without this, the Tab key not work in xrdp connection
-	sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
+	#sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
 }
 
 function func_init_config_xfce_keyring {
@@ -369,6 +383,7 @@ func_init_soft_gui				# only for gui
 func_init_soft_termial
 
 # Init - config
+func_init_config_xfce_app			# only for linuxmint XFCE version
 func_init_config_xfce_key			# only for linuxmint XFCE version
 func_init_config_xfce_keyring			# only for linuxmint XFCE version
 

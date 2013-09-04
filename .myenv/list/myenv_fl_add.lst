@@ -22,10 +22,10 @@ $MY_DEV/eclipse/eclipse.ini
 /VirtualBox\ VMs
 /.m2/settings.xml
 /.config/autostart/
+/.local/share/applications/
 /.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+/cygdrive/c/Users/ouyangzhu/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/reportIpAddr.bat
 
 # TODO: backup script will mix it with /.config/autostart/
 /etc/xdg/autostart/
-
-/cygdrive/c/Users/ouyangzhu/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/reportIpAddr.bat
 

@@ -174,7 +174,7 @@
     </Viewer>
     <Editor Enabled="True">
       <Path>/home/ouyangzhu/program/vim/bin/gvim</Path>
-      <Parameters/>
+      <Parameters> --servername SINGLE_VIM --remote-tab </Parameters>
       <RunInTerminal>False</RunInTerminal>
       <KeepTerminalOpen>False</KeepTerminalOpen>
     </Editor>
@@ -380,7 +380,7 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>8</ActiveTab>
+        <ActiveTab>7</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
@@ -541,7 +541,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/amp/</Path>
+                  <Path>/home/ouyangzhu/amp/2013-09-04/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -565,7 +565,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/</Path>
+                  <Path>/home/ouyangzhu/amp/download/</Path>
                 </Paths>
               </Entry>
             </History>
