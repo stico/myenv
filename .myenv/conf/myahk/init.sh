@@ -10,7 +10,7 @@ keyconf_xfce_source=$MY_ENV/conf/xfce/xfce4-keyboard-shortcuts.xml
 
 # Dependencies
 #sudo apt-get install -y tk xbindkeys-config		# for GUI dialogs, not really necessary
-sudo apt-get install -y tk xbindkeys
+sudo apt-get install -y wmctrl tk xbindkeys
 
 source $func_common
 func_bak_file $keyconf_xfce_target
@@ -18,7 +18,7 @@ rm $keyconf_xfce_target
 cp $keyconf_xfce_source $keyconf_xfce_target
 
 
-echo "Need logout to take effect, logout (N) [Y/N]?"
+echo "Need logout for XFCE keyboard settings to take effect, logout (N) [Y/N]?"
 read -e continue                                                                                           
 [ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls logout and login later" && return 1
 ( command -v xfce4-session-logout &> /dev/null ) && xfce4-session-logout --logout

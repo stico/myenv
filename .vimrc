@@ -172,7 +172,7 @@ set viminfo=						" don't want .viminfo everywhere
 
 """""""""""""""""""""""""""""" H1 - Settings - Key Charaters
 "set isfname+=32,38,40,41,44				make the { },{&},{(},{)},{,} as a part of file name, this will be useful for vim cmd gf to go to a file
-set isfname+=32						" make " " as part of filename, gf (goto file) use it
+"set isfname+=32					" make " " as part of filename, gf (goto file) use it
 "set isfname+=44					" make (,) as part of filename, gf (goto file) use it
 set isfname-=:						" make ":" NOT a part of the filename, gf (goto file) use it
 
@@ -392,7 +392,8 @@ function OnlyFileNameInTab()
 	
 	" show only the first 6 letters of the name + ..
 	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
-	let filename = fnamemodify(label,':t')
+	let filename = tabpagenr() . ":" . fnamemodify(label,':t')
+
 
 	"if want to show a short filename in the tab, use following
 	"

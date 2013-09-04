@@ -189,7 +189,7 @@ function func_vi_conditional {
 
 		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
 		# note: seems in ubuntu gui, not need "&" to make it background job
-		$vi_cmd $* 
+		$vi_cmd "$@"
 	else
 		# cygwin env: win style path + background job
 		parameters=${@:1:$(($#-1))}
@@ -237,9 +237,7 @@ function func_vi {
 	func_find_cache result_target f $base $*
 
 	# use original paramters if no target found
-	[ -n "$result_target" ] && param="$base/$result_target" || param=$*
-
-	func_vi_conditional $param
+	[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
 }
 
 function func_cd {
