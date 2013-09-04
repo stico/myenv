@@ -34,7 +34,7 @@ Capslock::Ctrl
 ^!e::		ShowHide_Window("E:\dev\eclipse\eclipse.exe", "Eclipse")
 ^!d::		ShowHide_Window("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", "Google Chrome")
 ^!s::		ShowHide_Window("E:\program\A_Network_SecureCRT_6.2.2\SecureCRT.EXE", "SecureCRT")
-^!m::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu\Microsoft Outlook 2010.lnk", "Microsoft Outlook")
+^!m::		ShowHide_Window("C:\Users\ouyangzhu\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu\Outlook 2013.lnk", "Outlook")
 
 ^+c::		AppendTo_TempCopiedRepository()
 

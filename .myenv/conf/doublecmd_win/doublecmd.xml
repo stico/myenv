@@ -281,15 +281,9 @@
     <Position>0</Position>
     <OpenedTabs>
       <Left>
-        <ActiveTab>2</ActiveTab>
+        <ActiveTab>3</ActiveTab>
         <Tab>
           <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
@@ -336,7 +330,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>C:\Users\ouyangzhu\Desktop\</Path>
+                  <Path>E:\amp\download\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -360,7 +354,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\dev\code_dw\</Path>
+                  <Path>E:\dev\code_dw\yypay_trunk\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -380,14 +374,14 @@
             <Sortings>
               <Sorting>
                 <Direction>1</Direction>
-                <Function>0</Function>
+                <Function>11</Function>
               </Sorting>
             </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>C:\Users\ouyangzhu\Desktop\Interview\</Path>
+                  <Path>E:\Documents\DCO\Job_Recruit\PaperTest_Dev_DW\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -405,7 +399,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\.myenv\</Path>
+                  <Path>E:\.myenv\secu\iptables\example\update.233\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -423,7 +417,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCB\</Path>
+                  <Path>E:\Documents\DCB\Collection_Note\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -455,6 +449,12 @@
         </Tab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
@@ -477,7 +477,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\Subyyaccount\</Path>
+                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -495,7 +495,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>C:\Users\ouyangzhu\Desktop\</Path>
+                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -768,10 +768,10 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>34</Left>
-      <Top>195</Top>
+      <Left>55</Left>
+      <Top>0</Top>
       <Width>980</Width>
-      <Height>412</Height>
+      <Height>400</Height>
       <Maximized>False</Maximized>
       <Splitter>40.3275332650972</Splitter>
     </Position>
