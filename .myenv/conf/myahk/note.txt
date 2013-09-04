@@ -1,0 +1,106 @@
+TODO
+	#TODO: fix the window title!
+	commands in xfce keyboard xml could directly use?
+	source env variable for X 
+
+RESOURCE
+	RESOURCE_XFCE_Key	$MY_ENV/conf/xfce/xfce4-keyboard-shortcuts.xml
+	
+Candidates
+	xbindkeys		binding keys
+		xbindkeys -p	reload configuration
+
+	xev			already in LM15, print contents of X events, good for detection/debug
+	xmodmap			already in LM15, seems could remap keys, lower level but powerful
+	Wmctrl			control window
+	xdotool
+	xvkbd			send keys
+	xprop			get windown properties
+	devilspie2		allowing the user to perform scripted actions on windows as they are created
+				Devil’s Pie启动之后会监视新窗口的建立，如果新建的窗口满足指定的条件则按照预定的动作设置该窗口的属性。例如最大化，总在最前面等
+	(more: recommendations in wmctrl main page)
+
+	xbindkeys-config	not used and not really necessary, helps to detect what you've pressed
+	devilspie		deprecated by devilspie2
+
+Read
+	http://www.semicomplete.com/projects/xdotool/
+	http://vickychijwani.github.io/2012/04/15/blazing-fast-application-switching-in-linux/
+	http://en.positon.org/tag/wmctrl
+	http://icyrock.com/blog/tag/wmctrl/
+	http://icyrock.com/blog/tag/xprop/
+
+Misc
+	#change title 
+	xdotool search --name "Old name" set_window --name "New name"
+
+	# get key code 
+	"xev" or "xbindkeys -k"
+
+	# Searching for a window 
+	wid=`xdotool search --name Calculator|head -1`
+
+	# Displaying the names of all windows
+	wids=`xdotool search --name ""`
+
+	# Moving windows
+	wid=`xdotool search --name Calculator|head -1`
+	eval `xdotool getwindowgeometry --shell $wid`
+	X=$(($X - 10))
+	xdotool windowmove $wid $X $Y
+
+	# maxmize/unmaxmize/toggle window
+	wid=`xdotool search --name Calculator|head -1`
+	wmctrl -ir $wid -b add,maximized_vert,maximized_horz
+	wid=`xdotool search --name Calculator|head -1`
+	wmctrl -ir $wid -b remove,maximized_vert,maximized_horz
+	wid=`xdotool search --name Calculator|head -1`
+	wmctrl -ir $wid -b toggle,maximized_vert,maximized_horz
+
+	# wmctrl是专门对窗口做操作的，xdotool是专门模拟鼠标键盘输入的。
+	http://blog.csdn.net/younggift/article/details/6170532
+
+	#"unmaximize" the window
+	wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz
+
+	#To move the currently focused window to coordinates 50,100
+	xdotool getwindowfocus windowmove 50 100
+
+	# Move window
+	wmctrl -r :ACTIVE: -e 0,$x,$y,-1,-1
+
+	# Get Window state
+	wid=`xdotool search --name Calculator|head -1`
+	xprop -id $wid _NET_WM_STATE
+
+	# show/hide window
+	wid=`xdotool search --name Calculator|head -1`
+	xdotool windowunmap $wid
+	wid=`xdotool search --name Calculator|head -1`
+	xdotool windowmap $wid
+
+	# get current window
+	wid=`xdotool getactivewindow`
+
+	# Raising wndow
+	wid=`xdotool getactivewindow`
+	xdotool windowraise $wid
+	# run or raise
+	wmctrl -x -a "$1" || $2
+
+	# Moving the active window to the other monitor (finally!)
+	wid=`xdotool getactivewindow`
+	max_state=`xprop -id $wid _NET_WM_STATE`
+	wmctrl -ir $wid -b remove,maximized_vert,maximized_horz
+	eval `xdotool getwindowgeometry --shell $wid`
+	new_x=1600
+	if [[ "$X" -ge "$new_x" ]]; then
+	  new_x=0
+	fi
+	xdotool windowmove $wid $new_x $Y
+	if [ -z "${max_state/*_NET_WM_STATE_MAXIMIZED_*/}" ]; then
+	  wmctrl -ir $wid -b add,maximized_vert,maximized_horz
+	fi
+	xdotool windowraise $wid
+
+	use xwininfo (from x11-utils) to help find the $x $y for that window

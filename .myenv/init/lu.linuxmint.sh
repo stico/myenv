@@ -186,8 +186,8 @@ function func_init_soft_manual_infinality {
 
 	echo "Need logout to take effect, logout (N) [Y/N]?"
 	read -e continue                                                                                           
-	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
-	( command -v xfce4-session-logout &> /dev/null ) && xfce4-session-logout
+	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls logout and login later" && return 1
+	( command -v xfce4-session-logout &> /dev/null ) && xfce4-session-logout --logout
 	( command -v gnome-session-quit &> /dev/null ) && gnome-session-quit
 	# what command for kde?
 } 

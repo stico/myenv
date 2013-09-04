@@ -192,8 +192,10 @@ function func_vi_conditional {
 		$vi_cmd $* 
 	else
 		# cygwin env: win style path + background job
-		[ -z "$*" ] && target="" || target=`cygpath -w "$*"`
-		( \\gvim $target & ) &> /dev/null
+		parameters=${@:1:$(($#-1))
+		target_origin=${@:$#}
+		[ -z "$target_origin" ] && target_cyg="" || target_cyg=`cygpath -w "$target_origin"`
+		( \\gvim $parameters $target_cyg & ) &> /dev/null
 	fi
 }
 

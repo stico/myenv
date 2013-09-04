@@ -2,3 +2,7 @@
 export XMODIFIERS=@im=fcitx
 export QT_IM_MODULE=xim
 export GTK_IM_MODULE=xim
+
+# Following lines makes xbindkeys config file easier 
+[ -e ~/.myenv/zgen/lu_bash/envVarAll ] && source ~/.myenv/zgen/lu_bash/envVarAll
+[ -e ~/.myenv/zgen/lu_bash/envFuncAll ] && source ~/.myenv/zgen/lu_bash/envFuncAll
