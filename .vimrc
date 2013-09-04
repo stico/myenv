@@ -18,7 +18,7 @@ endif
 
 """""""""""""""""""""""""""""" H1 - Input Method
 " Option 1: FCITX, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
-if ('fcitx-remote') && has('unix')
+if executable('fcitx-remote') && has('unix')
 	let g:input_toggle = 0
 	function! Fcitx2en()
 	   let s:input_status = system("fcitx-remote")
