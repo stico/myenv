@@ -10,13 +10,35 @@
 "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Google\ Drive/NOTE/A_A_NOTE_Schedule.txt"
   control+alt+z
 
-"xbindkeys_show"
+"/usr/bin/wmctrl -a 'Double Commander' || ~/program/doublecmd/doublecmd"
+  control+alt+f
+
+"/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
+  control+alt+d
+
+"/usr/bin/wmctrl -a '/bin/bash' || /usr/bin/terminator"
   control+alt+x
+
+"/usr/bin/wmctrl -a 'w7vm'"
+  control+alt+w
+
+"/usr/bin/xfce4-appfinder"
+  control+shift+z
+
+"/usr/bin/wmctrl -c :ACTIVE:"
+  alt+x
+
+"/usr/bin/wmctrl -c :ACTIVE: -b toggle,maximized_vert,maximized_horz"
+  alt+z
+
+# m:0x50 is "windows key" detect by "xbindkeys -k"
+"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
+  m:0x50+e
 
 # Examples
 # specify a mouse button
-"xbindkeys_show"
-  control + b:2
+#"xbindkeys_show"
+#  control + b:2
 
 ###########################
 # below are gen by "xbindkeys -d", everything below are commented

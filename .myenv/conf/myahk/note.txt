@@ -6,13 +6,27 @@ TODO
 RESOURCE
 	RESOURCE_XFCE_Key	$MY_ENV/conf/xfce/xfce4-keyboard-shortcuts.xml
 	
+Action
+	.xbindkeysrc
+		close
+		run or raise
+		quick text files
+		maximize/restore
+	
+	xfce4-keyboard-shortcuts.xml (XFCE's Window Manager > Keyboard)
+		app finder
+		cycle between window
+		tile window to top/bottom/left/right
+
 Candidates
+	Wmctrl			control window
 	xbindkeys		binding keys
 		xbindkeys -p	reload configuration
 
+	PyTyle			tile window tool,严格说来不是一个独立的窗口管理器，它是一个辅助整理窗口的python脚本，任何窗口或者系统应该都可以使用。使用很简单：运行之后，按Alt-A，窗口就整理好了。默认是：一个窗口，全屏大小;两个平分;三个以上，左边窗口不变（此处为你的当前运行窗口），右边按比例缩小从上至下排列。
+	x-tile			tile window in many ways, BUT not work on LM15 XFCE
 	xev			already in LM15, print contents of X events, good for detection/debug
 	xmodmap			already in LM15, seems could remap keys, lower level but powerful
-	Wmctrl			control window
 	xdotool
 	xvkbd			send keys
 	xprop			get windown properties
@@ -31,6 +45,9 @@ Read
 	http://icyrock.com/blog/tag/xprop/
 
 Misc
+	# move window 
+	wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz && wmctrl -r :ACTIVE: -e 0,0,0,500,500
+
 	#change title 
 	xdotool search --name "Old name" set_window --name "New name"
 
@@ -85,8 +102,6 @@ Misc
 	# Raising wndow
 	wid=`xdotool getactivewindow`
 	xdotool windowraise $wid
-	# run or raise
-	wmctrl -x -a "$1" || $2
 
 	# Moving the active window to the other monitor (finally!)
 	wid=`xdotool getactivewindow`

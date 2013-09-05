@@ -1,30 +1,49 @@
 [global_config]
   title_transmit_bg_color = "#91aff5"
   dbus = True
-  inactive_color_offset = 0.77
 [keybindings]
-  go_up = <Ctrl><Shift>k
-  go_left = <Ctrl><Shift>h
-  go_down = <Ctrl><Shift>j
-  go_right = <Ctrl><Shift>l
-  resize_up = <Ctrl><Shift>Up
+  cycle_prev = <Ctrl><Shift>p
+  close_window = ""
+  next_tab = <Ctrl>Page_Down
+  prev_tab = <Ctrl>Page_Up
+  group_tab = ""
   resize_left = <Ctrl><Shift>Left
-  resize_down = <Ctrl><Shift>Down
-  resize_right = <Ctrl><Shift>Right
+  reset_clear = ""
+  go_right = <Ctrl><Shift>l
   new_tab = <Ctrl>T
+  resize_right = <Ctrl><Shift>Right
+  resize_down = <Ctrl><Shift>Down
   toggle_zoom = <Ctrl>m
   scaled_zoom = <Ctrl><Shift>m
   zoom_in = <Ctrl>plus
-  zoom_out = <Ctrl>minus
-  zoom_normal = <Ctrl>0
+  group_all = ""
+  move_tab_right = ""
   split_vert = <Ctrl>bar
-  split_horiz = <Ctrl>underscore
+  ungroup_all = ""
+  ungroup_tab = ""
   paste = <Shift>Insert
+  cycle_next = <Ctrl><Shift>n
+  zoom_out = <Ctrl>minus
+  close_term = ""
+  new_terminator = ""
+  go_left = <Ctrl><Shift>h
+  copy = ""
+  hide_window = ""
+  reset = ""
+  go_up = <Ctrl><Shift>k
+  resize_up = <Ctrl><Shift>Up
+  split_horiz = <Ctrl>underscore
+  zoom_normal = <Ctrl>0
+  go_down = <Ctrl><Shift>j
+  new_window = ""
+  move_tab_left = ""
+  toggle_scrollbar = ""
 [profiles]
   [[default]]
     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
     font = Consolas 11
     background_image = None
+    background_darkness = 0.53
     scrollback_lines = 5000
     use_system_font = False
     foreground_color = "#839496"
@@ -47,7 +66,7 @@
     [[[window0]]]
       type = Window
       parent = ""
-      #profile = solarized-dark
+    #profile = solarized-dark
     [[[child1]]]
       type = Terminal
       parent = window0
@@ -65,31 +84,12 @@
       type = Terminal
       order = 0
       parent = child1
-      command = "ping 8.8.8.8"
+      command = ping 8.8.8.8
     [[[terminal2]]]
       type = Terminal
       order = 1
       parent = child1
-      command = "ping 4.2.2.1"
-  [[t2v]]
-    [[[child0]]]
-      type = Window
-      order = 0
-      parent = ""
-    [[[child1]]]
-      type = HPaned
-      order = 0
-      parent = child0
-    [[[terminal1]]]
-      type = Terminal
-      order = 0
-      parent = child1
-      command = "ping 8.8.8.8"
-    [[[terminal2]]]
-      type = Terminal
-      order = 1
-      parent = child1
-      command = "ping 4.2.2.1"
+      command = ping 4.2.2.1
   [[t4]]
     [[[child0]]]
       type = Window
@@ -111,20 +111,39 @@
       type = Terminal
       order = 0
       parent = child2
-      command = "ping 8.8.8.8"
+      command = ping 8.8.8.8
     [[[terminal2]]]
       type = Terminal
       order = 1
       parent = child2
-      command = "ping 4.2.2.1"
+      command = ping 4.2.2.1
     [[[terminal3]]]
       type = Terminal
       order = 0
       parent = child3
-      command = "top"
+      command = top
     [[[terminal4]]]
       type = Terminal
       order = 1
       parent = child3
-      command = "ping localhost"
+      command = ping localhost
+  [[t2v]]
+    [[[child0]]]
+      type = Window
+      order = 0
+      parent = ""
+    [[[child1]]]
+      type = HPaned
+      order = 0
+      parent = child0
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child1
+      command = ping 8.8.8.8
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child1
+      command = ping 4.2.2.1
 [plugins]

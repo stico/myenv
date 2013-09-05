@@ -90,6 +90,15 @@ function func_init_config_xfce_app {
 	cp $source_path/* $target_path/* >> $tmp_init_log
 }
 
+function func_init_config_xfce_wm {
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE config"
+
+	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+	func_bak_file_virgin ${target_path} || return 0
+
+	sed -i -e '/workspace_count/s/value="."/value="1"/' $target_path
+}
+
 function func_init_config_xfce_key {
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
 
@@ -99,7 +108,6 @@ function func_init_config_xfce_key {
 	mv -f $target_path /tmp/
 	cp $source_path $target_path >> $tmp_init_log
 	
-	echo " NOTE: update XFCE shortscuts need restart to take effect!"
 	# without this, the Tab key not work in xrdp connection
 	#sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
 }
@@ -115,6 +123,15 @@ function func_init_config_xfce_keyring {
 	else 
 		echo "INFO: $gnome_keying_desktop already contains $dt_type, ignore"
 	fi
+}
+
+function func_init_config_xfce {
+	func_init_config_xfce_wm
+	func_init_config_xfce_app
+	func_init_config_xfce_key
+	func_init_config_xfce_keyring
+
+	echo " NOTE: update XFCE shortscuts need restart to take effect!"
 }
 
 function func_init_apt_update_src {
@@ -383,9 +400,7 @@ func_init_soft_gui				# only for gui
 func_init_soft_termial
 
 # Init - config
-func_init_config_xfce_app			# only for linuxmint XFCE version
-func_init_config_xfce_key			# only for linuxmint XFCE version
-func_init_config_xfce_keyring			# only for linuxmint XFCE version
+func_init_config_xfce				# only for linuxmint XFCE version
 
 # Last - manual stuff
 func_init_soft_manual_needed
