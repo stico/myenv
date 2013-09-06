@@ -19,8 +19,14 @@
 "/usr/bin/wmctrl -a '/bin/bash' || /usr/bin/terminator"
   control+alt+x
 
+"~/.myenv/conf/myahk/myahk_script_hotstring.sh"
+  control+alt+h
+
 "/usr/bin/wmctrl -a 'w7vm'"
   control+alt+w
+
+"/usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt"
+  control+shift+c
 
 "/usr/bin/xfce4-appfinder"
   control+shift+z
@@ -31,9 +37,14 @@
 "/usr/bin/wmctrl -c :ACTIVE: -b toggle,maximized_vert,maximized_horz"
   alt+z
 
+"wmctrl -k on"
+  control+shift+alt+d
+
 # m:0x50 is "windows key" detect by "xbindkeys -k"
 "/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
   m:0x50+e
+"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
+  control+shift+alt+e
 
 # Examples
 # specify a mouse button

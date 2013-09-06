@@ -28,6 +28,8 @@ fcz=$MY_DOC/FCZ
 noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
 
 tt=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
+td=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
+tm=`tt_dir=$MY_TMP/$(date '+%Y-%m');mkdir -p $tt_dir;echo $tt_dir`
 
 # Deprecated
 #ampdl=$MY_TMP/download
