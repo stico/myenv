@@ -200,7 +200,7 @@ function func_vi_conditional {
 		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
 		# note: seems in ubuntu gui, not need "&" to make it background job
 		#$vi_cmd "$@"
-		$vi_cmd --servername SINGLE_VIM --remote-tab "$@"
+		$vi_cmd --version | grep -q '+clientserver' && $vi_cmd --servername SINGLE_VIM --remote-tab "$@" || $vi_cmd "$@"
 	else
 		# cygwin env: win style path + background job
 		parameters=${@:1:$(($#-1))}
