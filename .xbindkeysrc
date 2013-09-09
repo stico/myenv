@@ -1,3 +1,5 @@
+# TODO: seems using '' for command not works, why?
+
 "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt"
   control+alt+c
 
@@ -25,7 +27,13 @@
 "/usr/bin/wmctrl -a 'w7vm'"
   control+alt+w
 
-"/usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt"
+# Version 1: Not works:			sh -c "copied=\"$(/usr/bin/xclip -o)\" && echo \"$copied\" >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copy to File' \"$copied\" || notify-send -t 1000 -u critical 'Copy to File' 'Copy Failed, pls check'"
+# Version 2: Works for multiple line:	sh -c "copied=$(echo '$(/usr/bin/xclip -o)') && /usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copy to File' \"$(echo '$(/usr/bin/xclip -o)')\" "
+# Version 3: Works and simple		sh -c "/usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"
+# Problem: the notify-send can not show Body when copied multiple lines
+# TODO: seems GNOME notifications is better than Ubuntu NotifyOSD notification
+#"/usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt' \"$(echo '$(/usr/bin/xclip -o)')\" "
+"target=~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt ; echo >> $target && /usr/bin/xclip -o >> $target && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"
   control+shift+c
 
 "/usr/bin/xfce4-appfinder"

@@ -14,6 +14,9 @@ case "$hotstring" in
 	"ffdati")
 		xdotool type --clearmodifiers "$(date "+%Y-%m-%d_%H-%M-%S")"
 		;;
+	"ffpay")
+		xdotool type --clearmodifiers "pay.duowan.com"
+		;;
 	*)
 		;;
 esac
