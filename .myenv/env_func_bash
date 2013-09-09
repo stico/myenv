@@ -126,10 +126,10 @@ function func_find_type_cache {
 
 	if [ "$find_type" = "d" ] ; then
 		list_file=".dl_me.txt" 
-		func_gen_list d $base $list_file
+		func_gen_list d $base $list_file || return 1
 	else
 		list_file=".fl_me.txt"
-		func_gen_list f $base $list_file
+		func_gen_list f $base $list_file || return 1
 	fi
 
 	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
@@ -167,7 +167,9 @@ function func_find_cache {
 	eval $result_var_name=""
 
 	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
-	targets=`func_find_type_cache $find_type $*`
+	targets=$(func_find_type_cache $find_type $*)
+	[ $? -ne 0 ] && return 1
+
 	func_select_line $result_var_name shortest "$targets"
 }
 
@@ -241,9 +243,8 @@ function func_vi {
 	# set base, evaluated tag or just ./
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
-	# find target
-	#func_find result_target f $base $*			# (2013-05-23) works, non cache version	
-	func_find_cache result_target f $base $*
+	# Find target, if cache version return error, try no-cache version
+	func_find_cache result_target f $base $* || func_find result_target f $base $*
 
 	# use original paramters if no target found
 	[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
@@ -262,8 +263,9 @@ function func_cd {
 	# otherwise need search
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
-	#func_find result_target d $base $*			# (2013-05-23) works, non cache version	
-	func_find_cache result_target d $base $*
+	# Find target, If cache version return error, try no-cache version
+	func_find_cache result_target d $base $* || func_find result_target d $base $*
+
 	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist! pls check"
 	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
 }
@@ -327,7 +329,8 @@ function func_gen_list {
 	find_type=$1
 	base=$2
 	listfile=$3
-	[ -e $base/$listfile ] && return 0
+	[ -e "$base/$listfile" ] && return 0
+	[ ! -w "$base" ] && return 1
 
 	# make the path relative to the base, for better compitability
 	echo "$base/$listfile not exist, create it..." 1>&2
@@ -386,7 +389,7 @@ function func_gen_grep_result {
 	filelist=.fl_me.txt
 	grep_result=.grep_me.txt
 
-	func_gen_list f $base $filelist
+	func_gen_list f $base $filelist || func_die "ERROR: failed to gen $base/$filelist"
 
 	# Get search string and options
 		# Case need handle
