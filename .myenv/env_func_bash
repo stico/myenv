@@ -12,6 +12,14 @@ function func_dati {
 	date "+%Y-%m-%d_%H-%M-%S"
 }
 
+function func_die {
+	usage="Usage: $FUNCNAME [error_info]"
+	[ $# -lt 1 ] && echo $usage && return 1
+	
+	echo "$@" 1>&2
+	exit 1
+}
+
 function func_bak_file {
 	usage="Usage: $FUNCNAME [filename]"
 	[ $# -lt 1 ] && echo $usage && return 1

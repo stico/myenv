@@ -14,18 +14,24 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || e
 # platform depended operation
 if [ "$os_cygwin" = "false" ] ; then
 
-	# init auto complete
-	complete -o nospace -F _scp scpx
-	complete -F _ssh sshx
-	`complete | grep -q " dd$"` && complete -r dd			# Check before remove, since alias conflict with /bin/dd, disable /bin/dd complete. 
-	#complete -r vi vim gvim unzip	# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
+	# Auto complete (2013-09-9, LM15 need use ssh <tab> to "init" _ssh, otherwise not work, why?)
+	complete -o default -o nospace -F _scp scpx
+	complete -o default -o nospace -F _ssh sshx
+	complete -o default -o nospace -F _ssh ssht
+	#`complete | grep -q " dd$"` && complete -r dd			# Check before remove, since alias conflict with /bin/dd, disable /bin/dd complete. 
+	#complete -r vi vim gvim unzip					# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
 
 	# set diff prompt for internal machine and external machine 
-	internetIpCount=$(/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p' | grep -v -c '\(172\.\|192\.\|10\.\|127.0.0.1\)')
-	if [ $internetIpCount -ge 1 ] ; then 
+	internetIpCount=$(/sbin/ifconfig | sed -n -e '/inet addr:/p' | grep -v -c '\(172\.\|192\.\|10\.\|127.0.0.1\)')
+	if `/sbin/ifconfig | grep -q -c 172.19.11.[12]` ; then
+		# Green line with $ in same line
+		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"
+	elif [ $internetIpCount -ge 1 ] ; then 
+		# Red line with $ in next line
 		export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"
 	else 
-		export PS1="\[\e[32m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
+		# Yellow line with $ in same line
+		export PS1="\[\e[33m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
 	fi
 else
 	export PS1="\[\e[32m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"

@@ -6,9 +6,6 @@
 # Problem: for windows, currently can not deal with this alias contains "|", ")"
 
 
-# Inbox
-sshp			"%MY_ENV_SECU%#script_sshp.sh"
-
 # Alias - Misc
 cd			"func_cd"
 vi			"func_vi"
@@ -27,6 +24,7 @@ tree			"tree -A"
 showresp		"func_show_resp"
 vihosts			"vi %LOC_HOSTS%"
 sshx			"func_ssh_with_jump"
+ssht			"ssh -p 32200"
 scpx			"func_scp_with_jump"
 translate		"func_translate"
 #mvn			"mvn -Dmaven.repo.local=${HOME}/.m2/repository"
@@ -46,8 +44,6 @@ findtype		"find . -type"
 			# Head: d - dated
 ddelete			"func_delete_dated"
 dbackup			"func_backup_dated"
-dd			"ddelete"
-db			"dbackup"
 
 			# Head: d - dev 
 dloadpyvenv		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
@@ -75,12 +71,12 @@ egitcommitpush		"func_git_commit_push %HOME%"
 			# Head: l - list 
 l			"\ls -hF --color=auto"
 ls			"\ls -hF --color=auto"
-la			"\ls -A"
-ll			"\ls -lh"
-lla			"\ls -lhA"
-llt			"\ls -lhtr"
-lld			"\ls -lh | grep '^d'"
-llf			"\ls -lh | grep -v '^d'"
+la			"\ls -hF --color=auto -A"
+ll			"\ls -hF --color=auto -lh"
+lla			"\ls -hF --color=auto -lhA"
+llt			"\ls -hF --color=auto -lhtr"
+lld			"\ls -hF --color=auto -lh | grep '^d'"
+llf			"\ls -hF --color=auto -lh | grep -v '^d'"
 
 			# Head: g - grep 
 grep			"grep --color"
