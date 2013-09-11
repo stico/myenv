@@ -51,9 +51,17 @@
 "wmctrl -k on"
   control+shift+alt+d
 
+"~/.myenv/conf/myahk/myahk_script_move_next_monitor.sh"
+  control+shift+alt+Next
+
+"~/.myenv/conf/myahk/myahk_script_move_next_monitor.sh"
+  control+shift+alt+Prior
+
 # m:0x50 is "windows key" detect by "xbindkeys -k"
 "/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
-  m:0x50+e
+  Mod2+Mod4+Super_L+e
+"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
+  Mod2+Mod4+Super_R+e
 "/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
   control+shift+alt+e
 

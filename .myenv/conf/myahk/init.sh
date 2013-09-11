@@ -10,7 +10,7 @@ keyconf_xfce_source=$MY_ENV/conf/xfce/xfce4-keyboard-shortcuts.xml
 
 # Dependencies
 #sudo apt-get install -y tk xbindkeys-config		# for GUI dialogs, not really necessary
-sudo apt-get install -y wmctrl tk xbindkeys xclip
+sudo apt-get install -y wmctrl tk xbindkeys xclip xdotool
 
 source $func_common
 func_bak_file $keyconf_xfce_target
