@@ -662,7 +662,7 @@ function func_scp_with_jump {
 function func_terminator { 
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
 		# non-cygwin env: original program
-		terminator $*
+		terminator --title SINGLE_TERMINATOR $*
 	else
 		startxwin &> /dev/null	# just ensure X server started
 		raw_data=$(ipconfig)

@@ -18,7 +18,7 @@
 "/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
   control+alt+d
 
-"/usr/bin/wmctrl -a '/bin/bash' || /usr/bin/terminator"
+"/usr/bin/wmctrl -a 'SINGLE_TERMINATOR' || /usr/bin/terminator --title SINGLE_TERMINATOR"
   control+alt+x
 
 "~/.myenv/conf/myahk/myahk_script_hotstring.sh"
