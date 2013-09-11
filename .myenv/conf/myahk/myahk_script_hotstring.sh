@@ -3,19 +3,22 @@
 hotstring=$(zenity --entry --text "Hotstirng?" --entry-text "ffdate")
 case "$hotstring" in
 	"ffdate")
-		xdotool type --clearmodifiers "$(date "+%Y-%m-%d")"
+		xdotool type --delay 0 --clearmodifiers "$(date "+%Y-%m-%d")"
 		;;
 	"fgdate")
-		xdotool type --clearmodifiers "_$(date "+%Y-%m-%d")"
+		xdotool type --delay 0 --clearmodifiers "_$(date "+%Y-%m-%d")"
 		;;
 	"fftime")
-		xdotool type --clearmodifiers "$(date "+%H-%M-%S")"
+		xdotool type --delay 0 --clearmodifiers "$(date "+%H-%M-%S")"
 		;;
 	"ffdati")
-		xdotool type --clearmodifiers "$(date "+%Y-%m-%d_%H-%M-%S")"
+		xdotool type --delay 0 --clearmodifiers "$(date "+%Y-%m-%d_%H-%M-%S")"
+		;;
+	"ffip")
+		xdotool type --delay 0 --clearmodifiers "/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'"
 		;;
 	"ffpay")
-		xdotool type --clearmodifiers "pay.duowan.com"
+		xdotool type --delay 0 --clearmodifiers "pay.duowan.com"
 		;;
 	*)
 		;;

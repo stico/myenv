@@ -154,6 +154,7 @@ set linebreak						" won't break words as wrapping a line, need wrap set
 set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
+set autochdir						" automatically change current dir
 "set shell=bash\ --login				" will source .bashrc everytime
 "set cursorcolumn					" highlight current column
 "set relativenumber

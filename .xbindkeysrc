@@ -45,6 +45,9 @@
 "/usr/bin/wmctrl -c :ACTIVE: -b toggle,maximized_vert,maximized_horz"
   alt+z
 
+"/usr/bin/wmctrl -a SINGLE_VIM"
+  alt+a
+
 "wmctrl -k on"
   control+shift+alt+d
 

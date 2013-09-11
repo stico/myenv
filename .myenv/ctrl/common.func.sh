@@ -11,6 +11,7 @@ function func_pidfile_stop() {
 	pidfile=$1
 	shift
 	cmd_stop="$*"
+	[ ! -e "$pidfile" ] && pidfile=pidfile_auto
 	[ ! -e "$pidfile" ] && echo "ERROR: pidfile not exist: $pidfile)" && exit 1
 
 	pid=$(cat $pidfile)
@@ -36,6 +37,7 @@ function func_start() {
 
 	# start_cmd
 	eval $*
+	[ $? -eq 0 ] && echo "$!" > $base/pidfile_auto
 
 	# postcheck
 	sleep 1
@@ -47,11 +49,13 @@ function func_pidfile_status() {
 	return_status="Return status: 0 is running, otherwise not running or error"
 	[ "$#" -lt 1 ] && echo -e "${usage}\n${return_status}" && exit 1
 	
-	[ ! -e "$1" ] && echo "Not running (pidfile not exist: $1)" && return 1
+	pidfile=$1
+	[ ! -e "$pidfile" ] && pidfile=pidfile_auto
+	[ ! -e "$pidfile" ] && echo "Not running (pidfile not exist: $pidfile)" && return 1
 
-	pid_info=`ps -ef | grep $(cat $1) | grep -v grep`
+	pid_info=`ps -ef | grep $(cat $pidfile) | grep -v grep`
 	[ ! -z "$pid_info" ] && echo -e "Running\n$pid_info" && return 0
-	echo "Not running (pid $(cat $1) not exist)" && return 1
+	echo "Not running (pid $(cat $pidfile) not exist)" && return 1
 }
 
 function func_append_script() {

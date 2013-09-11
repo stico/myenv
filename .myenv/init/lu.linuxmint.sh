@@ -281,7 +281,7 @@ function func_init_soft_gui {
 	func_bak_file_virgin $ibus_table && sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' $ibus_table
 
 	# Virtualbox, the command will reinstall+install virtualbox, need to avoid
-	if (! command -v virtualbox &> /dev/null ) ; then
+	if ( ! command -v virtualbox &> /dev/null ) ; then
 		sudo apt-get install -y virtualbox-nonfree
 		sudo apt-get install -y virtualbox-guest-additions-iso
 		sudo usermod -a -G vboxusers ouyangzhu			# for functions like USB to work correctly
