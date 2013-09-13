@@ -30,11 +30,12 @@ if [ "$os_cygwin" = "false" ] ; then
 		# Red line with $ in next line
 		export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"
 	else 
-		# Yellow line with $ in same line
-		export PS1="\[\e[33m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
+		# Blue line with $ in same line
+		export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"
 	fi
 else
-	export PS1="\[\e[32m\]\u@\h \[\e[33m\]\w\$\[\e[0m\]"
+	# Green line with $ in same line
+	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"
 fi
 
 # If not running interactively, don't do anything
