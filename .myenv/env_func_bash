@@ -586,7 +586,7 @@ function func_ssh_with_jump {
 	shift
 	ssh -t $JUMP_MACHINE "ssh -p $PORT $ip_addr $@"
 
-	# TODO: check the $1, if it is a ip, should not parse as hostname
+	# TODO: check the $1, if it is a ip, should not parse as unique_name
 	# TODO: add function for run cmd on multiple host
 	# Demo: func_ssh_with_jump 222.88.95.197 
 }
@@ -635,7 +635,7 @@ function func_scp_with_jump {
 	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
 
 	# Improve: the file name was changed to tmp_xxx
-	# Improve: support hostname (need translate, since the jump machine didn't set the hosts)
+	# Improve: support unique_name (need translate, since the jump machine didn't set the hosts)
 	# Improve: support file name with wildcard
 	# Improve: cache the file based on MD5?
 	# Improve: support all senario 
@@ -732,7 +732,7 @@ function func_sys_info_os_name {
 }
 
 function func_sys_info { 
-	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
+	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<unique_name>	_<addInfo>
 	# exampe: ubuntu/linuxmint/cygwin/win	_12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm	_precise
 
 	os_name=`func_sys_info_os_name`
@@ -746,7 +746,7 @@ function func_sys_info {
 	os_ver=`func_sys_info_os_ver`
 	os_len=`func_sys_info_os_len`
 	os_type=`func_sys_info_os_type`
-	hostname=`hostname`
+	unique_name=`unique_name`
 
 	# addInfo
 	if [ "$os_name" = "ubuntu" ] ; then					addInfo=`sed -n -e "s/DISTRIB_CODENAME=\(\S*\)/\L\1/p" /etc/lsb-release`
@@ -763,7 +763,7 @@ function func_sys_info {
 	fi
 	############################################################## (not include in output yet)
 
-	echo -e "${os_name}_${os_ver}_${os_len}_${os_type}_${hostname}_${addInfo}" > $cache_file
+	echo -e "${os_name}_${os_ver}_${os_len}_${os_type}_${unique_name}_${addInfo}" > $cache_file
 	cat $cache_file
 
 	# TODO: put this func to another file, pre load as basic functions
@@ -773,12 +773,12 @@ function func_translate {
 	usage="Usage: $FUNCNAME [words]"
 	[ $# -lt 1 ] && echo $usage && return 1
 
-	host_id=$(hostid)
-	[ -z "$host_id" ] && echo "WARN: command hostid return empty, pls check!"
+	unique_name=$(hostname)
+	[ -z "$unique_name" ] && echo "WARN: command hostid return empty, pls check!"
 
 	# check history
-	history_file=$MY_ENV/list/translate/history_${host_id}
-	history_txt=`grep "^$*" -A 1 $history_file`
+	history_dir=$MY_ENV/list/translate
+	history_txt=$(grep "^$*" -A 1 $history_dir/*)
 	[ -n "$history_txt" ] && echo $history_txt && return 0
 
 	# might useful fields: ie=UTF-8&oe=UTF-8
@@ -798,7 +798,7 @@ function func_translate {
 
 	echo $res_simple
 	echo $res_raw
-	echo -e "$*\t$res_simple\n\t$res_raw" >> $history_file
+	echo -e "$*\t$res_simple\n\t$res_raw" >> $history_dir/history_${unique_name}
 }
 
 function func_delete_dated { 

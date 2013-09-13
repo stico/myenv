@@ -20,6 +20,6 @@ cp $keyconf_xfce_source $keyconf_xfce_target
 
 echo "Need logout for XFCE keyboard settings to take effect, logout (N) [Y/N]?"
 read -e continue                                                                                           
-[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls logout and login later" && return 1
+[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls logout and login later" && exit 1
 ( command -v xfce4-session-logout &> /dev/null ) && xfce4-session-logout --logout
 ( command -v gnome-session-quit &> /dev/null ) && gnome-session-quit

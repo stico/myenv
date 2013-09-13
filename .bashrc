@@ -23,7 +23,7 @@ if [ "$os_cygwin" = "false" ] ; then
 
 	# set diff prompt for internal machine and external machine 
 	internetIpCount=$(/sbin/ifconfig | sed -n -e '/inet addr:/p' | grep -v -c '\(172\.\|192\.\|10\.\|127.0.0.1\)')
-	if `/sbin/ifconfig | grep -q -c 172.19.11.[12]` ; then
+	if `grep -q "bash_prompt_color=green" ~/.myenv/zgen/sys_info_local &> /dev/null` ; then
 		# Green line with $ in same line
 		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"
 	elif [ $internetIpCount -ge 1 ] ; then 
