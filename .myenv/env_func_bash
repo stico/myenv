@@ -777,9 +777,8 @@ function func_translate {
 	[ -z "$unique_name" ] && echo "WARN: command hostid return empty, pls check!"
 
 	# check history
-	history_dir=$MY_ENV/list/translate
-	history_txt=$(grep "^$*" -A 1 $history_dir/*)
-	[ -n "$history_txt" ] && echo $history_txt && return 0
+	history_txt=$(grep "^$*" -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	# might useful fields: ie=UTF-8&oe=UTF-8
 	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
@@ -798,7 +797,7 @@ function func_translate {
 
 	echo $res_simple
 	echo $res_raw
-	echo -e "$*\t$res_simple\n\t$res_raw" >> $history_dir/history_${unique_name}
+	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/list/translate_history_${unique_name}
 }
 
 function func_delete_dated { 
@@ -903,7 +902,7 @@ function func_backup_listed {
 function func_run_file_java {
 	file=$1
 	file_name=`basename $file`
-	tmp_dir=`func_tag_value tt`
+	tmp_dir=$(func_tag_value tt)/$(func_time)
 
 	cp -f $file $tmp_dir || return 1
 	\cd $tmp_dir &> /dev/null

@@ -140,6 +140,7 @@ function func_init_apt_update_src {
 	for src_file in "${src_files[@]}"; do 
 		echo ">>> INIT `date "+%H:%M:%S"`: update $src_file"
 		func_bak_file_virgin $src_file || return 0
+		# another candidate (in China, also 163's): http://ubuntu.cn99.com/ubuntu
 		sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/mirrors.163.com/" $src_file
 	done
 }

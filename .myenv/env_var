@@ -123,6 +123,9 @@ HISTFILESIZE	10000
 		# erasedups: eliminate duplicates across the whole history
 HISTCONTROL	ignoredups:erasedups
 		
+		# command start with space will not into history
+HISTIGNORE	[\ ]*
+		
 		# bash auto-complete filter the .svn path
 FIGNORE		.svn
 
