@@ -56,9 +56,11 @@ ignore = Regex DC./SyncToy_.*.dat
 ignore = Regex EC./SyncToy_.*.dat
 ignore = Regex os_spec_.*/m2_repo/repository/.cache
 ignore = Regex os_spec_win/program/A_System_Cygwin_1.7.17/tmp/.*
-#ignore = Regex os_spec_win/program/A_System_Ditto_3.18.46.0_x64/Ditto.Settings
-#ignore = Regex os_spec_win/program/A_Media_Potplayer_1.5_26107/Playlist/PotPlayerMini.dpl
-#ignore = Regex os_spec_win/program/A_System_FindAndRunRobot_2.77.02_Official-Basic/FarrTroubleshooting.log
+ignore = Regex os_spec_win/program/A_System_Ditto_3.18.46.0_x64/Ditto.Settings
+ignore = Regex os_spec_win/program/A_System_Ditto_3.18.46.0_x64/Ditto.db
+ignore = Regex os_spec_win/program/A_Media_Potplayer_1.5_26107/Playlist/PotPlayerMini.dpl
+ignore = Regex os_spec_win/program/A_System_FindAndRunRobot_2.77.02_Official-Basic/FindAndRunRobot.ini
+ignore = Regex os_spec_win/program/A_System_FindAndRunRobot_2.77.02_Official-Basic/FarrTroubleshooting.log
 
 
 ################################################################################
