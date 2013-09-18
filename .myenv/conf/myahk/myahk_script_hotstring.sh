@@ -20,6 +20,15 @@ case "$hotstring" in
 	"ffpay")
 		xdotool type --delay 0 --clearmodifiers "pay.duowan.com"
 		;;
+	"ffmain")
+		xdotool type --delay 10 --clearmodifiers '
+public class T {
+public static void main(String[] args) {
+System.out.println("hello");
+}
+}
+'
+		;;
 	*)
 		;;
 esac
