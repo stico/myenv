@@ -800,7 +800,7 @@ function func_translate {
 	[ -z "$unique_name" ] && echo "WARN: command hostid return empty, pls check!"
 
 	# check history
-	history_txt=$(grep "^$*" -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	history_txt=$(grep "^$*\s" -A 1 --no-filename $MY_ENV/list/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	# might useful fields: ie=UTF-8&oe=UTF-8

@@ -18,6 +18,8 @@ func_me=$MY_ENV/env_func_bash
 # Pre-Check
 func_validate_exist $mnt_lfs 
 func_validate_user_exist lfs
+( ! df 2> /dev/null | grep -q /mnt/lfs ) && echo "ERROR: /mnt/lfs not mount" && exit 1
+( ! df 2> /dev/null | grep -q /mnt/lfs/boot ) && echo "ERROR: /mnt/lfs/boot not mount" && exit 1
 ( ! /bin/sh --version | head -1 | grep -q "bash" ) && echo "ERROR: /bin/sh must be bash, pls check" && exit 1
 ( ! sudo fdisk -l | grep "${dev_lfs}.*18874368.*83" &> /dev/null ) && echo "ERROR: failed to find $dev_lfs"  && exit 1
 ( ! sudo fdisk -l | grep "${dev_lfs_boot}.*512000.*83" &> /dev/null ) && echo "ERROR: failed to find $dev_lfs_boot" && exit 1
