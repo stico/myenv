@@ -20,6 +20,29 @@ function func_die {
 	exit 1
 }
 
+function func_validate_exist() {
+	usage="USAGE: $FUNCNAME <path> <path> ..."
+	[ "$#" -lt 1 ] && echo $usage && exit 1
+	
+	for path in $@ ; do
+		[ ! -e "$path" ] && echo "ERROR: $path not exist!" && exit 1
+	done
+}
+
+function func_validate_user_name() {
+	usage="USAGE: $FUNCNAME <user>"
+	[ "$#" -lt 1 ] && echo $usage && exit 1
+	
+	[ "`whoami`" != "$*" ] && echo "ERROR: username is not $*, pls check!" && exit 1
+}
+
+function func_validate_user_exist() {
+	usage="USAGE: $FUNCNAME <user>"
+	[ "$#" -lt 1 ] && echo $usage && exit 1
+	
+	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist, pls check!" && exit 1
+}
+
 function func_bak_file {
 	usage="Usage: $FUNCNAME [filename]"
 	[ $# -lt 1 ] && echo $usage && return 1
