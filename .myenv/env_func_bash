@@ -290,6 +290,9 @@ function func_cd {
 	# shortcut - home
 	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
 
+	# shortcut - only one parameter, and exist in current dir
+	[ $# -eq 1 ] && [ -d $1 ] && func_cd_conditional $1 && return 0
+
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
 	[ $# -eq 1 ] && [ -d $tag_eval ] && func_cd_conditional $tag_eval && return 0
@@ -365,26 +368,7 @@ function func_gen_list {
 	\cd - &> /dev/null
 }
 
-function func_me_fl_gen_grep {
-
-	filelist_all=$MY_ENV/.fl_me.txt
-	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
-	src_add=$MY_ENV/list/myenv_fl_add.lst
-
-	[ -e $filelist_all ] && return 0
-
-	echo -e "INFO: Generating full file list to: $filelist_all"
-	[ ! -e $filelist_git ] && func_me_fl_gen
-
-	sed -e "s/^/..\//" $filelist_git > $filelist_all
-	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
-		func_path_eval candidate $line
-		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
-		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
-	done
-}
-
-function func_me_fl_gen { 
+function func_gen_list_f_me_git_only { 
 	src_git=$HOME/.git
 	src_add=$MY_ENV/list/myenv_fl_add.lst
 	target=$MY_ENV/zgen/myenv_fl_git1.lst
@@ -399,7 +383,33 @@ function func_me_fl_gen {
 	sed -e "s/\/.*//;" $target | sort -u > $target_small
 }
 
-function func_gen_grep_result {
+function func_gen_list_f_me { 
+	filelist_all=$MY_ENV/.fl_me.txt
+	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
+	src_add=$MY_ENV/list/myenv_fl_add.lst
+
+	[ -e $filelist_all ] && return 0
+
+	echo -e "INFO: Generating full file list to: $filelist_all"
+	[ ! -e $filelist_git ] && func_gen_list_f_me_git_only
+
+	sed -e "s/^/..\//" $filelist_git > $filelist_all
+	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
+		func_path_eval candidate $line
+		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
+		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
+	done
+}
+
+function func_grep_cmd {
+	func_param_check 2 "Usage: $FUNCNAME <search_str> <cmd>" "$@"
+
+	search_str=$1
+	shift
+	eval "$@" | grep "$search_str"
+}
+
+function func_grep_dir_cached {
 
 	# TODO
 	# - seems can not support grepfile "aaa\|bbb"
@@ -463,11 +473,11 @@ function func_gen_grep_result {
 	\cd -
 }
 
-function func_gen_grep_result_myenv { 
+function func_grep_myenv {
 	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
-	func_me_fl_gen_grep
-	func_gen_grep_result $MY_ENV ALL "$*"
+	func_gen_list_f_me
+	func_grep_dir_cached $MY_ENV ALL "$*"
 }
 
 function func_head {
@@ -562,7 +572,7 @@ function func_git_commit_push {
 	git commit -a -m "$*" 			&&
 	git push github				&&
 	git status 				&&
-	func_me_fl_gen				&&
+	func_gen_list_f_me			&&
 	\cd - 
 }
 
@@ -904,7 +914,7 @@ function func_backup_listed {
 	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/.fl_me.txt 
 	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/.fl_me.txt 
 
-	#func_me_fl_gen	
+	#func_gen_list_f_me	
 	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
 	#$MY_ENV/util/listed_backup.sh
 }
