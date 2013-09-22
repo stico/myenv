@@ -10,8 +10,8 @@ sudo fdisk
 
 # !!! need manual check !!!
 mnt_lfs=/mnt/lfs
-dev_lfs=/dev/sda7
-dev_lfs_boot=/dev/sda6
+dev_lfs=$(sudo fdisk -l | grep sda && echo /dev/sda7 || echo /dev/sdb7)
+dev_lfs_boot=$(sudo fdisk -l | grep sda && echo /dev/sda6 || echo /dev/sdb6)
 
 # Check
 ( ! sudo fdisk -l | grep "${dev_lfs}.*18874368.*83" &> /dev/null ) && echo "ERROR: failed to find $dev_lfs"  && exit 1

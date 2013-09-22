@@ -14,7 +14,7 @@ function func_dati {
 
 function func_die {
 	usage="Usage: $FUNCNAME [error_info]"
-	[ $# -lt 1 ] && echo $usage && return 1
+	[ $# -lt 1 ] && echo $usage && exit 1
 	
 	echo "$@" 1>&2
 	exit 1
@@ -45,7 +45,7 @@ function func_validate_user_exist() {
 
 function func_bak_file {
 	usage="Usage: $FUNCNAME [filename]"
-	[ $# -lt 1 ] && echo $usage && return 1
+	[ $# -lt 1 ] && echo $usage && exit 1
 
 	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
 	
@@ -79,7 +79,7 @@ function func_tag_value {
 
 function func_tag_eval {
 	usage="Usage: $FUNCNAME [str]"
-	[ $# -lt 1 ] && echo $usage && return 1
+	[ $# -lt 1 ] && echo $usage && exit 1
 
 	str=$*
 	# eval value if contains var or cmd substitution, otherwise return itself
@@ -94,7 +94,7 @@ function func_tag_eval {
 
 function func_path_eval {
 	usage="Usage: $FUNCNAME [result_var_name] [pathstr]"
-	[ $# -lt 2 ] && echo $usage && return 1
+	[ $# -lt 2 ] && echo $usage && exit 1
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -113,7 +113,7 @@ function func_path_eval {
 
 function func_select_line {
 	usage="Usage: $FUNCNAME [result_var_name] [shortest|userselect] [lines]"
-	[ $# -lt 3 ] && echo $usage && return 1
+	[ $# -lt 3 ] && echo $usage && exit 1
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -141,7 +141,7 @@ function func_select_line {
 function func_find_type_cache {
 	# NOTE: must keep interface consistency with func_find_type
 	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 3 ] && echo $usage && return 1
+	[ $# -lt 3 ] && echo $usage && exit 1
 
 	find_type=$1
 	base=$2
@@ -164,7 +164,7 @@ function func_find_type_cache {
 function func_find_type {
 	# NOTE: must keep interface consistency with func_find_type_cache
 	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 3 ] && echo $usage && return 1
+	[ $# -lt 3 ] && echo $usage && exit 1
 
 	find_type=$1
 	base=$2
@@ -181,7 +181,7 @@ function func_find_type {
 function func_find_cache {
 	# NOTE: must keep interface consistency with func_find
 	usage="Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 4 ] && echo $usage && return 1
+	[ $# -lt 4 ] && echo $usage && exit 1
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -199,7 +199,7 @@ function func_find_cache {
 function func_find {
 	# NOTE: must keep interface consistency with func_find_cache
 	usage="Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 4 ] && echo $usage && return 1
+	[ $# -lt 4 ] && echo $usage && exit 1
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -333,7 +333,7 @@ function func_cd_tmp_today {
 
 function func_head_cmd {
 	usage="Usage: $FUNCNAME [show_lines] [cmd]"
-	[ $# -lt 2 ] && echo $usage && return 1
+	[ $# -lt 2 ] && echo $usage && exit 1
 
 	show_lines=$1
 	shift
@@ -347,7 +347,7 @@ function func_gen_list {
 	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
 
 	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [fl_name]"
-	[ $# -lt 3 ] && echo $usage && return 1
+	[ $# -lt 3 ] && echo $usage && exit 1
 
 	find_type=$1
 	base=$2
@@ -403,7 +403,7 @@ function func_gen_grep_result {
 	# - seems can not add more options
 
 	usage="Usage: $FUNCNAME [base] [suffix] [search]*"
-	[ $# -lt 3 ] && echo $usage && return 1
+	[ $# -lt 3 ] && echo $usage && exit 1
 
 	base=$1
 	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
@@ -464,7 +464,7 @@ function func_gen_grep_result {
 
 function func_gen_grep_result_myenv { 
 	usage="Usage: $FUNCNAME [search]*"
-	[ $# -lt 1 ] && echo $usage && return 1
+	[ $# -lt 1 ] && echo $usage && exit 1
 
 	func_me_fl_gen_grep
 	func_gen_grep_result $MY_ENV ALL "$*"
@@ -472,7 +472,7 @@ function func_gen_grep_result_myenv {
 
 function func_head {
 	usage="Usage: $FUNCNAME [show_lines] [text]"
-	[ $# -lt 2 ] && echo $usage && return 1
+	[ $# -lt 2 ] && echo $usage && exit 1
 
 	show_lines=$1
 	shift
@@ -496,7 +496,7 @@ function func_ip {
 
 function func_mkdir_cd { 
 	usage="Usage: $FUNCNAME [path]"
-	[[ -z $1 ]] && echo $usage && return 1
+	[[ -z $1 ]] && echo $usage && exit 1
 
 	mkdir -p "$@" 				&&
 	# why need such complex eval?
@@ -505,7 +505,7 @@ function func_mkdir_cd {
 
 function func_show_resp { 
 	usage="Usage: $FUNCNAME [url]"
-	[[ -z $1 ]] && echo $usage && return 1
+	[[ -z $1 ]] && echo $usage && exit 1
 
 	echo "sending request to: $1"
 	wget --timeout=2 --tries=1 -O - 2>&1 "$1"	\
@@ -519,7 +519,7 @@ function func_show_resp {
 
 function func_mvn_gen { 
 	usage="Usage: $FUNCNAME [name] [type(war/jar)]"
-	[ $# -lt 2 ] && echo $usage && return 1
+	[ $# -lt 2 ] && echo $usage && exit 1
 	
 	name=$1
 	type=$2
@@ -541,7 +541,7 @@ function func_mvn_gen {
 
 function func_git_pull { 
 	usage="Usage: $FUNCNAME [code_base]"
-	[[ -z $1 ]] && echo $usage && return 1
+	[[ -z $1 ]] && echo $usage && exit 1
 
 	\cd $1		 			&&
 	git pull github master 			&&
@@ -551,7 +551,7 @@ function func_git_pull {
 
 function func_git_status { 
 	usage="Usage: $FUNCNAME [code_base]"
-	[[ -z $1 ]] && echo $usage && return 1
+	[[ -z $1 ]] && echo $usage && exit 1
 
 	\cd $1					&&	
 	git status 	
@@ -560,7 +560,7 @@ function func_git_status {
 
 function func_git_commit_push { 
 	usage="Usage: $FUNCNAME [code_base] [comment]"
-	[[ -z $1 || -z $2 ]] && echo $usage && return 1
+	[[ -z $1 || -z $2 ]] && echo $usage && exit 1
 
 	\cd $1					&& 
 	git pull github master			&&
@@ -598,7 +598,7 @@ function func_ssh_agent_init {
 
 function func_ssh_with_jump {
 	usage="Usage: $FUNCNAME [target]"
-	[[ -z $1 ]] && echo $usage && return 1
+	[[ -z $1 ]] && echo $usage && exit 1
 
 	ip_addr=`getent hosts $1 | sed "s/\s\+.*$//"`
 	[[ -z $ip_addr ]] && ip_addr=$1
@@ -616,7 +616,7 @@ function func_ssh_with_jump {
 
 function func_scp_with_jump {
 	usage="Usage: $FUNCNAME [source] [target]"
-	[[ -z $1 || -z $2 ]] && echo $usage && return 1
+	[[ -z $1 || -z $2 ]] && echo $usage && exit 1
 
 	PORT=32200
 	JUMP_MACHINE=dw
@@ -697,7 +697,7 @@ function func_terminator {
 
 function func_sys_net {
 	usage="Usage: $FUNCNAME [interface] [interval]"
-	[ $# -lt 1 ] && echo "$usage, interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') && return 1
+	[ $# -lt 1 ] && echo "$usage, interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') && exit 1
 
 	interface=$1
 	sleep_time=${2-2}
@@ -794,7 +794,7 @@ function func_sys_info {
 
 function func_translate { 
 	usage="Usage: $FUNCNAME [words]"
-	[ $# -lt 1 ] && echo $usage && return 1
+	[ $# -lt 1 ] && echo $usage && exit 1
 
 	unique_name=$(hostname)
 	[ -z "$unique_name" ] && echo "WARN: command hostid return empty, pls check!"
@@ -825,7 +825,7 @@ function func_translate {
 
 function func_delete_dated { 
 	Usage="Usage: func_delete_dated <single_file_or_dir>"
-	[ $# -ne 1 ] && echo "$Usage" && return 1
+	[ $# -ne 1 ] && echo "$Usage" && exit 1
 
 	# the path might have blank, so use $*, and embrace with "" (many place used this)
 	targetDir=$MY_TMP/`func_date`
@@ -836,7 +836,7 @@ function func_delete_dated {
 
 function func_backup_dated { 
 	Usage="Usage: func_backup_dated <single_file_or_dir>"
-	[ $# -ne 1 ] && echo "$Usage" && return 1
+	[ $# -ne 1 ] && echo "$Usage" && exit 1
 
 	srcPath="$*"
 	fileName=$(basename "$srcPath")
@@ -873,7 +873,7 @@ function func_backup_listed {
 	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/zgen/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
 
 	usage="Usage: $FUNCNAME <tag> <filelists>*"
-	[ $# -lt 2 ] && echo $usage && return 1
+	[ $# -lt 2 ] && echo $usage && exit 1
 
 	tmp_dir=$MY_TMP/$1
 	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
@@ -936,7 +936,7 @@ function func_run_file_java {
 
 function func_run_file {
 	usage="Usage: $FUNCNAME <file>"
-	[ $# -lt 1 ] && echo $usage && return 1
+	[ $# -lt 1 ] && echo $usage && exit 1
 	
 	file=$1
 	[ ! -e "$file" ] && echo "ERROR: $file not exist, pls check!" && return 1

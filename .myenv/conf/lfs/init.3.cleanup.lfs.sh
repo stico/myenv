@@ -8,8 +8,8 @@ mnt_lfs=/mnt/lfs
 mnt_lfs_boot=/mnt/lfs/boot
 mnt_lfs_tools=/mnt/lfs/tools
 mnt_lfs_sources=/mnt/lfs/sources
-dev_lfs=/dev/sda7
-dev_lfs_boot=/dev/sda6
+dev_lfs=$(sudo fdisk -l | grep sda && echo /dev/sda7 || echo /dev/sdb7)
+dev_lfs_boot=$(sudo fdisk -l | grep sda && echo /dev/sda6 || echo /dev/sdb6)
 
 # Source functions
 func_me=$MY_ENV/env_func_bash
