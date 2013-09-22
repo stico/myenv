@@ -7,13 +7,8 @@
 
 
 # Alias - Misc
-cd			"func_cd"
-vi			"func_vi"
 terminator		"func_terminator"
 eclipse			"/home/ouyangzhu/dev/eclipse/eclipse &"
-clipit			"clipit &"
-#vim			"func_vi"	# seems this will confuse the test "(command -v vim &> /dev/null) && echo vim installed"
-
 wl			"wc -l"
 df			"df -h"
 du			"du -h"
@@ -23,24 +18,15 @@ psgf			"ps -ef | grep"
 tree			"tree -A"
 tailf			"tail -f"
 showresp		"func_show_resp"
-vihosts			"vi %LOC_HOSTS%"
-sshx			"func_ssh_with_jump"
-ssht			"ssh -p 32200"
-scpx			"func_scp_with_jump"
 translate		"func_translate"
+rdesk			"rdesktop -uouyangzhu -f -r clipboard:PRIMARYCLIPBOARD -r disk:R_Amp=/home/ouyangzhu/amp,R_Doc=/home/ouyangzhu/Documents -r sound:local 172.19.11.1"
 #mvn			"mvn -Dmaven.repo.local=${HOME}/.m2/repository"
-
-vimrc			"vi %HOME%/.vimrc"
-vimcdconf		"func_cd %VIM_CONF%"
-vimupdateplugin		"bash %MY_ENV_INIT%#vim_plugin.sh"
+#clipit			"clipit &"
 
 # Alias - By Topic (<topic><action><obj/arg>)
 
 svnupdate		'for dir in `find . -maxdepth 1 -type d` ; do \cd $dir > /dev/null; [ ! -e .svn ] && \cd - > /dev/null && continue ; echo "--------> Updating $dir"; svn update | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"; \cd - > /dev/null; done'
 mvngen			"func_mvn_gen"
-
-findname		"find . -name"
-findtype		"find . -type"
 
 			# Head: d - dated
 ddelete			"func_delete_dated"
@@ -59,14 +45,18 @@ eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remoun
 ebackup			"func_me_fl_gen; func_backup_listed myenv_full %MY_ENV%/zgen/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
 eload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 ehostsupdate		"sudo -E bash hosts_append.sh"
-ecd			"func_cd %MY_ENV%"
 evivar			"vi %MY_ENV%/env_var"
 evifunc			"vi %MY_ENV%/env_func_bash"
 evialias		"vi %MY_ENV%/env_alias"
 egitpull		"func_git_pull %HOME%; eload"
 egitstatus		"func_git_status %HOME%"
 egitcommitpush		"func_git_commit_push %HOME%"
+#ecd			"func_cd %MY_ENV%"
 
+			# Head: s - ssh
+sshx			"func_ssh_with_jump"
+ssht			"ssh -p 32200"
+scpx			"func_scp_with_jump"
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list 
@@ -78,6 +68,10 @@ lla			"\ls -hF --color=auto -lhA"
 llt			"\ls -hF --color=auto -lhtr"
 lld			"\ls -hF --color=auto -lh | grep '^d'"
 llf			"\ls -hF --color=auto -lh | grep -v '^d'"
+
+			# Head: f - find
+findname		"find . -name"
+findtype		"find . -type"
 
 			# Head: g - grep 
 grep			"grep --color"
@@ -94,7 +88,15 @@ gfxml			"func_gen_grep_result ./ xml"
 gfjava			"func_gen_grep_result ./ java"
 gfproperties		"func_gen_grep_result ./ properties"
 
+			# Head: v - vi/vim
+vi			"func_vi"
+vihosts			"sudo vi %LOC_HOSTS%"
+vimrc			"vi %HOME%/.vimrc"
+vimcdconf		"func_cd %VIM_CONF%"
+vimupdateplugin		"bash %MY_ENV_INIT%#vim_plugin.sh"
+
 			# note, there are some addition work to gen cd_*, check the gen script for detail
+cd			"func_cd"
 cd2			"func_cd ../.."
 cd3			"func_cd ../../.."
 cd4			"func_cd ../../../.."
@@ -109,7 +111,8 @@ cdtmp			"func_cd %MY_TMP%"
 cdamp			"func_cd %MY_TMP%"
 cddl			"func_cd %MY_TMP%/download"
 cdpf			"func_cd %WIN_PF%"
-cdtt			"func_cd_tmp_today"
+cdtt			"func_cd tt"
+cdtm			"func_cd tm"
 
 ################################################################################
 # Depreated

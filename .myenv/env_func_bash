@@ -14,15 +14,33 @@ function func_dati {
 
 function func_die {
 	usage="Usage: $FUNCNAME [error_info]"
-	[ $# -lt 1 ] && echo $usage && exit 1
+	[ $# -lt 1 ] && echo -e "${usage}\n$@" && exit 1
 	
 	echo "$@" 1>&2
+
+	# return if invoked from command line, exit if from script. 
+	# BUT messy up invoke chain 
+	#[ "$0" = "/bin/bash" ] && return 1 || exit 1
+
+	# easy solution
 	exit 1
 }
 
+function func_param_check {
+	usage="Usage: $FUNCNAME [param_count] [error_info]"
+
+	# usge -ge, so the exit status will not changed in legal condition
+	[ $# -ge 2 ] || func_die $usage
+	
+	param_count=$1
+	error_info=$2
+	shift;shift;
+
+	[ $# -lt $param_count ] && func_die $error_info
+}
+
 function func_validate_exist() {
-	usage="USAGE: $FUNCNAME <path> <path> ..."
-	[ "$#" -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
 	
 	for path in $@ ; do
 		[ ! -e "$path" ] && echo "ERROR: $path not exist!" && exit 1
@@ -30,34 +48,32 @@ function func_validate_exist() {
 }
 
 function func_validate_user_name() {
-	usage="USAGE: $FUNCNAME <user>"
-	[ "$#" -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
 	
-	[ "`whoami`" != "$*" ] && echo "ERROR: username is not $*, pls check!" && exit 1
+	[ "`whoami`" != "$*" ] && echo "ERROR: username is not $* !" && exit 1
 }
 
 function func_validate_user_exist() {
-	usage="USAGE: $FUNCNAME <user>"
-	[ "$#" -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
 	
-	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist, pls check!" && exit 1
+	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
 }
 
 function func_bak_file {
-	usage="Usage: $FUNCNAME [filename]"
-	[ $# -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "USAGE: $FUNCNAME <filename>" "$@"
 
 	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
 	
 	target=${1}.bak_$(func_dati)
-	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
 	[ -w "$(dirname ${1})" ] && cp "$1" $target || sudo cp "$1" $target 
 }
 
 function func_tag_value {
-	# DESC: translate a tag value, or return itself if not a tag
+	#desc="Desc: translate a tag value, or return itself if not a tag"
+	#usage="Usage: $FUNCNAME [filename]"
+	#[ $# -lt 1 ] && echo -e "${desc}\n${usage}" && exit 1
 
-	# empty parameter, empty output
+	# NO translation, empty parameter, empty output
 	[ -z "$*" ] && return 1
 
 	# NO translation, probably path, translate will also cause problem
@@ -78,23 +94,23 @@ function func_tag_value {
 }
 
 function func_tag_eval {
-	usage="Usage: $FUNCNAME [str]"
-	[ $# -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "USAGE: $FUNCNAME <tag>" "$@"
 
-	str=$*
+	tag=$*
+
 	# eval value if contains var or cmd substitution, otherwise return itself
-	if [ $(echo $str | grep -c '`\|$') -ge 1 ] ; then
+	if [ $(echo $tag | grep -c '`\|$') -ge 1 ] ; then
 		# remove starting and trailing quotes, otherwise eval will fail
-		#tag=`echo $str | sed -e "s/^['\"]//;s/['\"]$//"`		
-		eval echo $str
+		#tag=`echo $tag | sed -e "s/^['\"]//;s/['\"]$//"`		
+
+		eval echo $tag
 	else
-		echo $str
+		echo $tag
 	fi
 }
 
 function func_path_eval {
-	usage="Usage: $FUNCNAME [result_var_name] [pathstr]"
-	[ $# -lt 2 ] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME <result_var_name> <pathstr>" "$@"
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -104,7 +120,7 @@ function func_path_eval {
 
 	# eval path, check empty value
 	[ -n "$pathstr" ] && candidate=`func_tag_value $pathstr`
-	[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $pathstr, pls check!" && return 1
+	[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $pathstr !" && return 1
 
 	# Try $HOME as base (myenv backup need this for git listed files)
 	[ -e "$HOME/$candidate" ] && eval $result_var_name="$HOME/$candidate" && return 0
@@ -112,8 +128,7 @@ function func_path_eval {
 }
 
 function func_select_line {
-	usage="Usage: $FUNCNAME [result_var_name] [shortest|userselect] [lines]"
-	[ $# -lt 3 ] && echo $usage && exit 1
+	func_param_check 3 "Usage: $FUNCNAME <result_var_name> <shortest|userselect> <lines>" "$@"
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -140,8 +155,7 @@ function func_select_line {
 
 function func_find_type_cache {
 	# NOTE: must keep interface consistency with func_find_type
-	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 3 ] && echo $usage && exit 1
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
 	find_type=$1
 	base=$2
@@ -163,8 +177,7 @@ function func_find_type_cache {
 
 function func_find_type {
 	# NOTE: must keep interface consistency with func_find_type_cache
-	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 3 ] && echo $usage && exit 1
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
 	find_type=$1
 	base=$2
@@ -180,8 +193,7 @@ function func_find_type {
 
 function func_find_cache {
 	# NOTE: must keep interface consistency with func_find
-	usage="Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 4 ] && echo $usage && exit 1
+	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -198,8 +210,7 @@ function func_find_cache {
 
 function func_find {
 	# NOTE: must keep interface consistency with func_find_cache
-	usage="Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]"
-	[ $# -lt 4 ] && echo $usage && exit 1
+	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
 	# need use variable to "return" result
 	result_var_name=$1
@@ -289,7 +300,7 @@ function func_cd {
 	# Find target, If cache version return error, try no-cache version
 	func_find_cache result_target d $base $* || func_find result_target d $base $*
 
-	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist! pls check"
+	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist!"
 	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
 }
 
@@ -326,14 +337,8 @@ function func_ls {
 	#find $base $search 
 }
 
-function func_cd_tmp_today { 
-	# so could evaluate the date every time
-	func_mkdir_cd $MY_TMP/`func_date`	
-}
-
 function func_head_cmd {
-	usage="Usage: $FUNCNAME [show_lines] [cmd]"
-	[ $# -lt 2 ] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME [show_lines] [cmd]" "$@"
 
 	show_lines=$1
 	shift
@@ -345,9 +350,7 @@ function func_head_cmd {
 function func_gen_list {
 	# TODO: make a conversion of $type+l_me.txt ?
 	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
-
-	usage="Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [fl_name]"
-	[ $# -lt 3 ] && echo $usage && exit 1
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [fl_name]" "$@"
 
 	find_type=$1
 	base=$2
@@ -387,7 +390,7 @@ function func_me_fl_gen {
 	target=$MY_ENV/zgen/myenv_fl_git1.lst
 	target_small=$MY_ENV/zgen/myenv_fl_git2.lst
 
-	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists, pls check!" && exit 1
+	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists!" && exit 1
 
 	echo -e "INFO: Generating git file list to: $target"
 	\cd $HOME && git ls-files > $target; \cd - &> /dev/null
@@ -401,9 +404,7 @@ function func_gen_grep_result {
 	# TODO
 	# - seems can not support grepfile "aaa\|bbb"
 	# - seems can not add more options
-
-	usage="Usage: $FUNCNAME [base] [suffix] [search]*"
-	[ $# -lt 3 ] && echo $usage && exit 1
+	func_param_check 3 "Usage: $FUNCNAME [base] [suffix] [search]*" "$@"
 
 	base=$1
 	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
@@ -463,16 +464,14 @@ function func_gen_grep_result {
 }
 
 function func_gen_grep_result_myenv { 
-	usage="Usage: $FUNCNAME [search]*"
-	[ $# -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
 	func_me_fl_gen_grep
 	func_gen_grep_result $MY_ENV ALL "$*"
 }
 
 function func_head {
-	usage="Usage: $FUNCNAME [show_lines] [text]"
-	[ $# -lt 2 ] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME [show_lines] [text]" "$@"
 
 	show_lines=$1
 	shift
@@ -495,8 +494,7 @@ function func_ip {
 }
 
 function func_mkdir_cd { 
-	usage="Usage: $FUNCNAME [path]"
-	[[ -z $1 ]] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [path]" "$@"
 
 	mkdir -p "$@" 				&&
 	# why need such complex eval?
@@ -504,8 +502,7 @@ function func_mkdir_cd {
 }
 
 function func_show_resp { 
-	usage="Usage: $FUNCNAME [url]"
-	[[ -z $1 ]] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [url]" "$@"
 
 	echo "sending request to: $1"
 	wget --timeout=2 --tries=1 -O - 2>&1 "$1"	\
@@ -518,8 +515,7 @@ function func_show_resp {
 }
 
 function func_mvn_gen { 
-	usage="Usage: $FUNCNAME [name] [type(war/jar)]"
-	[ $# -lt 2 ] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME [name] [type(war/jar)]" "$@"
 	
 	name=$1
 	type=$2
@@ -540,8 +536,7 @@ function func_mvn_gen {
 }
 
 function func_git_pull { 
-	usage="Usage: $FUNCNAME [code_base]"
-	[[ -z $1 ]] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [code_base]" "$@"
 
 	\cd $1		 			&&
 	git pull github master 			&&
@@ -550,8 +545,7 @@ function func_git_pull {
 }
 
 function func_git_status { 
-	usage="Usage: $FUNCNAME [code_base]"
-	[[ -z $1 ]] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [code_base]" "$@"
 
 	\cd $1					&&	
 	git status 	
@@ -559,8 +553,7 @@ function func_git_status {
 }
 
 function func_git_commit_push { 
-	usage="Usage: $FUNCNAME [code_base] [comment]"
-	[[ -z $1 || -z $2 ]] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME [code_base] [comment]" "$@"
 
 	\cd $1					&& 
 	git pull github master			&&
@@ -597,8 +590,7 @@ function func_ssh_agent_init {
 }
 
 function func_ssh_with_jump {
-	usage="Usage: $FUNCNAME [target]"
-	[[ -z $1 ]] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
 
 	ip_addr=`getent hosts $1 | sed "s/\s\+.*$//"`
 	[[ -z $ip_addr ]] && ip_addr=$1
@@ -615,8 +607,7 @@ function func_ssh_with_jump {
 }
 
 function func_scp_with_jump {
-	usage="Usage: $FUNCNAME [source] [target]"
-	[[ -z $1 || -z $2 ]] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME [source] [target]" "$@"
 
 	PORT=32200
 	JUMP_MACHINE=dw
@@ -696,8 +687,8 @@ function func_terminator {
 }
 
 function func_sys_net {
-	usage="Usage: $FUNCNAME [interface] [interval]"
-	[ $# -lt 1 ] && echo "$usage, interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') && exit 1
+	usage="Usage: $FUNCNAME [interface] [interval], interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') 
+	func_param_check 1 $usage "$@"
 
 	interface=$1
 	sleep_time=${2-2}
@@ -793,11 +784,10 @@ function func_sys_info {
 }
 
 function func_translate { 
-	usage="Usage: $FUNCNAME [words]"
-	[ $# -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
 
 	unique_name=$(hostname)
-	[ -z "$unique_name" ] && echo "WARN: command hostid return empty, pls check!"
+	[ -z "$unique_name" ] && echo "WARN: command hostid return empty!"
 
 	# check history
 	history_txt=$(grep "^$*\s" -A 1 --no-filename $MY_ENV/list/translate_history_*)
@@ -824,8 +814,7 @@ function func_translate {
 }
 
 function func_delete_dated { 
-	Usage="Usage: func_delete_dated <single_file_or_dir>"
-	[ $# -ne 1 ] && echo "$Usage" && exit 1
+	func_param_check 1 "Usage: $FUNCNAME <single_file_or_dir>" "$@" 
 
 	# the path might have blank, so use $*, and embrace with "" (many place used this)
 	targetDir=$MY_TMP/`func_date`
@@ -835,8 +824,7 @@ function func_delete_dated {
 }
 
 function func_backup_dated { 
-	Usage="Usage: func_backup_dated <single_file_or_dir>"
-	[ $# -ne 1 ] && echo "$Usage" && exit 1
+	func_param_check 1 "Usage: $FUNCNAME <single_file_or_dir>" "$@" 
 
 	srcPath="$*"
 	fileName=$(basename "$srcPath")
@@ -865,15 +853,14 @@ function func_backup_dated {
 	done
 
 	[[ -e $packFile ]] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
-	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup, pls check it !\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 }
 
 function func_backup_listed { 
 	# TODO: merge with dated_backup?
 	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/zgen/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
 
-	usage="Usage: $FUNCNAME <tag> <filelists>*"
-	[ $# -lt 2 ] && echo $usage && exit 1
+	func_param_check 2 "Usage: $FUNCNAME <tag> <filelists>*" "$@" 
 
 	tmp_dir=$MY_TMP/$1
 	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
@@ -882,7 +869,7 @@ function func_backup_listed {
 	source=$*
 
 	for fl in $source ; do 
-		[ ! -e $fl ] && echo -e "WARN: file list ($fl) not exist, pls check!" && continue
+		[ ! -e $fl ] && echo -e "WARN: file list ($fl) not exist!" && continue
 		sub_name=`basename ${fl}`
 		sub_dir=$tmp_dir/${sub_name%%.*}
 		mkdir $sub_dir
@@ -891,7 +878,7 @@ function func_backup_listed {
 		sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
 			# eval path, check empty value
 			[ -n "$line" ] && candidate=`func_tag_eval $line` || continue
-			[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $line, pls check!" && continue
+			[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $line !" && continue
 
 			# Try $HOME as base (myenv backup need this for git listed files)
 			[ -e "$HOME/$candidate" ] && cp --no-preserve=all -R "$HOME/$candidate" $sub_dir && continue
@@ -935,11 +922,10 @@ function func_run_file_java {
 }
 
 function func_run_file {
-	usage="Usage: $FUNCNAME <file>"
-	[ $# -lt 1 ] && echo $usage && exit 1
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 	
 	file=$1
-	[ ! -e "$file" ] && echo "ERROR: $file not exist, pls check!" && return 1
+	[ ! -e "$file" ] && echo "ERROR: $file not exist!" && return 1
 
 	if [[ "$file" = *.java ]] ; then
 		func_run_file_java $file 
@@ -951,6 +937,6 @@ function func_run_file {
 	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File ${file//\\/\/}
 	elif [[ "$file" = *.groovy ]] ; then	groovy $file;
 	else
-		echo "ERROR: can not run file $file, pls check!"
+		echo "ERROR: can not run file $file !"
 	fi
 }
