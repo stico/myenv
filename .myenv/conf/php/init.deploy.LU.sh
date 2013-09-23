@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#TODO: when start: need touch the file if not exist: failed to open access log (logs/www.access.log): No such file or directory (2)
+
 desc="Generate php-fpm runtime dir"
 usage="USAGE: $0 <name> <port(80)>"
 [ $# -lt 2 ] && echo -e "${desc}\n${usage}" && exit 1
@@ -20,6 +22,7 @@ pidfile=$base/${name}.pid
 log=$base/logs/${name}.log
 log_slow=$base/logs/${name}.slow.log
 log_error=$base/logs/${name}.error.log
+log_access=$base/logs/www.access.log
 cmd_server=$php_home/php-fpm
 
 # Util
@@ -32,6 +35,7 @@ func_validate_exist $cmd_server
 
 # Init
 func_init_data_dir $base
+touch $log_access
 cp $php_conf $conf/php.ini
 cp $php_conf_fpm $conf/php-fpm.conf
 sed -i -e "s/^user = .*/user = $(whoami)/" $conf/php-fpm.conf
