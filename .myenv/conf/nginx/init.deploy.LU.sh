@@ -1,7 +1,7 @@
 #!/bin/bash
 
 desc="Generate nginx runtime dir"
-usage="USAGE: $0 <name> <port(80)>"
+usage="USAGE: $0 <name> <port(8000)>"
 [ $# -lt 2 ] && echo -e "${desc}\n${usage}" && exit 1
 
 # Var - Config

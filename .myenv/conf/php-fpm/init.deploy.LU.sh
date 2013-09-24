@@ -1,9 +1,7 @@
 #!/bin/bash
 
-#TODO: when start: need touch the file if not exist: failed to open access log (logs/www.access.log): No such file or directory (2)
-
 desc="Generate php-fpm runtime dir"
-usage="USAGE: $0 <name> <port(80)>"
+usage="USAGE: $0 <name> <port(9000)>"
 [ $# -lt 2 ] && echo -e "${desc}\n${usage}" && exit 1
 
 # Var - Config

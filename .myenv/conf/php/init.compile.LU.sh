@@ -29,7 +29,7 @@ sudo apt-get install -y build-essential openssl libcurl4-openssl-dev libreadline
 # Check
 [ ! -e "$source" ] && echo "ERROR: $source not exist!" && exit 1
 [ -e "$target" ] && echo "ERROR: $target already exist!" && exit 1
-[ ! -e "$apache_apxs" ] && echo "ERROR: $apache_apxs already exist!" && exit 1
+[ ! -e "$apache_apxs" ] && echo "ERROR: $apache_apxs not exist!" && exit 1
 
 # Compile - Prepare
 cd $source
@@ -37,6 +37,7 @@ make clean
 [ ! -f "$SRC/configure" ] && ./buildconf --force
 
 # Compile - Options
+# NOTE: --with-apxs2=$apache_apxs will generate $apache_apxs/../../lib/apache2/modules/libphp5.so and Add httpd.conf "LoadModule php5_module usr/lib/apache2/modules/libphp5.so"
 
 #--with-fpm-user=www-data \
 #--with-fpm-group=www-data

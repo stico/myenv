@@ -76,7 +76,7 @@ $conf_httpd
 
 if [ "$?" -eq 0 ] ; then
 	cp $target/etc/apache2/httpd.conf{,.bak}
-	sed -i -e "s/^Listen 80/Listen 9000/" $target/etc/apache2/httpd.conf
+	sed -i -e "s/^Listen 80/Listen 8070/" $target/etc/apache2/httpd.conf
 	sed -i -e "s/^#\(.*LoadModule.*slotmem_shm_module.*\)/\1/" $target/etc/apache2/httpd.conf
 	ln -s $target/usr/sbin/apachectl $target/usr/sbin/httpd
 else

@@ -950,3 +950,12 @@ function func_run_file {
 		echo "ERROR: can not run file $file !"
 	fi
 }
+
+function func_ctrl_me {
+	cmd=$1
+	name=$2
+	script=/data/${name}/${name}_me/bin/${1}.sh
+
+	[ ! -e "$script" ] && func_die "ERROR: $script not exist"
+	$script 
+}
