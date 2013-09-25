@@ -10,11 +10,17 @@ let loaded_settings_of_stico = 1
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 """"""""""""""""""""Tmp for Test""""""""""""""""""""
 
-"""""""""""""""""""""""""""""" H1 - OS spec
+"""""""""""""""""""""""""""""" H1 - Topic - Font
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
 	set guifont=XHei\ Mono\ 11
 endif
+
+" \zs in regex means set the start of the match
+" TODO: want to use C-+/-, but not works (explained in vim note)
+nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
+nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
+
 
 """""""""""""""""""""""""""""" H1 - Input Method
 " Option 1: FCITX, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
@@ -132,6 +138,7 @@ imap <C-@> <C-Space>
 let g:rubycomplete_rails = 1
 let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_classes_in_global = 1
+
 
 
 """""""""""""""""""""""""""""" H1 - Topic - auto save
@@ -435,31 +442,6 @@ function! ToggleAutoHighlight()
 endfunction
 
 
-""" Some settings on diff, not really understand
-set diffexpr=MyDiff()
-function MyDiff()
-  let opt = '-a --binary '
-  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-  let arg1 = v:fname_in
-  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-  let arg2 = v:fname_new
-  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-  let arg3 = v:fname_out
-  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-  let eq = ''
-  if $VIMRUNTIME =~ ' '
-    if &sh =~ '\<cmd'
-      let cmd = '""' . $VIMRUNTIME . '\diff"'
-      let eq = '"'
-    else
-      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-    endif
-  else
-    let cmd = $VIMRUNTIME . '\diff'
-  endif
-  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  
 """""""""""""""""""""
@@ -512,3 +494,30 @@ endif
 "autocmd Filetype python map <buffer> <F11> :RInPython<Enter>
 "autocmd Filetype dosbatch map <buffer> <F11> :RInCmd<Enter>
 
+
+" Since 7.3, not work anymore
+""" Some settings on diff, not really understand
+"set diffexpr=MyDiff()
+"function MyDiff()
+"  let opt = '-a --binary '
+"  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+"  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+"  let arg1 = v:fname_in
+"  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+"  let arg2 = v:fname_new
+"  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+"  let arg3 = v:fname_out
+"  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+"  let eq = ''
+"  if $VIMRUNTIME =~ ' '
+"    if &sh =~ '\<cmd'
+"      let cmd = '""' . $VIMRUNTIME . '\diff"'
+"      let eq = '"'
+"    else
+"      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+"    endif
+"  else
+"    let cmd = $VIMRUNTIME . '\diff'
+"  endif
+"  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+"endfunction

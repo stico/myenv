@@ -32,6 +32,7 @@ func_validate_exist $cmd_server
 
 # Init
 func_init_data_dir $base
+echo '<?php phpInfo(); ?>' > $data/phpinfo.php
 cp $httpd_conf $conf
 sed -i -e "s/^Listen .*/Listen $port/" $conf
 sed -i -e "s+^LogLevel .*+LogLevel info+" $conf
