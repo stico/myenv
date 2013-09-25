@@ -24,7 +24,7 @@ log_access=logs/access.log		# yes, relative path
 cmd_server=$nginx_home/sbin/nginx
 
 # Util
-[ ! -e $common_func ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
+[ ! -e "$common_func" ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
 
 # Check
 func_validate_name $name

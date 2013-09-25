@@ -117,6 +117,15 @@ function func_validate_exist() {
 	done
 }
 
+function func_validate_inexist() {
+	usage="USAGE: $FUNCNAME <path> <path> ..."
+	[ "$#" -lt 1 ] && echo $usage && exit 1
+	
+	for path in $@ ; do
+		[ -e "$path" ] && echo "ERROR: $path already exist!" && exit 1
+	done
+}
+
 function func_validate_addr() {
 	usage="USAGE: $FUNCNAME <addr>"
 	[ "$#" -lt 1 ] && echo $usage && exit 1
@@ -125,9 +134,13 @@ function func_validate_addr() {
 	echo $1 | egrep '[0-255]{1,3}\.[0-255]{1,3}\.[0-255]{1,3}\.[0-255]{1,3}' && echo "ERROR: <addr> ($addr) format not correct" && exit 1
 }
 
-function func_validate_port() {
+function func_validate_numeric() {
 	usage="USAGE: $FUNCNAME <port>"
 	[ "$#" -lt 1 ] && echo $usage && exit 1
 
 	echo $1 | grep -q -v "^[0-9]*$" && echo "ERROR: <port> ($port) MUST be numeric" && exit 1
+}
+
+function func_validate_port() {
+	func_validate_numeric "$@"
 }

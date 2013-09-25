@@ -12,7 +12,7 @@ httpd_home=$MY_DEV/httpd
 httpd_conf=$httpd_home/etc/apache2/httpd.conf
 common_func=$MY_ENV/ctrl/common.func.sh
 
-# Var - Count
+# Var - Self
 base=$parent_base/$name
 data=$base/data
 conf=$base/conf/httpd.conf
@@ -23,7 +23,7 @@ log_access=$base/logs/www.access.log
 cmd_server=$httpd_home/usr/sbin/apachectl
 
 # Util
-[ ! -e $common_func ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
+[ ! -e "$common_func" ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
 
 # Check
 func_validate_name $name

@@ -26,7 +26,7 @@ log=$log_dir/${name}.log
 log_zk=$log_dir/${name}_zk.log
 
 # Util
-[ ! -e $common_func ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
+[ ! -e "$common_func" ] && echo "ERROR: $common_func not exist" && exit 1 || source $common_func
 
 # Check
 func_validate_name $name

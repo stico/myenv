@@ -43,7 +43,15 @@ function func_validate_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
 	
 	for path in $@ ; do
-		[ ! -e "$path" ] && echo "ERROR: $path not exist!" && exit 1
+		[ ! -e "$path" ] && echo "ERROR: $path NOT exist!" && exit 1
+	done
+}
+
+function func_validate_inexist() {
+	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
+	
+	for path in $@ ; do
+		[ -e "$path" ] && echo "ERROR: $path already exist!" && exit 1
 	done
 }
 
@@ -57,6 +65,12 @@ function func_validate_user_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
 	
 	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
+}
+
+function func_validate_cmd_exist() {
+	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
+
+	( ! command -v "$1" &> /dev/null) && echo "ERROR: $1 not found (in PATH)" && exit 1
 }
 
 function func_bak_file {
