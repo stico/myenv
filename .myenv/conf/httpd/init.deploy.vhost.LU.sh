@@ -57,6 +57,8 @@ cat > $conf_vhost <<-EOF
 	</Directory>
 EOF
 echo "Include $conf_vhost" >> $conf
+echo "ErrorDocument 404 /404.html" >> $data_vhost/.htaccess
+echo "TODO: Change this ERROR page" >> $data_vhost/404.html
 
 echo -e "Add vhost success"
 echo -e "\tDocumentRoot: ${data_vhost}"
