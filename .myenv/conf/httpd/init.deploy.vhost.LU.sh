@@ -38,23 +38,26 @@ cat > $conf_vhost <<-EOF
 	    ServerAdmin webmaster@dummy-host.example.com
 	    DocumentRoot "${data_vhost}"
 	    ServerName www.localhost.com
+	    Alias /${name_vhost} "${data_vhost}"
+
+	    <Directory "${data_vhost}">
+	        DirectoryIndex index.php
+	        Options Indexes FollowSymLinks Includes ExecCGI
+
+	        #Options FollowSymLinks
+	        #AllowOverride Limit FileInfo Indexes
+	        AllowOverride All
+
+	        Order deny,allow
+	        Allow from all
+	        #DirectoryIndex index.cgi
+
+	        #AddHandler cgi-script .cgi
+	        
+	        # Without this line, will gets 403 (server log: "client denied by server configuration ...")
+	        Require all granted
+	    </Directory>
 	</VirtualHost>
-
-	Alias /${name_vhost} "${data_vhost}"
-
-	<Directory "${data_vhost}">
-	    Options Indexes FollowSymLinks Includes ExecCGI
-	    #Options FollowSymLinks
-	    #AllowOverride Limit FileInfo Indexes
-	    AllowOverride All
-	    Order deny,allow
-	    Allow from all
-	    #DirectoryIndex index.cgi
-	    #AddHandler cgi-script .cgi
-	    
-	    # Without this line, will gets 403 (server log: "client denied by server configuration ...")
-	    Require all granted
-	</Directory>
 EOF
 echo "Include $conf_vhost" >> $conf
 echo "ErrorDocument 404 /404.html" >> $data_vhost/.htaccess

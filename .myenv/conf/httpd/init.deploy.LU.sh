@@ -36,6 +36,7 @@ echo '<?php phpInfo(); ?>' > $data/phpinfo.php
 cp $httpd_conf $conf
 sed -i -e "s/^Listen .*/Listen $port/" $conf
 sed -i -e "s+^LogLevel .*+LogLevel info+" $conf
+sed -i -e "/^#.*LoadModule.*mod_rewrite.so/s/^#//" $conf
 sed -i -e "s+^ErrorLog .*+ErrorLog \"$log_error\"+" $conf
 sed -i -e "s+^DocumentRoot .*+DocumentRoot \"$data\"+" $conf
 sed -i -e "s+^\(\s*\)CustomLog.*+\1CustomLog \"$log_access\" common+" $conf

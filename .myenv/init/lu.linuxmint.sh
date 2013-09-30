@@ -256,6 +256,7 @@ function func_init_soft_gui {
 	sudo apt-get install -y vlc byobu			>> $tmp_init_log	# byobu is a better tmux
 	sudo apt-get install -y bum             		>> $tmp_init_log	# boot-up-manager
 	sudo apt-get install -y arandr             		>> $tmp_init_log	# set the screen layout, e.g for dual screen
+	sudo apt-get install -y gstm             		>> $tmp_init_log	# for auto ssh tunnel (puff)
 
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
 	sudo apt-get install -y pulseaudio pulseaudio-utils	>> $tmp_init_log

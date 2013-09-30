@@ -838,7 +838,7 @@ function func_translate {
 }
 
 function func_delete_dated { 
-	func_param_check 1 "Usage: $FUNCNAME <single_file_or_dir>" "$@" 
+	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
 
 	# the path might have blank, so use $*, and embrace with "" (many place used this)
 	targetDir=$MY_TMP/`func_date`
@@ -848,15 +848,16 @@ function func_delete_dated {
 }
 
 function func_backup_dated { 
-	func_param_check 1 "Usage: $FUNCNAME <single_file_or_dir>" "$@" 
+	func_param_check 1 "Usage: $FUNCNAME <path>" "$@" 
+	[ $# -ge 2 ] && func_die "ERROR: only one path/parameter supported"
 
-	srcPath="$*"
+	srcPath="$1"
 	fileName=$(basename "$srcPath")
 	targetFile=`func_dati`_`uname -n`_"$fileName"
 	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/ampext/backup")
 
 	# if path is a directory, zip it first
-	if [[ -d "$srcPath" ]]; then
+	if [ -d "$srcPath" ]; then
 		# need update the var to packed ones
 		targetFile=$targetFile.zip 
 		packFile=$MY_TMP/$targetFile
@@ -966,9 +967,12 @@ function func_run_file {
 }
 
 function func_ctrl_me {
-	cmd=$1
-	name=$2
-	script=/data/${name}/${name}_me/bin/${1}.sh
+	func_param_check 2 "Usage: $FUNCNAME <target> <action>" "$@" 
+
+	name=$1
+	action=$2
+	parent=${name%%_*}
+	script=/data/${parent}/${name}/bin/${action}.sh
 
 	[ ! -e "$script" ] && func_die "ERROR: $script not exist"
 	$script 

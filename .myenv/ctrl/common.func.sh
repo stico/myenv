@@ -134,6 +134,12 @@ function func_validate_addr() {
 	echo $1 | egrep '[0-255]{1,3}\.[0-255]{1,3}\.[0-255]{1,3}\.[0-255]{1,3}' && echo "ERROR: <addr> ($addr) format not correct" && exit 1
 }
 
+function func_validate_cmd_exist() {
+	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
+
+	( ! command -v "$1" &> /dev/null) && echo "ERROR: $1 not found (in PATH)" && exit 1
+}
+
 function func_validate_numeric() {
 	usage="USAGE: $FUNCNAME <port>"
 	[ "$#" -lt 1 ] && echo $usage && exit 1
