@@ -28,6 +28,11 @@ rdesk			"rdesktop -uouyangzhu -f -r clipboard:PRIMARYCLIPBOARD -r disk:R_Amp=/ho
 svnupdate		'for dir in `find . -maxdepth 1 -type d` ; do \cd $dir > /dev/null; [ ! -e .svn ] && \cd - > /dev/null && continue ; echo "--------> Updating $dir"; svn update | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"; \cd - > /dev/null; done'
 mvngen			"func_mvn_gen"
 
+			# Head: g - git
+gitpull			"func_git_pull"
+gitstatus		"func_git_status"
+gitcommitpush		"func_git_commit_push"
+
 			# Head: d - dated
 ddelete			"func_delete_dated"
 dbackup			"func_backup_dated"
@@ -35,23 +40,16 @@ dbackup			"func_backup_dated"
 			# Head: d - dev 
 dloadpyvenv		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
 dloadrbvenv		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm"
-dgitpullrepo		"func_git_pull %MY_CODE_REPO%"
-dgitstatusrepo		"func_git_status %MY_CODE_REPO%"
-dgitcommitpushrepo	"func_git_commit_push %MY_CODE_REPO%"
 
 			# Head: e - myenv 
 egf			"func_grep_myenv"
-eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
 ebackup			"func_gen_list_f_me; func_backup_listed myenv_full %MY_ENV%/zgen/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
 eload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 ehostsupdate		"sudo -E bash hosts_append.sh"
-evivar			"vi %MY_ENV%/env_var"
-evifunc			"vi %MY_ENV%/env_func_bash"
-evialias		"vi %MY_ENV%/env_alias"
 egitpull		"func_git_pull %HOME%; eload"
 egitstatus		"func_git_status %HOME%"
 egitcommitpush		"func_git_commit_push %HOME%"
-#ecd			"func_cd %MY_ENV%"
+#eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
 
 			# Head: s - ssh
 sshx			"func_ssh_with_jump"

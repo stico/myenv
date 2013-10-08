@@ -14,3 +14,29 @@ test	测试
 	[[["Index","指数","","Zhǐshù"]],[["noun",["index","exponent"],[["index",["指数","索引","指标","附以索引"],[103220],0.291016579],["exponent",["指数","传人","执行者"],[103220],0.0092096813]],"指数",1]],"zh-CN",,[["Index",[4],1,0,999,0,1,0]],[["指数",4,[["Index",999,1,0],["Exponent",0,1,0],["Indices",0,1,0],["Exponential",0,1,0],["Index of",0,1,0]],[[0,2]],"指数"]],,,[],2]
 consortium	财团
 	[[["财团","consortium","Cáituán",""]],[["noun",["合伙","会社"],[["合伙",["partnership","association","consortium","fellowship","alliance","coterie"],,0.000911881973],["会社",["alliance","association","conference","consociation","consortium"]]],"consortium",1]],"en",,[["财团",[4],0,0,1000,0,1,0]],[["consortium",4,[["财团",1000,0,0],["联盟",0,0,0],["联合体",0,0,0],["财团的",0,0,0],["的财团",0,0,0]],[[0,10]],"consortium"]],,,[],2]
+caret	插入符号
+	[[["插入符号","caret","Chārù fúhào",""]],,"en",,[["插入符号",[4],0,0,1000,0,2,0]],[["caret",4,[["插入符号",1000,0,0],["插入符",0,0,0],["脱字符号",0,0,0],["插入记号",0,0,0],["插入符的",0,0,0]],[[0,5]],"caret"]],,,[["en"]],18]
+boilerplate	样板
+	[[["样板","boilerplate","Yàngbǎn",""]],,"en",,[["样板",[4],0,0,1000,0,1,0]],[["boilerplate",4,[["样板",1000,0,0],["的样板",0,0,0],["样板文件",0,0,0],["样板式",0,0,0],["反复套用",0,0,0]],[[0,11]],"boilerplate"]],,,[["en"]],56]
+thesaurus	词库
+	[[["词库","thesaurus","Cí kù",""]],,"en",,[["词库",[4],0,0,1000,0,1,0]],[["thesaurus",4,[["词库",1000,0,0],["辞典",0,0,0],["叙词表",0,0,0],["同义字",0,0,0],["的词库",0,0,0]],[[0,9]],"thesaurus"]],,,[["en"]],15]
+Punctuation	标点
+	[[["标点","Punctuation","Biāodiǎn",""]],[["noun",["标点"],[["标点",["punctuation"],,0.233838394]],"punctuation",1]],"en",,[["标点",[4],0,0,1000,0,1,0]],[["Punctuation",4,[["标点",1000,0,0],["标点符号",0,0,0],["的标点符号",0,0,0],["的标点",0,0,0],["标点符号的",0,0,0]],[[0,11]],"Punctuation"]],,,[],2]
+发音	Pronunciation
+	[[["Pronunciation","发音","","Fāyīn"]],[["noun",["pronunciation","articulation","pronouncing","enunciation"],[["pronunciation",["发音","读音","读法"],,0.27338478],["articulation",["关节","发音","传声清晰度"],,0.00118931825],["pronouncing",["发音"],,0.000677653123],["enunciation",["发音","说明"],,9.76251904e-05]],"发音",1],["verb",["pronounce"],[["pronounce",["发音","断言","发表","发言","咬"],,0.0873790234]],"发音",2]],"zh-CN",,[["Pronunciation",[4],1,0,999,0,1,0]],[["发音",4,[["Pronunciation",999,1,0],["Pronounce",0,1,0],["Pronunciation in",0,1,0],["Pronounced",0,1,0],["Pronunciations",0,1,0]],[[0,2]],"发音"]],,,[],2]
+Pronunciation	发音
+	[[["发音","Pronunciation","Fāyīn",""]],[["noun",["发音","读音","读法"],[["发音",["pronunciation","articulation","pronouncing","enunciation"],,0.910510361],["读音",["pronunciation"],,0.056416139],["读法",["pronunciation"]]],"pronunciation",1]],"en",,[["发音",[4],0,0,1000,0,1,0]],[["Pronunciation",4,[["发音",1000,0,0],["的发音",0,0,0],["读音",0,0,0],["语音",0,0,0]],[[0,13]],"Pronunciation"]],,,[],2]
+音标	Phonetic transcription
+	[[["Phonetic transcription","音标","","Yīnbiāo"]],[["noun",["phonetic symbol","phonetic transcription","phonogram"],[["phonetic symbol",["表音文字","音标"]],["phonetic transcription",["音标"]],["phonogram",["唱片","表音文字","音标"]]],"音标",1]],"zh-CN",,[["Phonetic transcription",[4],1,0,991,0,2,0]],[["音 标",4,[["Phonetic transcription",991,1,0],["Phonetic symbol",8,1,0],["Phonetics",0,1,0],["The phonetic",0,1,0],["Phonetic",0,1,0]],[[0,2]],"音标"]],,,[],2]
+Phonetic transcription	音标
+	[[["音标","Phonetic transcription","Yīnbiāo",""]],[["noun",["音标"],[["音标",["phonetic symbol","phonetic transcription","phonogram"]]],"phonetic transcription",1]],"en",,[["音标",[4],0,0,1000,0,2,0]],[["Phonetic transcription",4,[["音标",1000,0,0],["拼音",0,0,0],["音位标音",0,0,0],["音译",0,0,0],["拼音查询",0,0,0]],[[0,22]],"Phonetic transcription"]],,,[],76]
+glyphs	字形
+	[[["字形","glyphs","Zìxíng",""]],,"en",,[["字形",[4],0,0,1000,0,1,0]],[["glyphs",4,[["字形",1000,0,0],["字型",0,0,0],["的字形",0,0,0],["雕文",0,0,0],["字形的",0,0,0]],[[0,6]],"glyphs"]],,,[["en"]],11]
+money
+	<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">钱</string>
+Scaffolding	脚手架
+	[[["脚手架","Scaffolding","Jiǎoshǒujià",""]],,"en",,[["脚手架",[4],0,0,1000,0,1,0]],[["Scaffolding",4,[["脚手架",1000,0,0],["棚架",0,0,0],["建筑脚手架",0,0,0],["棚架工作",0,0,0],["式脚手架",0,0,0]],[[0,11]],"Scaffolding"]],,,[["en"]],1]
+Indice	指数之报价
+	[[["指数之报价","Indice","Zhǐshù zhī bàojià",""]],,"en",,[["指数之报价",[4],0,0,1000,0,3,0]],[["Indice",4,[["指数之报价",1000,0,0],["指数之",0,0,0],["证指数之报价",0,0,0],["指数的关系研究",0,0,0],["证指数",0,0,0]],[[0,6]],"Indice"]],,,[["fr","it","es"]],36]
+conditioner	调节器
+	[[["调节器","conditioner","Tiáojié qì",""]],[["noun",["调节器"],[["调节器",["conditioner","controller","regulator"]]],"conditioner",1]],"en",,[["调节器",[4],0,0,1000,0,2,0]],[["conditioner",4,[["调节器",1000,0,0],["调理",0,0,0],["护发",0,0,0],["护发素",0,0,0],["空调器",0,0,0]],[[0,11]],"conditioner"]],,,[],3]

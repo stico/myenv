@@ -479,9 +479,12 @@ function func_grep_dir_cached {
 	sed -e "/\/target\//d"		| \
 	# Step: remove the fileist itself
 	sed -e "/$filelist$/d"		| \
-	# Step: grep result, -I is not match binary files
-	#xargs --delimiter="\n" grep -I -i $options "$search" | tee $grep_result | grep --color -i "$search"
-	xargs --delimiter="\n" grep -d skip -I -i $options "$search" | tee $grep_result | sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
+	# Step: grep result, -I: ignore binary, -oE & .{0.20}: only matched part and 20 char around
+	xargs --delimiter="\n" grep -d skip -I -i $options -oE ".{0,20}$search.{0,20}" | \
+	# store result for later ref
+	tee $grep_result		| \
+	# re-color the result, since pipe swiped color even using "--color" in grep
+	sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
 
 	# Jump back
 	\cd -
@@ -560,34 +563,30 @@ function func_mvn_gen {
 }
 
 function func_git_pull { 
-	func_param_check 1 "Usage: $FUNCNAME [code_base]" "$@"
-
-	\cd $1		 			&&
-	git pull github master 			&&
-	git status	 			&&
-	\cd -
+	[ -n "$1" ] && \cd $1
+	git pull origin master && git status
+	[ -n "$1" ] && \cd -
 }
 
 function func_git_status { 
-	func_param_check 1 "Usage: $FUNCNAME [code_base]" "$@"
-
-	\cd $1					&&	
+	[ -n "$1" ] && \cd $1
 	git status 	
-	\cd -
+	[ -n "$1" ] && \cd -
 }
 
 function func_git_commit_push { 
-	func_param_check 2 "Usage: $FUNCNAME [code_base] [comment]" "$@"
+	[ -e "$1" ] && target="$1" && \cd "$1" && shift
+	[ -n "$*" ] && comment="$*" || comment="update from $(hostname)"
 
-	\cd $1					&& 
-	git pull github master			&&
-	git add .				&&
-	shift					&&
-	git commit -a -m "$*" 			&&
-	git push github				&&
+	# git add -A: in git 2.0, will add those even not in current dir (which is what we want), just wait the 2.0
+	git pull origin master			&&
+	git add -A				&&
+	git commit -a -m "$comment" 		&&
+	git push origin				&&
 	git status 				&&
-	func_gen_list_f_me			&&
-	\cd - 
+	func_gen_list_f_me
+
+	[ -n "$target" ] && \cd -
 }
 
 function func_ssh_agent_init {
@@ -808,14 +807,24 @@ function func_sys_info {
 }
 
 function func_translate { 
-	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
-
 	unique_name=$(hostname)
 	[ -z "$unique_name" ] && echo "WARN: command hostid return empty!"
 
 	# check history
-	history_txt=$(grep "^$*\s" -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	history_txt=$(grep "^$*" -A 1 --no-filename $MY_ENV/list/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
+
+	func_translate_google "$@" || func_translate_microsoft "$@"
+}
+
+function func_translate_IPA_google { 
+	echo "WARN: not implemented yet!"
+	# IPA: International Phonetic Alphabet (IPA), tells pronunciation of words
+	# TODO: google api, IPA extraction: http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q=example&sl=en&tl=en
+}
+
+function func_translate_google { 
+	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
 
 	# might useful fields: ie=UTF-8&oe=UTF-8
 	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
@@ -828,13 +837,48 @@ function func_translate {
 		-H 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'			\
 		-s "http://translate.google.cn/translate_a/t"							\
 		-d "$data"`
+	[ -z "$res_raw" ] && return 1
 
 	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
-	#| awk -F"," '{printf "%s\n%s\n%s\n", $2,$3,$1}' 	
-
 	echo $res_simple
 	echo $res_raw
 	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/list/translate_history_${unique_name}
+}
+
+function func_translate_microsoft { 
+	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
+
+	access_token_tmp=/tmp/ms_translation_api_access_token
+	access_token_compare=/tmp/ms_translation_api_access_token_compare
+
+	access_token_uri="https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
+	# parameters below are applied from https://datamarket.azure.com
+	post_content="grant_type=client_credentials&client_id=ouyzhu&client_secret=0yAn46ClllxZk4CuY2tGkjo9Sl&scope=http://api.microsofttranslator.com"
+	translate_uri_cn2en="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=zh-CHS&to=en&text="
+	translate_uri_en2cn="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=en&to=zh-CHS&text="
+
+	# Check if valid access token exist
+	if [ ! -e "$access_token_tmp" ] || (( $(date +%s) > $(tail -1 $access_token_tmp) )) ; then
+		echo "INFO: requesting ms translate api token"
+		curl -s --data $post_content $access_token_uri > $access_token_tmp || return 1
+
+		expire_on=$(sed -e 's/.*ExpiresOn=\([^&]*\)&.*/\1/' $access_token_tmp)
+		echo -e "\n$expire_on" >> $access_token_tmp
+
+		#expire_in=$(sed -e 's/.*"expires_in":"\([^"]*\)".*/\1/' $access_token_tmp)
+		#touch -d "$expire_in seconds" $access_token_tmp
+	fi
+	access_token=$(head -1 "$access_token_tmp" | sed -e 's/.*"access_token":"\([^"]*\)".*/\1/')
+
+	# Translate, both '-H "ContentType: text/plain"' and '&contentType=text%2Fplain' NOT work (always get xml)
+	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
+	then res_raw=$(curl -s -H "ContentType: text/plain" -H "Authorization: Bearer $access_token" "${translate_uri_en2cn}$*")
+	else res_raw=$(curl -s -H "ContentType: text/plain" -H "Authorization: Bearer $access_token" "${translate_uri_en2cn}$*")
+	fi
+	[ -z "$res_raw" ] && return 1
+
+	echo $res_raw
+	echo -e "$*\n\t$res_raw" >> $MY_ENV/list/translate_history_${unique_name}
 }
 
 function func_delete_dated { 
@@ -977,3 +1021,4 @@ function func_ctrl_me {
 	[ ! -e "$script" ] && func_die "ERROR: $script not exist"
 	$script 
 }
+
