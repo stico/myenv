@@ -2,3 +2,15 @@ maybe	也许
 	[[["也许","maybe","Yěxǔ",""]],[["adverb",["也许","或许","说不定","恐怕","许","或","想必"],[["也许",["perhaps","maybe"],,0.329764992],["或许",["perhaps","probably","maybe","likely","perchance","haply"],,0.090152733],["说不定",["maybe"],,0.0326511562],["恐怕",["perhaps","maybe"],,0.000732717745],["许",["perhaps","maybe"],,0.000544509618],["或",["either","perhaps","maybe","possibly","probably"],,0.000144280682],["想必",["presumably","most probably","perhaps","most likely","maybe","almost certainly"],,2.24745945e-05]],"maybe",4]],"en",,[["也许",[4],0,0,1000,0,1,0]],[["maybe",4,[["也许",1000,0,0],["可能",0,0,0],["说不定",0,0,0],["或许",0,0,0]],[[0,5]],"maybe"]],,,[],4]
 olivia	奥利维亚
 	[[["奥利维亚","olivia","Ào lì wéi yǎ",""]],,"en",,[["奥利维亚",[4],0,0,1000,0,1,0]],[["olivia",4,[["奥利维亚",1000,0,0],["奥莉维亚",0,0,0],["张震",0,0,0]],[[0,6]],"olivia"]],,,[["en"]],3]
+交易所	Exchange
+	[[["Exchange","交易所","","Jiāoyì suǒ"]],,"zh-CN",,[["Exchange",[4],1,0,999,0,1,0]],[["交易所",4,[["Exchange",999,1,0],["Stock Exchange",0,1,0],["Exchange of",0,1,0],["Exchanges",0,1,0],["Transactions",0,1,0]],[[0,3]],"交易所"]],,,[["zh-CN"]],2]
+股票交易所	Stock exchange
+	[[["Stock exchange","股票交易所","","Gǔpiào jiāoyì suǒ"]],[["noun",["stock exchange","bourse"],[["stock exchange",["股票交易所","股票市场"],,0.0846906528],["bourse",["股票交易所"],,0.00218749116]],"股票交易所",1]],"zh-CN",,[["Stock exchange",[190],1,0,1000,0,2,1]],[["股票交易所",190,[["Stock exchange",1000,1,0],["AMEX",0,1,0],["Stock",0,1,0],["Stock exchanges",0,1,0]],[[0,5]],"股票交易所"]],,,[],3]
+arbitrage	套利
+	[[["套利","arbitrage","Tàolì",""]],[["noun",["套利","套汇","仲裁"],[["套利",["arbitrage"],,0.510749996],["套汇",["arbitrage"],,0.0283678155],["仲裁",["arbitration","arbitrage"],,0.0092096813]],"arbitrage",1]],"en",,[["套利",[4],0,0,1000,0,1,0]],[["arbitrage",4,[["套利",1000,0,0],["的套利",0,0,0],["套利的",0,0,0],["套汇",0,0,0],["仲裁",0,0,0]],[[0,9]],"arbitrage"]],,,[],2]
+Typography	活版印刷
+	[[["活版印刷","Typography","Huóbǎn yìnshuā",""]],[["noun",["活版","活版印刷"],[["活版",["typography","letter press"],,0.00165120489],["活版印刷",["typography"]]],"typography",1]],"en",,[["活版印刷",[4],0,0,1000,0,2,0]],[["Typography",4,[["活版印刷",1000,0,0],["排版",0,0,0],["印刷术",0,0,0],["版式",0,0,0],["排版规则",0,0,0]],[[0,10]],"Typography"]],,,[],2]
+Glyphicons	Glyphicons
+	[[["Glyphicons","Glyphicons","Glyphicons",""]],,"en",,[["Glyphicons",[4],0,0,1000,0,1,0]],[["Glyphicons",4,[["Glyphicons",1000,0,0]],[[0,10]],"Glyphicons"]],,,[["en"]],18]
+Carousel	圆盘传送带
+	[[["圆盘传送带","Carousel","Yuán pán chuánsòngdài",""]],[["noun",["圆盘传送带"],[["圆盘传送带",["carousel"]]],"carousel",1]],"en",,[["圆盘传送带",[4],0,0,1000,0,2,0]],[["Carousel",4,[["圆盘传送带",1000,0,0],["旋转木马",0,0,0],["传送带",0,0,0],["轮播",0,0,0],["转盘",0,0,0]],[[0,8]],"Carousel"]],,,[],7]

@@ -562,6 +562,39 @@ function func_mvn_gen {
 	esac
 }
 
+function func_svn_backup { 
+	[ -n "$1" ] && src_path="$1" || src_path="."
+
+	src_name=$(basename $(readlink -f $src_path))
+	tmp_path=$MY_TMP/${src_name}_svn_export
+
+	# current dir is already project
+	[ -e ./.svn ] && svn export $src_path $tmp_path && return 0
+	
+	# projects are in subdir
+	mkdir -p $tmp_path
+	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
+		[ -n "$dir" ] && [ -e $dir/.svn ] && svn export $dir/  $tmp_path/$(basename $dir)
+	done
+
+	# backup
+	func_backup_dated $tmp_path
+	[ -e "$tmp_path" ] && rm -rf $tmp_path
+}
+
+function func_svn_update { 
+	[ -n "$1" ] && src_path="$1" || src_path="."
+
+	# current dir is already project
+	[ -e $src_path/.svn ] && svn update $src_path && return 0
+	
+	# projects are in subdir
+	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
+		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
+		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ 
+	done
+}
+
 function func_git_pull { 
 	[ -n "$1" ] && \cd $1
 	git pull origin master && git status
@@ -921,7 +954,7 @@ function func_backup_dated {
 		fi
 	done
 
-	[[ -e $packFile ]] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
+	[ -e $packFile ] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
 	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 }
 
@@ -967,7 +1000,6 @@ function func_backup_listed {
 
 	func_backup_dated $tmp_dir
 	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
-	rm -rf $tmp_dir
 
 	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/.fl_me.txt 
 	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/.fl_me.txt 

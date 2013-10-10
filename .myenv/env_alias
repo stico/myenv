@@ -25,7 +25,8 @@ rdesk			"rdesktop -uouyangzhu -f -r clipboard:PRIMARYCLIPBOARD -r disk:R_Amp=/ho
 
 # Alias - By Topic (<topic><action><obj/arg>)
 
-svnupdate		'for dir in `find . -maxdepth 1 -type d` ; do \cd $dir > /dev/null; [ ! -e .svn ] && \cd - > /dev/null && continue ; echo "--------> Updating $dir"; svn update | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"; \cd - > /dev/null; done'
+svnupdate		"func_svn_update"
+svnbackup		"func_svn_backup"
 mvngen			"func_mvn_gen"
 
 			# Head: g - git
