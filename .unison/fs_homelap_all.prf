@@ -32,8 +32,14 @@ path=ECH
 path=ECS
 path=ECZ
 path=FCB
-path=os_spec_lu
-path=os_spec_win
+path=os_spec_lu/m2_repo
+path=os_spec_lu/program
+path=os_spec_lu/dev/eclipse-4.3_x64
+path=os_spec_win/m2_repo
+path=os_spec_win/program
+path=os_spec_win/dev/eclipse_plugins
+path=os_spec_win/dev/eclipse-4.2.2_x64
+path=os_spec_win/dev/nginx_workspace
 
 ################################################################################
 # SETTINGS

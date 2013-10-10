@@ -811,7 +811,7 @@ function func_translate {
 	[ -z "$unique_name" ] && echo "WARN: command hostid return empty!"
 
 	# check history
-	history_txt=$(grep "^$*" -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	history_txt=$(grep "^$*" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	func_translate_google "$@" || func_translate_microsoft "$@"
