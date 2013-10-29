@@ -209,7 +209,7 @@ noremap <C-T> :tabnew<CR>
 " failed to update to use <C-A-s>, seems vim never received 
 " failed to update to use <C-S-T>, seems will override the <C-T>
 " suggest not to use <A-T>, it means alt+shift+t
-noremap <A-t> :tabnew<CR>:e $HOME/Documents/DCB/Collection_Note/allFile_All.txt<CR><CR>:set isfname+=:<CR>
+noremap <A-t> :tabnew<CR>:e $MY_ENV/zgen/collection_note/note_collection_txt.txt<CR><CR>:set isfname+=:<CR>
 " for line merge, not cursor after J will either on the insert blank (when vim insert one) or on the 1st char of next line (when already blank on 1st line and no need to insert)
 nnoremap J JgEldw
 nnoremap gJ J
