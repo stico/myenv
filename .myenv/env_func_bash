@@ -453,7 +453,7 @@ function func_gen_collection_note {
 	target_original_file=$target_base/original_files
 	target_note_collection_fl=$target_base/note_collection_fl.txt
 	target_note_collection_txt=$target_base/note_collection_txt.txt
-	source_base=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)	# Not included DCM, put DCD first
+	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)	# Not included DCM, put DCD first
 	source_note_list=$MY_ENV/list/collection_quick_link_files
 
 	# clean up old things
@@ -461,18 +461,18 @@ function func_gen_collection_note {
 
 	# init target dir, gen file lists
 	func_mkdir_cd "$target_base"
-	for tag in ${source_base[@]}
+	for tag in ${source_bases[@]}
 	do
 		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
-	done
 
-	# create filelist to collect
-	sed -e "/\.lnk$/d" fl_*.txt | grep -i "\(A_NOTE\|--NOTE--\|\.bat$\|\.sh$\)" >> ${target_note_collection_fl}
+		sed -e "/\.lnk$/d;/DCB\/DatedBackup\//d" fl_${tag}.txt	\
+		| grep -i "\(A_NOTE\|--NOTE--\|\.bat$\|\.sh$\)" 	\
+		>> ${target_note_collection_fl}
+	done
 
 	# bak orginal file and collect notes
 	mkdir $target_original_file
 	sed -e "" "$source_note_list" >> ${target_note_collection_txt}
-	echo ">>> This line is to ensure this file can not be excuted successfully" >> $target_note_collection_txt
 	while read line
 	do
 		source_path="$(func_eval "$line")"
@@ -490,8 +490,15 @@ function func_gen_collection_note {
 		fi
 	done < ${target_note_collection_fl}
 
+	# append all file list in the end
+	echo -e "\n\n>>> File list of $source_bases \n\n" >> ${target_note_collection_txt}
+	cat fl_*.txt >> ${target_note_collection_txt}
+
 	# backup collection
-	func_backup_dated "$target_original_file" && rm -rf "$target_original_file"
+	func_backup_dated "$target_original_file" 
+	rm -rf "$target_original_file"
+
+	\cd - > /dev/null
 }
 
 function func_grep_cmd {
