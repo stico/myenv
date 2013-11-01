@@ -9,6 +9,9 @@
 ################################################################################
 CUR_OS_LU	lu
 CUR_OS_WIN	win
+DOT_CACHE_DL	.dl_me.txt
+DOT_CACHE_FL	.fl_me.txt
+DOT_CACHE_GREP	.grep_me.txt
 
 ################################################################################
 # ENV - Main Path

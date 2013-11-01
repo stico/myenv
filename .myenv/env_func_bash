@@ -42,7 +42,7 @@ function func_param_check {
 function func_validate_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
 	
-	for path in $@ ; do
+	for path in "$@" ; do
 		[ ! -e "$path" ] && echo "ERROR: $path NOT exist!" && exit 1
 	done
 }
@@ -50,7 +50,7 @@ function func_validate_exist() {
 function func_validate_inexist() {
 	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
 	
-	for path in $@ ; do
+	for path in "$@" ; do
 		[ -e "$path" ] && echo "ERROR: $path already exist!" && exit 1
 	done
 }
@@ -71,6 +71,16 @@ function func_validate_cmd_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
 
 	( ! command -v "$1" &> /dev/null) && echo "ERROR: $1 not found (in PATH)" && exit 1
+}
+
+function func_cleanup_dotcache() {
+	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@"
+
+	for path in "$@" ; do
+		[ -e "$path/$DOT_CACHE_DL" ] && rm "$path/$DOT_CACHE_DL" 
+		[ -e "$path/$DOT_CACHE_FL" ] && rm "$path/$DOT_CACHE_FL" 
+		[ -e "$path/$DOT_CACHE_GREP" ] && rm "$path/$DOT_CACHE_GREP" 
+	done
 }
 
 function func_bak_file {
@@ -167,7 +177,7 @@ function func_select_line {
 	eval $result_var_name=$user_selection
 }
 
-function func_find_type_cache {
+function func_find_type_dotcache {
 	# NOTE: must keep interface consistency with func_find_type
 	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
@@ -176,13 +186,11 @@ function func_find_type_cache {
 	shift;shift
 
 	if [ "$find_type" = "d" ] ; then
-		list_file=".dl_me.txt" 
 		#func_gen_list d $base $list_file || return 1
-		func_gen_filedirlist $base $base/$list_file -type d || return 1
+		func_gen_filedirlist "$base" "$base/$DOT_CACHE_DL" -type d || return 1
 	else
-		list_file=".fl_me.txt"
 		#func_gen_list f $base $list_file || return 1
-		func_gen_filedirlist $base $base/$list_file -type f || return 1
+		func_gen_filedirlist "$base" "$base/$DOT_CACHE_FL" -type f || return 1
 	fi
 
 	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
@@ -192,7 +200,7 @@ function func_find_type_cache {
 }
 
 function func_find_type {
-	# NOTE: must keep interface consistency with func_find_type_cache
+	# NOTE: must keep interface consistency with func_find_type_dotcache
 	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
 	find_type=$1
@@ -207,7 +215,7 @@ function func_find_type {
 	echo "$targets"
 }
 
-function func_find_cache {
+function func_find_dotcache {
 	# NOTE: must keep interface consistency with func_find
 	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
@@ -218,14 +226,14 @@ function func_find_cache {
 	eval $result_var_name=""
 
 	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
-	targets=$(func_find_type_cache $find_type $*)
+	targets=$(func_find_type_dotcache $find_type $*)
 	[ $? -ne 0 ] && return 1
 
 	func_select_line $result_var_name shortest "$targets"
 }
 
 function func_find {
-	# NOTE: must keep interface consistency with func_find_cache
+	# NOTE: must keep interface consistency with func_find_dotcache
 	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
 
 	# need use variable to "return" result
@@ -294,7 +302,7 @@ function func_vi {
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
 	# Find target, if cache version return error, try no-cache version
-	func_find_cache result_target f $base $* || func_find result_target f $base $*
+	func_find_dotcache result_target f $base $* || func_find result_target f $base $*
 
 	# use original paramters if no target found
 	[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
@@ -311,13 +319,14 @@ function func_cd {
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && [ ! -d $tag_eval ] && echo "ERROR: tag ($1) found, but value ($tag_eval) not directory" && return 0
 	[ $# -eq 1 ] && [ -d $tag_eval ] && func_cd_conditional $tag_eval && return 0
 
 	# otherwise need search
 	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
 
 	# Find target, If cache version return error, try no-cache version
-	func_find_cache result_target d $base $* || func_find result_target d $base $*
+	func_find_dotcache result_target d $base $* || func_find result_target d $base $*
 
 	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist!"
 	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
@@ -431,7 +440,7 @@ function func_gen_list_f_me_git_only {
 }
 
 function func_gen_list_f_me { 
-	filelist_all=$MY_ENV/.fl_me.txt
+	filelist_all=$MY_ENV/$DOT_CACHE_FL
 	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
 	src_add=$MY_ENV/list/myenv_fl_add.lst
 
@@ -509,7 +518,7 @@ function func_grep_cmd {
 	eval "$@" | grep -i "$search_str"
 }
 
-function func_grep_dir_cached {
+function func_grep_dotcache {
 
 	# TODO
 	# - seems can not support grepfile "aaa\|bbb"
@@ -520,11 +529,8 @@ function func_grep_dir_cached {
 	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
 	shift;shift
 
-	filelist=.fl_me.txt
-	grep_result=.grep_me.txt
-
-	#func_gen_list f $base $filelist || func_die "ERROR: failed to gen $base/$filelist"
-	func_gen_filedirlist $base $base/$filelist -type f || func_die "ERROR: failed to gen $base/$filelist"
+	#func_gen_list f $base $DOT_CACHE_FL || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
+	func_gen_filedirlist "$base" "$base/$DOT_CACHE_FL" -type f || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
 
 
 	# Get search string and options
@@ -550,9 +556,9 @@ function func_grep_dir_cached {
 	search=${search//\\/.}							# make the path sep compatible
 	search=${search//\//.}							# make the sed (tput) coloring works
 
-	# Jump to base, since the filelist is using relative path
+	# Jump to base, since the DOT_CACHE_FL is using relative path
 	\cd $base
-	grep $suffix'$' $filelist	| \
+	grep $suffix'$' $DOT_CACHE_FL	| \
 	# Step: remove files not need to grep (for "grepfile")
 	sed -e "/\/.svn\//d" 		| \
 	sed -e "/\/.hg\//d" 		| \
@@ -560,17 +566,18 @@ function func_grep_dir_cached {
 	sed -e "/\/.lnk\//d"		| \
 	sed -e "/\/.metadata\//d"	| \
 	sed -e "/\/.class$\//d"		| \
-	sed -e "/.grep_result.txt/d"	| \
-	sed -e "/.grep_me.txt/d"	| \
+	sed -e "/$DOT_CACHE_DL/d"	| \
+	sed -e "/$DOT_CACHE_FL/d"	| \
+	sed -e "/$DOT_CACHE_GREP/d"	| \
 	sed -e "/\/.jar$\//d"		| \
 	# Step: special removal, the target is mvn, but might cause miss-hit!
 	sed -e "/\/target\//d"		| \
 	# Step: remove the fileist itself
-	sed -e "/$filelist$/d"		| \
+	sed -e "/$DOT_CACHE_FL$/d"	| \
 	# Step: grep result, -I: ignore binary, -oE & .{0.20}: only matched part and 20 char around
 	xargs --delimiter="\n" grep -d skip -I -i $options -oE ".{0,20}$search.{0,20}" | \
 	# store result for later ref
-	tee $grep_result		| \
+	tee $DOT_CACHE_GREP		| \
 	# re-color the result, since pipe swiped color even using "--color" in grep
 	sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
 
@@ -582,7 +589,7 @@ function func_grep_myenv {
 	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
 	func_gen_list_f_me
-	func_grep_dir_cached $MY_ENV ALL "$*"
+	func_grep_dotcache $MY_ENV ALL "$*"
 }
 
 function func_head {
@@ -674,18 +681,20 @@ function func_svn_update {
 	[ -n "$1" ] && src_path="$1" || src_path="."
 
 	# current dir is already project
-	[ -e $src_path/.svn ] && svn update $src_path && return 0
+	[ -e $src_path/.svn ] && svn update $src_path && func_cleanup_dotcache $src_path && return 0
 	
 	# projects are in subdir
 	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
 		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
-		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ 
+		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ && func_cleanup_dotcache $dir
 	done
+	func_cleanup_dotcache $src_path 
 }
 
 function func_git_pull { 
 	[ -n "$1" ] && \cd $1
 	git pull origin master && git status
+	func_cleanup_dotcache $PWD
 	[ -n "$1" ] && \cd -
 }
 
@@ -707,6 +716,7 @@ function func_git_commit_push {
 	git status 				&&
 	func_gen_list_f_me
 
+	func_cleanup_dotcache $PWD
 	[ -n "$target" ] && \cd -
 }
 
@@ -1089,9 +1099,9 @@ function func_backup_listed {
 	func_backup_dated $tmp_dir
 	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
 
-	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/.fl_me.txt 
-	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/.fl_me.txt 
-	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/.fl_me.txt 
+	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
+	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
+	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
 
 	#func_gen_list_f_me	
 	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
@@ -1142,3 +1152,9 @@ function func_ctrl_me {
 	$script 
 }
 
+function func_mount_iso {
+	func_param_check 2 "Usage: $FUNCNAME <target_path> <iso_path>" "$@" 
+
+	#mount -t iso9660 -o ro,loop,noauto /your/texlive2012.iso /mnt
+	sudo mount -t iso9660 -o ro,loop,noauto $2 $1
+}

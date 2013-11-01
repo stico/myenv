@@ -1,4 +1,5 @@
 # TODO: seems using '' for command not works, why?
+# Restart CMD: killall -HUP xbindkeys
 
 "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt"
   control+alt+c
@@ -17,6 +18,9 @@
 
 "/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
   control+alt+d
+
+"/usr/bin/wmctrl -a 'Mozilla Thunderbird' || /usr/bin/thunderbird"
+  control+alt+m
 
 "/usr/bin/wmctrl -a 'SINGLE_TERMINATOR' || /usr/bin/terminator --title SINGLE_TERMINATOR"
   control+alt+x
