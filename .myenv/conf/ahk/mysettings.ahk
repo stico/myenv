@@ -21,12 +21,10 @@ return
 Capslock::Ctrl
 ;+Capslock::Capslock	; seems will actually cause "ctrl"
 
-^!q::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Record.txt", false, false, false, "")
-^!z::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Schedule.txt", false, false, false, "")
-^!c::		ShowHide_TextWindow("Documents\DCB\Record\Z\A_A_NOTE_Copy.txt", true, false, true, "")
-^!a::		ShowHide_TextWindow("Documents\DCB\Collection_Note\allFile_All.txt", false, true, false, ": set isfname+=:")
-
-^!p::		ShowHide_TextWindow("dev\a_workspaces\A_Project.lst", true, false, false, ": set isfname+=:")
+;^!q::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Record.txt", false, false, false, "")
+;^!z::		ShowHide_TextWindow("Documents\DCB\Google Drive\NOTE\A_A_NOTE_Schedule.txt", false, false, false, "")
+;^!c::		ShowHide_TextWindow("Documents\DCB\Record\Z\A_A_NOTE_Copy.txt", true, false, true, "")
+;^!a::		ShowHide_TextWindow(".myenv\zgen\collection_note\note_collection_txt.txt", false, true, false, ": set isfname+=:")
 
 ^!x::		ShowHide_Window("E:\program\A_System_ConEmuPack_X\ConEmu.exe", "ahk_class VirtualConsoleClass")
 ^!f::		ShowHide_Window("E:\program\doublecmd-0.5.6.x86_64\doublecmd.exe", "Double Commander")
@@ -88,6 +86,7 @@ InitGlobalVar()
 }
 
 ; Deprecated, but the logic in them may useful
+;^!p::		ShowHide_TextWindow("dev\a_workspaces\A_Project.lst", true, false, false, ": set isfname+=:")
 ;^ESC::		RunTaskCenter()	
 ;$!Enter::	Filter_A_Enter()
 ;$^!s::		Filter_CtrlAlt_s_Vim()

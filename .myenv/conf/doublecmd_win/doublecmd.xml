@@ -281,14 +281,14 @@
     <Position>0</Position>
     <OpenedTabs>
       <Left>
-        <ActiveTab>3</ActiveTab>
+        <ActiveTab>2</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\program\</Path>
+                  <Path>E:\amp\download\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -330,7 +330,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\amp\download\</Path>
+                  <Path>E:\Documents\DCD\A_General\KPI\history\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -354,7 +354,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\dev\code_dw\yypay_trunk\</Path>
+                  <Path>E:\Documents\DCD\A_General\Mail\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -368,20 +368,20 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>8</ActiveTab>
+        <ActiveTab>1</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <Sortings>
               <Sorting>
                 <Direction>1</Direction>
-                <Function>11</Function>
+                <Function>0</Function>
               </Sorting>
             </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCO\Job_Recruit\PaperTest_Dev_DW\</Path>
+                  <Path>E:\Documents\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -399,7 +399,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\.myenv\secu\iptables\example\update.233\</Path>
+                  <Path>E:\.myenv\conf\ahk\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -417,7 +417,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCB\Collection_Note\</Path>
+                  <Path>E:\Documents\DCB\DatedBackup\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -459,7 +459,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\</Path>
+                  <Path>E:\Documents\DCD\A_General\KPI\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -531,7 +531,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\amp\download\</Path>
+                  <Path>E:\amp\2013-10\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -768,8 +768,8 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>55</Left>
-      <Top>0</Top>
+      <Left>236</Left>
+      <Top>124</Top>
       <Width>980</Width>
       <Height>400</Height>
       <Maximized>False</Maximized>
