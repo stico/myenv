@@ -40,10 +40,6 @@ gitcommitpush		"func_git_commit_push"
 ddelete			"func_delete_dated"
 dbackup			"func_backup_dated"
 
-			# Head: d - dev 
-dloadpyvenv		"source %PYTHON_HOME%/bin/virtualenvwrapper.sh"
-dloadrbvenv		"[ -e %RVM_HOME%/scripts/rvm ] && source %RVM_HOME%/scripts/rvm"
-
 			# Head: e - myenv 
 egf			"func_grep_myenv"
 ebackup			"func_gen_list_f_me; func_backup_listed myenv_full %MY_ENV%/zgen/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
@@ -53,6 +49,10 @@ egitpull		"func_git_pull %HOME%; eload"
 egitstatus		"func_git_status %HOME%"
 egitcommitpush		"func_git_commit_push %HOME%"
 #eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
+
+			# Head: d - dev 
+loadrvm			"func_load_rvm"
+loadvirtualenv		"func_load_virtualenvwrapper"
 
 			# Head: s - ssh
 sshx			"func_ssh_with_jump"

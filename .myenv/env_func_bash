@@ -76,10 +76,10 @@ function func_validate_cmd_exist() {
 function func_cleanup_dotcache() {
 	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@"
 
-	for path in "$@" ; do
-		[ -e "$path/$DOT_CACHE_DL" ] && rm "$path/$DOT_CACHE_DL" 
-		[ -e "$path/$DOT_CACHE_FL" ] && rm "$path/$DOT_CACHE_FL" 
-		[ -e "$path/$DOT_CACHE_GREP" ] && rm "$path/$DOT_CACHE_GREP" 
+	for p in "$@" ; do
+		[ -e "$p/$DOT_CACHE_DL" ] && rm "$p/$DOT_CACHE_DL" 
+		[ -e "$p/$DOT_CACHE_FL" ] && rm "$p/$DOT_CACHE_FL" 
+		[ -e "$p/$DOT_CACHE_GREP" ] && rm "$p/$DOT_CACHE_GREP" 
 	done
 }
 
@@ -187,14 +187,16 @@ function func_find_type_dotcache {
 
 	if [ "$find_type" = "d" ] ; then
 		#func_gen_list d $base $list_file || return 1
-		func_gen_filedirlist "$base" "$base/$DOT_CACHE_DL" -type d || return 1
+		list_file="$base/$DOT_CACHE_DL" 
+		func_gen_filedirlist "$base" $list_file -type d || return 1
 	else
 		#func_gen_list f $base $list_file || return 1
-		func_gen_filedirlist "$base" "$base/$DOT_CACHE_FL" -type f || return 1
+		list_file="$base/$DOT_CACHE_FL" 
+		func_gen_filedirlist "$base" $list_file -type f || return 1
 	fi
 
 	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-	targets=`cat $base/$list_file | sed -e "/^$/d" | grep -i "$search"`
+	targets=`cat $list_file | sed -e "/^$/d" | grep -i "$search"`
 
 	echo "$targets"
 }
@@ -267,6 +269,26 @@ function func_vi_conditional {
 		[ -z "$target_origin" ] && target_cyg="" || target_cyg=`cygpath -w "$target_origin"`
 		( \\gvim $parameters $target_cyg & ) &> /dev/null
 	fi
+}
+
+function func_load_virtualenvwrapper {
+	# virtualenvwrapper is for python virtual env
+	source $PYTHON_HOME/bin/virtualenvwrapper.sh
+}
+
+function func_load_rvm {
+	# rvm is for ruby virtual env
+
+	# Init rvm step 1: rvm hacks command "cd", record it before myenv loads func_cd 
+	[ -e "$RVM_HOME/scripts/rvm" ] && source "$RVM_HOME/scripts/rvm"
+	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
+
+	# Reload myenv
+	source %HOME%/.bashrc
+
+	# Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
+	#[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && rvm use ruby-1.9.3-p327@global --default &> /dev/null
+	[ -e "$RVM_HOME/scripts/rvm" ] && rvm use ruby-2.0.0-p247@global --default
 }
 
 function func_cd_conditional {
@@ -507,6 +529,7 @@ function func_gen_collection_note {
 	func_backup_dated "$target_original_file" 
 	rm -rf "$target_original_file"
 
+	func_cleanup_dotcache $MY_ENV $MY_ENV_ZGEN
 	\cd - > /dev/null
 }
 
@@ -942,7 +965,7 @@ function func_translate {
 	[ -z "$unique_name" ] && echo "WARN: command hostid return empty!"
 
 	# check history
-	history_txt=$(grep "^$*" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	history_txt=$(grep "^$*[^A-Za-z0-9_]" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	func_translate_google "$@" || func_translate_microsoft "$@"

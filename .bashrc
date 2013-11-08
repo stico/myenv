@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # TODO: seems cygwin init is very slow
+# NOTE: unison remote style can not accept .bashrc have output
 
 # set flags
 [ $(uname -s | grep -c CYGWIN) -eq 1 ] && os_cygwin="true" || os_cygwin="false"
@@ -41,18 +42,9 @@ fi
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-# Init rvm step 1: rvm hacks command "cd", record it before myenv loads func_cd 
-[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && source /home/ouyangzhu/.rvm/scripts/rvm
-[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
-
 # Init myenv
 source $HOME/.myenv/init/bash.sh
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
-
-# Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
-# The unison remote style can not accept .bashrc have output
-#rvm use ruby-1.9.3-p327@global --default
-[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && rvm use ruby-1.9.3-p327@global --default &> /dev/null
 
 # call functions
 func_ssh_agent_init
