@@ -4,7 +4,7 @@
 "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt"
   control+alt+c
 
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/note_collection_txt.txt"
+"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt"
   control+alt+a
 
 "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Google\ Drive/NOTE/A_A_NOTE_Record.txt"

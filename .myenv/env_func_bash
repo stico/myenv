@@ -515,8 +515,6 @@ function deprecated_func_gen_grep_pattern_str {
 function func_gen_collection {
 	func_param_check 5 "Usage: $FUNCNAME [target_base] [source_bases] [source_quick_link] [include_patterns] [exclude_patterns]" "$@"
 
-	# TODO: migration: update name func_gen_collection_note
-	# TODO: migration: update name of "collection_quick_link_files"
 	# TODO: migration: update file path in vimrc and xkeybindings
 	# TODO: make it optional: backup original file feature
 
@@ -590,33 +588,36 @@ function func_gen_collection_code {
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .rb$ .ruby$ .java$ .html$ .htm$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
-	exclude_patterns=(.doc$ .min.js$ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
+	exclude_patterns=(.doc$ .min.js$ .compressed.js$ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
 
 	func_gen_collection $target_base $source_bases "" $include_patterns $exclude_patterns
 }
 
 function func_gen_collection_note {
+
+	# TODO: the output file is not utf8?
+	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
+
+	target_base=$MY_ENV/zgen/collection_note
+	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)			# Not included DCM, put DCD first
+	source_quick_link=$(eval echo "$MY_ENV/list/collection_note_quick_link")
+
+	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
+	include_patterns=(A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
+	exclude_patterns=(.lnk$ /DCB/DatedBackup/)
+	func_gen_collection $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+
+
+	return
+	#Following are deprecated but not delete yet
+
+
 	target_base=$MY_ENV/zgen/collection_note
 	target_original_file=$target_base/original_files
 	target_note_collection_fl=$target_base/note_collection_fl.txt
 	target_note_collection_txt=$target_base/note_collection_txt.txt
 	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)	# Not included DCM, put DCD first
 	source_note_list=$MY_ENV/list/collection_quick_link_files
-
-
-
-	target_base=$MY_ENV/zgen/collection_note
-	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)	# Not included DCM, put DCD first
-
-	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	include_patterns=(A_NOTE_ --NOTE-- --NOTED-- .bash$ .sh$)
-	include_patterns=(.lnk$ /DCB/DatedBackup/)
-	source_quick_link="$MYENV/list/collection_note_quick_link"
-	#func_gen_collection $target_base $source_bases "" $include_patterns $exclude_patterns
-	#return
-
-
-
 
 	# clean up old things
 	[ -e "$target_base" ] && rm -rf "$target_base"
