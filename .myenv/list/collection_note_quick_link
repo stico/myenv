@@ -40,9 +40,9 @@ $MY_DOC/DCB/Collection_Note/allFile_Script_Shell.txt
 
 # Z
 $HOME/.vimrc
-$MY_DOC/DCC/Tool_Regex/A_NOTE_Regex.txt
-$MY_DOC/DCB/Collection_Note/Script/QuickLinkFileList.txt
 $MY_DOC/DCC/Dev_SCM_Git/A_NOTE_Git.txt
+$MY_DOC/DCC/Tool_Regex/A_NOTE_Regex.txt
+$MY_ENV/list/collection_note_quick_link
 $MY_DOC/DCC/Programming_Javascript/A_NOTE_JavaScript.txt
 $MY_DOC/DCB/Software/A_NOTE_SoftList.txt
 $MY_DOC/DCC/Tool_Eclipse/A_NOTE_Eclipse.txt
