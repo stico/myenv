@@ -1,6 +1,6 @@
 #!/bin/bash
 
-usage="$0 [gen/update]\n\tgen\t\twill just gen hosts list,\n\tupdate\t\twill update /etc/hosts"
+usage="$0 [gen/update]\n\tgen\t\twill just gen hosts list,\n\tupdate\t\twill gen and update /etc/hosts"
 [ $# -lt 1 ] && echo -e $usage && exit 1
 
 target_sys=$LOC_HOSTS 

@@ -512,7 +512,7 @@ function deprecated_func_gen_grep_pattern_str {
 	eval $result_var_name=$result_pattern_str
 }
 
-function func_gen_collection {
+function func_collect_files {
 	func_param_check 5 "Usage: $FUNCNAME [target_base] [source_bases] [source_quick_link] [include_patterns] [exclude_patterns]" "$@"
 
 	# TODO: migration: update file path in vimrc and xkeybindings
@@ -541,7 +541,7 @@ function func_gen_collection {
 		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
 		#echo "$include_pattern_str"
 		#echo "$exclude_pattern_str"
-		egrep -i "$include_pattern_str" fl_${tag}.txt | egrep -v "$exclude_pattern_str" >> ${target_collection_fl}
+		egrep -i "$include_pattern_str" fl_${tag}.txt | egrep -v -i "$exclude_pattern_str" >> ${target_collection_fl}
 	done
 
 	echo "INFO: start to Collect and backup original file"
@@ -569,6 +569,7 @@ function func_gen_collection {
 		
 		count=$(($count + 1)) && [ $(($count % 100)) -eq 0 ] && echo "INFO: collected $count files"
 	done < ${target_collection_fl}
+	echo "INFO: collected $count files"
 
 	# append all file list in the end
 	echo -e "\n\n>>> File list of ${source_bases[@]} \n\n" >> ${target_collection_content}
@@ -582,18 +583,19 @@ function func_gen_collection {
 	\cd - > /dev/null
 }
 
-function func_gen_collection_code {
+function func_collect_code {
 	target_base=$MY_ENV/zgen/collection_code
 	source_bases=(dw repo)
+	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .rb$ .ruby$ .java$ .html$ .htm$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
 	exclude_patterns=(.doc$ .min.js$ .compressed.js$ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
 
-	func_gen_collection $target_base $source_bases "" $include_patterns $exclude_patterns
+	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 }
 
-function func_gen_collection_note {
+function func_collect_note {
 
 	# TODO: the output file is not utf8?
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
@@ -604,8 +606,8 @@ function func_gen_collection_note {
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	include_patterns=(A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
-	exclude_patterns=(.lnk$ /DCB/DatedBackup/)
-	func_gen_collection $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+	exclude_patterns=(.lnk$ /DCB/DatedBackup/ thunderbird.*trash)
+	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 
 
 	return
