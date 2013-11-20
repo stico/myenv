@@ -23,19 +23,38 @@ function init_git {
 	git_name="${git_tar%%.tar.gz}"
 	#git_url="https://git-core.googlecode.com/files/${git_tar}"
 	git_url="https://www.kernel.org/pub/software/scm/git/${git_tar}"
-	git_target="${HOME}/dev/${git_name}"
+	git_target_path="${HOME}/dev/${git_name}"
 	git_target_link="${HOME}/dev/git"
 
-	cd ${HOME} && rm -rf "$git_tar" "$git_name" && wget "$git_url" && tar zxvf "$git_tar" && cd "$git_name"
+	# Download source
+	cd /tmp && rm -rf "$git_tar" "$git_name" && wget "$git_url" && tar zxvf "$git_tar" && cd "$git_name"
 	[ "$?" -ne "0" ] && echo "ERROR: failed to get git source" && exit 1
-	rm -rf "$git_target" "$git_target_link"
-	mkdir -p "$git_target"
+
+	# Compile - prepare options
+	# Note 1: not really need gettext (cause git could only use in English)
+	# Note 2: not really need tcl_tk (cause git could only use command line)
+	# Note 3: zlib1g-dev is a must
+	option_make="NO_GETTEXT=1 NO_TCLTK=1"
+	option_configure=""
+	if dpkg -l | grep -q zlib1g-dev ; then
+		cd /tmp
+		apt-get source zlib1g-dev
+		zlib_name=$(ls | grep zlib-)
+		[ ! -e "/tmp/$zlib_name" ] && echo "ERROR: failed to install dependency zlib1g-dev" && exit 1
+		cd /tmp/$zlib_name
+		./configure --prefix=$HOME/dev/$zlib_name && make && make install
+		option_configure="$option_configure --with-zlib=$HOME/dev/$zlib_name "
+	fi
 
 	# Compile
-	# Note 1: some env can not install gettext correct which cause "/usr/lib/libevent.so.tar.gz is not an ELF file" error, so not compile with tcl/tk
-	./configure --prefix="$git_target" --without-tcltk && make && make install
+	rm -rf "$git_target_path" "$git_target_link"
+	mkdir -p "$git_target_path"
+	cd /tmp/"$git_name"
+	#./configure --prefix="$git_target_path" --without-tcltk && make && make install
+	#./configure --prefix=$HOME/dev/git-1.8.4.3 --with-zlib=$HOME/dev/zlib && make NO_GETTEXT=1 NO_TCLTK=1 install
+	./configure --prefix="$git_target_path" $option_configure && make $option_make install
 
-	ln -s "$git_target" "$git_target_link"
+	ln -s "$git_target_path" "$git_target_link"
 }
 
 function init_env_with_git {
