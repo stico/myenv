@@ -15,7 +15,7 @@ function init_git {
 	# Try install by system
 	# Note 1: the git install command should be separate, seems its fail will make other package not continue
 	(sudo -n ls &> /dev/null) && sudo apt-get update 
-	(sudo -n ls &> /dev/null) && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential tree zip unzip subversion && return 0
+	(sudo -n ls &> /dev/null) && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential tree zip unzip subversion 
 	(sudo -n ls &> /dev/null) && sudo apt-get install -y git && return 0
 
 	# Try compile
