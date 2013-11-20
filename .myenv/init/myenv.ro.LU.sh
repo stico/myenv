@@ -25,9 +25,11 @@ function init_git {
 
 	cd ${HOME} && rm -rf "$git_tar" "$git_name" && wget "$git_url" && tar zxvf "$git_tar" && cd "$git_name"
 	[ "$?" -ne "0" ] && echo "ERROR: failed to get git source" && exit 1
-
-	rm -rf "$git_target"
+	rm -rf "$git_target" "$git_target_link"
 	mkdir -p "$git_target"
+
+	# Compile
+	# Note 1: some env can not install gettext correct which cause "/usr/lib/libevent.so.tar.gz is not an ELF file" error, so not compile with tcl/tk
 	./configure --prefix="$git_target" --without-tcltk && make && make install
 
 	ln -s "$git_target" "$git_target_link"
