@@ -3,7 +3,8 @@
 # Command: rm /tmp/myenv.ro.LU.sh ; wget -O /tmp/myenv.ro.LU.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh && bash /tmp/myenv.ro.LU.sh 
 
 git_myenv_name=myenv
-git_myenv_addr=https://github.com/stico/myenv.git
+git_myenv_addr=git://github.com/stico/myenv.git
+#git_myenv_addr=https://github.com/stico/myenv.git	# not work when libcurl not support https
 #git_myenv_addr=git@github.com:stico/myenv.git		# need priviledge
 
 function init_git {
@@ -40,27 +41,27 @@ function init_git {
 		cd /tmp
 		apt-get source zlib1g-dev
 		zlib_name=$(ls | grep zlib-)
-		[ ! -e "/tmp/$zlib_name" ] && echo "ERROR: failed to install dependency zlib1g-dev" && exit 1
+		[ ! -e "/tmp/$zlib_name" ] && echo "ERROR: failed to download source of zlib1g-dev" && exit 1
 		cd /tmp/$zlib_name
 		./configure --prefix=$HOME/dev/$zlib_name && make && make install
 		option_configure="$option_configure --with-zlib=$HOME/dev/$zlib_name "
-		[ ! -e "$HOME/dev/$zlib_name" ] && echo "ERROR: failed to install zlib." && exit 1
+		[ ! -e "$HOME/dev/$zlib_name" ] && echo "ERROR: failed to install dependency zlib1g-dev" && exit 1
 	fi
 	if ( ! dpkg -l | grep -q openssl ) ; then
 		cd /tmp
 		apt-get source openssl
 		openssl_name=$(ls | grep openssl-)
-		[ ! -e "/tmp/$openssl_name" ] && echo "ERROR: failed to install dependency openssl" && exit 1
+		[ ! -e "/tmp/$openssl_name" ] && echo "ERROR: failed to download source of openssl" && exit 1
 		cd /tmp/$openssl_name
 		./configure --prefix=$HOME/dev/$openssl_name && make && make install
 		option_configure="$option_configure --with-openssl=$HOME/dev/$openssl_name "
-		[ ! -e "$HOME/dev/$openssl_name" ] && echo "ERROR: failed to install openssl" && exit 1
+		[ ! -e "$HOME/dev/$openssl_name" ] && echo "ERROR: failed to install dependency openssl" && exit 1
 	fi
 	if ( ! dpkg -l | grep -q libcurl4-gnutls-dev ) ; then
 		cd /tmp
 		apt-get source libcurl4-gnutls-dev
 		curl_name=$(ls | grep curl-)
-		[ ! -e "/tmp/$curl_name" ] && echo "ERROR: failed to install dependency libcurl4-gnutls-dev" && exit 1
+		[ ! -e "/tmp/$curl_name" ] && echo "ERROR: failed to download source of libcurl4-gnutls-dev" && exit 1
 		cd /tmp/$curl_name
 
 		if ( ! dpkg -l | grep -q openssl ) ; then
@@ -70,7 +71,7 @@ function init_git {
 		fi
 
 		option_configure="$option_configure --with-curl=$HOME/dev/$curl_name "
-		[ ! -e "$HOME/dev/$curl_name" ] && echo "ERROR: failed to install curl" && exit 1
+		[ ! -e "$HOME/dev/$curl_name" ] && echo "ERROR: failed to install dependency libcurl4-gnutls-dev" && exit 1
 	fi
 	echo "INFO: option_make=$option_make"
 	echo "INFO: option_configure=$option_configure"
