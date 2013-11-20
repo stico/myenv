@@ -44,6 +44,7 @@ function init_git {
 		cd /tmp/$zlib_name
 		./configure --prefix=$HOME/dev/$zlib_name && make && make install
 		option_configure="$option_configure --with-zlib=$HOME/dev/$zlib_name "
+		[ ! -e "$HOME/dev/$zlib_name" ] && echo "ERROR: failed to install zlib." && exit 1
 	fi
 	if ( ! dpkg -l | grep -q openssl ) ; then
 		cd /tmp
@@ -53,6 +54,7 @@ function init_git {
 		cd /tmp/$openssl_name
 		./configure --prefix=$HOME/dev/$openssl_name && make && make install
 		option_configure="$option_configure --with-openssl=$HOME/dev/$openssl_name "
+		[ ! -e "$HOME/dev/$openssl_name" ] && echo "ERROR: failed to install openssl" && exit 1
 	fi
 	if ( ! dpkg -l | grep -q libcurl4-gnutls-dev ) ; then
 		cd /tmp
@@ -60,8 +62,15 @@ function init_git {
 		curl_name=$(ls | grep curl-)
 		[ ! -e "/tmp/$curl_name" ] && echo "ERROR: failed to install dependency libcurl4-gnutls-dev" && exit 1
 		cd /tmp/$curl_name
-		./configure --prefix=$HOME/dev/$curl_name && make && make install
+
+		if ( ! dpkg -l | grep -q openssl ) ; then
+			./configure --prefix=$HOME/dev/$curl_name --with-ssl=$openssl_name  && make && make install
+		else
+			./configure --prefix=$HOME/dev/$curl_name --with-ssl && make && make install
+		fi
+
 		option_configure="$option_configure --with-curl=$HOME/dev/$curl_name "
+		[ ! -e "$HOME/dev/$curl_name" ] && echo "ERROR: failed to install curl" && exit 1
 	fi
 	echo "INFO: option_make=$option_make"
 	echo "INFO: option_configure=$option_configure"
