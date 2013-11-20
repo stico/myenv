@@ -21,14 +21,16 @@ function init_git {
 	#git_url="https://git-core.googlecode.com/files/${git_tar}"
 	git_url="https://www.kernel.org/pub/software/scm/git/${git_tar}"
 	git_target="${HOME}/dev/${git_name}"
+	git_target_link="${HOME}/dev/git"
 
 	cd ${HOME} && rm -rf "$git_tar" "$git_name" && wget "$git_url" && tar zxvf "$git_tar" && cd "$git_name"
 	[ "$?" -ne "0" ] && echo "ERROR: failed to get git source" && exit 1
 
+	rm -rf "$git_target"
 	mkdir -p "$git_target"
-	./configure --prefix="$git_target" && make && make install
+	./configure --prefix="$git_target" --without-tcltk && make && make install
 
-	ln -s ${HOME}/dev/${git_target} ${HOME}/dev/git
+	ln -s "$git_target" "$git_target_link"
 }
 
 function init_env_with_git {
