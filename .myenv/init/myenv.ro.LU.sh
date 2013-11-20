@@ -53,7 +53,11 @@ function init_git {
 		cd /tmp/$openssl_name
 		./configure --prefix=$HOME/dev/$openssl_name && make && make install
 		option_configure="$option_configure --with-openssl=$HOME/dev/$openssl_name "
+	else
+		option_configure="$option_configure --with-openssl "
 	fi
+	echo "INFO: option_make=$option_make"
+	echo "INFO: option_configure=$option_configure"
 
 	# Compile
 	rm -rf "$git_target_path" "$git_target_link"
