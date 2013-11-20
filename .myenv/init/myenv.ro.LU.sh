@@ -53,8 +53,15 @@ function init_git {
 		cd /tmp/$openssl_name
 		./configure --prefix=$HOME/dev/$openssl_name && make && make install
 		option_configure="$option_configure --with-openssl=$HOME/dev/$openssl_name "
-	else
-		option_configure="$option_configure --with-openssl "
+	fi
+	if ( ! dpkg -l | grep -q libcurl4-gnutls-dev ) ; then
+		cd /tmp
+		apt-get source libcurl4-gnutls-dev
+		curl_name=$(ls | grep curl-)
+		[ ! -e "/tmp/$curl_name" ] && echo "ERROR: failed to install dependency libcurl4-gnutls-dev" && exit 1
+		cd /tmp/$curl_name
+		./configure --prefix=$HOME/dev/$curl_name && make && make install
+		option_configure="$option_configure --with-curl=$HOME/dev/$curl_name "
 	fi
 	echo "INFO: option_make=$option_make"
 	echo "INFO: option_configure=$option_configure"
