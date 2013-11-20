@@ -10,18 +10,19 @@ function init_git {
 	
 	# Check if already exist
 	(command -v git &> /dev/null) && echo "INFO: git already exist, skip init git" && return 0 
-	[ -e ~/dev/git ] && echo "INFO: git already exist, skip init git" && return 0
+	[ -e ${HOME}/dev/git ] && echo "INFO: git already exist, skip init git" && return 0
 
 	# Try install by system
-	(sudo -n ls &> /dev/null) && sudo apt-get install -y git tree zip unzip subversion > /dev/null && return 0
+	(sudo -n ls &> /dev/null) && sudo apt-get update && sudo apt-get install -y git tree zip unzip subversion > /dev/null && return 0
 
 	# Try compile
 	git_tar="git-1.8.4.3.tar.gz"
 	git_name="${git_tar%%.tar.gz}"
-	git_url="https://git-core.googlecode.com/files/${git_tar}"
-	git_target="~/dev/${git_name}"
+	#git_url="https://git-core.googlecode.com/files/${git_tar}"
+	git_url="https://www.kernel.org/pub/software/scm/git/${git_tar}"
+	git_target="${HOME}/dev/${git_name}"
 
-	cd ~ && rm -rf "$git_tar" "$git_name" && wget "$git_url" && tar zxvf "$git_tar" && cd "$git_name"
+	cd ${HOME} && rm -rf "$git_tar" "$git_name" && wget "$git_url" && tar zxvf "$git_tar" && cd "$git_name"
 	[ "$?" -ne "0" ] && echo "ERROR: failed to get git source" && exit 1
 
 	mkdir -p "$git_target"
@@ -29,7 +30,7 @@ function init_git {
 	make
 	make install
 
-	ln -s ~/dev/${git_target} ~/dev/git
+	ln -s ${HOME}/dev/${git_target} ${HOME}/dev/git
 }
 
 function init_env_with_git {
@@ -38,16 +39,16 @@ function init_env_with_git {
 	tmp_init_dir=/tmp/myenv_init/`date "+%Y%m%d_%H%M%S"`
 	mkdir -p $tmp_init_dir
 	cd $tmp_init_dir
-	( command -v git &> /dev/null ) && git="git" || git="~/dev/git/bin/git"
+	( command -v git &> /dev/null ) && git="git" || git="${HOME}/dev/git/bin/git"
 
 	$git clone $git_myenv_addr
 	[ ! -e $tmp_init_dir/$git_myenv_name/.git ] && echo "ERROR: failed to init myenv, pls check!" && exit 1
 
-	mv $tmp_init_dir/$git_myenv_name/* ~
-	mv $tmp_init_dir/$git_myenv_name/.* ~
-	#rm -rf ~/$git_myenv_name/
+	mv $tmp_init_dir/$git_myenv_name/* ${HOME}
+	mv $tmp_init_dir/$git_myenv_name/.* ${HOME}
+	#rm -rf ${HOME}/$git_myenv_name/
 
-	cd ~
+	cd ${HOME}
 	$git remote add github $git_myenv_addr
 	echo "INFO: myenv init success (git way)!"
 }
@@ -70,12 +71,12 @@ function init_env_without_git {
 	unzip $pkg_name
 	[ ! -e $tmp_init_dir/$git_myenv_name/.myenv ] && echo "ERROR: failed to init myenv, pls check!" && exit 1
 
-	mv -f $tmp_init_dir/$dir_name/* ~
-	mv -f $tmp_init_dir/$dir_name/.* ~
+	mv -f $tmp_init_dir/$dir_name/* ${HOME}
+	mv -f $tmp_init_dir/$dir_name/.* ${HOME}
 	echo "INFO: myenv init success (unzip way)!"
 }
 
-[ -e ~/.git ] && echo "~/.git already exist, will not init (RO), pls check!" && exit 0
+[ -e ${HOME}/.git ] && echo "${HOME}/.git already exist, will not init (RO), pls check!" && exit 0
 
 init_git
 init_env_with_git
