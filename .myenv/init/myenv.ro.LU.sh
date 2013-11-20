@@ -36,7 +36,7 @@ function init_git {
 	# Note 3: zlib1g-dev is a must
 	option_make="NO_GETTEXT=1 NO_TCLTK=1"
 	option_configure=""
-	if dpkg -l | grep -q zlib1g-dev ; then
+	if ( ! dpkg -l | grep -q zlib1g-dev ) ; then
 		cd /tmp
 		apt-get source zlib1g-dev
 		zlib_name=$(ls | grep zlib-)
@@ -44,6 +44,15 @@ function init_git {
 		cd /tmp/$zlib_name
 		./configure --prefix=$HOME/dev/$zlib_name && make && make install
 		option_configure="$option_configure --with-zlib=$HOME/dev/$zlib_name "
+	fi
+	if ( ! dpkg -l | grep -q libssl-dev ) ; then
+		cd /tmp
+		apt-get source libssl-dev
+		libssl_name=$(ls | grep libssl-)
+		[ ! -e "/tmp/$libssl_name" ] && echo "ERROR: failed to install dependency libssl-dev" && exit 1
+		cd /tmp/$libssl_name
+		./configure --prefix=$HOME/dev/$libssl_name && make && make install
+		option_configure="$option_configure --with-openssl=$HOME/dev/$libssl_name "
 	fi
 
 	# Compile
