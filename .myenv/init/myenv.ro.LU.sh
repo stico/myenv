@@ -13,7 +13,8 @@ function init_git {
 	[ -e ${HOME}/dev/git ] && echo "INFO: git already exist, skip init git" && return 0
 
 	# Try install by system
-	(sudo -n ls &> /dev/null) && sudo apt-get update && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential tree zip unzip subversion git > /dev/null && return 0
+	(sudo -n ls &> /dev/null) && sudo apt-get update 
+	(sudo -n ls &> /dev/null) && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential tree zip unzip subversion git > /dev/null && return 0
 
 	# Try compile
 	git_tar="git-1.8.4.3.tar.gz"
