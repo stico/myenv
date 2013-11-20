@@ -15,7 +15,7 @@ function init_git {
 	# Try install by system
 	# Note 1: the git install command should be separate, seems its fail will make other package not continue
 	(sudo -n ls &> /dev/null) && sudo apt-get update 
-	(sudo -n ls &> /dev/null) && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential tree zip unzip subversion 
+	(sudo -n ls &> /dev/null) && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev openssl libssl-dev build-essential tree zip unzip subversion 
 	(sudo -n ls &> /dev/null) && sudo apt-get install -y git && return 0
 
 	# Try compile
@@ -45,14 +45,14 @@ function init_git {
 		./configure --prefix=$HOME/dev/$zlib_name && make && make install
 		option_configure="$option_configure --with-zlib=$HOME/dev/$zlib_name "
 	fi
-	if ( ! dpkg -l | grep -q libssl-dev ) ; then
+	if ( ! dpkg -l | grep -q openssl ) ; then
 		cd /tmp
-		apt-get source libssl-dev
-		libssl_name=$(ls | grep libssl-)
-		[ ! -e "/tmp/$libssl_name" ] && echo "ERROR: failed to install dependency libssl-dev" && exit 1
-		cd /tmp/$libssl_name
-		./configure --prefix=$HOME/dev/$libssl_name && make && make install
-		option_configure="$option_configure --with-openssl=$HOME/dev/$libssl_name "
+		apt-get source openssl
+		openssl_name=$(ls | grep openssl-)
+		[ ! -e "/tmp/$openssl_name" ] && echo "ERROR: failed to install dependency openssl && exit 1
+		cd /tmp/$openssl_name
+		./configure --prefix=$HOME/dev/$openssl_name && make && make install
+		option_configure="$option_configure --with-openssl=$HOME/dev/$openssl_name "
 	fi
 
 	# Compile
