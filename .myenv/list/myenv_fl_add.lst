@@ -18,8 +18,8 @@ $MY_DEV/eclipse/eclipse.ini
 
 /.ssh/
 /.subversion/
+/.VirtualBoxVMs/
 /.smbcredentials
-/VirtualBox\ VMs
 /.m2/settings.xml
 /.config/autostart/
 /.thunderbird/profiles.ini

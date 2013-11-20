@@ -144,7 +144,7 @@ function func_eval {
 	fi
 }
 
-function func_path_eval {
+function func_eval_path {
 	func_param_check 2 "Usage: $FUNCNAME <result_var_name> <pathstr>" "$@"
 
 	# need use variable to "return" result
@@ -484,7 +484,7 @@ function func_gen_list_f_me {
 
 	sed -e "s/^/..\//" $filelist_git > $filelist_all
 	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
-		func_path_eval candidate $line
+		func_eval_path candidate $line
 		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
 		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
 	done
@@ -589,8 +589,8 @@ function func_collect_code {
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .rb$ .ruby$ .java$ .html$ .htm$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
-	exclude_patterns=(.doc$ .min.js$ .compressed.js$ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
+	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
+	exclude_patterns=(.doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
 
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 }

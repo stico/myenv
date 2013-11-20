@@ -18,7 +18,7 @@ $MY_DOC/DCC/OS_Win/A_NOTE_Win.txt
 C:/WINDOWS/system32/drivers/etc/hosts
 $MY_ENV/conf/ahk/mySettings.ahk
 $MY_ENV/conf/ahk/myHotString.ahk
-
+$MY_DOC/DCC/A_NOTE_DCC.txt
 $MY_DOC/DCC/Business_Net_Pay/A_NOTE_Pay.txt
 $MY_DOC/DCB/Record/Z/Schedule_History_NotNeedToCollect.txt
 
