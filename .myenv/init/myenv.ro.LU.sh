@@ -49,7 +49,7 @@ function init_git {
 		cd /tmp
 		apt-get source openssl
 		openssl_name=$(ls | grep openssl-)
-		[ ! -e "/tmp/$openssl_name" ] && echo "ERROR: failed to install dependency openssl && exit 1
+		[ ! -e "/tmp/$openssl_name" ] && echo "ERROR: failed to install dependency openssl" && exit 1
 		cd /tmp/$openssl_name
 		./configure --prefix=$HOME/dev/$openssl_name && make && make install
 		option_configure="$option_configure --with-openssl=$HOME/dev/$openssl_name "
