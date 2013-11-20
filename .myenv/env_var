@@ -60,6 +60,9 @@ PATH		%NODE_HOME%#bin
 PHP_HOME	%MY_DEV%#php
 PATH		%PHP_HOME%#bin
 
+GIT_HOME	%MY_DEV%#git
+PATH		%GIT_HOME%#bin
+
 #Use rvm version
 #RUBY_HOME	%MY_DEV%#ruby
 #PATH		%RUBY_HOME%#bin
