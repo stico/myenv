@@ -13,7 +13,7 @@ function init_git {
 	[ -e ${HOME}/dev/git ] && echo "INFO: git already exist, skip init git" && return 0
 
 	# Try install by system
-	(sudo -n ls &> /dev/null) && sudo apt-get update && sudo apt-get install -y git tree zip unzip subversion > /dev/null && return 0
+	(sudo -n ls &> /dev/null) && sudo apt-get update && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev build-essential tree zip unzip subversion git > /dev/null && return 0
 
 	# Try compile
 	git_tar="git-1.8.4.3.tar.gz"
@@ -26,9 +26,7 @@ function init_git {
 	[ "$?" -ne "0" ] && echo "ERROR: failed to get git source" && exit 1
 
 	mkdir -p "$git_target"
-	./configure --prefix="$git_target"
-	make
-	make install
+	./configure --prefix="$git_target" && make && make install
 
 	ln -s ${HOME}/dev/${git_target} ${HOME}/dev/git
 }
