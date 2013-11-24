@@ -65,7 +65,7 @@ function init_git {
 		cd /tmp/$curl_name
 
 		if ( ! dpkg -l | grep -q openssl ) ; then
-			./configure --prefix=$HOME/dev/$curl_name --with-ssl=$openssl_name  && make && make install
+			./configure --prefix=$HOME/dev/$curl_name --with-ssl=$HOME/dev/$openssl_name  && make && make install
 		else
 			./configure --prefix=$HOME/dev/$curl_name --with-ssl && make && make install
 		fi
