@@ -1,4 +1,5 @@
 #!/bin/bash
+#[ ! -e $MY_ENV/env_func_bash ] && echo "ERROR: $MY_ENV/env_func_bash not exist" && exit 1 || source $MY_ENV/env_func_bash
 
 function func_date {
 	date "+%Y-%m-%d"
@@ -70,7 +71,7 @@ function func_validate_user_exist() {
 function func_validate_cmd_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
 
-	( ! command -v "$1" &> /dev/null) && echo "ERROR: $1 not found (in PATH)" && exit 1
+	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
 }
 
 function func_validate_filetype_text() {
@@ -295,11 +296,11 @@ function func_load_rvm {
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
 
 	# Reload myenv
-	source %HOME%/.bashrc
+	source $HOME/.bashrc
 
 	# Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
 	#[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && rvm use ruby-1.9.3-p327@global --default &> /dev/null
-	[ -e "$RVM_HOME/scripts/rvm" ] && rvm use ruby-2.0.0-p247@global --default
+	[ -e "$RVM_HOME/scripts/rvm" ] && rvm use ruby-2.0.0-p353@global --default
 }
 
 function func_cd_conditional {
@@ -589,7 +590,7 @@ function func_collect_code {
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
+	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .sql$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
 	exclude_patterns=(.doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
 
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
@@ -641,6 +642,9 @@ function func_collect_note {
 	while read line
 	do
 		source_path="$(func_eval "$line")"
+
+		# recursively backup *.MD dir. TODO: also update the target_file name?
+		[ -d "$source_path" ] && [[ "$source_path" != *.MD ]] && cp "$source_path" "$target_original_file" && continue
 		[ -d "$source_path" ] && echo -e "INFO: skipping dir: $line" && continue
 
 		# backup original files, need udpate file name to avoid name confliction
@@ -1057,21 +1061,18 @@ function func_sys_info_os_name {
 }
 
 function func_sys_info { 
-	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<unique_name>	_<addInfo>
+	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
 	# exampe: ubuntu/linuxmint/cygwin/win	_12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm	_precise
 
 	os_name=`func_sys_info_os_name`
 
 	# use cache if cached, need os_name to distiguish cygwin/mingw
-	if [ -n $MY_ENV_ZGEN ] ; then						cache_file=$MY_ENV_ZGEN/sys_info_${os_name}
-	else									cache_file=/tmp/sys_info_${os_name}
-	fi
+	[ -n "$MY_ENV_ZGEN" ] && [ -e "$MY_ENV_ZGEN" ] && cache_file=$MY_ENV_ZGEN/sys_info_${os_name} || cache_file=/tmp/sys_info_${os_name}
 	[ -e $cache_file ] && cat $cache_file && return
 
 	os_ver=`func_sys_info_os_ver`
 	os_len=`func_sys_info_os_len`
 	os_type=`func_sys_info_os_type`
-	unique_name=`unique_name`
 
 	# addInfo
 	if [ "$os_name" = "ubuntu" ] ; then					addInfo=`sed -n -e "s/DISTRIB_CODENAME=\(\S*\)/\L\1/p" /etc/lsb-release`
@@ -1088,18 +1089,16 @@ function func_sys_info {
 	fi
 	############################################################## (not include in output yet)
 
-	echo -e "${os_name}_${os_ver}_${os_len}_${os_type}_${unique_name}_${addInfo}" > $cache_file
+	result="${os_name}_${os_ver}_${os_len}_${os_type}_$(hostname)_${addInfo}" 
+	echo -e "${result%_}" > $cache_file
 	cat $cache_file
 
 	# TODO: put this func to another file, pre load as basic functions
 }
 
 function func_translate { 
-	unique_name=$(hostname)
-	[ -z "$unique_name" ] && echo "WARN: command hostid return empty!"
-
 	# check history
-	history_txt=$(grep "^$*[^A-Za-z0-9_]" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	func_translate_google "$@" || func_translate_microsoft "$@"
@@ -1130,7 +1129,7 @@ function func_translate_google {
 	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
 	echo $res_simple
 	echo $res_raw
-	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/list/translate_history_${unique_name}
+	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/list/translate_history_$(hostname)
 }
 
 function func_translate_microsoft { 
@@ -1166,7 +1165,7 @@ function func_translate_microsoft {
 	[ -z "$res_raw" ] && return 1
 
 	echo $res_raw
-	echo -e "$*\n\t$res_raw" >> $MY_ENV/list/translate_history_${unique_name}
+	echo -e "$*\n\t$res_raw" >> $MY_ENV/list/translate_history_$(hostname)
 }
 
 function func_delete_dated { 

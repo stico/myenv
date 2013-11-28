@@ -98,3 +98,21 @@ encrypt	加密
 	[[["加密","encrypt","Jiāmì",""]],[["verb",["加密"],[["加密",["encrypt"],,0.731615603]],"encrypt",2]],"en",,[["加密",[4],0,0,1000,0,1,0]],[["encrypt",4,[["加密",1000,0,0],["进行加密",0,0,0],["加密的",0,0,0]],[[0,7]],"encrypt"]],,,[],3]
 Leopard	豹
 	[[["豹","Leopard","Bào",""]],[["noun",["豹","豹子"],[["豹",["leopard","panther"],,0.45783335],["豹子",["leopard"],,0.0915724337]],"leopard",1]],"en",,[["豹",[4],0,0,1000,0,1,0]],[["Leopard",4,[["豹",1000,0,0],["豹纹",0,0,0],["豹子",0,0,0],["金钱豹",0,0,0],["Leopard的",0,0,0]],[[0,7]],"Leopard"]],,,[],2]
+career	事业
+	[[["事业","career","Shìyè",""]],[["noun",["事业","生涯","速度"],[["事业",["cause","career","enterprise","undertaking","facilities","plant"],,0.141830161],["生涯",["career"],,0.0959670842],["速度",["speed","rate","velocity","pace","tempo","career"],,1.87387889e-06]],"career",1],["verb",["速度"],[["速度",["career"],,1.87387889e-06]],"career",2]],"en",,[["事业",[4],0,0,698,0,1,0]],[["career",4,[["事业",698,0,0],["生涯",301,0,0],["职业",0,0,0],["职业生涯",0,0,0],["的职业生涯",0,0,0]],[[0,6]],"career"]],,,[],5]
+本科	Undergraduate course
+	[[["Undergraduate course","本科","","Běnkē"]],[["noun",["undergraduate course","regular college course"],[["undergraduate course",["本科"],,0.0107672084],["regular college course",["本科"],,0.000282487861]],"本科",1]],"zh-CN",,[["Undergraduate course",[4],1,0,1000,0,2,0]],[["本科",4,[["Undergraduate course",1000,1,0],["Undergraduate",0,1,0],["Bachelor",0,1,0],["This course",0,1,0],["Of undergraduate",0,1,0]],[[0,2]],"本科"]],,,[],2]
+研究生	Graduate
+	[[["Graduate","研究生","","Yánjiūshēng"]],,"zh-CN",,[["Graduate",[4],1,0,997,0,1,0]],[["研究生",4,[["Graduate",997,1,0],["Postgraduate",1,1,0],["Graduate students",0,1,0],["Graduate student",0,1,0],["Students",0,1,0]],[[0,3]],"研究生"]],,,[["zh-CN"]],4]
+时期	Period
+	[[["Period","时期","","Shíqí"]],[["noun",["period","phase","epoch","time interval"],[["period",["期间","期","时期","周期","时间","时代"],,0.233838394],["phase",["相","阶段","期","时期","局面","段落"],,0.00247875229],["epoch",["时代","时期","纪元"],,0.0008174057],["time interval",["时期","时节"],,3.07191294e-05]],"时期",1]],"zh-CN",,[["Period",[4],1,0,999,0,1,0]],[["时期",4,[["Period",999,1,0],["Phase",0,1,0],["Period of",0,1,0],["During",0,1,0],["Periods",0,1,0]],[[0,2]],"时期"]],,,[],2]
+Senior	前辈
+	[[["前辈","Senior","Qiánbèi",""]],[["noun",["前辈","伯"],[["前辈",["senior","elder","elder generation","father","antecessor","eldership"],,0.00576327136],["伯",["paternal elder uncle","senior","father's elder brother"],,5.86284841e-06]],"senior",1],["adjective",["主任","长","年长的","上级的","一级的"],[["主任",["senior"],,0.00101727783],["长",["long","lasting","big","elder","senior","massive"],,0.000226985372],["年长的",["elder","senior"]],["上级的",["senior"]],["一级的",["senior"]]],"senior",3]],"en",,[["前辈",[4],0,0,1000,0,1,0]],[["Senior",4,[["前辈",1000,0,0],["高级",0,0,0],["资深",0,0,0],["高层",0,0,0],["的高级",0,0,0]],[[0,6]],"Senior"]],,,[],4]
+出题小组	The topic group
+	[[["The topic group","出题小组","","Chū tí xiǎozǔ"]],,"zh-CN",,[["The topic",[4],1,0,997,0,2,0],["group",[5],1,0,996,2,3,0]],[["出 题",4,[["The topic",997,1,0],["The topic and",0,1,0],["Topic and",0,1,0],["Out of question",0,1,0]],[[0,2]],"出题小组"],["小组",5,[["group",996,1,0],["Team",1,1,0],["the group",0,1,0],["Panel",0,1,0],["the Panel",0,1,0]],[[2,4]],""]],,,[["zh-CN"]],23]
+命题小组	Proposition Team
+	[[["Proposition Team","命题小组","","Mìngtí xiǎozǔ"]],,"zh-CN",,[["Proposition",[4],1,0,988,0,1,0],["Team",[5],1,0,652,1,2,0]],[["命题",4,[["Proposition",988,1,0],["Propositions",0,1,0],["Propositional",0,1,0],["The proposition",0,1,0],["Thesis",0,1,0]],[[0,2]],"命题小组"],["小组",5,[["Team",652,1,0],["group",99,1,0],["Panel",16,1,0],["teams",7,1,0],["the Panel",0,1,0]],[[2,4]],""]],,,[["zh-CN"]],64]
+出题	The topic
+	[[["The topic","出题","","Chū tí"]],,"zh-CN",,[["The topic",[4],1,0,950,0,2,0]],[["出 题",4,[["The topic",950,1,0],["Out of question",38,1,0],["The topic and",0,1,0],["Topic and",0,1,0]],[[0,2]],"出题"]],,,[["zh-CN"]],42]
+school recruit	校招
+	[[["校招","school recruit","Xiào zhāo",""]],,"en",,[["校招",[4],0,0,801,0,2,0]],[["school recruit",4,[["校招",801,0,0]],[[0,14]],"school recruit"]],,,[["en"]],13]
