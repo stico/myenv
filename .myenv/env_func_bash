@@ -671,6 +671,23 @@ function func_collect_note {
 	\cd - > /dev/null
 }
 
+function func_repeat {
+	func_param_check 3 "Usage: $FUNCNAME <interval> <times> <cmd>" "$@"
+
+	count=1
+	times="$2"
+	interval="$1"
+	shift;shift
+
+	#for count in $(eval echo {1..$times}) ; do	# when times value big, will slow or not work
+	while (($count < $times)); do
+		eval "$@" 
+		((count++))
+		sleep $interval
+		echo -e "\n\n------------------------- Count: $count / $times -------------------------\n\n"
+	done
+}
+
 function func_grep_cmd {
 	func_param_check 2 "Usage: $FUNCNAME <search_str> <cmd>" "$@"
 

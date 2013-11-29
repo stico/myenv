@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Command: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh | bash
 # Command: rm /tmp/myenv.ro.LU.sh ; wget -O /tmp/myenv.ro.LU.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.ro.LU.sh && bash /tmp/myenv.ro.LU.sh 
 
 git_myenv_name=myenv
@@ -20,9 +21,9 @@ function init_git {
 	(sudo -n ls &> /dev/null) && sudo apt-get install -y git && return 0
 
 	# Try compile
-	git_tar="git-1.8.4.3.tar.gz"
+	git_tar="git-1.8.5.tar.gz"
 	git_name="${git_tar%%.tar.gz}"
-	#git_url="https://git-core.googlecode.com/files/${git_tar}"
+	#git_url="https://git-core.googlecode.com/files/${git_tar}"	# usable, but not fast
 	git_url="https://www.kernel.org/pub/software/scm/git/${git_tar}"
 	git_target_path="${HOME}/dev/${git_name}"
 	git_target_link="${HOME}/dev/git"
@@ -39,6 +40,7 @@ function init_git {
 	option_configure=""
 	if ( ! dpkg -l | grep -q zlib1g-dev ) ; then
 		cd /tmp
+		sudo apt-get install -y dpkg-dev	# some env need this to compile
 		apt-get source zlib1g-dev
 		zlib_name=$(ls | grep zlib-)
 		[ ! -e "/tmp/$zlib_name" ] && echo "ERROR: failed to download source of zlib1g-dev" && exit 1
