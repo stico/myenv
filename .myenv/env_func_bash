@@ -50,6 +50,7 @@ function func_param_check {
 	error_info=$2
 	shift;shift;
 
+	# check if parameter enough
 	[ $# -lt $param_count ] && func_die $error_info
 }
 
@@ -93,6 +94,15 @@ function func_validate_cmd_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
 
 	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
+}
+
+function func_validate_dir_not_empty() {
+	func_param_check 1 "DESC:\tCheck if dir not empty.\nUSAGE:\t$FUNCNAME <dir>" "$@"
+	
+	for path in "$@" ; do
+		# only redirect stderr, otherwise the test will always false
+		[ ! "$(ls -A "$path" 2> /dev/null)" ] && echo "ERROR: $path is empty!" && exit 1
+	done
 }
 
 function func_validate_dir_empty() {
@@ -1350,8 +1360,6 @@ function func_ctrl_me {
 function func_uncompress {
 	func_param_check 2 "Usage: $FUNCNAME <source> <target>" "$@" 
 
-	# TODO: make the target 
-
 	func_validate_exist "$1"
 	func_validate_dir_empty "$2"
 
@@ -1372,6 +1380,10 @@ function func_uncompress {
 		#*.tbz2)		tar -jxvf "$source_file"	;;
 		*)		echo "unknow format of file: $source_file"	;;
 	esac
+
+	func_validate_dir_not_empty "$target_dir"
+
+	[ "$(ls -A "$target_dir" | wc -l)" = 1 ] && echo "INFO: moving one dir level up" && mv -f "$target_dir"/*/* "$target_dir"/
 
 	\cd -
 }
