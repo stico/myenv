@@ -1364,7 +1364,7 @@ function func_uncompress {
 	func_validate_dir_empty "$2"
 
 	source_file=$(readlink -f "$1")
-	target_dir="$2"
+	target_dir=$(readlink -f "$2")
 
 	func_mkdir_cd "$target_dir"
 
@@ -1383,7 +1383,8 @@ function func_uncompress {
 
 	func_validate_dir_not_empty "$target_dir"
 
-	[ "$(ls -A "$target_dir" | wc -l)" = 1 ] && echo "INFO: moving one dir level up" && mv -f "$target_dir"/*/* "$target_dir"/
+	# Note, there might be only 1 file in the compressed file
+	[ "$(ls -A "$target_dir" | wc -l)" = 1 ] && echo "INFO: try to move one dir level up" && mv -f "$target_dir"/*/* "$target_dir"/ 2> /dev/null
 
 	\cd -
 }

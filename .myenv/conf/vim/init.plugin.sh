@@ -7,6 +7,7 @@ plugin_addr["vim-colors-solarized"]="git://github.com/altercation/vim-colors-sol
 plugin_addr["vim-surround"]="git://github.com/tpope/vim-surround.git"
 plugin_addr["vim-pathogen"]="git://github.com/tpope/vim-pathogen.git"
 plugin_addr["vim-repeat"]="git://github.com/tpope/vim-repeat.git"
+plugin_addr["tabular"]="git://github.com/godlygeek/tabular.git"
 plugin_addr["ctrlp.vim"]="git://github.com/kien/ctrlp.vim.git"
 
 plugin_candidates=""
@@ -36,4 +37,4 @@ echo "Updating pathogen by copy"
 cp -R $VIM_CONF/bundle/vim-pathogen/autoload/ $VIM_CONF/
 
 # other notes
-echo "=== NOTE: conque is installed manaully"
+echo "=== NOTE: conque (ver 2.3, Sep 2011) is installed manaully (http://code.google.com/p/conque/). Note, there is offcial version on github (https://github.com/vim-scripts/Conque-Shell), but seems not update enough (even the source is also very old) "
