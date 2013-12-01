@@ -31,18 +31,17 @@ function func_die {
 	usage="Usage: $FUNCNAME [error_info]"
 	[ $# -lt 1 ] && echo -e "${usage}\n$@" && exit 1
 	
-	echo "$@" 1>&2
+	echo -e "$@" 1>&2
 
-	# return if invoked from command line, exit if from script. 
-	# BUT messy up invoke chain 
+	# Not easy solution: return if invoked from command line, exit if from script. BUT messy up invoke chain 
 	#[ "$0" = "/bin/bash" ] && return 1 || exit 1
 
-	# easy solution
+	# Easy solution
 	exit 1
 }
 
 function func_param_check {
-	usage="Usage: $FUNCNAME [param_count] [error_info]"
+	usage="Usage: $FUNCNAME <param_count> <error_info>"
 
 	# usge -ge, so the exit status will not changed in legal condition
 	[ $# -ge 2 ] || func_die $usage
@@ -53,6 +52,14 @@ function func_param_check {
 
 	[ $# -lt $param_count ] && func_die $error_info
 }
+
+function func_mkdir_cd { 
+	func_param_check 1 "Usage: $FUNCNAME [path]" "$@"
+
+	# why need such complex eval?
+	mkdir -p "$@" && eval \cd "\"\$$#\"" || func_die "ERROR: failed to mkdir and cd into it"
+}
+
 
 function func_validate_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
@@ -88,7 +95,16 @@ function func_validate_cmd_exist() {
 	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
 }
 
-function func_validate_filetype_text() {
+function func_validate_dir_empty() {
+	func_param_check 1 "DESC:\tCheck if dir empty (not exist also ok).\nUSAGE:\t$FUNCNAME <dir>" "$@"
+	
+	for path in "$@" ; do
+		# only redirect stderr, otherwise the test will always false
+		[ "$(ls -A "$path" 2> /dev/null)" ] && echo "ERROR: $path not empty!" && exit 1
+	done
+}
+
+function func_validate_file_type_text() {
 	func_param_check 1 "USAGE: $FUNCNAME <file>" "$@"
 
 	# TODO: effeciency need improve!
@@ -574,7 +590,7 @@ function func_collect_files {
 		cp "$source_path" "$target_original_files/$target_file" 
 
 		# won't collect non-text file
-		func_validate_filetype_text "$line" || continue
+		func_validate_file_type_text "$line" || continue
 
 		# Collect files
 		#if [ -z "${line##*.txt}" ] ; then 
@@ -805,14 +821,6 @@ function func_ip {
 		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
 		#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
 	fi
-}
-
-function func_mkdir_cd { 
-	func_param_check 1 "Usage: $FUNCNAME [path]" "$@"
-
-	mkdir -p "$@" 				&&
-	# why need such complex eval?
-	eval \cd "\"\$$#\""
 }
 
 function func_show_resp { 
@@ -1337,6 +1345,35 @@ function func_ctrl_me {
 
 	[ ! -e "$script" ] && func_die "ERROR: $script not exist"
 	$script 
+}
+
+function func_uncompress {
+	func_param_check 2 "Usage: $FUNCNAME <source> <target>" "$@" 
+
+	# TODO: make the target 
+
+	func_validate_exist "$1"
+	func_validate_dir_empty "$2"
+
+	source_file=$(readlink -f "$1")
+	target_dir="$2"
+
+	func_mkdir_cd "$target_dir"
+
+	case "$source_file" in
+		#*.Z)		uncompress "$source_file"	;;
+		*.7z)		7z e "$source_file"		;;	# do NOT use -e, which will fail
+		*.gz)		tar -zxvf "$source_file"	;;
+		*.tgz)		tar -zxvf "$source_file"	;;
+		*.bz2)		tar -jxvf "$source_file"	;;
+		*.tar)		tar -xvf "$source_file"		;;
+		*.rar)		7z e "$source_file"		;;
+		*.zip)		unzip "$source_file"		;;
+		#*.tbz2)		tar -jxvf "$source_file"	;;
+		*)		echo "unknow format of file: $source_file"	;;
+	esac
+
+	\cd -
 }
 
 function func_mount_iso {

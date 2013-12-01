@@ -365,9 +365,9 @@ function func_init_soft_basic {
 
 	func_init_apt_upgrade
 	sudo apt-get install -y dkms				>> $tmp_init_log
-	sudo apt-get install -y aptitude			>> $tmp_init_log
+	sudo apt-get install -y aptitude curl			>> $tmp_init_log
 	sudo apt-get install -y openssh-server			>> $tmp_init_log
-	sudo apt-get install -y zip unzip curl			>> $tmp_init_log
+	sudo apt-get install -y zip unzip p7zip p7zip-rar	>> $tmp_init_log
 	sudo apt-get install -y linux-headers-`uname -r`	>> $tmp_init_log	# some soft compile need this
 
 	#(! command -v aptitude &>> $tmp_init_log) && echo "install aptitude failed, pls check!" && exit 1
