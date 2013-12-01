@@ -12,14 +12,15 @@ common_func_url="https://raw.github.com/stico/myenv/master/.myenv/env_func_bash"
 cp -f "$common_func_env" "$common_func_tmp" || wget -O "$common_func_tmp" -q "$common_func_url" 
 [ ! -e "$common_func_tmp" ] && echo "ERROR: $common_func_tmp not exist" && exit 1|| source "$common_func_tmp" 
 
-# Pre-check
+# Prepare - Check pre-condition
+func_param_check 1 "USAGE: $0 <remote|local>" "$@" 
 func_validate_cmd_exist ruby
 func_validate_cmd_exist python
-func_param_check 1 "USAGE: $0 <remote|local>" "$@" 
 
-# Prepare - source. 
+# Prepare - source
+source_base=/tmp/source_base_vim
+# func_build_prepare_source $source_base vim_73_source-hg_2013-05-02.zip https://vim.googlecode.com/hg/
 if [ "$1" = "remote" ] ; then
-	source_base=/tmp/vim_src_hg
 	source_makefile=${source_base}/src/Make_mvc.mak
 	func_mkdir_cd "${source_base}"
 	[ -e $source_base/.hg ] && hg pull && hg update || hg clone https://vim.googlecode.com/hg/ .

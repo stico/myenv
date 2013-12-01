@@ -3,21 +3,12 @@ if exists('loaded_settings_of_stico')
 endif
 let loaded_settings_of_stico = 1
 
-"source $VIMRUNTIME/vimrc_example.vim		"content is already joined
-"source $VIMRUNTIME/mswin.vim			"content is already joined
-
-
-""""""""""""""""""""Tmp for Test""""""""""""""""""""
-""""""""""""""""""""Tmp for Test""""""""""""""""""""
 
 """""""""""""""""""""""""""""" H1 - Topic - Font
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
 	set guifont=XHei\ Mono\ 11
 endif
-
-" \zs in regex means set the start of the match
-" TODO: want to use C-+/-, but not works (explained in vim note)
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
 nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
 
@@ -47,7 +38,7 @@ if executable('fcitx-remote') && has('unix')
 	autocmd InsertEnter * call Fcitx2cn()
 endif
 
-" Option 2: ibus, Need vim-ibus interface for really usable
+" Option 2: ibus, Need vim-ibus interface to use
 " https://github.com/bouzuya/vim-ibus
 " https://github.com/eagle0701/vim-ibus
 " https://github.com/tuvistavie/dot-files/tree/master/.vim/bundle/vim-ibus
