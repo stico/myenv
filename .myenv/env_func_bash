@@ -1416,6 +1416,7 @@ function func_build_prepare_source_remote {
 function func_build_prepare_source_remote_hg {
 	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
 
+	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-HG-
 	source_base_name=$(basename ${1})
 	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-HG-
 
@@ -1427,6 +1428,7 @@ function func_build_prepare_source_remote_hg {
 function func_build_prepare_source_remote_git {
 	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
 
+	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-GIT-
 	source_base_name=$(basename ${1})
 	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-GIT-
 

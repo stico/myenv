@@ -8,6 +8,7 @@ ahk=$MY_ENV/conf/ahk
 dev=$MY_DEV
 dw=$MY_DEV/code_dw
 repo=$MY_DEV/code_repo
+misc=$MY_DEV/code_misc
 php=$MY_DEV/code_repo/php
 java=$MY_DEV/code_repo/java
 ruby=$MY_DEV/code_repo/ruby
