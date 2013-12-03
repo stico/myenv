@@ -31,8 +31,12 @@ puff			"bash $MY_ENV/secu/autossh.sh"
 
 # Alias - By Topic (<topic><action><obj/arg>)
 
+			# Head: svn
+svnstatus		"svn status"
 svnupdate		"func_svn_update"
 svnbackup		"func_svn_backup"
+
+			# Head: mvn
 mvngen			"func_mvn_gen"
 
 			# Head: g - git

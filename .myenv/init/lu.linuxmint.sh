@@ -234,7 +234,7 @@ function func_init_soft_manual_needed {
 
 	func_init_soft_manual_infinality
 
-	# Need comfirm the dialog
+	# Need comfirm the dialog, seems deprecated the package "msttcorefonts"
 	#sudo apt-get install -y --force-yes ttf-mscorefonts-installer
 }
 

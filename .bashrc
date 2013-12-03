@@ -42,9 +42,8 @@ if [ "$os_cygwin" = "false" ] ; then
 	#complete -r vi vim gvim unzip					# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
 
 	# set diff prompt for internal machine and external machine 
-	internetIpCount=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|127.0.0.1\)')
-	if `grep -q "bash_prompt_color=green" ~/.myenv/zgen/sys_info_local &> /dev/null` ; 
-	then
+	internetIpCount=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|127.0.0.1\|fc00::\|fe80::\|::1\)')
+	if `grep -q "bash_prompt_color=green" ~/.myenv/zgen/sys_info_local &> /dev/null` ; then
 		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"	# Green line with $ in same line
 	elif [ "$internetIpCount" -ge 1 ] ; then 
 		export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"	# Red line with $ in next line
