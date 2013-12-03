@@ -83,12 +83,15 @@ call pathogen#infect()
 let g:solarized_italic = 0				" 0 to set comment font NOT use italic
 colorscheme solarized
 
+"let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
+"let g:ctrlp_user_command = 'find %s -type f'		" custom option forfinding files
+let g:ctrlp_show_hidden = 1
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
 let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
 let g:ctrlp_custom_ignore = {
-	\ 'dir':  '/\.(git\|hg\|svn\|metadata)$\|/target/\|\\target\\',
-	\ 'file': '\.(exe\|so\|dll\|class\|jar\|svn-base)$',
-	\ 'link': 'some_bad_symbolic_links',
+	\ 'dir':  '\v[\/]\.(git|hg|svn|metadata)$|\/target$',
+	\ 'file': '\v\.(exe|so|dll|class|jar|svn-base)$',
+	\ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
 	\ }
 
 " disable the creation
