@@ -55,10 +55,12 @@ function func_param_check {
 }
 
 function func_mkdir_cd { 
-	func_param_check 1 "Usage: $FUNCNAME [path]" "$@"
+	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
+
+	mkdir -p "$1" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir and cd into it ($1)"
 
 	# why need such complex eval?
-	mkdir -p "$@" && eval \cd "\"\$$#\"" || func_die "ERROR: failed to mkdir and cd into it"
+	#mkdir -p "$@" && eval \cd "\"\$$#\"" || func_die "ERROR: failed to mkdir and cd into it"
 }
 
 
@@ -389,7 +391,7 @@ function func_cd {
 	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
 
 	# shortcut - only one parameter, and exist in current dir
-	[ $# -eq 1 ] && [ -d $1 ] && func_cd_conditional $1 && return 0
+	[ $# -eq 1 ] && [ -d "$1" ] && func_cd_conditional "$1" && return 0
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
@@ -1363,9 +1365,8 @@ function func_uncompress {
 	func_validate_exist "$1"
 	func_validate_dir_empty "$2"
 
-	source_file=$(readlink -f "$1")
-	target_dir=$(readlink -f "$2")
-
+	target_dir="$(readlink -f "$2")"
+	source_file="$(readlink -f "$1")"
 	func_mkdir_cd "$target_dir"
 
 	case "$source_file" in
@@ -1377,14 +1378,18 @@ function func_uncompress {
 		*.tar)		tar -xvf "$source_file"		;;
 		*.rar)		7z e "$source_file"		;;
 		*.zip)		unzip "$source_file"		;;
-		#*.tbz2)		tar -jxvf "$source_file"	;;
+		#*.tbz2)	tar -jxvf "$source_file"	;;
 		*)		echo "unknow format of file: $source_file"	;;
 	esac
 
 	func_validate_dir_not_empty "$target_dir"
 
 	# Note, there might be only 1 file in the compressed file
-	[ "$(ls -A "$target_dir" | wc -l)" = 1 ] && echo "INFO: try to move one dir level up" && mv -f "$target_dir"/*/* "$target_dir"/ 2> /dev/null
+	if [ "$(ls -A "$target_dir" | wc -l)" = 1 ] ; then
+		echo "INFO: try to move one dir level up" 
+		mv -f "$target_dir"/**/* "$target_dir"/ 2> /dev/null 
+		rmdir "$target_dir"/**/ 2> /dev/null 
+	fi
 
 	\cd -
 }

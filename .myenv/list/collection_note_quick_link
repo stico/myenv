@@ -16,12 +16,12 @@ $MY_DOC/DCC/Programming_Ruby/A_NOTE_Ruby.txt
 $MY_DOC/DCC/Programming_Python/A_NOTE_Python.txt
 $MY_DOC/DCC/OS_Win/A_NOTE_Win.txt
 C:/WINDOWS/system32/drivers/etc/hosts
-$MY_ENV/conf/ahk/mySettings.ahk
-$MY_ENV/conf/ahk/myHotString.ahk
+$MY_ENV/conf/ahk/mysettings.ahk
+$MY_ENV/conf/ahk/myhotstring.ahk
 $MY_DOC/DCC/A_NOTE_DCC.txt
 $MY_DOC/DCC/Business_Net_Pay/A_NOTE_Pay.txt
-$MY_DOC/DCB/Record/Z/Schedule_History_NotNeedToCollect.txt
-
+$MY_DOC/DCB/Record/Note/A_NOTE_Schedule.txt
+$MY_DOC/DCB/Record/Note/A_NOTE_Schedule_History.txt
 $MY_DOC/DCC/Programming_Java/A_NOTE_Java.txt
 $MY_DOC/DCC/Programming_Java_Spring/A_NOTE_Spring.txt
 $MY_DEV/a_workspaces/A_Project.lst

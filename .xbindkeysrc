@@ -1,20 +1,19 @@
 # TODO: seems using '' for command not works, why?
 # Restart CMD: killall -HUP xbindkeys
 
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt"
+# NOTE: for path with space: "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Google\ Drive/NOTE/A_A_NOTE_Record.txt"
+
+"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_Copy.txt"
   control+alt+c
+
+"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_TmpRecord.txt"
+  control+alt+q
 
 "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt"
   control+alt+a
 
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Google\ Drive/NOTE/A_A_NOTE_Record.txt"
-  control+alt+q
-
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Google\ Drive/NOTE/A_A_NOTE_Schedule.txt"
+"/usr/bin/wmctrl -a 'SINGLE_VIM' || ~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt"
   control+alt+z
-
-"/usr/bin/wmctrl -a 'Double Commander' || ~/program/doublecmd/doublecmd"
-  control+alt+f
 
 "/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
   control+alt+d
@@ -22,14 +21,17 @@
 "/usr/bin/wmctrl -a 'Mozilla Thunderbird' || /usr/bin/thunderbird"
   control+alt+m
 
+"/usr/bin/wmctrl -a 'Double Commander' || ~/program/doublecmd/doublecmd"
+  control+alt+f
+
 "/usr/bin/wmctrl -a 'SINGLE_TERMINATOR' || /usr/bin/terminator --title SINGLE_TERMINATOR"
   control+alt+x
 
-"~/.myenv/conf/myahk/myahk_script_hotstring.sh"
-  control+alt+h
-
 "/usr/bin/wmctrl -a 'w7vm'"
   control+alt+w
+
+"~/.myenv/conf/myahk/myahk_script_hotstring.sh"
+  control+alt+h
 
 # Version 1: Not works:			sh -c "copied=\"$(/usr/bin/xclip -o)\" && echo \"$copied\" >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copy to File' \"$copied\" || notify-send -t 1000 -u critical 'Copy to File' 'Copy Failed, pls check'"
 # Version 2: Works for multiple line:	sh -c "copied=$(echo '$(/usr/bin/xclip -o)') && /usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copy to File' \"$(echo '$(/usr/bin/xclip -o)')\" "
@@ -37,8 +39,11 @@
 # Problem: the notify-send can not show Body when copied multiple lines
 # TODO: seems GNOME notifications is better than Ubuntu NotifyOSD notification
 #"/usr/bin/xclip -o >> ~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt' \"$(echo '$(/usr/bin/xclip -o)')\" "
-"target=~/Documents/DCB/Record/Z/A_A_NOTE_Copy.txt ; echo >> $target && /usr/bin/xclip -o >> $target && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"
+"target=~/Documents/DCB/Record/Note/A_NOTE_Copy.txt ; echo >> $target && /usr/bin/xclip -o >> $target && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"
   control+shift+c
+
+"/usr/bin/xfce4-screenshooter -r -c"
+  control+shift+x
 
 "/usr/bin/xfce4-appfinder"
   control+shift+z
