@@ -50,7 +50,6 @@
 	</mirrors>
 
 	<profiles>
-		<!-- START: pay.duowan.com -->
 		<profile>
 			<id>nexus</id>
 			<repositories>

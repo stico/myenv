@@ -326,11 +326,17 @@
         </Tab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\A_General\KPI\history\</Path>
+                  <Path>C:\Users\ouyangzhu\Desktop\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -354,7 +360,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\A_General\Mail\</Path>
+                  <Path>E:\dev\code_dw\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -368,7 +374,7 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>1</ActiveTab>
+        <ActiveTab>0</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <Sortings>
@@ -399,7 +405,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\.myenv\conf\ahk\</Path>
+                  <Path>E:\.myenv\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -459,7 +465,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\A_General\KPI\</Path>
+                  <Path>E:\Documents\DCD\Team_CommonService\A_Report\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -477,7 +483,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\</Path>
+                  <Path>E:\Documents\DCD\Team_CommonService\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -486,8 +492,8 @@
             </ColumnsView>
           </FileView>
           <Options>2</Options>
-          <LockPath>E:\Documents\DCD\Work_BasicServiceTeam\</LockPath>
-          <Title>BST</Title>
+          <LockPath>E:\Documents\DCD\Team_CommonService\</LockPath>
+          <Title>Team_CS</Title>
         </Tab>
         <Tab>
           <FileView Type="columns">
@@ -495,7 +501,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</Path>
+                  <Path>E:\Documents\DCD\Team_CommonService\PayPlf\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -504,7 +510,7 @@
             </ColumnsView>
           </FileView>
           <Options>2</Options>
-          <LockPath>E:\Documents\DCD\Work_BasicServiceTeam\PayPlf\</LockPath>
+          <LockPath>E:\Documents\DCD\Team_CommonService\PayPlf\</LockPath>
           <Title>PayPlf</Title>
         </Tab>
         <Tab>
@@ -527,11 +533,17 @@
         </Tab>
         <Tab>
           <FileView Type="columns">
+            <Sortings>
+              <Sorting>
+                <Direction>1</Direction>
+                <Function>0</Function>
+              </Sorting>
+            </Sortings>
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>E:\amp\2013-10\</Path>
+                  <Path>E:\amp\download\</Path>
                 </Paths>
               </Entry>
             </History>
@@ -768,10 +780,10 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>236</Left>
-      <Top>124</Top>
-      <Width>980</Width>
-      <Height>400</Height>
+      <Left>93</Left>
+      <Top>72</Top>
+      <Width>880</Width>
+      <Height>394</Height>
       <Maximized>False</Maximized>
       <Splitter>40.3275332650972</Splitter>
     </Position>
