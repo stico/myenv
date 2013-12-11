@@ -80,6 +80,13 @@ function func_validate_inexist() {
 	done
 }
 
+function func_validate_user_proc() {
+	func_param_check 1 "USAGE: $FUNCNAME <proc_info>" "$@"
+
+	ps -ef | grep "$1" | grep -v grep > /dev/null && return 0
+	return 1
+}
+
 function func_validate_user_name() {
 	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
 	
@@ -632,8 +639,9 @@ function func_collect_code {
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .sql$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ pom.xml$ .php$ .ps$ .md$ .markdown$)
-	exclude_patterns=(.doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
+	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .sql$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ .php$ .ps$ .md$ .markdown$ .xml$)
+	exclude_patterns=(/crashreport /componentsrv /education /client-update-server_branch1 /docs/ /doc/ .doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /easyui/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
+			  /crashreport
 
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 }
@@ -932,26 +940,24 @@ function func_git_commit_push {
 	[ -n "$target" ] && \cd -
 }
 
+
 function func_ssh_agent_init {
 	# do nothing if already set
 	# The unison remote style can not accept .bashrc have output
 	#[ -n "$SSH_AUTH_SOCK" ] && echo "INFO: ssh agent already exist: $SSH_AUTH_SOCK" && return 0
 
-	ssh_agent_cmd="ssh-agent -s"
-	ssh_agent_env_tmp=~/.ssh/ssh_agent_env_tmp
+	local cmd="ssh-agent -s"
+	local env_tmp=~/.ssh/ssh_agent_env_tmp
+	local auth_sock="$([ -e "${env_tmp}" ] && grep -o "SSH_AUTH_SOCK=[^;]*" "${env_tmp}" | sed -e "s/SSH_AUTH_SOCK=//" 2> /dev/null)"
 
-	# reuse if already started
-	. "${ssh_agent_env_tmp}" &> /dev/null
+	# reuse if already started. NOTE, the SSH_AUTH_SOCK file and the Process must all exist!
+	[ -e "${auth_sock}" ] && . "${env_tmp}" &> /dev/null && func_validate_user_proc "${SSH_AGENT_PID}.*ssh-agent" && return 0
 
-	# The unison remote style can not accept .bashrc have output
-	#ps -ef | grep "${SSH_AGENT_PID}" | grep ssh-agent | grep -v grep > /dev/null && echo "INFO: reuse exist agent: $SSH_AUTH_SOCK" && return 0
-	ps -ef | grep "${SSH_AGENT_PID}" | grep ssh-agent | grep -v grep > /dev/null && return 0
-
-	# start a new one
+	# otherwise start a new one
 	echo -e "INFO: Initialising new SSH agent...\n"
-	${ssh_agent_cmd} | sed "s/^echo/#echo/" > "${ssh_agent_env_tmp}"
-	chmod 600 "${ssh_agent_env_tmp}"
-	. "${ssh_agent_env_tmp}" > /dev/null
+	${cmd} | sed "s/^echo/#echo/" > "${env_tmp}"
+	chmod 600 "${env_tmp}"
+	. "${env_tmp}" > /dev/null
 	ssh-add ~/.ssh/ouyangzhu_duowan
 }
 

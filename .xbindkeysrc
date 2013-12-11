@@ -3,13 +3,13 @@
 
 # NOTE: for path with space: "~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Google\ Drive/NOTE/A_A_NOTE_Record.txt"
 
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_Copy.txt"
+"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_Copy.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
   control+alt+c
 
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_TmpRecord.txt"
+"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_TmpRecord.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
   control+alt+q
 
-"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt"
+"~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
   control+alt+a
 
 "/usr/bin/wmctrl -a 'SINGLE_VIM' || ~/program/vim/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<doublecmd DCVersion="0.5.7 beta" ConfigVersion="7">
+<doublecmd DCVersion="0.5.6 beta" ConfigVersion="7">
   <Configuration Save="True">
     <UseConfigInProgramDir>False</UseConfigInProgramDir>
   </Configuration>
@@ -294,7 +294,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/amp/download/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -387,7 +387,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCM/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCB/Record/Note/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -815,11 +815,11 @@
   </ColumnsSets>
   <MainWindow>
     <Position>
-      <Left>43</Left>
-      <Top>147</Top>
+      <Left>304</Left>
+      <Top>218</Top>
       <Width>931</Width>
       <Height>430</Height>
-      <Maximized>True</Maximized>
+      <Maximized>False</Maximized>
       <Splitter>42.0670897552131</Splitter>
     </Position>
   </MainWindow>
