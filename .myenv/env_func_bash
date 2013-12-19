@@ -1457,3 +1457,44 @@ function func_build_prepare_source_local {
 	func_param_check 1 "Usage: $FUNCNAME <local_addr>" "$@" 
 	echo "ERROR: not implement yet"
 }
+
+function func_mytask_all {
+	func_param_check 1 "Usage: $FUNCNAME <local_addr>" "$@" 
+	#Name, zgen/mytask, func_mytask_mail_add/run
+
+	# Req: one time task
+	# Req: repeat task
+	# Req: fix time repeat task
+
+	#Design
+	#	- Single crontab trigger (so no contend), 10s, (TODO: crontab line > run As ouyangzhu)
+	#	- Async execution: add task file (parameter in file), then func_mytask_<topic>_run
+
+	#Converstion
+	#	File Name	<status>		_<topic>	_<identity>
+	#			temp/fail/todo/done	mail		(unique)
+
+	#	File Content	(use bash associate array)
+	#			mt_time_deadline	func_dati, no execution after this time
+	#			mt_time_win_start	func_dati, time window for start task
+	#			mt_time_win_stop	func_dati, time window for stop task 
+	#			mt_time_last_run	func_dati, 
+	#			mt_history		(execution status, could be multiple, better with time)
+
+	#	Func Name	func_mytask_run				run all task
+	#			func_mytask_<topic>_add <filename>	add <topic> task
+	#			func_mytask_<topic>_run <filename>	run <topic> task
+
+	#func_mytask_all
+	#    Parse file (todo: bash, how to splite str)
+	#    Select sub func(todo: bash, how to read param)
+	#    ! Log to zgen/mytask/a.log
+
+	#func_mytask_mail_run
+	#	source file
+	#	calculate next exe time: mt_time_last_run + repeat_interval
+	#	check start/expire time
+	#	run
+
+	#func_mytask_mail_add
+}

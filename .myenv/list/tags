@@ -1,11 +1,20 @@
+# Global
 pro=$MY_PRO
-data=$HOME/data
-
 me=$MY_ENV
 env=$MY_ENV
+dev=$MY_DEV
+data=$HOME/data
+
+# MY_ENV
 ahk=$MY_ENV/conf/ahk
 
-dev=$MY_DEV
+# MY_TMP
+amp=$MY_TMP
+tmp=$MY_TMP
+st=$MY_TMP/stage1
+dl=$MY_TMP/download
+
+# MY_DEV
 dw=$MY_DEV/code_dw
 src=$MY_DEV/code_src
 repo=$MY_DEV/code_repo
@@ -15,11 +24,7 @@ java=$MY_DEV/code_repo/java
 ruby=$MY_DEV/code_repo/ruby
 groovy=$MY_DEV/code_repo/groovy
 
-amp=$MY_TMP
-tmp=$MY_TMP
-st=$MY_TMP/stage1
-dl=$MY_TMP/download
-
+# MY_DOC
 doc=$MY_DOC
 dcb=$MY_DOC/DCB
 dcc=$MY_DOC/DCC
@@ -32,13 +37,10 @@ ech=$MY_DOC/ECH
 ecs=$MY_DOC/ECS
 ecz=$MY_DOC/ECZ
 fcz=$MY_DOC/FCZ
-
-cs=$MY_DOC/DCD/Team_CommonService
-cs2=$MY_DOC/DCD/Team_CommonService2
-payplf=$MY_DOC/DCD/Team_CommonService/PayPlf
-
+tcs=$MY_DOC/DCD/Team_CommonService
 noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
 
+# Function
 tt=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
 td=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
 tm=`tt_dir=$MY_TMP/$(date '+%Y-%m');mkdir -p $tt_dir;echo $tt_dir`
