@@ -641,7 +641,6 @@ function func_collect_code {
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .sql$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ .php$ .ps$ .md$ .markdown$ .xml$)
 	exclude_patterns=(/crashreport /componentsrv /education /client-update-server_branch1 /docs/ /doc/ .doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /easyui/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
-			  /crashreport
 
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 }
@@ -657,68 +656,8 @@ function func_collect_note {
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	include_patterns=(A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
-	exclude_patterns=(.lnk$ /DCB/DatedBackup/ thunderbird.*trash)
+	exclude_patterns=(.rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash)
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
-
-
-	return
-	#Following are deprecated but not delete yet
-
-
-	target_base=$MY_ENV/zgen/collection_note
-	target_original_file=$target_base/original_files
-	target_note_collection_fl=$target_base/note_collection_fl.txt
-	target_note_collection_txt=$target_base/note_collection_txt.txt
-	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)	# Not included DCM, put DCD first
-	source_note_list=$MY_ENV/list/collection_quick_link_files
-
-	# clean up old things
-	[ -e "$target_base" ] && rm -rf "$target_base"
-
-	# init target dir, gen file lists
-	func_mkdir_cd "$target_base"
-	for tag in ${source_bases[@]}
-	do
-		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
-
-		sed -e "/\.lnk$/d;/DCB\/DatedBackup\//d" fl_${tag}.txt	\
-		| grep -i "\(A_NOTE\|--NOTE--\|\.bat$\|\.sh$\)" 	\
-		>> ${target_note_collection_fl}
-	done
-
-	# bak orginal file and collect notes
-	mkdir $target_original_file
-	sed -e "" "$source_note_list" >> ${target_note_collection_txt}
-	while read line
-	do
-		source_path="$(func_eval "$line")"
-
-		# recursively backup *.MD dir. TODO: also update the target_file name?
-		[ -d "$source_path" ] && [[ "$source_path" != *.MD ]] && cp "$source_path" "$target_original_file" && continue
-		[ -d "$source_path" ] && echo -e "INFO: skipping dir: $line" && continue
-
-		# backup original files, need udpate file name to avoid name confliction
-		target_file=$(echo "$line" | sed -e 's+/\|:+@+g;s+\$\| \|\(\|\)\|（\|）\|&++g')
-		cp "$source_path" "$target_original_file/$target_file" 
-
-		# collect text files
-		if [ -z "${line##*.txt}" ] ; then 
-			echo -e "\n\n>>> $line\n\n"	>> ${target_note_collection_txt}
-			sed -e "s///" "$source_path"	>> ${target_note_collection_txt}
-			#cat "$source_path"	>> ${target_note_collection_txt}
-		fi
-	done < ${target_note_collection_fl}
-
-	# append all file list in the end
-	echo -e "\n\n>>> File list of $source_bases \n\n" >> ${target_note_collection_txt}
-	cat fl_*.txt >> ${target_note_collection_txt}
-
-	# backup collection
-	func_backup_dated "$target_original_file" 
-	rm -rf "$target_original_file"
-
-	func_cleanup_dotcache $MY_ENV $MY_ENV_ZGEN
-	\cd - > /dev/null
 }
 
 function func_repeat {
