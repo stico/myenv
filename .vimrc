@@ -141,6 +141,7 @@ set autowriteall
 
 
 """""""""""""""""""""""""""""" H1 - Settings - Misc
+filetype plugin indent on				" type detection, language-dependent indenting
 set dictionary+=$MY_ENV/list/words_us
 set nocompatible					" very important for vim, since we are using vim, not vi
 set nobackup						" won't leave additional file(s) after close VIM
@@ -370,23 +371,31 @@ command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 
 """ copied from vimrc_example.vim, see comments there
 if has("autocmd") && !exists("autocommands_loaded")
-  let autocommands_loaded = 1
-  filetype plugin indent on				" type detection, language-dependent indenting
+	let autocommands_loaded = 1
+	" add to a group, and clean the previous cmds
+	augroup vimrcEx							
+		au!
+		" goto the last position last edit before quit
+		autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+	augroup END
+endif
 
-  augroup vimrcEx					" add to a group, and clean the previous cmds
-  au!
-
-  "autocmd FileType text setlocal textwidth=78		" set width 78 if type is text
-
-  autocmd BufReadPost *					" goto the last position last edit before quit
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
-
-  augroup END
-
-endif " for autocmd
-
+"""
+nnoremap <C-w>m :call WindowMaxMinToggle()<CR>
+function WindowMaxMinToggle()
+	if exists('t:window_max_min_sizes') && (t:window_max_min_sizes.after == winrestcmd())
+		silent! exe t:window_max_min_sizes.before
+		if t:window_max_min_sizes.before != winrestcmd()
+			wincmd =
+		endif
+		unlet t:window_max_min_sizes
+	elseif winnr('$') > 1
+		let t:window_max_min_sizes = { 'before': winrestcmd() }
+		vert resize | resize
+		let t:window_max_min_sizes.after = winrestcmd()
+	endif
+	normal! ze
+endfunction
 
 """ OnlyFileNameInTab is for showing only the filename, excluding the path
 set guitablabel=%{OnlyFileNameInTab()}		" invoke the function

@@ -20,7 +20,6 @@ make clean
 #--with-debug \
 #--with-http_stub_status_module \
 #--with-http_flv_module \
-#--with-http_ssl_module \
 #--with-http_dav_module \
 #--with-http_gzip_static_module \
 #--with-http_realip_module \
@@ -29,7 +28,8 @@ make clean
 #--with-ipv6 \
 #--add-module=./modules/nginx-ey-balancer \
 #--add-module=./modules/ngx_cache_purge
-./configure --prefix=$target
+./configure --prefix=$target	\
+--with-http_ssl_module
 [ "$?" -eq 0 ] && make && make install 
 
 target_link=${target%-*}
