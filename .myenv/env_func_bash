@@ -9,6 +9,7 @@
 [ -z "$RVM_HOME" ]		&& RVM_HOME=$HOME/.rvm
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
 [ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
+[ -z "$MY_ENV_LOG" ]		&& MY_ENV_LOG=$MY_ENV/zgen/log
 [ -z "$PYTHON_HOME" ]		&& PYTHON_HOME=$MY_DEV/python
 [ -z "$MY_CODE_MISC" ]		&& MY_CODE_MISC=$MY_DEV/code_misc
 [ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
@@ -236,6 +237,25 @@ function func_select_line {
 	read -e selection
 	user_selection=`echo "$*" | sed -n -e "${selection}p"`
 	eval $result_var_name=$user_selection
+}
+
+function func_log {
+	func_param_check 4 "Usage: $FUNCNAME <level> <prefix> <log_path> <str>" "$@"
+
+	local level="$1"
+	local prefix="$2"
+	local log_path="$3"
+	shift; shift; shift
+
+	[ ! -e "$log_path" ] && mkdir -p $(dirname $log_path) && touch "$log_path"
+
+	echo "$(func_dati) $level [$prefix] $@" >> "$log_path"
+}
+
+function func_log_info {
+	func_param_check 3 "Usage: $FUNCNAME <prefix> <log_path> <str>" "$@"
+
+	func_log "INFO" "$@"
 }
 
 function func_find_type_dotcache {
@@ -1398,7 +1418,17 @@ function func_build_prepare_source_local {
 }
 
 function func_mytask_all {
-	func_param_check 1 "Usage: $FUNCNAME <local_addr>" "$@" 
+	local base=$MY_ENV_ZGEN/mytask
+	local log=$base/a.log
+	func_log_info $FUNCNAME $log "start"
+
+	# find all files to execute
+	for f in $base/todo_* ; do
+		func_log_info $FUNCNAME $log "found $f"
+		IFS="_" read -ra fa <<< "$f"
+		func_mytask_${fa[1]}_run "$f"
+	done
+
 	#Name, zgen/mytask, func_mytask_mail_add/run
 
 	# Req: one time task
@@ -1436,4 +1466,18 @@ function func_mytask_all {
 	#	run
 
 	#func_mytask_mail_add
+}
+
+function func_mytask_mail_run {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+
+	local log=$base/a.log
+	func_log_info $FUNCNAME $log "execute file $f"
+
+	source "$f"
+	echo ${mytask[mt_time_deadline]}
+	echo ${mytask[mt_time_win_start]}
+	echo ${mytask[mt_time_win_stop]}
+	echo ${mytask[mt_time_last_run]}
+	echo ${mytask[mt_history]}
 }

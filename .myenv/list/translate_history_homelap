@@ -22,3 +22,29 @@ uncompress	解压缩
 	[[["解压缩","uncompress","Jiě yāsuō",""]],,"en",,[["解压缩",[4],0,0,636,0,2,0]],[["uncompress",4,[["解压缩",636,0,0],["解压",363,0,0],["解压或下载失败",0,0,0],["解压或",0,0,0],["解压或下载",0,0,0]],[[0,10]],"uncompress"]],,,[["en"]],11]
 umcompress	umcompress
 	[[["umcompress","umcompress","Umcompress",""]],,"en",,[["umcompress",[4],0,0,1000,0,1,0]],[["umcompress",4,[["umcompress",1000,0,0]],[[0,10]],"umcompress"]],,["<b><i>uncompress</i></b>","uncompress",[1]],[["pt","ca","fr","it","en"]],7]
+fertility	生育能力
+	[[["生育能力","fertility","Shēngyù nénglì",""]],[["noun",["肥沃","生殖力","丰产","丰饶","生育能力"],[["肥沃",["fertility","fecundity","enrichment","fatness","mellowness"],,0.00950202812],["生殖力",["fertility"],,0.00642939378],["丰产",["fertility","fruitfulness"],,0.00338805257],["丰饶",["fertility","fecundity","opulence","corn in Egypt","foison"],,0.00150343915],["生育能力",["fertility"]]],"fertility",1]],"en",,[["生育能力",[4],0,0,993,0,2,0]],[["fertility",4,[["生育能力",993,0,0],["生殖力",5,0,0],["丰产",0,0,0],["肥沃",0,0,0],["生育",0,0,0]],[[0,9]],"fertility"]],,,[],2]
+sterility	不育症
+	[[["不育症","sterility","Bù yù zhèng",""]],[["noun",["不育症","不育性"],[["不育症",["sterility","barrenness"],,0.0201157946],["不育性",["sterility"]]],"sterility",1]],"en",,[["不育症",[4],0,0,953,0,1,0]],[["sterility",4,[["不育症",953,0,0],["不育性",46,0,0],["无菌",0,0,0],["不育",0,0,0],["育",0,0,0]],[[0,9]],"sterility"]],,,[],2]
+scrotal hyperthermia	阴囊热疗
+	[[["阴囊热疗","scrotal hyperthermia","Yīnnáng rè liáo",""]],,"en",,[["阴囊",[4],0,0,969,0,1,0],["热疗",[5],0,0,810,1,2,0]],[["scrotal",4,[["阴囊",969,0,0],["阴囊的",3,0,0],["的阴囊",0,0,0],["阴囊内",0,0,0]],[[0,7]],"scrotal hyperthermia"],["hyperthermia",5,[["热疗",810,0,0],["高热",125,0,0],["高温",34,0,0],["体温过高",0,0,0],["温热",0,0,0]],[[8,20]],""]],,,[["en"]],9]
+infertility	不孕不育
+	[[["不孕不育","infertility","Bù yùn bù yù",""]],,"en",,[["不孕不育",[4],0,0,955,0,3,0]],[["infertility",4,[["不孕不育",955,0,0],["不孕",25,0,0],["不育",13,0,0],["不孕症",3,0,0],["不育症",1,0,0]],[[0,11]],"infertility"]],,,[["en"]],2]
+cushion	坐垫
+	[[["坐垫","cushion","Zuòdiàn",""]],[["noun",["缓冲","垫","坐垫","垫子","填料","茵"],[["缓冲",["buffer","cushion"],,0.165816262],["垫",["pad","mat","cushion"],,0.135335281],["坐垫",["cushion"],,0.0649345815],["垫子",["mat","pad","cushion"],,0.00455912296],["填料",["filler","packing","wad","cushion","diluent","brasque"],,0.000488095247],["茵",["cushion"],,0.000480528019]],"cushion",1],["verb",["坐垫","加垫褥"],[["坐垫",["cushion"],,0.0649345815],["加垫褥",["cushion"]]],"cushion",2]],"en",,[["坐垫",[4],0,0,803,0,1,0]],[["cushion",4,[["坐垫",803,0,0],["垫",167,0,0],["缓冲",17,0,0],["垫子",11,0,0],["靠垫",0,0,0]],[[0,7]],"cushion"]],,,[],3]
+pillow	枕头
+	[[["枕头","pillow","Zhěntou",""]],[["noun",["枕头","枕","靠垫","靠枕","葄"],[["枕头",["pillow","weeping willow"],,0.423426628],["枕",["pillow"],,0.196911678],["靠垫",["pillow"],,0.0217503589],["靠枕",["pillow"],,0.00276524783],["葄",["straw cushion","pillow"],,2.97740007e-05]],"pillow",1],["verb",["枕于"],[["枕于",["pillow"]]],"pillow",2]],"en",,[["枕头",[4],0,0,783,0,1,0]],[["pillow",4,[["枕头",783,0,0],["枕",216,0,0],["的枕头",0,0,0],["抱枕",0,0,0],["枕式",0,0,0]],[[0,6]],"pillow"]],,,[],3]
+misconstrued	误解
+	[[["误解","misconstrued","Wùjiě",""]],,"en",,[["误解",[4],false,false,983,0,1,0]],[["misconstrued",4,[["误解",983,false,false],["曲解",13,false,false],["误会",2,false,false],["误解了",0,false,false],["误以为",0,false,false]],[[0,12]],"misconstrued"]],,,[["en"]],55]
+misconstrue	误解
+	[[["误解","misconstrue","Wùjiě",""]],,"en",,[["误解",[4],false,false,994,0,1,0]],[["misconstrue",4,[["误解",994,false,false],["曲解",5,false,false],["误将",0,false,false],["误解了",0,false,false]],[[0,11]],"misconstrue"]],,["<b><i>misconstrued</i></b>","misconstrued",[1]],[],55]
+aesthetics	美学
+	[[["美学","aesthetics","Měixué",""]],[["noun",["美学","审美学"],[["美学",["aesthetics","esthetics"],,0.48736107],["审美学",["aesthetics","esthetics"]]],"aesthetics",1]],"en",,[["美学",[96],false,false,1000,0,1,1]],[["aesthetics",96,[["美学",1000,false,false],["美观",0,false,false],["审美",0,false,false],["美感",0,false,false],["的美学",0,false,false]],[[0,10]],"aesthetics"]],,,[],3]
+mishap	不测
+	[[["不测","mishap","Bùcè",""]],[["noun",["意外","不测","闪失","问题","好歹","失","不幸之事"],[["意外",["accident","crash","disaster","mishap","collision","mistake"],,0.043936934],["不测",["accident","mishap","contingency"],,0.041924916],["闪失",["accident","mishap"],,0.030672923],["问题",["problem","issue","question","matter","trouble","mishap"],,0.0078774579],["好歹",["mishap","disaster"],,0.0022569296],["失",["mistake","mishap"],,0.00062672672],["不幸之事",["mishap"]]],"mishap",1]],"en",,[["不测",[4],false,false,589,0,1,0]],[["mishap",4,[["不测",589,false,false],["不幸之事",181,false,false],["意外",164,false,false],["闪失",64,false,false],["事故",0,false,false]],[[0,6]],"mishap"]],,,[],3]
+sloppy	稀松
+	[[["稀松","sloppy","Xīsōng",""]],[["adjective",["稀松","泥泞的"],[["稀松",["sloppy","poor","unimportant"],,0.011642128],["泥泞的",["founderous","greasy","miry","muddy","slimy","sloppy"]]],"sloppy",3]],"en",,[["稀松",[4],false,false,1000,0,1,0]],[["sloppy",4,[["稀松",1000,false,false],["松懈",0,false,false],["马虎",0,false,false],["草率",0,false,false],["松懈的",0,false,false]],[[0,6]],"sloppy"]],,,[],57]
+pronouns	代词
+	[[["代词","pronouns","Dàicí",""]],[["noun",["代词","代名词"],[["代词",["pronoun"],,0.45783335],["代名词",["pronoun","synonym"],,0.30025443]],"pronoun",1]],"en",,[["代词",[4],false,false,940,0,1,0]],[["pronouns",4,[["代词",940,false,false],["代名词",48,false,false],["人称代词",9,false,false],["代词的",0,false,false],["的代名词",0,false,false]],[[0,8]],"pronouns"]],,,[],5]
+gigi	梁咏琪
+	[[["梁咏琪","gigi","Liángyǒngqí",""]],,"en",,[["梁咏琪",[4],false,false,850,0,1,0]],[["gigi",4,[["梁咏琪",850,false,false],["黎姿",78,false,false],["吉吉",56,false,false],["琪琪",15,false,false]],[[0,4]],"gigi"]],,,[["it","ro","id","en"]],35]
