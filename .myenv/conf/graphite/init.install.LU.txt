@@ -8,7 +8,10 @@ cd graphite-web_-GIT-
 git checkout 0.9.x
 
 # For apache 
+cd dl
 wget http://modwsgi.googlecode.com/files/mod_wsgi-3.4.tar.gz
+tar -zxvf mod_wsgi-3.4.tar.gz 
+cd mod_wsgi-3.4/
 ./configure --with-apxs=/home/ouyangzhu/dev/httpd/usr/bin/apxs --with-python=/home/ouyangzhu/dev/python/bin/python && make && make install
 
 # Update vhost file: 
@@ -50,7 +53,7 @@ cd ~/.virtualenvs/graphite/conf
 cp carbon.conf.example carbon.conf
 cp storage-schemas.conf.example storage-schemas.conf
 cp graphite.wsgi.example graphite.wsgi
-vi graphite.wsgi.example graphite.wsgi			# update the path '/opt/graphite' to '/home/ouyangzhu/.virtualenvs/graphite/webapp'
+vi graphite.wsgi					# update the path '/opt/graphite' to '/home/ouyangzhu/.virtualenvs/graphite/webapp'
 vi ~/.virtualenvs/graphite/lib/graphite/settings.py	# update SECRET_KEY = '*lk^6@0l0(iulgar$j)fbvfy&^(^u+qk3j73d18@&+ur^xuTxY'
 cd ~/.virtualenvs/graphite/lib/graphite
 python manage.py syncdb
