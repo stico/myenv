@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#func="${HOME}/.myenv/env_func_bash"; source "${func}" || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/${func}")" || exit 1
 #[ ! -e ~/.myenv/env_func_bash ] && echo "ERROR: ~/.myenv/env_func_bash not exist" && exit 1 || source ~/.myenv/env_func_bash
 
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
@@ -58,7 +59,7 @@ function func_param_check {
 function func_mkdir_cd { 
 	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
 
-	mkdir -p "$1" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir and cd into it ($1)"
+	mkdir -p "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir and cd into it ($1)"
 
 	# why need such complex eval?
 	#mkdir -p "$@" && eval \cd "\"\$$#\"" || func_die "ERROR: failed to mkdir and cd into it"
@@ -66,7 +67,7 @@ function func_mkdir_cd {
 
 
 function func_validate_exist() {
-	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
+	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@" 
 	
 	for path in "$@" ; do
 		[ ! -e "$path" ] && echo "ERROR: $path NOT exist!" && exit 1
@@ -74,7 +75,7 @@ function func_validate_exist() {
 }
 
 function func_validate_inexist() {
-	func_param_check 1 "USAGE: $FUNCNAME <path> <path> ..." "$@" 
+	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@" 
 	
 	for path in "$@" ; do
 		[ -e "$path" ] && echo "ERROR: $path already exist!" && exit 1
@@ -98,6 +99,12 @@ function func_validate_user_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
 	
 	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
+}
+
+function func_validate_available_port() {
+	func_param_check 1 "USAGE: $FUNCNAME <port>" "$@"
+	
+	[ "$(netstat -an | grep -c "$1" 2>/dev/null)" = "1" ] && func_die "ERROR: port $1 has been used!"
 }
 
 function func_validate_cmd_exist() {
@@ -956,26 +963,26 @@ function func_scp_with_jump {
 		echo "Downloading ..."
 
 		# download content to jump machine
-		ssh $jump_machine "scp -r -P $port $source ~/$tmpTransferName"
+		ssh $JUMP_MACHINE "scp -r -P $PORT $source ~/$tmpTransferName"
 
 		# create dir and download content to local machine 
 		$targetCmd
 		[[ -d $target ]] && targetFullName=$target/$sourceName
-		scp -r -P $port ouyangzhu@$jump_machine:~/$tmpTransferName $targetFullName
+		scp -r -P $PORT ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName $targetFullName
 	else
 		echo "Uploading ..."
 
 		# upload content to jump machine
-		scp -r -P $port $source ouyangzhu@$jump_machine:~/$tmpTransferName
+		scp -r -P $PORT $source ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName
 
 		# create dir and upload content to target machine in jump machine
-		ssh $jump_machine "ssh -p $port $targetAddr $targetCmd"
+		ssh $JUMP_MACHINE "ssh -p $PORT $targetAddr $targetCmd"
 		# TODO: support rename in target (see above)
-		ssh $jump_machine "scp -r -P $port ~/$tmpTransferName $target"
+		ssh $JUMP_MACHINE "scp -r -P $PORT ~/$tmpTransferName $target"
 	fi
 
 	# delete tmp file in jump machine
-	ssh $jump_machine "rm -rf ~/$tmpTransferName"
+	ssh $JUMP_MACHINE "rm -rf ~/$tmpTransferName"
 
 	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
 
@@ -1324,6 +1331,25 @@ function func_ctrl_me {
 	$script 
 }
 
+function func_download {
+	func_param_check 2 "Usage: $FUNCNAME <source> <target> <options>" "$@" 
+
+	case "$*" in
+		http://*)	func_download_http "$@" ;;
+		https://*)	func_download_http "$@" ;;
+		*)		echo "ERROR: unable to handle source address: $*" ;;
+	esac
+}
+
+function func_download_http {
+	func_param_check 2 "Usage: $FUNCNAME <source> <target> <options>" "$@" 
+
+	local source="$1"
+	local target="$2"
+	shift;shift;
+	func_mkdir_cd "$target" && wget "$@" "$source" && \cd -
+}
+
 function func_uncompress {
 	func_param_check 2 "Usage: $FUNCNAME <source> <target>" "$@" 
 
@@ -1376,6 +1402,7 @@ function func_build_prepare_source {
 function func_build_prepare_source_remote {
 	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
 
+	# TODO: func_download to download?
 	case "$*" in
 		*/hg/*)		func_build_prepare_source_remote_hg "$@" ;;
 		*/git/*)	func_build_prepare_source_remote_git "$@" ;;

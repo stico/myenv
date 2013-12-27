@@ -1,0 +1,46 @@
+<settings>
+	<pluginGroups>
+		<pluginGroup>org.codehaus.mojo</pluginGroup>
+		<pluginGroup>com.yy.maven.plugin</pluginGroup>
+		<pluginGroup>org.apache.maven.plugins</pluginGroup>
+	</pluginGroups>
+
+	<mirrors>
+		<mirror>
+			<id>jrepo2-public</id>
+			<mirrorOf>*</mirrorOf>
+			<url>http://172.19.108.117/nexus/content/groups/public</url>
+		</mirror>
+	</mirrors>
+
+	<servers>
+		<server>
+			<id>jrepo2-public</id>
+			<username>deployment</username>
+			<password>deployment123</password>
+		</server>
+	</servers>
+
+	<profiles>
+		<profile>
+			<id>jrepo2-public</id>
+			<activeByDefault>true</activeByDefault>
+			<repositories>
+				<repository>
+					<id>central</id>
+					<url>http://central</url>
+					<releases><enabled>true</enabled></releases>
+					<snapshots><enabled>true</enabled></snapshots>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>central</id>
+					<url>http://central</url>
+					<releases><enabled>true</enabled></releases>
+					<snapshots><enabled>true</enabled></snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+	</profiles>
+</settings>

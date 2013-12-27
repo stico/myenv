@@ -1,0 +1,57 @@
+myenv
+	???plig???girgin???
+		TODO
+			how to mgmt configure files?
+
+		Desc
+			a tool for quick install dev tools (e.g. redis, mysql, etc), create work area, generate control scripts
+			make life more safe by installing/running thing without root priviledge
+			make life easier by defining conversions, make diff tool use same conversion
+			build in script for installing popular tools, expect to gather more and more
+
+		Cmd
+			install
+			stage
+			ctrl
+
+		Config
+			$MYDEV_INS_BASE
+			$MYDEV_TOOL_BASE
+			$MYDEV_CUST_BASE
+			$MYDEV_STAGE_BASE
+
+		Concept
+			tool_base	=$MYDEV_TOOL_BASE, root dir for tool's binary
+			tool_name	name of the tool, without version info, e.g. "redis"
+			tool_ver	version of the tool, e.g. "2.7.3"
+
+			ins_base	=$MYDEV_INS_BASE, root dir for installations, might be source code, or ins packages
+
+			cust_base	=$MYDEV_CUST_BASE, root dir for customization, (# TODO: how to use?)
+
+			stage_base	=$MYDEV_STAGE_BASE, root dir for work area, which is the place for data, configuration, logs, etc. 
+			stage_name	the work area name
+
+		Conversion
+			stage 
+				layout
+					${stage_base}/${stage_name}/
+					|-bin					# for control scripts
+					  |-start.sh				# command to start service
+					  |-start-client.sh			# command to start client (if exist)
+					  |-stop.sh				# command to stop service
+					  |-stauts.sh				# command to check service status
+					|-conf					# for configuration files
+					|-logs					# for log files
+					|-data					# for data files
+			
+--------------------------------
+			env_base	base in ~/.myenv
+			ecs_base	base in ~/Documents/ECS
+			dev_base	bin base in ~/dev
+			data_base	work dir in ~/data
+
+			start_cmd	command to start
+			stop_cmd	command to stop, or use? 'kill `cat '$pidfile'`'
+			start_cli_cmd	command to start client
+				

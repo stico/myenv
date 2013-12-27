@@ -1,5 +1,18 @@
 #!/bin/bash
 
+#func="${HOME}/.myenv/ctrl/common.func.sh"; source "${func}" || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/${func}")" || exit 1
+
+# Converstion
+#	see ~/.myenv/todo/my_open_source.txt
+#	env_base	base in ~/.myenv
+#	ecs_base	base in ~/Documents/ECS
+#	dev_base	bin base in ~/dev
+#	data_base	work dir in ~/data
+#
+#	start_cmd	command to start
+#	stop_cmd	command to stop, or use? 'kill `cat '$pidfile'`'
+#	start_cli_cmd	command to start client
+
 COMMON_ENV=env.sh
 COMMON_FUNC=common.func.sh
 COMMON_TPL_SCRIPT=common.tpl.ctrl.sh
@@ -36,6 +49,7 @@ function func_start() {
 	$base/bin/status.sh &> /dev/null && echo 'ERROR: already running' && exit 1
 
 	# start_cmd
+	echo "Starting with command: $*"
 	eval $*
 	[ $? -eq 0 ] && echo "$!" > $base/pidfile_auto
 

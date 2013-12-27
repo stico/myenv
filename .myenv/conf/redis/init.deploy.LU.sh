@@ -7,13 +7,12 @@ usage="USAGE: $0 <name> <port(6379)>"
 # Var - Config
 name=$1
 port=$2
-parent_base=~/data/redis
 redis_home=$MY_DEV/redis
 redis_conf=$redis_home/redis.conf
 common_func=$MY_ENV/ctrl/common.func.sh
 
 # Var - Count
-base=$parent_base/$name
+base=~/data/redis/$name
 data=$base/data
 conf=$base/conf/${name}.conf
 pidfile=$base/${name}.pid

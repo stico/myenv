@@ -6,11 +6,8 @@
 # INFO: target path must be fixed, otherwise vim can not load files in runtime
 
 # Load common function
-common_func_env=~/.myenv/env_func_bash 
-common_func_tmp=/tmp/env_func_bash 
-common_func_url="https://raw.github.com/stico/myenv/master/.myenv/env_func_bash" 
-cp -f "$common_func_env" "$common_func_tmp" || wget -O "$common_func_tmp" -q "$common_func_url" 
-[ ! -e "$common_func_tmp" ] && echo "ERROR: $common_func_tmp not exist" && exit 1|| source "$common_func_tmp" 
+func="${HOME}/.myenv/env_func_bash"; source "${func}" || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/${func}")" || exit 1
+#source ~/.myenv/env_func_bash || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/env_func_bash")" || exit 1
 
 # Prepare - Check pre-condition
 func_validate_cmd_exist ruby
