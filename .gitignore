@@ -20,6 +20,8 @@
 !/.unison/deprecated
 !/.w3m/
 !/.w3m/*
+!/.pip/
+!/.pip/*.conf
 /.w3m/cookie
 /.w3m/history
 
