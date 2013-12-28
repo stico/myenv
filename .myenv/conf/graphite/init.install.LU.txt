@@ -34,7 +34,8 @@ cd py2cairo-1.10.0/
 ./waf configure --prefix=$VIRTUAL_ENV
 ./waf build
 ./waf install
-pip install django
+#pip install django
+pip install 'django<1.6'
 pip install django-tagging
 pip install python-memcached
 #pip install Twisted, the newer version seems not play well 
