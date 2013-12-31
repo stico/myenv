@@ -152,3 +152,9 @@ girgin	girgin
 	[[["girgin","girgin","Girgin",""]],,"en",,[["girgin",[4],false,false,1000,0,1,0]],[["girgin",4,[["girgin",1000,false,false]],[[0,6]],"girgin"]],,,[["tr"]],5]
 retention	保留
 	[[["保留","retention","Bǎoliú",""]],[["noun",["保留","保持","保有"],[["保留",["retention","reservation","preservation","maintenance"],,0.34559074],["保持",["keeping","holding","retention","maintenance","preservation"],,0.091572434],["保有",["tenure","retention"],,0.0025177868]],"retention",1]],"en",,[["保留",[4],false,false,859,0,1,0]],[["retention",4,[["保留",859,false,false],["保持",140,false,false],["保存",0,false,false],["滞留",0,false,false],["固定",0,false,false]],[[0,9]],"retention"]],,,[],3]
+gauge	规
+	[[["规","gauge","Guī",""]],[["noun",["规","轨距","浆液","标准尺寸"],[["规",["regulation","rule","gauge","plan","compass","divider"],,0.12322418],["轨距",["gauge"],,0.015912903],["浆液",["size","bigness","gauge","magnitude","measure"],,8.7510656e-05],["标准尺寸",["gauge"]]],"gauge",1],["verb",["测量","估计"],[["测量",["measure","survey","gauge"],,0.057304565],["估计",["estimate","reckon","gauge","appraise"],,0.026649097]],"gauge",2]],"en",,[["规",[4],false,false,851,0,1,0]],[["gauge",4,[["规",851,false,false],["轨距",119,false,false],["测量",28,false,false],["计",0,false,false],["压力表",0,false,false]],[[0,5]],"gauge"]],,,[],2]
+Volatile	挥发物
+	[[["挥发物","Volatile","Huīfā wù",""]],[["adjective",["易变的"],[["易变的",["changeful","fickle","fugitive","inconsistent","inconstant","volatile"]]],"volatile",3],["noun",["挥发物"],[["挥发物",["volatile"]]],"volatile",1]],"en",,[["挥发物",[4],false,false,1000,0,2,0]],[["Volatile",4,[["挥发物",1000,false,false],["挥发性",0,false,false],["挥发",0,false,false],["易失性",0,false,false],["易失",0,false,false]],[[0,8]],"Volatile"]],,,[],8]
+percentile	百分
+	[[["百分","percentile","Bǎi fēn",""]],,"en",,[["百分",[4],false,false,863,0,1,0]],[["percentile",4,[["百分",863,false,false],["百分位",104,false,false],["百分位数",24,false,false],["百分点",5,false,false],["百",1,false,false]],[[0,10]],"percentile"]],,,[["en"]],60]

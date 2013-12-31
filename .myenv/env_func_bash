@@ -140,6 +140,12 @@ function func_validate_file_type_text() {
 	file "$real_file" | grep -q text
 }
 
+function func_filter_comments() {
+	func_param_check 1 "USAGE: $FUNCNAME <file> ..." "$@"
+
+	sed -e "/^\s*#/d;/^\s*$/d" "$@"
+}
+
 function func_cleanup_dotcache() {
 	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@"
 

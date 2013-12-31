@@ -60,6 +60,21 @@ cd ~/.virtualenvs/graphite/lib/graphite
 python manage.py syncdb
 # yes to create super user, 
 # copy and use example-graphite-vhost.conf in apache
-cd ~/.virtualenvs/graphite
-./bin/carbon-cache.py start
+~/.virtualenvs/graphite/bin/carbon-cache.py start
 
+
+
+
+exit
+exit
+exit
+alias dstop="/data/httpd/httpd_me/bin/stop.sh"
+alias dstart="/data/httpd/httpd_me/bin/start.sh"
+alias dstatus="/data/httpd/httpd_me/bin/status.sh"
+alias dlogs="ll /data/httpd/httpd_me/logs"
+alias dinfo="vi /data/httpd/httpd_me/logs/httpd_me.log"
+alias derror="vi /data/httpd/httpd_me/logs/httpd_me.error.log"
+alias glogs="ll ~/.virtualenvs/graphite/storage/log/webapp/"
+alias ginfo="vi ~/.virtualenvs/graphite/storage/log/webapp/info.log"
+alias gerror="vi ~/.virtualenvs/graphite/storage/log/webapp/error.log"
+alias tailall="multitail ~/.virtualenvs/graphite/storage/log/webapp/{error,info,access}.log /data/httpd/httpd_me/logs/httpd_me.{,error.}log"
