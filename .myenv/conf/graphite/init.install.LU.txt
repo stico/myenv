@@ -45,6 +45,7 @@ pip install whisper
 pip install carbon --install-option="--prefix=/home/ouyangzhu/.virtualenvs/graphite" --install-option="--install-lib=/home/ouyangzhu/.virtualenvs/graphite/lib"
 # python-ldap failed, but ok since it is optional
 pip install python-ldap
+
 # check if still something need to install
 python ~/dev/code_src/graphite-web_-GIT-/check-dependencies.py
 pip install graphite-web --install-option="--prefix=/home/ouyangzhu/.virtualenvs/graphite" --install-option="--install-lib=/home/ouyangzhu/.virtualenvs/graphite/lib"

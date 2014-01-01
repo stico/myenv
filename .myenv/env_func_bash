@@ -1371,6 +1371,7 @@ function func_uncompress {
 		*.7z)		7z e "$source_file"		;;	# do NOT use -e, which will fail
 		*.gz)		tar -zxvf "$source_file"	;;
 		*.tgz)		tar -zxvf "$source_file"	;;
+		*.xz)		tar -Jxvf "$source_file"	;;
 		*.bz2)		tar -jxvf "$source_file"	;;
 		*.tar)		tar -xvf "$source_file"		;;
 		*.rar)		7z e "$source_file"		;;
