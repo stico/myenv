@@ -48,3 +48,5 @@ pronouns	代词
 	[[["代词","pronouns","Dàicí",""]],[["noun",["代词","代名词"],[["代词",["pronoun"],,0.45783335],["代名词",["pronoun","synonym"],,0.30025443]],"pronoun",1]],"en",,[["代词",[4],false,false,940,0,1,0]],[["pronouns",4,[["代词",940,false,false],["代名词",48,false,false],["人称代词",9,false,false],["代词的",0,false,false],["的代名词",0,false,false]],[[0,8]],"pronouns"]],,,[],5]
 gigi	梁咏琪
 	[[["梁咏琪","gigi","Liángyǒngqí",""]],,"en",,[["梁咏琪",[4],false,false,850,0,1,0]],[["gigi",4,[["梁咏琪",850,false,false],["黎姿",78,false,false],["吉吉",56,false,false],["琪琪",15,false,false]],[[0,4]],"gigi"]],,,[["it","ro","id","en"]],35]
+Holt-Winters	霍尔特 - 温特斯
+	[[["霍尔特 - 温特斯","Holt-Winters","Huò ěr tè - wēn tè sī",""]],,"en",,[["霍尔特",[4],false,false,1000,0,1,0],[" - ",[5],false,false,1000,1,2,0],["温特斯",[6],false,false,1000,2,3,0]],[["Holt",4,[["霍尔特",1000,false,false],["林地",0,false,false],["杂木林",0,false,false],["尔特",0,false,false]],[[0,4]],"Holt-Winters"],["-",5,[[" - ",1000,false,false]],[[4,5]],""],["Winters",6,[["温特斯",1000,false,false],["冬天",0,false,false],["冬季",0,false,false]],[[5,12]],""]],,,[["en"]],12]

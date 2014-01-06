@@ -28,6 +28,7 @@ mountiso		"func_mount_iso /ext/iso_mount"
 rdesk			"rdesktop -uouyangzhu -f -r clipboard:PRIMARYCLIPBOARD -r disk:R_Amp=/home/ouyangzhu/amp,R_Doc=/home/ouyangzhu/Documents -r sound:local 172.19.11.1"
 puff			"bash $MY_ENV/secu/autossh.sh"
 readconf		"func_filter_comments"
+foxit			"wine 'C:\Program Files (x86)\Foxit Software\Foxit Reader\Foxit Reader.exe' &> /dev/null &"
 #mvn			"mvn -Dmaven.repo.local=${HOME}/.m2/repository"
 #clipit			"clipit &"
 

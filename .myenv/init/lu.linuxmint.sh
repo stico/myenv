@@ -254,9 +254,10 @@ function func_init_soft_gui {
 	
 	sudo apt-get install -y xrdp rdesktop			>> $tmp_init_log	# xrdp: supports windows native remote desktop connection. rdesktop: use to connect to remote desktop (including windows)
 	sudo apt-get install -y vlc byobu			>> $tmp_init_log	# byobu is a better tmux
-	sudo apt-get install -y bum             		>> $tmp_init_log	# boot-up-manager
-	sudo apt-get install -y arandr             		>> $tmp_init_log	# set the screen layout, e.g for dual screen
-	sudo apt-get install -y gstm             		>> $tmp_init_log	# for auto ssh tunnel (puff)
+	sudo apt-get install -y bum				>> $tmp_init_log	# boot-up-manager
+	sudo apt-get install -y arandr				>> $tmp_init_log	# set the screen layout, e.g for dual screen
+	sudo apt-get install -y gstm				>> $tmp_init_log	# for auto ssh tunnel (puff)
+	sudo apt-get install -y wine1.7 winetricks		>> $tmp_init_log	# for wineHQ
 
 	# For LM 15, for logitech usb headset, use "PulseAudio Volume Control" to control the device
 	sudo apt-get install -y pulseaudio pulseaudio-utils	>> $tmp_init_log
@@ -347,6 +348,7 @@ function func_init_apt_update_ppa {
 	func_add_apt_repo ppa:gnome-terminator
 	func_add_apt_repo ppa:alexx2000/doublecmd				# double commander
 	func_add_apt_repo ppa:byobu/ppa						# byobu
+	func_add_apt_repo ppa:ubuntu-wine/ppa					# wine
 }
 
 function func_init_soft_termial {
