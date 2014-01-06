@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#source $MY_ENV/myenv/func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/myenv/func.sh")" || exit 1
+#source $MY_ENV/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/.myenv/myenv_func.sh")" || exit 1
 
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
