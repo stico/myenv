@@ -1,7 +1,8 @@
 # Global
-pro=$MY_PRO
+zbox=$ZBOX
 me=$MY_ENV
 env=$MY_ENV
+pro=$MY_PRO
 dev=$MY_DEV
 data=$HOME/data
 

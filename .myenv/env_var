@@ -16,6 +16,7 @@ DOT_CACHE_GREP	.grep_me.txt
 ################################################################################
 # ENV - Main Path
 ################################################################################
+ZBOX		%HOME%/.zbox
 MY_DOC		%HOME%Documents
 MY_PRO		%HOME%program
 MY_DEV		%HOME%dev
