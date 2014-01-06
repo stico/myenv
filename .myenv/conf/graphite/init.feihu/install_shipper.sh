@@ -47,9 +47,9 @@ fi
 
 
 # Final Setup
-stop_script=$feihu/stop_shipper.sh
-start_script=$feihu/start_shipper.sh
-status_script=$feihu/status_shipper.sh
+stop_script=$feihu/shipper_stop.sh
+start_script=$feihu/shipper_start.sh
+status_script=$feihu/shipper_status.sh
 if [ ! -e $stop_script ] ; then
 	cat > $stop_script <<-EOF
 		#!/bin/bash
@@ -77,8 +77,8 @@ fi
 if [ ! -e $status_script ] ; then
 	cat > $status_script <<-EOF
 		#!/bin/bash
-		echo "INFO: checking ports"
-		netstat -an | grep ":8125"
+		echo "INFO: checking ports, statsd owns 8125/8126"
+		netstat -an | grep ":8125\|:8126"
 
 		echo "INFO: checking process"
 		ps -ef | grep "logstash\|statsd" | grep -v grep

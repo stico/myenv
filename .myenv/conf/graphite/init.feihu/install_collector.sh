@@ -203,7 +203,12 @@ if [ ! -e $graphite_target/conf/carbon.conf ] ; then
 	sed -i "/\[default_1min_for_1day\]/,$d" storage-schemas.conf
 	echo -e "\n[stats]\npattern = ^stats\\.\nretentions = 10s:1d,1m:30d,1h:1y\n\n[default_1min_for_1day]\npattern = .*\nretentions = 60s:1d" >> storage-schemas.conf
 	sed -i -e '/\[default_average\]/,$d' storage-aggregation.conf
-	echo -e "\n[statsd_min]\npattern = \\.lower$\nxFilesFactor = 0.1\naggregationMethod = min\n\n[statsd_max]\npattern = \\.upper$\nxFilesFactor = 0.1\naggregationMethod = max\n\n[statsd_max_90]\npattern = \\.upper_90$\nxFilesFactor = 0.1\naggregationMethod = max\n\n[statsd_sum]\npattern = \\.sum$\nxFilesFactor = 0\naggregationMethod = sum\n\n[statsd_sum_90]\npattern = \\.sum_90$\nxFilesFactor = 0\naggregationMethod = sum\n\n[statsd_count]\npattern = \\.count$\nxFilesFactor = 0\naggregationMethod = sum\n\n[statsd_count_legacy]\npattern = ^stats_counts\\.\nxFilesFactor = 0\naggregationMethod = sum\n\n[default_average]\npattern = .*\nxFilesFactor = 0.5\naggregationMethod = average\n" >> storage-aggregation.conf
+	echo -e "\n[statsd_lower]\npattern = \\.lower$\nxFilesFactor = 0.1\naggregationMethod = min\n\n[statsd_upper]\npattern = \\.upper$\nxFilesFactor = 0.1\naggregationMethod = max\n\n[statsd_upper_90]\npattern = \\.upper_90$\nxFilesFactor = 0.1\naggregationMethod = max\n\n[statsd_sum]\npattern = \\.sum$\nxFilesFactor = 0\naggregationMethod = sum\n\n[statsd_sum_90]\npattern = \\.sum_90$\nxFilesFactor = 0\naggregationMethod = sum\n\n[statsd_count]\npattern = \\.count$\nxFilesFactor = 0\naggregationMethod = sum\n\n[statsd_count_legacy]\npattern = ^stats_counts\\.\nxFilesFactor = 0\naggregationMethod = sum\n\n[default_average]\npattern = .*\nxFilesFactor = 0.5\naggregationMethod = average\n" >> storage-aggregation.conf
+
+	# Time zone (not sure which one works, but works)
+	cp $graphite_target/lib/graphite/local_settings.py{.example,}
+	sed -i -e "s+^#TIME_ZONE = .*+TIME_ZONE = 'Asia/Shanghai'+" $graphite_target/lib/graphite/local_settings.py
+	mkdir -p $graphite_target/webapp/graphite ; echo "TIME_ZONE = 'Asia/Shanghai'" > $graphite_target/webapp/graphite/local_settings.py
 
 	cd $graphite_target/lib/graphite
 	python manage.py syncdb
@@ -227,9 +232,9 @@ if [ ! -e ${graphite_vhost}.bak ] ; then
 fi
 
 # Final setup
-stop_script=$feihu/stop_collector.sh
-start_script=$feihu/start_collector.sh
-status_script=$feihu/status_collector.sh
+stop_script=$feihu/collector_stop.sh
+start_script=$feihu/collector_start.sh
+status_script=$feihu/collector_status.sh
 if [ ! -e $stop_script ] ; then
 	cat > $stop_script <<-EOF
 		#!/bin/bash
@@ -260,7 +265,7 @@ fi
 if [ ! -e $status_script ] ; then
 	cat > $status_script <<-EOF
 		#!/bin/bash
-		echo "INFO: checking ports"
+		echo "INFO: checking ports, graphite web on apache owns 8070, graphite carbon owns 2003"
 		netstat -an | grep ":8070.*LISTEN\|:2003.*LISTEN"
 
 		echo "INFO: checking process"

@@ -1,0 +1,1493 @@
+#!/bin/bash
+
+#source $MY_ENV/myenv/func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/myenv/func.sh")" || exit 1
+
+[ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
+[ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
+[ -z "$MY_DEV" ]		&& MY_ENV =$HOME/dev
+[ -z "$MY_ENV" ]		&& MY_ENV =$HOME/.myenv
+[ -z "$RVM_HOME" ]		&& RVM_HOME=$HOME/.rvm
+[ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
+[ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
+[ -z "$MY_ENV_LOG" ]		&& MY_ENV_LOG=$MY_ENV/zgen/log
+[ -z "$PYTHON_HOME" ]		&& PYTHON_HOME=$MY_DEV/python
+[ -z "$MY_CODE_MISC" ]		&& MY_CODE_MISC=$MY_DEV/code_misc
+[ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
+[ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
+[ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
+
+source $MY_ENV/myenv/lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/myenv/lib.sh")" || exit 1
+
+function func_param_check {
+	usage="Usage: $FUNCNAME <param_count> <error_info>"
+
+	# usge -ge, so the exit status will not changed in legal condition
+	[ $# -ge 2 ] || func_die $usage
+	
+	param_count=$1
+	error_info=$2
+	shift;shift;
+
+	# check if parameter enough
+	[ $# -lt $param_count ] && func_die $error_info
+}
+
+function func_mkdir_cd { 
+	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
+
+	mkdir -p "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir and cd into it ($1)"
+
+	# why need such complex eval?
+	#mkdir -p "$@" && eval \cd "\"\$$#\"" || func_die "ERROR: failed to mkdir and cd into it"
+}
+
+
+function func_validate_exist() {
+	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@" 
+	
+	for path in "$@" ; do
+		[ ! -e "$path" ] && echo "ERROR: $path NOT exist!" && exit 1
+	done
+}
+
+function func_validate_inexist() {
+	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@" 
+	
+	for path in "$@" ; do
+		[ -e "$path" ] && echo "ERROR: $path already exist!" && exit 1
+	done
+}
+
+function func_validate_user_proc() {
+	func_param_check 1 "USAGE: $FUNCNAME <proc_info>" "$@"
+
+	ps -ef | grep "$1" | grep -v grep > /dev/null && return 0
+	return 1
+}
+
+function func_validate_user_name() {
+	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
+	
+	[ "`whoami`" != "$*" ] && echo "ERROR: username is not $* !" && exit 1
+}
+
+function func_validate_user_exist() {
+	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
+	
+	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
+}
+
+function func_validate_available_port() {
+	func_param_check 1 "USAGE: $FUNCNAME <port>" "$@"
+	
+	[ "$(netstat -an | grep -c "$1" 2>/dev/null)" = "1" ] && func_die "ERROR: port $1 has been used!"
+}
+
+function func_validate_cmd_exist() {
+	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
+
+	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
+}
+
+function func_validate_dir_not_empty() {
+	func_param_check 1 "DESC:\tCheck if dir not empty.\nUSAGE:\t$FUNCNAME <dir>" "$@"
+	
+	for path in "$@" ; do
+		# only redirect stderr, otherwise the test will always false
+		[ ! "$(ls -A "$path" 2> /dev/null)" ] && echo "ERROR: $path is empty!" && exit 1
+	done
+}
+
+function func_validate_dir_empty() {
+	func_param_check 1 "DESC:\tCheck if dir empty (not exist also ok).\nUSAGE:\t$FUNCNAME <dir>" "$@"
+	
+	for path in "$@" ; do
+		# only redirect stderr, otherwise the test will always false
+		[ "$(ls -A "$path" 2> /dev/null)" ] && echo "ERROR: $path not empty!" && exit 1
+	done
+}
+
+function func_validate_file_type_text() {
+	func_param_check 1 "USAGE: $FUNCNAME <file>" "$@"
+
+	# TODO: effeciency need improve!
+
+	real_file=$(eval echo "$*")
+	file "$real_file" | grep -q text
+}
+
+function func_filter_comments() {
+	func_param_check 1 "USAGE: $FUNCNAME <file> ..." "$@"
+
+	sed -e "/^\s*#/d;/^\s*$/d" "$@"
+}
+
+function func_cleanup_dotcache() {
+	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@"
+
+	#TODO: also cleanup dir above it?
+
+	for p in "$@" ; do
+		[ -e "$p/$DOT_CACHE_DL" ] && rm "$p/$DOT_CACHE_DL" 
+		[ -e "$p/$DOT_CACHE_FL" ] && rm "$p/$DOT_CACHE_FL" 
+		[ -e "$p/$DOT_CACHE_GREP" ] && rm "$p/$DOT_CACHE_GREP" 
+	done
+}
+
+function func_bak_file {
+	func_param_check 1 "USAGE: $FUNCNAME <filename>" "$@"
+
+	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
+	
+	target=${1}.bak_$(func_dati)
+	[ -w "$(dirname ${1})" ] && cp "$1" $target || sudo cp "$1" $target 
+}
+
+function func_tag_value_raw {
+	tags=$MY_ENV_LIST/tags
+	sed -n -e "s+^${1}=++p" $tags
+}
+
+function func_tag_value {
+	#desc="Desc: translate a tag value, or return itself if not a tag"
+	#usage="Usage: $FUNCNAME [filename]"
+	#[ $# -lt 1 ] && echo -e "${desc}\n${usage}" && exit 1
+
+	# NO translation, empty parameter, empty output
+	[ -z "$*" ] && return 1
+
+	# NO translation, probably path, translate will also cause problem
+	[ "$*" = "." -o "$*" = ".." ] && echo $* && return 0
+
+	# NO translation, contain no-tag char
+	[ $(echo "$*" | grep -c "/\| ") -ge 1 ] && echo $* && return 0
+
+	tag_value_raw="$(func_tag_value_raw ${1})"
+
+	# not a tag, return itself
+	[ -z "$tag_value_raw" ] && echo $1 && return 0
+
+	# eval
+	func_eval $tag_value_raw
+}
+
+function func_eval {
+	func_param_check 1 "USAGE: $FUNCNAME <tag>" "$@"
+
+	tag=$*
+
+	# eval value if contains var or cmd substitution, otherwise return itself
+	if [ $(echo $tag | grep -c '`\|$') -ge 1 ] ; then
+		eval echo $tag
+	else
+		echo $tag
+	fi
+}
+
+function func_eval_path {
+	func_param_check 2 "Usage: $FUNCNAME <result_var_name> <pathstr>" "$@"
+
+	# need use variable to "return" result
+	result_var_name=$1
+	eval $result_var_name=""
+	shift
+	pathstr="$*"
+
+	# eval path, check empty value
+	[ -n "$pathstr" ] && candidate=`func_tag_value $pathstr`
+	[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $pathstr !" && return 1
+
+	# Try $HOME as base (myenv backup need this for git listed files)
+	[ -e "$HOME/$candidate" ] && eval $result_var_name="$HOME/$candidate" && return 0
+	[ -e "$candidate" ] && eval $result_var_name="$candidate" && return 0
+}
+
+function func_select_line {
+	func_param_check 3 "Usage: $FUNCNAME <result_var_name> <shortest|userselect> <lines>" "$@"
+
+	# need use variable to "return" result
+	result_var_name=$1
+	eval $result_var_name=""
+	shift
+
+	# empty parameter, empty output
+	[ -z "$*" ] && return 1
+	
+	# direct return for shortest
+	select_type=$1
+	shift
+	[ "shortest" = "$select_type" ] && eval $result_var_name=`echo "$*" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1` && return 0
+
+	targets_lines=$(echo "$*" | wc -l)
+	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
+
+	func_head 20 "$*" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"
+	echo "NOT SINGLE CANDIDATES, PLS SELECT ONE:"
+	read -e selection
+	user_selection=`echo "$*" | sed -n -e "${selection}p"`
+	eval $result_var_name=$user_selection
+}
+
+function func_log {
+	func_param_check 4 "Usage: $FUNCNAME <level> <prefix> <log_path> <str>" "$@"
+
+	local level="$1"
+	local prefix="$2"
+	local log_path="$3"
+	shift; shift; shift
+
+	[ ! -e "$log_path" ] && mkdir -p $(dirname $log_path) && touch "$log_path"
+
+	echo "$(func_dati) $level [$prefix] $@" >> "$log_path"
+}
+
+function func_log_info {
+	func_param_check 3 "Usage: $FUNCNAME <prefix> <log_path> <str>" "$@"
+
+	func_log "INFO" "$@"
+}
+
+function func_find_type_dotcache {
+	# NOTE: must keep interface consistency with func_find_type
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	find_type=$1
+	base=$2
+	shift;shift
+
+	if [ "$find_type" = "d" ] ; then
+		#func_gen_list d $base $list_file || return 1
+		list_file="$base/$DOT_CACHE_DL" 
+		func_gen_filedirlist "$base" $list_file -type d || return 1
+	else
+		#func_gen_list f $base $list_file || return 1
+		list_file="$base/$DOT_CACHE_FL" 
+		func_gen_filedirlist "$base" $list_file -type f || return 1
+	fi
+
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	targets=`cat $list_file | sed -e "/^$/d" | grep -i "$search"`
+
+	echo "$targets"
+}
+
+function func_find_type {
+	# NOTE: must keep interface consistency with func_find_type_dotcache
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	find_type=$1
+	base=$2
+	shift;shift
+
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	targets=`find -P "$base" -iregex "$search" -xtype $find_type | sed -e "/^$/d"`				# 1st try, not follow links
+	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type $find_type | sed -e "/^$/d"`	# not found, follow links maybe works
+	[ -z "$targets" ] && return 1										# not found, return
+
+	echo "$targets"
+}
+
+function func_find_dotcache {
+	# NOTE: must keep interface consistency with func_find
+	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	# need use variable to "return" result
+	result_var_name=$1
+	find_type=$2
+	shift;shift
+	eval $result_var_name=""
+
+	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
+	targets=$(func_find_type_dotcache $find_type $*)
+	[ $? -ne 0 ] && return 1
+
+	func_select_line $result_var_name shortest "$targets"
+}
+
+function func_find {
+	# NOTE: must keep interface consistency with func_find_dotcache
+	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	# need use variable to "return" result
+	result_var_name=$1
+	find_type=$2
+	shift;shift
+	eval $result_var_name=""
+
+	targets=`func_find_type $find_type $*`
+	func_select_line $result_var_name shortest "$targets"
+}
+
+function func_vi_conditional {
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+		# non-cygwin env: original path style + front job. 
+
+		# use gvim when GUI running and gvim available, otherwise vim if available, otherwise vi
+		[ -n "$DISPLAY" ] && (command -v gvim &> /dev/null) && vi_cmd=gvim 
+		[ -z "$vi_cmd" ] && (command -v vim &> /dev/null) && vi_cmd=vim
+		[ -z "$vi_cmd" ] && vi_cmd=vi
+
+		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
+		# note: seems in ubuntu gui, not need "&" to make it background job
+		#$vi_cmd "$@"
+		$vi_cmd --version | grep -q '+clientserver' && $vi_cmd --servername SINGLE_VIM --remote-tab "$@" || $vi_cmd "$@"
+	else
+		# cygwin env: win style path + background job
+		parameters=${@:1:$(($#-1))}
+		target_origin=${@:$#}
+
+		[ -z "$target_origin" ] && target_cyg="" || target_cyg=`cygpath -w "$target_origin"`
+		( \\gvim $parameters $target_cyg & ) &> /dev/null
+	fi
+}
+
+function func_load_virtualenvwrapper {
+	# virtualenvwrapper is for python virtual env
+	source $PYTHON_HOME/bin/virtualenvwrapper.sh
+}
+
+function func_load_rvm {
+	# rvm is for ruby virtual env
+
+	# Init rvm step 1: rvm hacks command "cd", record it before myenv loads func_cd 
+	[ -e "$RVM_HOME/scripts/rvm" ] && source "$RVM_HOME/scripts/rvm"
+	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
+
+	# Reload myenv
+	source $HOME/.bashrc
+
+	# Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
+	#[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && rvm use ruby-1.9.3-p327@global --default &> /dev/null
+	[ -e "$RVM_HOME/scripts/rvm" ] && rvm use ruby-2.0.0-p353@global --default
+}
+
+function func_cd_conditional {
+	# shortcut - home
+	[ -z "$*" ] && \cd && return 0
+
+	# shortcut - last dir
+	if [ "-" = "$*" ] ; then
+		\cd - 
+		# TODO: (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
+		[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd .
+		return 0
+	fi
+
+	# TODO: (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
+	# use rvm's cd function if needed (note, the func_rvm_cd is hacked in .bashrc
+	[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
+
+	# otherwise just cd, use "\cd" to avoid infinite loop, since cd is hacked
+	\cd "$*"
+	func_head_cmd 30 ll
+}
+
+function func_vi {
+	# shortcut - open a new one
+	[ -z "$*" ] && func_vi_conditional && return 0
+
+	# shortcut - only one parameter, and exist
+	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && func_vi_conditional "$tag_eval" && return 0
+
+	# set base, evaluated tag or just ./
+	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
+
+	# Find target, if cache version return error, try no-cache version
+	func_find_dotcache result_target f $base $* || func_find result_target f $base $*
+
+	# use original paramters if no target found
+	[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
+}
+
+function func_cd {
+	# TODO: seem using "../paygat" will fail, possbile to make it work?
+
+	# shortcut - home
+	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
+
+	# shortcut - only one parameter, and exist in current dir
+	[ $# -eq 1 ] && [ -d "$1" ] && func_cd_conditional "$1" && return 0
+
+	# shortcut - only one parameter, and exist
+	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && [ ! -d $tag_eval ] && echo "ERROR: tag ($1) found, but value ($tag_eval) not directory" && return 0
+	[ $# -eq 1 ] && [ -d $tag_eval ] && func_cd_conditional $tag_eval && return 0
+
+	# otherwise need search
+	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
+
+	# Find target, If cache version return error, try no-cache version
+	func_find_dotcache result_target d $base $* || func_find result_target d $base $*
+
+	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist!"
+	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
+}
+
+function func_ls { 
+	# TODO: seem using "../paygat" will fail, possbile to make it work?
+
+	# shortcut - home
+	[ -z "$*" -o "-" = "$*" ] && func_ls_conditional "$*" && return 0
+
+	# shortcut - only one parameter, and exist
+	tag_eval="`func_tag_value $1`"
+	[ $# -eq 1 ] && [ -d $tag_eval ] && func_ls_conditional $tag_eval && return 0
+
+	# FOR_DEV: w | !source /home/ouyangzhu/.myenv/env_func_bash; func_ls dev
+
+	# TODO: how to distiguish ll/ls/lla etc
+	# TODO: Avoid Filename_Expansion
+	# TODO: For Cmd History: ls the cmd output dir?
+
+	# Translate tag
+	base="./"
+	if [[ -n "`func_tag_text_value $1`" ]] ;then 
+		base="`func_tag_value $1`/"
+		shift
+	fi
+	pathPattern=`echo "$*" | sed -e '/^$/q;s/ /*\//g;s/$/*/'`
+
+	echo ------------------------------------"$base/$pathPattern"
+	ls -lhtrF --color=auto $base/$pathPattern
+
+	# Tmp Cmd
+	#search=`echo "$*" | sed -e '/^$/q;s/ \|^\|$/.*/g'`
+	#[[ -n $search ]] && search="-iregex $search"
+	#find $base $search 
+}
+
+function func_head_cmd {
+	func_param_check 2 "Usage: $FUNCNAME [show_lines] [cmd]" "$@"
+
+	show_lines=$1
+	shift
+
+	cmd_result=`eval "$*"`
+	func_head $show_lines "$cmd_result"
+}
+
+function func_gen_filedirlist {
+	# TODO: make a conversion of $type+l_me.txt ?
+	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
+	func_param_check 3 "Usage: $FUNCNAME [base] [listfile] [find_options]" "$@"
+
+	base=$1
+	listfile=$2
+	shift;shift
+	find_options="$*"
+
+	# for better compatibility, always: 1) use relative path (./) or path start with variable
+	tag_value_raw="$(func_tag_value_raw ${base})"
+	if [ -n "$tag_value_raw" ]; then
+		base=$(func_eval $tag_value_raw)
+		base_raw=$tag_value_raw
+	else
+		base=$base
+		base_raw="."
+	fi
+
+	[ -e "$listfile" ] && return 0
+	[ ! -e "$base" ] && echo "ERROR: $base not exist" && return 1
+	[ ! -w "$(dirname $listfile)" ] && echo "ERROR: $(dirname $listfile) not exist or not writable" && return 1
+
+	echo "$listfile not exist, create it..." 1>&2
+	\cd $base &> /dev/null
+	[ -w ./ ] && find -L ./ $find_options | sed -e "s+^./+${base_raw}/+" > $listfile || echo "ERROR: no write permisson for $PWD!"
+	\cd - &> /dev/null
+}
+
+function func_gen_list {
+	# Deprecated: use func_tag_value_raw !
+	# TODO: make a conversion of $type+l_me.txt ?
+	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [listfile]" "$@"
+
+	find_type=$1
+	base=$2
+	listfile=$3
+	[ -e "$base/$listfile" ] && return 0
+	[ ! -w "$base" ] && return 1
+
+	# make the path relative to the base, for better compitability
+	echo "$base/$listfile not exist, create it..." 1>&2
+	\cd $base &> /dev/null
+	[ -w ./ ] && find -L ./ -type $find_type > $listfile || echo "ERROR: no write permisson for $PWD!"
+	\cd - &> /dev/null
+}
+
+function func_gen_list_f_me_git_only { 
+	src_git=$HOME/.git
+	src_add=$MY_ENV/list/myenv_fl_add.lst
+	target=$MY_ENV/zgen/myenv_fl_git1.lst
+	target_small=$MY_ENV/zgen/myenv_fl_git2.lst
+
+	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists!" && exit 1
+
+	echo -e "INFO: Generating git file list to: $target"
+	\cd $HOME && git ls-files > $target; \cd - &> /dev/null
+
+	echo -e "INFO: Generating git compact file list to: $target_small"
+	sed -e "s/\/.*//;" $target | sort -u > $target_small
+}
+
+function func_gen_list_f_me { 
+	filelist_all=$MY_ENV/$DOT_CACHE_FL
+	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
+	src_add=$MY_ENV/list/myenv_fl_add.lst
+
+	[ -e $filelist_all ] && return 0
+
+	echo -e "INFO: Generating full file list to: $filelist_all"
+	[ ! -e $filelist_git ] && func_gen_list_f_me_git_only
+
+	sed -e "s/^/..\//" $filelist_git > $filelist_all
+	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
+		func_eval_path candidate $line
+		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
+		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
+	done
+}
+
+function deprecated_func_gen_grep_pattern_str {
+	# Deprecated: passing array between functions is painful!
+	
+	func_param_check 2 "Usage: $FUNCNAME [result_var_name] [patterns]" "$@"
+
+	# need use variable to "return" result
+	result_var_name="$1"
+	eval $result_var_name=""
+	shift
+	patterns=$*
+
+	result_pattern_str='\\\('
+	for pattern in ${patterns[@]}
+	do
+		#pattern=${pattern/./\\\\.}'\\\|'
+		result_pattern_str=${result_pattern_str}${pattern}
+	done
+	result_pattern_str=${result_pattern_str%%\\\\\\\|}'\\\)'
+
+	eval $result_var_name=$result_pattern_str
+}
+
+function func_collect_files {
+	func_param_check 5 "Usage: $FUNCNAME [target_base] [source_bases] [source_quick_link] [include_patterns] [exclude_patterns]" "$@"
+
+	# TODO: migration: update file path in vimrc and xkeybindings
+	# TODO: make it optional: backup original file feature
+
+	target_base="$1"
+	source_bases=$2
+	source_quick_link=$3
+	include_patterns=$4
+	exclude_patterns=$5
+	target_collection_fl=$target_base/collection_fl.txt
+	target_collection_content=$target_base/collection_content.txt
+	target_original_files=/tmp/original_files_$(basename $target_base)
+
+	# clean up old things
+	[ -e "$target_base" ] && rm -rf "$target_base"
+
+	# create patterns for grep cmd
+	include_pattern_str=$(echo ${include_patterns[@]} | sed -e "s/\s/\|/g")
+	exclude_pattern_str=$(echo ${exclude_patterns[@]} | sed -e "s/\s/\|/g")
+
+	# init target dir, gen file lists
+	func_mkdir_cd "$target_base"
+	for tag in ${source_bases[@]}
+	do
+		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
+		#echo "$include_pattern_str"
+		#echo "$exclude_pattern_str"
+		egrep -i "$include_pattern_str" fl_${tag}.txt | egrep -v -i "$exclude_pattern_str" >> ${target_collection_fl}
+	done
+
+	echo "INFO: start to Collect and backup original file"
+	mkdir $target_original_files
+	[ -n "$source_quick_link" ] && sed -e "" "$source_quick_link" >> ${target_collection_content}
+
+	count=0
+	while read line
+	do
+		source_path="$(func_eval "$line")"
+		[ -d "$source_path" ] && echo -e "INFO: skipping dir: $line" && continue
+
+		# backup original files, need udpate file name to avoid name confliction
+		target_file=$(echo "$line" | sed -e 's+/\|:+@+g;s+\$\| \|\(\|\)\|（\|）\|&++g')
+		cp "$source_path" "$target_original_files/$target_file" 
+
+		# won't collect non-text file
+		func_validate_file_type_text "$line" || continue
+
+		# Collect files
+		#if [ -z "${line##*.txt}" ] ; then 
+			echo -e "\n\n>>> $line\n\n"	>> ${target_collection_content}
+			sed -e "s///" "$source_path"	>> ${target_collection_content}
+		#fi
+		
+		count=$(($count + 1)) && [ $(($count % 100)) -eq 0 ] && echo "INFO: collected $count files"
+	done < ${target_collection_fl}
+	echo "INFO: collected $count files"
+
+	# append all file list in the end
+	echo -e "\n\n>>> File list of ${source_bases[@]} \n\n" >> ${target_collection_content}
+	cat fl_*.txt >> ${target_collection_content}
+
+	# backup collection
+	func_backup_dated "$target_original_files" 
+	rm -rf "$target_original_files"
+
+	func_cleanup_dotcache $MY_ENV $MY_ENV_ZGEN
+	\cd - > /dev/null
+}
+
+function func_collect_code {
+	target_base=$MY_ENV/zgen/collection_code
+	source_bases=(dw repo)
+	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
+
+	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
+	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .sql$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ .php$ .ps$ .md$ .markdown$ .xml$)
+	exclude_patterns=(/crashreport /componentsrv /education /client-update-server_branch1 /docs/ /doc/ .doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /easyui/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
+
+	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+}
+
+function func_collect_note {
+
+	# TODO: the output file is not utf8?
+	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
+
+	target_base=$MY_ENV/zgen/collection_note
+	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)			# Not included DCM, put DCD first
+	source_quick_link=$(eval echo "$MY_ENV/list/collection_note_quick_link")
+
+	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
+	include_patterns=(A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
+	exclude_patterns=(.rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash)
+	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+}
+
+function func_repeat {
+	func_param_check 3 "Usage: $FUNCNAME <interval> <times> <cmd>" "$@"
+
+	count=1
+	times="$2"
+	interval="$1"
+	shift;shift
+
+	#for count in $(eval echo {1..$times}) ; do	# when times value big, will slow or not work
+	while (($count < $times)); do
+		eval "$@" 
+		((count++))
+		sleep $interval
+		echo -e "\n\n------------------------- Count: $count / $times -------------------------\n\n"
+	done
+}
+
+function func_grep_cmd {
+	func_param_check 2 "Usage: $FUNCNAME <search_str> <cmd>" "$@"
+
+	search_str=$1
+	shift
+	eval "$@" | grep -i "$search_str"
+}
+
+function func_grep_dotcache {
+
+	# TODO
+	# - seems can not support grepfile "aaa\|bbb"
+	# - seems can not add more options
+	func_param_check 3 "Usage: $FUNCNAME [base] [suffix] [search]*" "$@"
+
+	base=$1
+	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
+	shift;shift
+
+	#func_gen_list f $base $DOT_CACHE_FL || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
+	func_gen_filedirlist "$base" "$base/$DOT_CACHE_FL" -type f || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
+
+
+	# Get search string and options
+		# Case need handle
+		# no options, just search string
+		# "-" or " -" in search string
+		# multiple options with values
+
+		# Option 1
+		# TODO: can not support multiple option, like " -a a -b b"
+		# TODO: option is whole string if no option there
+		#parameters="$*"
+		#options=${parameters/#* -/ -}
+		#search=${parameters/% -*/}
+
+		# Option 2
+		# TODO: can not support multiple option, like " -a a -b b", since sed not support non-greedy regex
+		# TODO: how to avoid " -" in quoted string, since " or ' is not there after pipe
+		options=`echo "$*" | sed -e '/ -/!d;s/^.* -/ -/'`					# first " -" not in " or '
+		search=`[ -z "$options" ] && echo "$*" || echo "$*" | sed -e "s/$options//;"`		# remove all options, $options empty will cause sed have error
+
+	# we treat path in search text as .
+	search=${search//\\/.}							# make the path sep compatible
+	search=${search//\//.}							# make the sed (tput) coloring works
+
+	# Jump to base, since the DOT_CACHE_FL is using relative path
+	\cd $base
+	grep $suffix'$' $DOT_CACHE_FL	| \
+	# Step: remove files not need to grep (for "grepfile")
+	sed -e "/\/.svn\//d" 		| \
+	sed -e "/\/.hg\//d" 		| \
+	sed -e "/\/.git\//d"		| \
+	sed -e "/\/.lnk\//d"		| \
+	sed -e "/\/.metadata\//d"	| \
+	sed -e "/\/.class$\//d"		| \
+	sed -e "/$DOT_CACHE_DL/d"	| \
+	sed -e "/$DOT_CACHE_FL/d"	| \
+	sed -e "/$DOT_CACHE_GREP/d"	| \
+	sed -e "/\/.jar$\//d"		| \
+	# Step: special removal, the target is mvn, but might cause miss-hit!
+	sed -e "/\/target\//d"		| \
+	# Step: remove the fileist itself
+	sed -e "/$DOT_CACHE_FL$/d"	| \
+	# Step: grep result, -I: ignore binary, -oE & .{0.20}: only matched part and 20 char around
+	xargs --delimiter="\n" grep -d skip -I -i $options -oE ".{0,20}$search.{0,20}" | \
+	# store result for later ref
+	tee $DOT_CACHE_GREP		| \
+	# re-color the result, since pipe swiped color even using "--color" in grep
+	sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
+
+	# Jump back
+	\cd -
+}
+
+function func_grep_myenv {
+	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
+
+	func_gen_list_f_me
+	func_grep_dotcache $MY_ENV ALL "$*"
+}
+
+function func_head {
+	func_param_check 2 "Usage: $FUNCNAME [show_lines] [text]" "$@"
+
+	show_lines=$1
+	shift
+
+	total_lines=$(echo "$*" | wc -l)
+	echo "$*" | sed -n -e "1,${show_lines}p;${show_lines}s/.*/( ...... WARN: more lines suppressed, $total_lines total ...... )/p"
+}
+
+function func_ip {
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+		# non-cygwin env: ifconfig
+		/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
+		/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
+	else
+		# seem directly pipe the output of ipconfig is very slow
+		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
+		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
+		#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
+	fi
+}
+
+function func_show_resp { 
+	func_param_check 1 "Usage: $FUNCNAME [url]" "$@"
+
+	echo "sending request to: $1"
+	wget --timeout=2 --tries=1 -O - 2>&1 "$1"	\
+	| sed -e '/'${1//\//.}'/d'			\
+	| sed -e '/^Resolving/d'			\
+	| sed -e '/^Length/d'				\
+	| sed -e '/^Saving/d;/100%.*=.*s/d'		\
+	| sed -e '/0K.*0.00.=0s/d'			\
+	| sed -e '/^$/d'
+}
+
+function func_mvn_gen { 
+	func_param_check 2 "Usage: $FUNCNAME [name] [type(war/jar)]" "$@"
+	
+	name=$1
+	type=$2
+	case "$type" in
+	war)
+		#mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+		mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeCatalog=local -DarchetypeGroupId=com.tpl.archetype -DarchetypeArtifactId=tpl-war-archetype -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false
+		mkdir -p $name/src/main/java
+		;;
+	jar)
+		mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+		mkdir -p $name/src/main/resources
+		;;
+	*)
+		echo "ERROR: type must be war/jar"
+		exit 1
+	esac
+}
+
+function func_svn_backup { 
+	[ -n "$1" ] && src_path="$1" || src_path="."
+
+	src_name=$(basename $(readlink -f $src_path))
+	tmp_path=$MY_TMP/${src_name}_svn_export
+
+	# current dir is already project
+	[ -e ./.svn ] && svn export $src_path $tmp_path && return 0
+	
+	# projects are in subdir
+	mkdir -p $tmp_path
+	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
+		[ -n "$dir" ] && [ -e $dir/.svn ] && svn export $dir/  $tmp_path/$(basename $dir)
+	done
+
+	# backup
+	func_backup_dated $tmp_path
+	[ -e "$tmp_path" ] && rm -rf $tmp_path
+}
+
+function func_svn_update { 
+	[ -n "$1" ] && src_path="$1" || src_path="."
+
+	# current dir is already project
+	[ -e $src_path/.svn ] && svn update $src_path && func_cleanup_dotcache $src_path && return 0
+	
+	# projects are in subdir
+	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
+		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
+		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ && func_cleanup_dotcache $dir
+	done
+	func_cleanup_dotcache $src_path 
+}
+
+function func_git_pull { 
+	[ -n "$1" ] && \cd $1
+	git pull origin master && git status
+	func_cleanup_dotcache $PWD
+	[ -n "$1" ] && \cd -
+}
+
+function func_git_status { 
+	[ -n "$1" ] && \cd $1
+	git status 	
+	[ -n "$1" ] && \cd -
+}
+
+function func_git_commit_push { 
+	[ -e "$1" ] && target="$1" && \cd "$1" && shift
+	[ -n "$*" ] && comment="$*" || comment="update from $(hostname)"
+
+	# git add -A: in git 2.0, will add those even not in current dir (which is what we want), just wait the 2.0
+	git pull origin master			&&
+	git add -A				&&
+	git commit -a -m "$comment" 		&&
+	git push origin				&&
+	git status 				&&
+	func_gen_list_f_me
+
+	func_cleanup_dotcache $PWD
+	[ -n "$target" ] && \cd -
+}
+
+
+function func_ssh_agent_init {
+	# do nothing if already set
+	# The unison remote style can not accept .bashrc have output
+	#[ -n "$SSH_AUTH_SOCK" ] && echo "INFO: ssh agent already exist: $SSH_AUTH_SOCK" && return 0
+
+	local cmd="ssh-agent -s"
+	local env_tmp=~/.ssh/ssh_agent_env_tmp
+	local auth_sock="$([ -e "${env_tmp}" ] && grep -o "SSH_AUTH_SOCK=[^;]*" "${env_tmp}" | sed -e "s/SSH_AUTH_SOCK=//" 2> /dev/null)"
+
+	# reuse if already started. NOTE, the SSH_AUTH_SOCK file and the Process must all exist!
+	[ -e "${auth_sock}" ] && . "${env_tmp}" &> /dev/null && func_validate_user_proc "${SSH_AGENT_PID}.*ssh-agent" && return 0
+
+	# otherwise start a new one
+	echo -e "INFO: Initialising new SSH agent...\n"
+	${cmd} | sed "s/^echo/#echo/" > "${env_tmp}"
+	chmod 600 "${env_tmp}"
+	. "${env_tmp}" > /dev/null
+	ssh-add ~/.ssh/ouyangzhu_duowan
+}
+
+function func_ssh_with_jump {
+	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
+
+	ip_addr=`getent hosts $1 | sed "s/\s\+.*$//"`
+	[[ -z $ip_addr ]] && ip_addr=$1
+
+	port=32200
+	jump_machine=dw
+	
+	shift
+	ssh -t $jump_machine "ssh -p $port $ip_addr $@"
+
+	# TODO: check the $1, if it is a ip, should not parse as unique_name
+	# TODO: add function for run cmd on multiple host
+	# Demo: func_ssh_with_jump 222.88.95.197 
+}
+
+function func_scp_with_jump {
+	func_param_check 2 "Usage: $FUNCNAME [source] [target]" "$@"
+
+	PORT=32200
+	JUMP_MACHINE=dw
+
+	source=$1
+	sourceName=$(basename $source)
+	tmpTransferName=tmp_transfer_`func_dati`_${sourceName}
+	target=$2
+	targetDir=$(dirname ${target##*:})
+	targetCmd="mkdir -p $targetDir"
+	targetAddr=${target%%:*}
+
+	if [[ $(echo $1 | grep -c ":") == 1 ]] 
+	then
+		echo "Downloading ..."
+
+		# download content to jump machine
+		ssh $JUMP_MACHINE "scp -r -P $PORT $source ~/$tmpTransferName"
+
+		# create dir and download content to local machine 
+		$targetCmd
+		[[ -d $target ]] && targetFullName=$target/$sourceName
+		scp -r -P $PORT ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName $targetFullName
+	else
+		echo "Uploading ..."
+
+		# upload content to jump machine
+		scp -r -P $PORT $source ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName
+
+		# create dir and upload content to target machine in jump machine
+		ssh $JUMP_MACHINE "ssh -p $PORT $targetAddr $targetCmd"
+		# TODO: support rename in target (see above)
+		ssh $JUMP_MACHINE "scp -r -P $PORT ~/$tmpTransferName $target"
+	fi
+
+	# delete tmp file in jump machine
+	ssh $JUMP_MACHINE "rm -rf ~/$tmpTransferName"
+
+	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
+
+	# Improve: the file name was changed to tmp_xxx
+	# Improve: support unique_name (need translate, since the jump machine didn't set the hosts)
+	# Improve: support file name with wildcard
+	# Improve: cache the file based on MD5?
+	# Improve: support all senario 
+	#	L > R	I	cmd on L(src=L-Path		target=J-Host-Tmp)		II: cmd on J(src=J-Tmp	target=R-Host-Path)
+	#	R > L	II	cmd on J(src=R-Host-Path	target=J-Tmp)			II: cmd on L(src=L-Path	target=J-Host-Tmp)
+	#	R1 > R2	III	cmd on J(src=R1-Host-Path	target=J-Tmp)			II: cmd on J(src=J-Tmp	target=R2-Host-Tmp)
+	#
+	#	rule for scp exe location		J if $1 contains :, otherwise L
+	#	rule for scp exe stage 1 src		directly use
+	#	rule for scp exe stage 1 target		J-Tmp if $1 contains :, otherwise J-Host-Tmp
+	#	rule for scp exe stage 2 src		J-Tmp if $2 contains :, otherwise directly use
+	#	rule for scp exe stage 2 target		directly use if $2 contains :, otherwuse J-Host-Tmp
+	#
+	#	and mkdir?
+
+	# Demo: 
+		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test
+		#func_scp_with_jump ~/amp/test/t1 ouyangzhu@222.134.66.106:~/test1
+		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test2/test
+		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test/t1 ~/amp/2012-11-01/test1
+		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
+}
+
+function func_terminator { 
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+		# non-cygwin env: original program
+		terminator --title SINGLE_TERMINATOR $*
+	else
+		startxwin &> /dev/null	# just ensure X server started
+		raw_data=$(ipconfig)
+		local_ip=`echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p" | head -1`
+		# both --maximise/--fullscreen are not really work
+		ssh workvm "DISPLAY=$local_ip:0.0 terminator --geometry=1910x1010+0+0 --title Gnome-Terminator&> /dev/null &" &> /dev/null
+	fi
+}
+
+function func_sys_net {
+	usage="Usage: $FUNCNAME [interface] [interval], interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') 
+	func_param_check 1 $usage "$@"
+
+	interface=$1
+	sleep_time=${2-2}
+	rx_before=$(ifconfig $interface | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
+	tx_before=$(ifconfig $interface | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
+	while : ; do
+		sleep $sleep_time
+		rx_after=$(ifconfig $interface | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
+		tx_after=$(ifconfig $interface | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
+		rx_result=$(( (rx_after-rx_before)*8/$sleep_time ))
+		tx_result=$(( (tx_after-tx_before)*8/$sleep_time ))
+		echo -e "$(date "+%Y-%m-%d %H:%M:%S") IN: ${rx_result}/$(( ${rx_result}/1000 )) bps/kbps,\tOUT: ${tx_result}/$(( ${tx_result}/1000 )) bps/kbps"
+
+		rx_before=$rx_after
+		tx_before=$tx_after
+	done
+}
+
+function func_sys_info_os_len {
+	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+
+	# Note, cygwin is usually 32bit
+	if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then		echo "64bit"
+	elif [ $(echo $uname_info | grep -ic "i[3-6]86") -eq 1 ] ; then		echo "32bit"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info_os_ver {
+	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release
+	elif [ "$os_name" = "cygwin" ] ; then					uname -r | sed -e "s/(.*//"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info_os_type {
+	if [ "$os_name" = "ubuntu" ] && (command -v dpkg &> /dev/null) ; then 
+		if (dpkg -l ubuntu-desktop &> /dev/null) ; then			echo "desktop"
+		else								echo "server"
+		fi
+	elif [ "$os_name" = "cygwin" -o "$os_name" = "mingw" ] ; then		echo "desktop"
+	elif [ "$os_name" = "linuxmint" ] ; then				echo "desktop"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info_os_name {
+	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+
+	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release
+	elif [ $(echo $uname_info | grep -ic "cygwin") -eq 1 ] ; then		echo "cygwin"
+	elif [ $(echo $uname_info | grep -ic "mingw") -eq 1 ] ; then		echo "mingw"
+	else									echo "unknown"
+	fi
+}
+
+function func_sys_info { 
+	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
+	# exampe: ubuntu/linuxmint/cygwin/win	_12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm	_precise
+
+	os_name=`func_sys_info_os_name`
+
+	# use cache if cached, need os_name to distiguish cygwin/mingw
+	[ -n "$MY_ENV_ZGEN" ] && [ -e "$MY_ENV_ZGEN" ] && cache_file=$MY_ENV_ZGEN/sys_info_${os_name} || cache_file=/tmp/sys_info_${os_name}
+	[ -e $cache_file ] && cat $cache_file && return
+
+	os_ver=`func_sys_info_os_ver`
+	os_len=`func_sys_info_os_len`
+	os_type=`func_sys_info_os_type`
+
+	# addInfo
+	if [ "$os_name" = "ubuntu" ] ; then					addInfo=`sed -n -e "s/DISTRIB_CODENAME=\(\S*\)/\L\1/p" /etc/lsb-release`
+	fi
+	############################################################## (not include in output yet)
+	# cpu_type 
+	cpu_type="unknown"
+
+	# cpu_len 
+	# if [ $(grep -c "flags.* lm " /proc/cpuinfo) -ge 1 ] ; then # lm (long bit), deprecated
+	if [ $(getconf -a | grep -c "LONG_BIT\s*64") -eq 1 ] ; then		cpu_len=64bit
+	elif [ $(getconf -a | grep -c "LONG_BIT\s*32") -eq 1 ] ; then		cpu_len=32bit
+	else									cpu_len="unknown"
+	fi
+	############################################################## (not include in output yet)
+
+	result="${os_name}_${os_ver}_${os_len}_${os_type}_$(hostname)_${addInfo}" 
+	echo -e "${result%_}" > $cache_file
+	cat $cache_file
+
+	# TODO: put this func to another file, pre load as basic functions
+}
+
+function func_translate { 
+	# check history
+	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	[ -n "$history_txt" ] && echo "$history_txt" && return 0
+
+	func_translate_google "$@" || func_translate_microsoft "$@"
+}
+
+function func_translate_IPA_google { 
+	echo "WARN: not implemented yet!"
+	# IPA: International Phonetic Alphabet (IPA), tells pronunciation of words
+	# TODO: google api, IPA extraction: http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q=example&sl=en&tl=en
+}
+
+function func_translate_google { 
+	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
+
+	# might useful fields: ie=UTF-8&oe=UTF-8
+	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
+	then	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=zh-CN&sl=en"	# en > cn
+	else	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=en&sl=zh-CN"	# cn > en	# why become cn > cn !!??
+	fi
+
+	res_raw=`curl -e "http://translate.google.cn/?"							\
+		-H 'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:11.0) Gecko/20100101 Firefox/11.0'	\
+		-H 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'			\
+		-s "http://translate.google.cn/translate_a/t"							\
+		-d "$data"`
+	[ -z "$res_raw" ] && return 1
+
+	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
+	echo $res_simple
+	echo $res_raw
+	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/list/translate_history_$(hostname)
+}
+
+function func_translate_microsoft { 
+	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
+
+	access_token_tmp=/tmp/ms_translation_api_access_token
+	access_token_compare=/tmp/ms_translation_api_access_token_compare
+
+	access_token_uri="https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
+	# parameters below are applied from https://datamarket.azure.com
+	post_content="grant_type=client_credentials&client_id=ouyzhu&client_secret=0yAn46ClllxZk4CuY2tGkjo9Sl&scope=http://api.microsofttranslator.com"
+	translate_uri_cn2en="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=zh-CHS&to=en&text="
+	translate_uri_en2cn="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=en&to=zh-CHS&text="
+
+	# Check if valid access token exist
+	if [ ! -e "$access_token_tmp" ] || (( $(date +%s) > $(tail -1 $access_token_tmp) )) ; then
+		echo "INFO: requesting ms translate api token"
+		curl -s --data $post_content $access_token_uri > $access_token_tmp || return 1
+
+		expire_on=$(sed -e 's/.*ExpiresOn=\([^&]*\)&.*/\1/' $access_token_tmp)
+		echo -e "\n$expire_on" >> $access_token_tmp
+
+		#expire_in=$(sed -e 's/.*"expires_in":"\([^"]*\)".*/\1/' $access_token_tmp)
+		#touch -d "$expire_in seconds" $access_token_tmp
+	fi
+	access_token=$(head -1 "$access_token_tmp" | sed -e 's/.*"access_token":"\([^"]*\)".*/\1/')
+
+	# Translate, both '-H "ContentType: text/plain"' and '&contentType=text%2Fplain' NOT work (always get xml)
+	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
+	then res_raw=$(curl -s -H "ContentType: text/plain" -H "Authorization: Bearer $access_token" "${translate_uri_en2cn}$*")
+	else res_raw=$(curl -s -H "ContentType: text/plain" -H "Authorization: Bearer $access_token" "${translate_uri_en2cn}$*")
+	fi
+	[ -z "$res_raw" ] && return 1
+
+	echo $res_raw
+	echo -e "$*\n\t$res_raw" >> $MY_ENV/list/translate_history_$(hostname)
+}
+
+function func_delete_dated { 
+	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
+
+	# the path might have blank, so use $*, and embrace with "" (many place used this)
+	targetDir=$MY_TMP/`func_date`
+
+	[[ ! -e $targetDir ]] && mkdir $targetDir
+	mv "$@" $targetDir
+}
+
+function func_backup_dated { 
+	func_param_check 1 "Usage: $FUNCNAME <path>" "$@" 
+	[ $# -ge 2 ] && func_die "ERROR: only one path/parameter supported"
+
+	srcPath="$1"
+	fileName=$(basename "$srcPath")
+	targetFile=`func_dati`_`uname -n`_"$fileName"
+	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/ampext/backup")
+
+	# if path is a directory, zip it first
+	if [ -d "$srcPath" ]; then
+		# need update the var to packed ones
+		targetFile=$targetFile.zip 
+		packFile=$MY_TMP/$targetFile
+		echo -e "INFO: Creating zip file for backup: $packFile"
+		zip -rq "$packFile" "$srcPath"
+		srcPath="$packFile"
+	fi
+
+	for path in "${bakPath[@]}"
+	do
+		if [ -e "$path" ]; then
+			cp "$srcPath" "$path/$targetFile"
+			[ -e "$path/$targetFile" ] && echo -e "INFO: backup success: `ls -lh \"$path/$targetFile\"`" 
+			copied=$success
+		else
+			echo -e "WARN: backup failed, path not exist ($path)" 
+		fi
+	done
+
+	[ -e $packFile ] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
+	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+}
+
+function func_backup_listed { 
+	# TODO: merge with dated_backup?
+	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/zgen/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
+
+	func_param_check 2 "Usage: $FUNCNAME <tag> <filelists>*" "$@" 
+
+	tmp_dir=$MY_TMP/$1
+	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
+	mkdir -p $tmp_dir
+	shift
+	source=$*
+
+	for fl in $source ; do 
+		[ ! -e $fl ] && echo -e "WARN: file list ($fl) not exist!" && continue
+		sub_name=`basename ${fl}`
+		sub_dir=$tmp_dir/${sub_name%%.*}
+		mkdir $sub_dir
+
+		# TODO duplicated code block - start - evalfl1
+		sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
+			# eval path, check empty value
+			[ -n "$line" ] && candidate=`func_eval $line` || continue
+			[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $line !" && continue
+
+			# Try $HOME as base (myenv backup need this for git listed files)
+			[ -e "$HOME/$candidate" ] && cp --no-preserve=all -R "$HOME/$candidate" $sub_dir && continue
+			[ -e "$candidate" ] && cp --no-preserve=all -R "$candidate" $sub_dir || continue
+		done
+		# TODO duplicated code block - end - evalfl1
+
+		# dirty check 1, for myenv bak, change its ACL, otherwise can not open/delete that dir
+		dirty_dir=fstab.d
+		[ -e $sub_dir/$dirty_dir ] && 					\
+			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir &&	\
+			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir/*
+
+		# dirty check 2, for myenv bak, not want the .unison log file 
+		[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm &> /dev/null
+	done
+
+	func_backup_dated $tmp_dir
+	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
+
+	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
+	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
+	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
+
+	#func_gen_list_f_me	
+	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
+	#$MY_ENV/util/listed_backup.sh
+}
+
+function func_run_file_java {
+	file=$1
+	file_name=`basename $file`
+	tmp_dir=$(func_tag_value tt)/$(func_time)
+
+	cp -f $file $tmp_dir || return 1
+	\cd $tmp_dir &> /dev/null
+	rm ${file_name/.java/.class} &> /dev/null
+	javac $file_name
+	java -cp . ${file_name%.java}
+}
+
+function func_run_file {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	
+	file=$1
+	[ ! -e "$file" ] && echo "ERROR: $file not exist!" && return 1
+
+	if [[ "$file" = *.java ]] ; then
+		func_run_file_java $file 
+	elif [[ "$file" = *.rb ]] ; then	ruby $file;
+	elif [[ "$file" = *.sh ]] ; then	bash $file;
+	elif [[ "$file" = *.py ]] ; then	python $file;
+	elif [[ "$file" = *.bat ]] ; then	cmd $file;
+	elif [[ "$file" = *.exe ]] ; then	cmd $file;
+	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File ${file//\\/\/}
+	elif [[ "$file" = *.groovy ]] ; then	groovy $file;
+	else
+		echo "ERROR: can not run file $file !"
+	fi
+}
+
+function func_ctrl_me {
+	func_param_check 2 "Usage: $FUNCNAME <target> <action>" "$@" 
+
+	name=$1
+	action=$2
+	parent=${name%%_*}
+	script=/data/${parent}/${name}/bin/${action}.sh
+
+	[ ! -e "$script" ] && func_die "ERROR: $script not exist"
+	$script 
+}
+
+function func_download {
+	func_param_check 2 "Usage: $FUNCNAME <source> <target> <options>" "$@" 
+
+	case "$*" in
+		http://*)	func_download_http "$@" ;;
+		https://*)	func_download_http "$@" ;;
+		*)		echo "ERROR: unable to handle source address: $*" ;;
+	esac
+}
+
+function func_download_http {
+	func_param_check 2 "Usage: $FUNCNAME <source> <target> <options>" "$@" 
+
+	local source="$1"
+	local target="$2"
+	shift;shift;
+	func_mkdir_cd "$target" && wget "$@" "$source" && \cd -
+}
+
+function func_uncompress {
+	func_param_check 2 "Usage: $FUNCNAME <source> <target>" "$@" 
+
+	func_validate_exist "$1"
+	func_validate_dir_empty "$2"
+
+	target_dir="$(readlink -f "$2")"
+	source_file="$(readlink -f "$1")"
+	func_mkdir_cd "$target_dir"
+
+	case "$source_file" in
+		#*.Z)		uncompress "$source_file"	;;
+		*.7z)		7z e "$source_file"		;;	# do NOT use -e, which will fail
+		*.gz)		tar -zxvf "$source_file"	;;
+		*.tgz)		tar -zxvf "$source_file"	;;
+		*.xz)		tar -Jxvf "$source_file"	;;
+		*.bz2)		tar -jxvf "$source_file"	;;
+		*.tar)		tar -xvf "$source_file"		;;
+		*.rar)		7z e "$source_file"		;;
+		*.zip)		unzip "$source_file"		;;
+		#*.tbz2)	tar -jxvf "$source_file"	;;
+		*)		echo "unknow format of file: $source_file"	;;
+	esac
+
+	func_validate_dir_not_empty "$target_dir"
+
+	# Note, there might be only 1 file in the compressed file
+	if [ "$(ls -A "$target_dir" | wc -l)" = 1 ] ; then
+		echo "INFO: try to move one dir level up" 
+		mv -f "$target_dir"/**/* "$target_dir"/ 2> /dev/null 
+		rmdir "$target_dir"/**/ 2> /dev/null 
+	fi
+
+	\cd -
+}
+
+function func_mount_iso {
+	func_param_check 2 "Usage: $FUNCNAME <target_path> <iso_path>" "$@" 
+
+	#mount -t iso9660 -o ro,loop,noauto /your/texlive2012.iso /mnt
+	sudo mount -t iso9660 -o ro,loop,noauto $2 $1
+}
+ 
+function func_build_prepare_source {
+	func_param_check 3 "Usage: $FUNCNAME <source_base> <local_addr> <remote_addr>" "$@" 
+
+	# remote first
+	[ -n "$3" ] && func_build_prepare_source_remote "$1" "$3" || func_build_prepare_source_local "$1" "$2"
+}
+
+function func_build_prepare_source_remote {
+	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
+
+	# TODO: func_download to download?
+	case "$*" in
+		*/hg/*)		func_build_prepare_source_remote_hg "$@" ;;
+		*/git/*)	func_build_prepare_source_remote_git "$@" ;;
+		*)		echo "ERROR: unable to handle build address: $*" ;;
+	esac
+}
+
+function func_build_prepare_source_remote_hg {
+	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
+
+	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-HG-
+	source_base_name=$(basename ${1})
+	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-HG-
+
+	mkdir -p $MY_CODE_MISC
+	[ -e "$source_base_remote" ] && hg pull && hg update || hg clone "$2" "$source_base_remote"
+	rm -rf "$1" ; ln -s "$source_base_remote" "$1"
+}
+
+function func_build_prepare_source_remote_git {
+	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
+
+	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-GIT-
+	source_base_name=$(basename ${1})
+	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-GIT-
+
+	mkdir -p $MY_CODE_MISC
+	[ -e "$source_base_remote" ] && git pull || git clone "$2" "$source_base_remote"
+	rm -rf "$1" ; ln -s "$source_base_remote" "$1"
+}
+
+function func_build_prepare_source_remote_download {
+	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
+	echo "ERROR: not implement yet"
+}
+
+function func_build_prepare_source_local {
+	func_param_check 1 "Usage: $FUNCNAME <local_addr>" "$@" 
+	echo "ERROR: not implement yet"
+}
+
+function func_mytask_all {
+	local base=$MY_ENV_ZGEN/mytask
+	local log=$base/a.log
+	func_log_info $FUNCNAME $log "start"
+
+	# find all files to execute
+	for f in $base/todo_* ; do
+		func_log_info $FUNCNAME $log "found $f"
+		IFS="_" read -ra fa <<< "$f"
+		func_mytask_${fa[1]}_run "$f"
+	done
+
+	#Name, zgen/mytask, func_mytask_mail_add/run
+
+	# Req: one time task
+	# Req: repeat task
+	# Req: fix time repeat task
+
+	#Design
+	#	- Single crontab trigger (so no contend), 10s, (TODO: crontab line > run As ouyangzhu)
+	#	- Async execution: add task file (parameter in file), then func_mytask_<topic>_run
+
+	#Converstion
+	#	File Name	<status>		_<topic>	_<identity>
+	#			temp/fail/todo/done	mail		(unique)
+
+	#	File Content	(use bash associate array)
+	#			mt_time_deadline	func_dati, no execution after this time
+	#			mt_time_win_start	func_dati, time window for start task
+	#			mt_time_win_stop	func_dati, time window for stop task 
+	#			mt_time_last_run	func_dati, 
+	#			mt_history		(execution status, could be multiple, better with time)
+
+	#	Func Name	func_mytask_run				run all task
+	#			func_mytask_<topic>_add <filename>	add <topic> task
+	#			func_mytask_<topic>_run <filename>	run <topic> task
+
+	#func_mytask_all
+	#    Parse file (todo: bash, how to splite str)
+	#    Select sub func(todo: bash, how to read param)
+	#    ! Log to zgen/mytask/a.log
+
+	#func_mytask_mail_run
+	#	source file
+	#	calculate next exe time: mt_time_last_run + repeat_interval
+	#	check start/expire time
+	#	run
+
+	#func_mytask_mail_add
+}
+
+function func_mytask_mail_run {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+
+	local log=$base/a.log
+	func_log_info $FUNCNAME $log "execute file $f"
+
+	source "$f"
+	echo ${mytask[mt_time_deadline]}
+	echo ${mytask[mt_time_win_start]}
+	echo ${mytask[mt_time_win_stop]}
+	echo ${mytask[mt_time_last_run]}
+	echo ${mytask[mt_history]}
+}
