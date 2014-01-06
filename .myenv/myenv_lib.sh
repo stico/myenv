@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# source ~/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/myenv_lib.sh")" || exit 1
+# source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
 function func_date {	date "+%Y-%m-%d";		}
 function func_time {	date "+%H-%M-%S";		}

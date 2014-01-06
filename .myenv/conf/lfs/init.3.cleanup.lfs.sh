@@ -12,8 +12,7 @@ dev_lfs=$(sudo fdisk -l | grep sda && echo /dev/sda7 || echo /dev/sdb7)
 dev_lfs_boot=$(sudo fdisk -l | grep sda && echo /dev/sda6 || echo /dev/sdb6)
 
 # Source functions
-func_me=$MY_ENV/env_func_bash
-[ ! -e $func_me ] && echo "ERROR: $func_me not exist" && exit 1 || source $func_me
+source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 
 # Pre-Check
 func_validate_exist $mnt_lfs 

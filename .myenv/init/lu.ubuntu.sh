@@ -3,19 +3,15 @@
 #TODO: investigate ubuntu tweak
 #TODO: investigate MyUnity
 
-
 # Variables
 chrome_stable='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 apt_update_stamp=/var/lib/apt/periodic/update-success-stamp
 apt_update_ago=$(( `date +%s` - `stat -c %Y $apt_update_stamp` ))
 apt_source=/etc/apt/sources.list
 
-
 # Pre-condition/pre-work
-[ ! -e ~/.myenv/env_func_bash ] && echo "ERROR: .myenv not exist !" && exit 1
+source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 (( $(grep -c "http://cn" $apt_source) < 1 )) && echo "ERROR: $apt_source are using non 'http://cn' sources!" && exit 1
-. ~/.myenv/env_func_bash
-
 
 # Installations
 sys_info=`func_sys_info`

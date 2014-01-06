@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#source $MY_ENV/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/.myenv/myenv_func.sh")" || exit 1
+# source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
@@ -16,7 +16,7 @@
 [ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
 [ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
 
-source $MY_ENV/myenv/lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/myenv/myenv/lib.sh")" || exit 1
+source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
 function func_param_check {
 	usage="Usage: $FUNCNAME <param_count> <error_info>"

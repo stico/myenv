@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load common function
-func="${HOME}/.myenv/env_func_bash"; source "${func}" || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/${func}")" || exit 1
+source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 func="${HOME}/.myenv/ctrl/common.func.sh"; source "${func}" || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/${func}")" || exit 1
 
 # Variable
