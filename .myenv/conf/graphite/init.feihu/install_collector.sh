@@ -83,8 +83,6 @@ if [ ! -e $httpd_target ] ; then
 	"
 	./configure --prefix=$httpd_target --with-mpm=prefork --enable-shared-mods=all $httpd_conf_opts
 	[ "$?" -eq 0 ] && make && make install
-
-	cp $httpd_target/etc/apache2/httpd.conf{,.bak}
 fi
 
 # Setup httpd

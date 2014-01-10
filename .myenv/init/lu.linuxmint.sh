@@ -391,12 +391,13 @@ func_init_apt_update_list
 func_init_soft_basic
 
 # Init - myenv
-func_init_link dev os_spec_lu/dev		# ony for /ext/home_data init
+mkdir -p ~/dev
+func_init_link dev os_spec_lu/dev/code_dw	# ony for /ext/home_data init
+func_init_link dev os_spec_lu/dev/code_src	# ony for /ext/home_data init
+func_init_link dev os_spec_lu/dev/code_repo	# ony for /ext/home_data init
+func_init_link dev os_spec_lu/dev/code_stage	# ony for /ext/home_data init
 func_init_link .m2 os_spec_lu/m2_repo		# ony for /ext/home_data init
 func_init_link program os_spec_lu/program 	# ony for /ext/home_data init
-#func_init_link_doc
-#func_init_link_dev
-#func_init_link_pro
 func_init_myenv_rw
 
 # Init - soft

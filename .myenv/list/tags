@@ -1,4 +1,5 @@
 # Global
+zb=$ZBOX
 zbox=$ZBOX
 me=$MY_ENV
 env=$MY_ENV
