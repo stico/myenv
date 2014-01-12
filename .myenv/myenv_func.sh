@@ -18,44 +18,13 @@
 
 source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
-function func_param_check {
-	usage="Usage: $FUNCNAME <param_count> <error_info>"
-
-	# usge -ge, so the exit status will not changed in legal condition
-	[ $# -ge 2 ] || func_die $usage
-	
-	param_count=$1
-	error_info=$2
-	shift;shift;
-
-	# check if parameter enough
-	[ $# -lt $param_count ] && func_die $error_info
-}
-
-function func_mkdir_cd { 
-	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
-
-	mkdir -p "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir and cd into it ($1)"
-
-	# why need such complex eval?
-	#mkdir -p "$@" && eval \cd "\"\$$#\"" || func_die "ERROR: failed to mkdir and cd into it"
-}
-
-
 function func_validate_exist() {
-	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@" 
-	
-	for path in "$@" ; do
-		[ ! -e "$path" ] && echo "ERROR: $path NOT exist!" && exit 1
-	done
+	# TODO: deprecate this wrapper
+	func_validate_path_exist "$@"
 }
-
 function func_validate_inexist() {
-	func_param_check 1 "USAGE: $FUNCNAME <path> ..." "$@" 
-	
-	for path in "$@" ; do
-		[ -e "$path" ] && echo "ERROR: $path already exist!" && exit 1
-	done
+	# TODO: deprecate this wrapper
+	func_validate_path_inexist "$@"
 }
 
 function func_validate_user_proc() {
@@ -87,24 +56,6 @@ function func_validate_cmd_exist() {
 	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
 
 	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
-}
-
-function func_validate_dir_not_empty() {
-	func_param_check 1 "DESC:\tCheck if dir not empty.\nUSAGE:\t$FUNCNAME <dir>" "$@"
-	
-	for path in "$@" ; do
-		# only redirect stderr, otherwise the test will always false
-		[ ! "$(ls -A "$path" 2> /dev/null)" ] && echo "ERROR: $path is empty!" && exit 1
-	done
-}
-
-function func_validate_dir_empty() {
-	func_param_check 1 "DESC:\tCheck if dir empty (not exist also ok).\nUSAGE:\t$FUNCNAME <dir>" "$@"
-	
-	for path in "$@" ; do
-		# only redirect stderr, otherwise the test will always false
-		[ "$(ls -A "$path" 2> /dev/null)" ] && echo "ERROR: $path not empty!" && exit 1
-	done
 }
 
 function func_validate_file_type_text() {
@@ -1330,42 +1281,6 @@ function func_download_http {
 	local target="$2"
 	shift;shift;
 	func_mkdir_cd "$target" && wget "$@" "$source" && \cd -
-}
-
-function func_uncompress {
-	func_param_check 2 "Usage: $FUNCNAME <source> <target>" "$@" 
-
-	func_validate_exist "$1"
-	func_validate_dir_empty "$2"
-
-	target_dir="$(readlink -f "$2")"
-	source_file="$(readlink -f "$1")"
-	func_mkdir_cd "$target_dir"
-
-	case "$source_file" in
-		#*.Z)		uncompress "$source_file"	;;
-		*.7z)		7z e "$source_file"		;;	# do NOT use -e, which will fail
-		*.gz)		tar -zxvf "$source_file"	;;
-		*.tgz)		tar -zxvf "$source_file"	;;
-		*.xz)		tar -Jxvf "$source_file"	;;
-		*.bz2)		tar -jxvf "$source_file"	;;
-		*.tar)		tar -xvf "$source_file"		;;
-		*.rar)		7z e "$source_file"		;;
-		*.zip)		unzip "$source_file"		;;
-		#*.tbz2)	tar -jxvf "$source_file"	;;
-		*)		echo "unknow format of file: $source_file"	;;
-	esac
-
-	func_validate_dir_not_empty "$target_dir"
-
-	# Note, there might be only 1 file in the compressed file
-	if [ "$(ls -A "$target_dir" | wc -l)" = 1 ] ; then
-		echo "INFO: try to move one dir level up" 
-		mv -f "$target_dir"/**/* "$target_dir"/ 2> /dev/null 
-		rmdir "$target_dir"/**/ 2> /dev/null 
-	fi
-
-	\cd -
 }
 
 function func_mount_iso {
