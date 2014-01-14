@@ -305,7 +305,8 @@ function func_load_rvm {
 	[ -e "${init_src}" ] && source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
 
-	# step 2: reload myenv (seems this will cause the warning, since the rvm again not in PATH after this)
+	# step 2: reload myenv: 2 effection: 1) rvm again not in PATH (seems will cause warning). 2) the func_cd is hacked back
+	# TODO: update func_cd name and remove this step?
 	source $HOME/.bashrc
 
 	# step 3: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
