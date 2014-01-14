@@ -300,16 +300,18 @@ function func_load_virtualenvwrapper {
 function func_load_rvm {
 	# rvm is for ruby virtual env
 
-	# Init rvm step 1: rvm hacks command "cd", record it before myenv loads func_cd 
-	[ -e "$RVM_HOME/scripts/rvm" ] && source "$RVM_HOME/scripts/rvm"
+	# step 1: rvm hacks command "cd", record it before myenv loads func_cd 
+	local init_src="$RVM_HOME/scripts/rvm"
+	[ -e "${init_src}" ] && source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
 
-	# Reload myenv
+	# step 2: reload myenv (seems this will cause the warning, since the rvm again not in PATH after this)
 	source $HOME/.bashrc
 
-	# Init rvm step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
-	#[ -e /home/ouyangzhu/.rvm/scripts/rvm ] && rvm use ruby-1.9.3-p327@global --default &> /dev/null
-	[ -e "$RVM_HOME/scripts/rvm" ] && rvm use ruby-2.0.0-p353@global --default
+	# step 3: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
+	local use_ver="$($RVM_HOME/bin/rvm list | sed -n -e "s/^=.*ruby-\([^ ]*\)\s*\[.*/\1/p" | head -1)"
+	[ -n "${use_ver}" ] && echo "INFO: use version ruby-${use_ver}@global" && rvm use "ruby-${use_ver}@global" --default || func_die "ERROR: can not find any usable version"
+	#$RVM_HOME/bin/rvm use "ruby-${use_ver}@global" --default	# why not work? just prefixed with $RVM_HOME/bin
 }
 
 function func_cd_conditional {

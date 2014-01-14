@@ -1,0 +1,48 @@
+digraph G {
+
+	subgraph cluster_0 {
+		style=filled;
+		color=lightgrey;
+		node [style=filled,color=white];
+		label = "Collector";
+
+		 "Customized Dashboard" -> "Graphite Web" -> "Whisper (storage)" -> "Carbon" ;
+	}
+
+	subgraph cluster_1 {
+		color=blue
+		label = "Shipper on #1";
+		node [style=filled];
+
+		"statsd #1" -> "logstash #1";
+		"logstash #1" -> "xxx.log #1";
+		"logstash #1" -> "...";
+		"logstash #1" -> "zzz.log #1";
+	}
+
+	subgraph cluster_dot {
+		color=blue
+		label = "Shipper on #...";
+		node [style=filled];
+
+		"statsd #..." -> "logstash #...";
+		"logstash #..." -> "xxx.log #...";
+		"logstash #..." -> "....";
+		"logstash #..." -> "zzz.log #...";
+	}
+
+	subgraph cluster_n {
+		color=blue
+		label = "Shipper on #n";
+		node [style=filled];
+
+		"statsd #n" -> "logstash #n";
+		"logstash #n" -> "xxx.log #n";
+		"logstash #n" -> ".....";
+		"logstash #n" -> "zzz.log #n";
+	}
+
+	"Carbon" -> "statsd #1";
+	"Carbon" -> "statsd #...";
+	"Carbon" -> "statsd #n";
+}

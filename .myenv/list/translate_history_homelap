@@ -54,3 +54,5 @@ splines	样条曲线
 	[[["样条曲线","splines","Yàng tiáo qūxiàn",""]],[["noun",["仿样"],[["仿样",["spline"]]],"spline",1]],"en",,[["样条曲线",[4],false,false,348,0,3,0]],[["splines",4,[["样条曲线",348,false,false],["花键",328,false,false],["样条",242,false,false],["样条线",68,false,false],["样条函数",12,false,false]],[[0,7]],"splines"]],,,[],3]
 acyclic	非循环
 	[[["非循环","acyclic","Fēi xúnhuán",""]],,"en",,[["非循环",[4],false,false,416,0,2,0]],[["acyclic",4,[["非循环",416,false,false],["非周期性",279,false,false],["无环",213,false,false],["非周期",77,false,false],["非循环的",13,false,false]],[[0,7]],"acyclic"]],,,[],55]
+censor	检查员
+	[[["检查员","censor","Jiǎnchá yuán",""]],[["noun",["检查员"],[["检查员",["inspector","censor","examiner","observer","viewer"],,0.25682124]],"censor",1],["verb",["审查","检查"],[["审查",["examine","censor","investigate"],,0.22664395],["检查",["examine","inspect","censor"],,0.052998058]],"censor",2]],"en",,[["检查员",[4],false,false,875,0,1,0]],[["censor",4,[["检查员",875,false,false],["审查",124,false,false],["御史",0,false,false],["电影检查",0,false,false]],[[0,6]],"censor"]],,,[],2]

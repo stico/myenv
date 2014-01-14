@@ -64,9 +64,12 @@ PATH		%PHP_HOME%#bin
 GIT_HOME	%MY_DEV%#git
 PATH		%GIT_HOME%#bin
 
-#Use rvm version
+# Try rvm 
 #RUBY_HOME	%MY_DEV%#ruby
 #PATH		%RUBY_HOME%#bin
+# Use alias 'loadrvm'
+#RVM_HOME	%HOME%.rvm
+#PATH		%RVM_HOME%#bin
 
 HTTPD_HOME	%MY_DEV%#httpd
 PATH		%HTTPD_HOME%#usr#sbin
@@ -83,9 +86,6 @@ PATH		%REDIS_HOME%#src
 
 TOMCAT_HOME	%MY_DEV%#tomcat
 PATH		%TOMCAT_HOME%#bin
-
-RVM_HOME	%HOME%.rvm
-PATH		%RVM_HOME%#bin
 
 PYTHON_HOME	%MY_DEV%#python
 PATH		%PYTHON_HOME%#bin

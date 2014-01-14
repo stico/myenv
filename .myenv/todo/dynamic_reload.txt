@@ -1,0 +1,1 @@
+for i in {1..1000} ; do pkill ristretto; rm architecture.png; dot architecture.dot -Tpng -o architecture.png ; op architecture.png ; sleep 1 ; /usr/bin/wmctrl -a 'SINGLE_VIM' ; sleep 4 ; done
