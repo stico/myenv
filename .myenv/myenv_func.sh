@@ -303,7 +303,7 @@ function func_load_virtualenvwrapper {
 function func_load_rvm {
 	echo "INFO: loading Ruby Version Manager, note the 'cd' cmd will be hijacked"
 
-	# step 1: rvm hacks command "cd", record it before myenv loads func_cd 
+	# step 1: rvm hacks command "cd", record it before myenv loads func_cd_tag
 	local init_src="$RVM_HOME/scripts/rvm"
 	[ -e "${init_src}" ] && source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
@@ -356,7 +356,7 @@ function func_vi {
 	[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
 }
 
-function func_cd {
+function func_cd_tag {
 	# TODO: seem using "../paygat" will fail, possbile to make it work?
 
 	# shortcut - home
@@ -448,7 +448,7 @@ function func_gen_filedirlist {
 	[ ! -w "$(dirname $listfile)" ] && echo "ERROR: $(dirname $listfile) not exist or not writable" && return 1
 
 	echo "$listfile not exist, create it..." 1>&2
-	\cd $base &> /dev/null
+	func_cd $base &> /dev/null
 	[ -w ./ ] && find -L ./ $find_options | sed -e "s+^./+${base_raw}/+" > $listfile || echo "ERROR: no write permisson for $PWD!"
 	\cd - &> /dev/null
 }
@@ -467,7 +467,7 @@ function func_gen_list {
 
 	# make the path relative to the base, for better compitability
 	echo "$base/$listfile not exist, create it..." 1>&2
-	\cd $base &> /dev/null
+	func_cd $base &> /dev/null
 	[ -w ./ ] && find -L ./ -type $find_type > $listfile || echo "ERROR: no write permisson for $PWD!"
 	\cd - &> /dev/null
 }
@@ -481,7 +481,9 @@ function func_gen_list_f_me_git_only {
 	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists!" && exit 1
 
 	echo -e "INFO: Generating git file list to: $target"
-	\cd $HOME && git ls-files > $target; \cd - &> /dev/null
+	func_cd $HOME 
+	git ls-files > $target
+	\cd - &> /dev/null
 
 	echo -e "INFO: Generating git compact file list to: $target_small"
 	sed -e "s/\/.*//;" $target | sort -u > $target_small
@@ -689,7 +691,7 @@ function func_grep_dotcache {
 	search=${search//\//.}							# make the sed (tput) coloring works
 
 	# Jump to base, since the DOT_CACHE_FL is using relative path
-	\cd $base
+	func_cd $base
 	grep $suffix'$' $DOT_CACHE_FL	| \
 	# Step: remove files not need to grep (for "grepfile")
 	sed -e "/\/.svn\//d" 		| \
@@ -816,16 +818,16 @@ function func_svn_update {
 }
 
 function func_git_pull { 
-	[ -n "$1" ] && \cd $1
+	func_cd "${1}"
 	git pull origin master && git status
 	func_cleanup_dotcache $PWD
-	[ -n "$1" ] && \cd -
+	\cd - &> /dev/null
 }
 
 function func_git_status { 
-	[ -n "$1" ] && \cd $1
+	func_cd "${1}"
 	git status 	
-	[ -n "$1" ] && \cd -
+	\cd - &> /dev/null
 }
 
 function func_git_commit_push { 
@@ -1231,7 +1233,7 @@ function func_run_file_java {
 	tmp_dir=$(func_tag_value tt)/$(func_time)
 
 	cp -f $file $tmp_dir || return 1
-	\cd $tmp_dir &> /dev/null
+	func_cd $tmp_dir &> /dev/null
 	rm ${file_name/.java/.class} &> /dev/null
 	javac $file_name
 	java -cp . ${file_name%.java}
@@ -1267,25 +1269,6 @@ function func_ctrl_me {
 
 	[ ! -e "$script" ] && func_die "ERROR: $script not exist"
 	$script 
-}
-
-function func_download {
-	func_param_check 2 "Usage: $FUNCNAME <source> <target> <options>" "$@" 
-
-	case "$*" in
-		http://*)	func_download_http "$@" ;;
-		https://*)	func_download_http "$@" ;;
-		*)		echo "ERROR: unable to handle source address: $*" ;;
-	esac
-}
-
-function func_download_http {
-	func_param_check 2 "Usage: $FUNCNAME <source> <target> <options>" "$@" 
-
-	local source="$1"
-	local target="$2"
-	shift;shift;
-	func_mkdir_cd "$target" && wget "$@" "$source" && \cd -
 }
 
 function func_mount_iso {
