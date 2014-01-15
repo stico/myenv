@@ -818,16 +818,16 @@ function func_svn_update {
 }
 
 function func_git_pull { 
-	func_cd "${1}"
+	[ -n "${1}" ] && func_cd "${1}"
 	git pull origin master && git status
 	func_cleanup_dotcache $PWD
-	\cd - &> /dev/null
+	[ -n "${1}" ] && \cd - &> /dev/null
 }
 
 function func_git_status { 
-	func_cd "${1}"
+	[ -n "${1}" ] && func_cd "${1}"
 	git status 	
-	\cd - &> /dev/null
+	[ -n "${1}" ] && \cd - &> /dev/null
 }
 
 function func_git_commit_push { 
