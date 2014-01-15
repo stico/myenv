@@ -293,26 +293,28 @@ function func_vi_conditional {
 }
 
 function func_load_virtualenvwrapper {
+	echo "INFO: loading Virtualenvwrapper for Python"
+
 	# virtualenvwrapper is for python virtual env
 	source $PYTHON_HOME/bin/virtualenvwrapper.sh
+	export PS1="(VirtualEnv) ${PS1}"
 }
 
 function func_load_rvm {
-	# rvm is for ruby virtual env
+	echo "INFO: loading Ruby Version Manager, note the 'cd' cmd will be hijacked"
 
 	# step 1: rvm hacks command "cd", record it before myenv loads func_cd 
 	local init_src="$RVM_HOME/scripts/rvm"
 	[ -e "${init_src}" ] && source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
 
-	# step 2: reload myenv: 2 effection: 1) rvm again not in PATH (seems will cause warning). 2) the func_cd is hacked back
-	# TODO: update func_cd name and remove this step?
-	source $HOME/.bashrc
-
-	# step 3: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
+	# step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
 	local use_ver="$($RVM_HOME/bin/rvm list | sed -n -e "s/^=.*ruby-\([^ ]*\)\s*\[.*/\1/p" | head -1)"
 	[ -n "${use_ver}" ] && echo "INFO: use version ruby-${use_ver}@global" && rvm use "ruby-${use_ver}@global" --default || func_die "ERROR: can not find any usable version"
 	#$RVM_HOME/bin/rvm use "ruby-${use_ver}@global" --default	# why not work? just prefixed with $RVM_HOME/bin
+
+	# step 3: update PS1
+	export PS1="(RVM) ${PS1}"
 }
 
 function func_cd_conditional {
