@@ -335,7 +335,7 @@ function func_cd_conditional {
 
 	# otherwise just cd, use "\cd" to avoid infinite loop, since cd is hacked
 	\cd "$*"
-	func_head_cmd 30 ll
+	func_head_cmd 30 ls
 }
 
 function func_vi {
@@ -818,20 +818,15 @@ function func_svn_update {
 }
 
 function func_git_pull { 
-	[ -n "${1}" ] && func_cd "${1}"
 	git pull origin master && git status
 	func_cleanup_dotcache $PWD
-	[ -n "${1}" ] && \cd - &> /dev/null
 }
 
 function func_git_status { 
-	[ -n "${1}" ] && func_cd "${1}"
 	git status 	
-	[ -n "${1}" ] && \cd - &> /dev/null
 }
 
 function func_git_commit_push { 
-	[ -e "$1" ] && target="$1" && \cd "$1" && shift
 	[ -n "$*" ] && comment="$*" || comment="update from $(hostname)"
 
 	# git add -A: in git 2.0, will add those even not in current dir (which is what we want), just wait the 2.0
@@ -843,7 +838,6 @@ function func_git_commit_push {
 	func_gen_list_f_me
 
 	func_cleanup_dotcache $PWD
-	[ -n "$target" ] && \cd -
 }
 
 

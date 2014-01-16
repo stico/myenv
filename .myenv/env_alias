@@ -56,9 +56,6 @@ egf			"func_grep_myenv"
 ebackup			"func_gen_list_f_me; func_backup_listed myenv_full %MY_ENV%/zgen/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
 eload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 ehostsupdate		"sudo -E bash hosts_append.sh"
-egitpull		"func_git_pull %HOME%; eload"
-egitstatus		"func_git_status %HOME%"
-egitcommitpush		"func_git_commit_push %HOME%"
 #eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
 
 			# Head: d - dev 

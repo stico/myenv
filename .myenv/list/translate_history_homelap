@@ -56,3 +56,5 @@ acyclic	非循环
 	[[["非循环","acyclic","Fēi xúnhuán",""]],,"en",,[["非循环",[4],false,false,416,0,2,0]],[["acyclic",4,[["非循环",416,false,false],["非周期性",279,false,false],["无环",213,false,false],["非周期",77,false,false],["非循环的",13,false,false]],[[0,7]],"acyclic"]],,,[],55]
 censor	检查员
 	[[["检查员","censor","Jiǎnchá yuán",""]],[["noun",["检查员"],[["检查员",["inspector","censor","examiner","observer","viewer"],,0.25682124]],"censor",1],["verb",["审查","检查"],[["审查",["examine","censor","investigate"],,0.22664395],["检查",["examine","inspect","censor"],,0.052998058]],"censor",2]],"en",,[["检查员",[4],false,false,875,0,1,0]],[["censor",4,[["检查员",875,false,false],["审查",124,false,false],["御史",0,false,false],["电影检查",0,false,false]],[[0,6]],"censor"]],,,[],2]
+verbatim	逐字
+	[[["逐字","verbatim","Zhú zì",""]],[["noun",["逐字"],[["逐字",["verbatim"],,0.38553435]],"verbatim",1]],"en",,[["逐字",[4],false,false,1000,0,1,0]],[["verbatim",4,[["逐字",1000,false,false],["逐字记录",0,false,false],["逐字逐句",0,false,false],["一字不差",0,false,false],["的逐字记录",0,false,false]],[[0,8]],"verbatim"]],,,[],2]
