@@ -18,6 +18,8 @@ tar zxvf $source_pkg_2 -C $source/srclib && mv $source/srclib/$name_2 $source/sr
 [ ! -e $source ] && echo "ERROR: $source not exist!" && exit 1
 [ -e $target ] && echo "ERROR: $target already exist!" && exit 1
 
+sudo apt-get install libpcre3-dev
+
 cd $source
 make clean
 
