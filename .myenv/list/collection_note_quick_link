@@ -1,5 +1,5 @@
 $MY_DOC/DCD/A_NOTE_DCD.txt
-$MY_DOC/DCD/Team_CommonService/CommonService/A_NOTE_CommonService.txt
+$MY_DOC/DCD/Team_CommonService/A_Team/A_NOTE_CommonService.txt
 $MY_DOC/DCD/Team_CommonService/PayPlf/A_NOTE_PayPlf.txt
 $MY_DOC/DCD/Team_ALineWeb/1301_FuHu/A_NOTE_Fuhu.txt
 $MY_DOC/DCD/Team_CommonService/UpdateServer/A_NOTE_UpdateServer.txt
@@ -77,5 +77,7 @@ $MY_DOC/DCO/Job_Freshman/A_NOTE_Freshman.txt
 $MY_DOC/DCD/A_General/KPI/A_NOTE_KPI.txt
 $MY_DOC/DCD/Team_ALineWeb/1109_Recharge/A_NOTE_Recharge.txt
 $MY_DOC/DCO/Job_Career/Career.MD/Career.md
+$MY_DOC/DCB/Record/Mine/Account.txt
+$MY_DOC/DCB/Record/Mine/Info.txt
 
 ###############################################################################
