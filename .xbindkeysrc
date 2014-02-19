@@ -64,8 +64,9 @@
   control+shift+alt+Prior
 
 # m:0x50 is "windows key" detect by "xbindkeys -k"
-"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
-  Mod2+Mod4+Super_L+e
+# seems Super_R/Super_L works the same?
+#"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
+#  Mod2+Mod4+Super_L+e
 "/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
   Mod2+Mod4+Super_R+e
 "/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"

@@ -1,35 +1,31 @@
 ------------------------------------------------------------
-/home/ouyangzhu/.virtualenvs/graphite/bin/pip run on Sat Dec 28 22:09:56 2013
-Downloading/unpacking django<1.6
+/home/ouyangzhu/.virtualenvs/common/bin/pip run on Wed Feb 12 10:41:09 2014
+Downloading/unpacking hamcrest
 
-  Getting page http://pypi.yypm.com/simple/django/
-  Could not fetch URL http://pypi.yypm.com/simple/django/: HTTP Error 404: Not Found
-  Will skip URL http://pypi.yypm.com/simple/django/ when looking for download links for django<1.6
-  Getting page http://pypi.yypm.com/simple/
-  Could not fetch URL http://pypi.yypm.com/simple/: HTTP Error 404: Not Found
-  Will skip URL http://pypi.yypm.com/simple/ when looking for download links for django<1.6
-  Cannot fetch index base URL http://pypi.yypm.com/simple/
-
-  URLs to search for versions for django<1.6:
-  * http://pypi.yypm.com/simple/django/
-  Getting page http://pypi.yypm.com/simple/django/
-  Could not fetch URL http://pypi.yypm.com/simple/django/: HTTP Error 404: Not Found
-  Will skip URL http://pypi.yypm.com/simple/django/ when looking for download links for django<1.6
-  Could not find any downloads that satisfy the requirement django<1.6
+  Getting page https://pypi.python.org/simple/hamcrest/
+  Could not fetch URL https://pypi.python.org/simple/hamcrest/: HTTP Error 404: Not Found
+  Will skip URL https://pypi.python.org/simple/hamcrest/ when looking for download links for hamcrest
+  Getting page https://pypi.python.org/simple/
+  URLs to search for versions for hamcrest:
+  * https://pypi.python.org/simple/hamcrest/
+  Getting page https://pypi.python.org/simple/hamcrest/
+  Could not fetch URL https://pypi.python.org/simple/hamcrest/: HTTP Error 404: Not Found
+  Will skip URL https://pypi.python.org/simple/hamcrest/ when looking for download links for hamcrest
+  Could not find any downloads that satisfy the requirement hamcrest
 
 Cleaning up...
 
-  Removing temporary dir /home/ouyangzhu/.virtualenvs/graphite/build...
-No distributions at all found for django<1.6
+  Removing temporary dir /home/ouyangzhu/.virtualenvs/common/build...
+No distributions at all found for hamcrest
 
 Exception information:
 Traceback (most recent call last):
-  File "/home/ouyangzhu/.virtualenvs/graphite/lib/python2.7/site-packages/pip/basecommand.py", line 134, in main
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/basecommand.py", line 134, in main
     status = self.run(options, args)
-  File "/home/ouyangzhu/.virtualenvs/graphite/lib/python2.7/site-packages/pip/commands/install.py", line 236, in run
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/commands/install.py", line 236, in run
     requirement_set.prepare_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
-  File "/home/ouyangzhu/.virtualenvs/graphite/lib/python2.7/site-packages/pip/req.py", line 1085, in prepare_files
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/req.py", line 1085, in prepare_files
     url = finder.find_requirement(req_to_install, upgrade=self.upgrade)
-  File "/home/ouyangzhu/.virtualenvs/graphite/lib/python2.7/site-packages/pip/index.py", line 265, in find_requirement
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/index.py", line 265, in find_requirement
     raise DistributionNotFound('No distributions at all found for %s' % req)
-DistributionNotFound: No distributions at all found for django<1.6
+DistributionNotFound: No distributions at all found for hamcrest

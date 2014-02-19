@@ -160,3 +160,11 @@ percentile	百分
 	[[["百分","percentile","Bǎi fēn",""]],,"en",,[["百分",[4],false,false,863,0,1,0]],[["percentile",4,[["百分",863,false,false],["百分位",104,false,false],["百分位数",24,false,false],["百分点",5,false,false],["百",1,false,false]],[[0,10]],"percentile"]],,,[["en"]],60]
 logarithm	对数
 	[[["对数","logarithm","Duì shù",""]],[["noun",["对数"],[["对数",["logarithm"]]],"logarithm",1]],"en",,[["对数",[4],false,false,1000,0,2,0]],[["logarithm",4,[["对数",1000,false,false],["数",0,false,false],["对数值",0,false,false],["的对数",0,false,false]],[[0,9]],"logarithm"]],,,[],2]
+controversy	争议
+	[[["争议","controversy","Zhēngyì",""]],[["noun",["争议","争论","论争","论战","争端","长期的争论"],[["争议",["dispute","controversy","debate"],,0.43009463],["争论",["debate","controversy","argument","dispute","contention","disagreement"],,0.20636167],["论争",["debate","controversy","argument","contest","contestation","discussion"],,0.059123605],["论战",["controversy","rencontre","rencounter"],,0.034756977],["争端",["dispute","conflict","controversy"],,0.0023652418],["长期的争论",["controversy"]]],"controversy",1]],"en",,[["争议",[1],false,false,567,0,1,0]],[["controversy",1,[["争议",567,false,false],["争论",426,false,false],["论战",4,false,false],["论争",1,false,false],["的争议",0,false,false]],[[0,11]],"controversy"]],,,[],2]
+Canonical	典范
+	[[["典范","Canonical","Diǎnfàn",""]],[["adjective",["典范","法服","轮唱的"],[["典范",["canonical","canonic"],,0.10376516],["法服",["canonic","canonical"],,0.00041101739],["轮唱的",["canonic","canonical"]]],"canonical",3]],"en",,[["典范",[1],false,false,1000,0,1,0]],[["Canonical",1,[["典范",1000,false,false],["规范",0,false,false],["典型",0,false,false],["正则",0,false,false],["规范的",0,false,false]],[[0,9]],"Canonical"]],,,[],2]
+CLA	CLA
+	[[["CLA","CLA","","CLA"]],,"zh-CN",,[["CLA",[1],true,false,1000,0,1,0]],[["CLA",1,[["CLA",1000,true,false]],[[0,3]],"CLA"]],,,[["en","fr","cs","pt"]],11]
+Hamcrest	Hamcrest
+	[[["Hamcrest","Hamcrest","Hamcrest",""]],,"en",,[["Hamcrest",[1],false,false,1000,0,1,0]],[["Hamcrest",1,[["Hamcrest",1000,false,false]],[[0,8]],"Hamcrest"]],,,[],21]
