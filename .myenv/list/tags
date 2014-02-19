@@ -1,3 +1,7 @@
+# Tmp
+tsd=$HOME/dev/code_repo/python/tshield
+tshield=$HOME/dev/code_repo/python/tshield
+
 # Global
 zb=$ZBOX
 zbox=$ZBOX

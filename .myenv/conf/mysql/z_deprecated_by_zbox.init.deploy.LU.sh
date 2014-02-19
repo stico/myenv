@@ -42,8 +42,6 @@ cp $mysql_conf $conf
 touch $log_error
 
 # Prepare
-# NOTE 1: options here Overrides those in .cnf
-# NOTE 2: (strange but yes), --defaults-file must as first option!
 read start_opts <<-EOF
 --defaults-file=$conf \
 --port=$port \

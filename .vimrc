@@ -198,7 +198,7 @@ nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
-noremap <F11> :!source $MY_ENV/env_func_bash; func_run_file %:p:gs?\\?/?<Enter>
+noremap <F11> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
 noremap <C-T> :tabnew<CR>
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 
