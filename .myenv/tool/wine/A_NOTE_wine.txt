@@ -1,0 +1,14 @@
+Run
+	wine notepad.exe
+	wine 'C:\Program Files\Internet Explorer\iexplore'
+	wine 'C:\Program Files (x86)\Foxit Software\Foxit Reader\Foxit Reader.exe'
+
+	alias foxit='wine '\''C:\Program Files (x86)\Foxit Software\Foxit Reader\Foxit Reader.exe'\'' &> /dev/null &'
+
+Mgmt
+	winecfg
+	winetricks
+
+	Install		$MY_ENV_TOOL/wine/init/install_foxit.sh
+	Uninstall	rm -rf .wine/drive_c/Programe\ Files/Internet\ Explorer/
+

@@ -1375,7 +1375,7 @@ function func_mytask_all {
 	#func_mytask_mail_add
 }
 
-function func_mytask_mail_run {
+function func_mytask_mail_run() {
 	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 
 	local log=$base/a.log
@@ -1387,4 +1387,54 @@ function func_mytask_mail_run {
 	echo ${mytask[mt_time_win_stop]}
 	echo ${mytask[mt_time_last_run]}
 	echo ${mytask[mt_history]}
+}
+
+function func_tool_ins() {
+	func_param_check 1 "USAGE: $FUNCNAME <tool-name> <version>" "$@"
+
+	local ins_files="$MY_ENV/tool/${1}/init/ins"
+	[ -n "${2}" ] && ins_files="${ins_files} ${ins_files}-${2}"
+	eval $(func_tool_gen_vars ${ins_files})
+
+	case "${ins_tool}" in
+		apt)	func_tool_ins_apt "$@"		;;
+		*)	func_die "ERROR: can NOT handle ins_tool: ${ins_tool}"	;;
+	esac
+}
+
+function func_tool_ins_apt() {
+	func_param_check 1 "USAGE: $FUNCNAME <tool-name> <version>" "$@"
+
+	local ins_files="$MY_ENV/tool/${1}/init/ins"
+	[ -n "${2}" ] && ins_files="${ins_files} ${ins_files}-${2}"
+	eval $(func_tool_gen_vars ${ins_files})
+	
+	[ -n "${ins_apt_repo}" ] && func_apt_add_repo "${ins_apt_repo}"
+	sudo apt-get update
+	[ -n "${ins_apt_install}" ] && sudo apt-get install -y "${ins_apt_install}"
+}
+
+function func_tool_gen_vars() {
+	local desc="Desc: 1) generate variable list for functions to source. 2) all variables are prefixed with 'local'"
+	func_param_check 1 "${desc}" "$@"
+	
+	cat "$@" 2> /dev/null |\
+	sed -e 	"/^\s*#/d;
+		/^\s*$/d;
+		s/^\([^=[:blank:]]*\)[[:blank:]]*=[[:blank:]]*/\1=/;
+		s/^/local /"
+}
+
+function func_apt_add_repo() {
+	func_param_check 1 "USAGE: $FUNCNAME <repo-name>" "$@"
+
+	apt_repo_name="${1}"
+	apt_source_name="$(echo ${apt_repo_name} | sed -e 's/.*://;s/\//-/')"
+
+	if [ $(ls /etc/apt/sources.list.d/ | grep -c ${apt_source_name}) -ge 1 ] ; then
+		echo "INFO: ${apt_repo_name} (${apt_source_name}) already added, skip"
+		return 0
+	fi
+
+	sudo add-apt-repository -y "${apt_repo_name}" &> /dev/null
 }

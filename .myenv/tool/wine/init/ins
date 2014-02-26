@@ -1,0 +1,4 @@
+ins_type        = auto
+ins_tool        = apt
+ins_apt_repo    = ppa:ubuntu-wine/ppa
+ins_apt_install = wine2.1

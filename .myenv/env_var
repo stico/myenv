@@ -28,6 +28,7 @@ MY_ENV_INIT	%HOME%.myenv#init
 MY_ENV_CTRL	%HOME%.myenv#ctrl
 MY_ENV_LIST	%HOME%.myenv#list
 MY_ENV_TODO	%HOME%.myenv#todo
+MY_ENV_TOOL	%HOME%.myenv#tool
 MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
