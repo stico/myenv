@@ -324,7 +324,13 @@ noremap <C-Tab> gt
 inoremap <C-Tab> <Esc>gt
 noremap <C-S-Tab> gT
 inoremap <C-S-Tab> <Esc>gT
-
+" gnome terminator style windown jump, note vim actually can not distiguish <C-H> and <C-S-H>
+nnoremap <C-S-H> <C-w>h
+nnoremap <C-S-J> <C-w>j
+nnoremap <C-S-K> <C-w>k
+nnoremap <C-S-L> <C-w>l
+nnoremap <C-m> :call WindowMaxMinToggle()<CR>
+nnoremap <C-w>m :call WindowMaxMinToggle()<CR>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Jump
 " <C-I> equals <Tab>, since <Tab> is mapped in normal mode, need another key for function "jump next",  C-N in normal mode is useless, so use it
@@ -381,7 +387,6 @@ if has("autocmd") && !exists("autocommands_loaded")
 endif
 
 """
-nnoremap <C-w>m :call WindowMaxMinToggle()<CR>
 function WindowMaxMinToggle()
 	if exists('t:window_max_min_sizes') && (t:window_max_min_sizes.after == winrestcmd())
 		silent! exe t:window_max_min_sizes.before
@@ -444,6 +449,31 @@ function! ToggleAutoHighlight()
   endif
 endfunction
 
+" Dim inactive windows, using 'colorcolumn', usefull but 1) tends to slow down redrawing. 2) only work with lines containing text (i.e. not '~'). Based on https://groups.google.com/d/msg/vim_use/IJU-Vk-QLJE/xz4hjPjCRBUJ
+function! s:DimInactiveWindows()
+  for i in range(1, tabpagewinnr(tabpagenr(), '$'))
+    let l:range = ""
+    if i != winnr()
+      if &wrap
+        " HACK: when wrapping lines is enabled, we use the maximum number
+        " of columns getting highlighted. This might get calculated by
+        " looking for the longest visible line and using a multiple of
+        " winwidth().
+        let l:width=256 " max
+      else
+        let l:width=winwidth(i)
+      endif
+      let l:range = join(range(1, l:width), ',')
+    endif
+    call setwinvar(i, '&colorcolumn', l:range)
+  endfor
+endfunction
+augroup DimInactiveWindows
+  au!
+  au WinEnter * call s:DimInactiveWindows()
+  au WinEnter * set cursorline
+  au WinLeave * set nocursorline
+augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  
@@ -457,7 +487,7 @@ endif
 if has('mouse')
   set mouse=a
 endif
-"
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SKILLS            "
 """""""""""""""""""""
