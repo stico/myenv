@@ -106,6 +106,9 @@ function init_env_with_git {
 
 	cd ${HOME}
 	$git remote add github $git_myenv_addr
+	$git config --global user.email "stico@163.com"
+	$git config --global user.name "stico"
+	$git config --global push.default simple
 	echo "INFO: myenv init success (git way)!"
 }
 
