@@ -47,3 +47,4 @@ git remote rm origin
 git remote add origin "stico_github:stico/myenv.git"
 git config --global user.name stico
 git config --global user.email ouyzhu@gmail.com
+git push --set-upstream origin master
