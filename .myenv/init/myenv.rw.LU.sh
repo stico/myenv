@@ -41,9 +41,9 @@ mkdir -p ~/.ssh ~/.myenv/secu
 [ ! -e ~/.ssh ] && echo "ERROR: ~/.ssh not restored success! pls check!" 
 [ ! -e ~/.myenv/secu -a ! -e ~/.myenv/scure ] && echo "ERROR: both ~/.myenv/secu and ~/.myenv/scure not restored success! pls check!" 
 
-# Update github remote
+# Update origin remote
 cd ~
-git remote rm github
-git remote add github "stico_github:stico/myenv.git"
+git remote rm origin
+git remote add origin "stico_github:stico/myenv.git"
 git config --global user.name stico
 git config --global user.email ouyzhu@gmail.com

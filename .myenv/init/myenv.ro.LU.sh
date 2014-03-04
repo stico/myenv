@@ -105,7 +105,6 @@ function init_env_with_git {
 	#rm -rf ${HOME}/$git_myenv_name/
 
 	cd ${HOME}
-	$git remote add github $git_myenv_addr
 	$git config --global user.email "stico@163.com"
 	$git config --global user.name "stico"
 	$git config --global push.default simple
