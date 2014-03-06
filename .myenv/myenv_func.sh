@@ -85,15 +85,6 @@ function func_cleanup_dotcache() {
 	done
 }
 
-function func_bak_file {
-	func_param_check 1 "USAGE: $FUNCNAME <filename>" "$@"
-
-	[ -d "${1}" ] && echo "ERROR: $1 is a directory" && exit 1
-	
-	target=${1}.bak_$(func_dati)
-	[ -w "$(dirname ${1})" ] && cp "$1" $target || sudo cp "$1" $target 
-}
-
 function func_tag_value_raw {
 	tags=$MY_ENV_LIST/tags
 	sed -n -e "s+^${1}=++p" $tags
@@ -1397,7 +1388,7 @@ function func_tool_ins() {
 	eval $(func_tool_gen_vars ${ins_files})
 
 	case "${ins_tool}" in
-		apt)	func_tool_ins_apt "$@"		;;
+		apt)	func_tool_ins_apt "$@"					;;
 		*)	func_die "ERROR: can NOT handle ins_tool: ${ins_tool}"	;;
 	esac
 }

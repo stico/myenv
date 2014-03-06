@@ -329,7 +329,7 @@ nnoremap <C-S-H> <C-w>h
 nnoremap <C-S-J> <C-w>j
 nnoremap <C-S-K> <C-w>k
 nnoremap <C-S-L> <C-w>l
-nnoremap <C-m> :call WindowMaxMinToggle()<CR>
+"nnoremap <C-m> :call WindowMaxMinToggle()<CR>	" can not use C-m, which also effects the <enter> key
 nnoremap <C-w>m :call WindowMaxMinToggle()<CR>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Jump

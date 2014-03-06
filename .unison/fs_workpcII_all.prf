@@ -58,6 +58,7 @@ ignore = Regex EC./SyncToy_.*.dat
 ignore = Regex FCS/[^/]*/[^/]*-hg
 ignore = Regex FCS/[^/]*/[^/]*-git
 ignore = Regex FCS/[^/]*/[^/]*-svn
+ignore = Regex FCS/[^/]*/[^/]*-read
 ignore = Regex DCB/Record/Note/A_NOTE_Copy.txt
 ignore = Regex os_spec_.*/m2_repo/repository/.cache
 ignore = Regex os_spec_lu/program/vim

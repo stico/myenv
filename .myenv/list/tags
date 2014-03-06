@@ -1,7 +1,3 @@
-# Tmp
-tsd=$HOME/dev/code_repo/python/tshield
-tshield=$HOME/dev/code_repo/python/tshield
-
 # Global
 zb=$ZBOX
 zbox=$ZBOX
@@ -22,13 +18,18 @@ dl=$MY_TMP/download
 
 # MY_DEV
 dw=$MY_DEV/code_dw
-src=$MY_DEV/code_src
-repo=$MY_DEV/code_repo
 stage=$MY_DEV/code_stage
-php=$MY_DEV/code_repo/php
-java=$MY_DEV/code_repo/java
-ruby=$MY_DEV/code_repo/ruby
-groovy=$MY_DEV/code_repo/groovy
+
+# Source code
+src=~/.zbox/src
+myrepo=~/.zbox/src/myrepo/myrepo-git
+php=~/.zbox/src/myrepo/myrepo-git/php
+py=~/.zbox/src/myrepo/myrepo-git/python
+java=~/.zbox/src/myrepo/myrepo-git/java
+ruby=~/.zbox/src/myrepo/myrepo-git/ruby
+groovy=~/.zbox/src/myrepo/myrepo-git/groovy
+tsd=~/.zbox/src/myrepo/myrepo-git/python/tshield
+tshield=~/.zbox/src/myrepo/myrepo-git/python/tshield
 
 # MY_DOC
 doc=$MY_DOC
@@ -42,6 +43,8 @@ ece=$MY_DOC/ECE
 ech=$MY_DOC/ECH
 ecs=$MY_DOC/ECS
 ecz=$MY_DOC/ECZ
+fcb=$MY_DOC/FCB
+fcs=$MY_DOC/FCS
 fcz=$MY_DOC/FCZ
 tcs=$MY_DOC/DCD/Team_CommonService
 noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
