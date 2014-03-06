@@ -6,8 +6,8 @@
 ################################################################################
 
 # Local
-root=/home/ouyangzhu/Documents
-rootalias = //lapIIxb//home/ouyangzhu/Documents -> //X220T_LU//Documents
+root=/ext/Documents
+rootalias = //lapIIxb//ext/Documents -> //X220T_LU//Documents
 
 # External
 root=/media/ouyangzhu/22D0B554D0B52F43/backup
