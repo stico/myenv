@@ -7,11 +7,11 @@
 
 # Local
 root=/ext/Documents
-rootalias = //lapIIxb//ext/Documents -> //X220T_LU//Documents
+rootalias = //lapII//ext/Documents -> //X220T_LU//Documents
 
 # External
 root=/media/ouyangzhu/22D0B554D0B52F43/backup
-rootalias = //lapIIxb//media/ouyangzhu/22D0B554D0B52F43/backup -> //MHD//Documents
+rootalias = //lapII//media/ouyangzhu/22D0B554D0B52F43/backup -> //MHD//Documents
 
 ################################################################################
 # PATH: the -path cmd option not support glob
