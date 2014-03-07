@@ -7,9 +7,6 @@ pro=$MY_PRO
 dev=$MY_DEV
 data=$HOME/data
 
-# MY_ENV
-ahk=$MY_ENV/conf/ahk
-
 # MY_TMP
 amp=$MY_TMP
 tmp=$MY_TMP
