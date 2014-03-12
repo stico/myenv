@@ -1,7 +1,8 @@
 #!/bin/bash
 #Tested on: ubuntu server 12.04/11.10 (2013-01-18)
 
-ruby_ver=ruby-2.0.0-p247 
+#ruby_ver=ruby-2.0.0-p247 
+ruby_ver=ruby-2.1.1
 
 [ -e ~/.rvm ] && echo "ERROR: ~/.rvm already exist, if want reinstall, remove it" && exit
 sudo apt-get update

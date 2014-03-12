@@ -20,6 +20,16 @@ source $HOME/.myenv/init/bash.sh
 [ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
 func_ssh_agent_init
 
+# Init zbox
+zbox_func=${HOME}/.zbox/zbox_func.sh
+if [ -e "${zbox_func}" ]  ; then
+	source "${zbox_func}"
+	func_zbox_use python 2.7.6
+	func_zbox_use vim hg ouyzhu
+	func_zbox_use oraclejdk 7u21 x64
+fi
+
+
 stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
 
