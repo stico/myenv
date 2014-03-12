@@ -3,6 +3,7 @@
 # One line cmd
 # V1: curl https://raw.github.com/stico/myenv/master/.myenv/init/linux.sh | bash
 # V2: rm /tmp/linux.sh ; wget -O /tmp/linux.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/linux.sh && bash /tmp/linux.sh 
+# V3: ( bash linux.sh & ) ; sleep 1 ; tail -f /tmp/init_linux/$(ls /tmp/init_linux | tail -1)/init.log
 
 # TODO: standarize func_init_soft_xxx to $MY_ENV/tool
 
@@ -12,6 +13,7 @@ tmp_init_log=${tmp_init_dir}/init.log
 
 # Source & Prepare
 umask 077
+mkdir -p ${tmp_init_dir}
 source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 
 # Function
@@ -62,21 +64,22 @@ function func_init_link() {
 function func_init_links() {
 	func_log_echo "${tmp_init_log}" "INFO: init links"
 
-	func_init_link ${HOME}/.m2              /ext/Documents/os_spec_lu/m2_repo
-	func_init_link ${HOME}/data             /ext/data
-	func_init_link ${HOME}/program          /ext/Documents/os_spec_lu/program 	
+	func_init_link ${HOME}/.m2              /ext/Documents/FCS/maven/m2_repo
 	func_init_link ${HOME}/Documents        /ext/Documents
-	func_init_link ${HOME}/dev/code_dw	/ext/Documents/os_spec_lu/dev/code_dw	
 }
 
 function func_init_myenv() {
 	func_log_echo "${tmp_init_log}" "INFO: init myenv"
-	[ -e "${HOME}/.myenv" ] && func_log_echo "${tmp_init_log}" "INFO: ~/.myenv already exist, skip" && return 0
+	[ -e "${HOME}/.myenv" -a -e "{HOME}/.ssh" ] && func_log_echo "${tmp_init_log}" "INFO: ~/.myenv already exist, skip" && return 0
 
-	local myenv_tmp=${tmp_init_dir}/myenv.sh
-	local myenv_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh
-	wget -O ${myenv_tmp} -q ${myenv_url}		|| func_log_die "${tmp_init_log}" "ERROR: failed to download ${myenv_url}"
-	[ -s "${myenv_tmp}" ] && bash ${myenv_tmp}	|| func_log_die "${tmp_init_log}" "ERROR: failed to init myenv!"
+	if [ -e "${MY_ENV}/init/myenv.sh" ] ; then
+		bash "${MY_ENV}/init/myenv.sh" 
+	else
+		local myenv_tmp=${tmp_init_dir}/myenv.sh
+		local myenv_url=https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh
+		wget -O ${myenv_tmp} -q ${myenv_url}		|| func_log_die "${tmp_init_log}" "ERROR: failed to download ${myenv_url}"
+		[ -s "${myenv_tmp}" ] && bash ${myenv_tmp}	|| func_log_die "${tmp_init_log}" "ERROR: failed to init myenv!"
+	fi
 }
 
 function func_init_sudoer() {
@@ -92,6 +95,7 @@ function func_init_apt_config() {
 	func_log_echo "${tmp_init_log}" "INFO: apt config update, files: ${src_files}"
 
 	# Update source mirror for speed
+	local need_update="no"
 	local mirror_addr=mirrors.163.com		# another candidate (in China, also 163's): http://ubuntu.cn99.com/ubuntu
 	for src_file in "${src_files[@]}"; do 
 		grep "${mirror_addr}" "${src_file}" &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: ${src_file} already updated, skip" && continue
@@ -101,7 +105,9 @@ function func_init_apt_config() {
 		func_log_echo "${tmp_init_log}" "INFO: update ${src_file} with mirror: ${mirror_addr}"
 		#sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/${mirror_addr}/" ${src_file}	# reserve original source
 		sudo sed -i -e "s/[^\/]*\.ubuntu\.com/${mirror_addr}/" ${src_file}			# replace original source
+		need_update="yes"
 	done
+	[ ${need_update} = "yes" ] && sudo apt-get update
 }
 
 function func_init_apt_distupgrade() {
@@ -111,9 +117,9 @@ function func_init_apt_distupgrade() {
 	[ ! -e $apt_upgrade_stamp ] && touch -t 197101020304 $apt_upgrade_stamp
 
 	local last_stamp=$(( `date +%s` - `stat -c %Y ${apt_upgrade_stamp}` ))
-	if [ -e $apt_update_stamp ] && (( $last_stamp > 86400 )) ; then
+	if [ -e $apt_upgrade_stamp ] && (( $last_stamp > 86400 )) ; then
 		func_log_echo "${tmp_init_log}" "INFO: execute 'supdo apt-get -y dist-upgrade'"
-		sudo apt-get -y dist-upgrade &>> $tmp_init_log && touch $apt_update_stamp
+		sudo apt-get -y dist-upgrade &>> $tmp_init_log && touch $apt_upgrade_stamp
 	else
 		func_log_echo "${tmp_init_log}" "INFO: last update was ${last_stamp} seconds ago, skip..."
 	fi
@@ -157,7 +163,7 @@ function func_init_soft_ibus() {
 	# Chinese Input Method - Ibus. Still need: manual part: 1) add to autostart, use the /usr/bin/ibus-daemon. 2) set hotkey and in ibus preference 3) select input method in ibus preference
 	ibus_table=/usr/share/ibus-table/engine/table.py
 	sudo apt-get install -y ibus-table-wubi
-	func_bak_file_virgin $ibus_table && sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' $ibus_table
+	func_bak_file $ibus_table && sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' $ibus_table
 }
 
 function func_init_soft_terminator() { 
@@ -180,11 +186,21 @@ function func_init_soft_clipit() {
 	
 function func_init_soft_virtualbox() { 
 	func_log_echo "${tmp_init_log}" "INFO: try to install soft virtualbox"
-	command -v virtualbox &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
+	[ -e /usr/bin/virtualbox ] && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
 
-	sudo apt-get install -y virtualbox-nonfree
-	sudo apt-get install -y virtualbox-guest-additions-iso
-	sudo usermod -a -G vboxusers ouyangzhu						# for functions like USB to work correctly
+	if ( grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) && ( grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) ; then
+		wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+		sudo sh -c 'echo "deb http://download.virtualbox.org/virtualbox/debian saucy contrib" >> /etc/apt/sources.list.d/virtualbox.list'
+		sudo apt-get update
+		sudo apt-get install virtualbox-4.2		# (2014-03: can NOT use usb in ver 4.3, even after install extension pack. V4.2 works and not need extension pack)
+	elif ( grep -i "DISTRIB_ID=LinuxMint" /etc/lsb-release ) && ( grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) ; then
+		sudo apt-get install -y virtualbox-nonfree
+		sudo apt-get install -y virtualbox-guest-additions-iso
+		# for functions like USB to work correctly
+		sudo usermod -a -G vboxusers ouyangzhu
+	else
+		func_log_echo "${tmp_init_log}" "WARN: failed to install virtualbox"
+	fi
 }
 
 function func_init_soft_chrome() {
@@ -229,6 +245,7 @@ function func_init_os_common() {
 	( ! grep "DISTRIB_CODENAME=\(saucy\|olivia\)" /etc/lsb-release ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
 
 	sudo apt-get install -y vlc				&>> $tmp_init_log
+	sudo apt-get install -y xbindkeys			&>> $tmp_init_log
 	sudo apt-get install -y fcitx-table-wbpy		&>> $tmp_init_log	# Chinese Input Method - Fcitx
 
 	func_init_font						&>> $tmp_init_log
@@ -240,7 +257,11 @@ function func_init_os_common() {
 
 function func_init_os_ubuntu1310() {
 	func_log_echo "${tmp_init_log}" "INFO: OS specific init for ubuntu 13.10"
-	( ! grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
+
+	( ! grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) &&				\
+	( ! grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) &&				\
+	func_log_echo "${tmp_init_log}" "INFO: skip, since version not matched" &&	\
+	return 0
 }
 
 function func_init_os_linuxmint15() {
@@ -259,22 +280,24 @@ function func_init_de_xfce() {
 	func_log_echo "${tmp_init_log}" "INFO: DE specific init for XFCE"
 	( ! dpkg -l | grep -i "xfce" &> /dev/null ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
 
+	# TODO: how to check?
+
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE applications config"
 	source_path=~/.myenv/conf/xfce/applications/
 	target_path=~/.local/share/applications/
-	func_bak_file_virgin ${target_path}/defaults.list || return 0
+	func_bak_file ${target_path}/defaults.list || return 0
 	mv -f ${target_path}/defaults.list /tmp/
 	cp $source_path/* $target_path/* >> $tmp_init_log
 
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE config"
 	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
-	func_bak_file_virgin ${target_path} || return 0
+	func_bak_file ${target_path} || return 0
 	sed -i -e '/workspace_count/s/value="."/value="1"/' $target_path
 
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
 	source_path=~/.myenv/conf/xfce/xfce4-keyboard-shortcuts.xml
 	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-	func_bak_file_virgin ${target_path} || return 0
+	func_bak_file ${target_path} || return 0
 	mv -f $target_path /tmp/
 	cp $source_path $target_path >> $tmp_init_log
 	# without this, the Tab key not work in xrdp connection
@@ -284,7 +307,7 @@ function func_init_de_xfce() {
 	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
 	dt_type=XFCE
 	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
-	func_bak_file_virgin ${gnome_keying_desktop} || return 0
+	func_bak_file ${gnome_keying_desktop} || return 0
 	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
 		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
 	else 
@@ -340,7 +363,7 @@ func_init_links
 func_init_myenv
 
 # Action - apt
-func_init_apt_config
+#func_init_apt_config	# seems changed too much stuff (in ubuntu 13.10)
 func_init_apt_distupgrade
 func_init_apt_install_basic
 
