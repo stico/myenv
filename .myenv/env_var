@@ -16,12 +16,21 @@ DOT_CACHE_GREP	.grep_me.txt
 ################################################################################
 # ENV - Main Path
 ################################################################################
-ZBOX		%HOME%/.zbox
+ZBOX		%HOME%#.zbox
 MY_DOC		%HOME%Documents
-MY_PRO		%HOME%program
-MY_DEV		%HOME%dev
-MY_REF		%HOME%REF
-MY_TMP		%HOME%amp
+MY_DCB		%HOME%Documents#DCB
+MY_DCC		%HOME%Documents#DCC
+MY_DCD		%HOME%Documents#DCD
+MY_DCM		%HOME%Documents#DCM
+MY_DCO		%HOME%Documents#DCO
+MY_ECB		%HOME%Documents#ECB
+MY_ECE		%HOME%Documents#ECE
+MY_ECH		%HOME%Documents#ECH
+MY_ECS		%HOME%Documents#ECS
+MY_ECZ		%HOME%Documents#ECZ
+MY_FCB		%HOME%Documents#FCB
+MY_FCS		%HOME%Documents#FCS
+MY_FCZ		%HOME%Documents#FCZ
 MY_ENV		%HOME%.myenv
 MY_ENV_CONF	%HOME%.myenv#conf
 MY_ENV_INIT	%HOME%.myenv#init
@@ -32,10 +41,7 @@ MY_ENV_TOOL	%HOME%.myenv#tool
 MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
-MY_CODE_DW	%MY_DEV%#code_dw
-MY_CODE_REPO	%MY_DEV%#code_repo
-MY_CODE_MISC	%MY_DEV%#code_misc
-MY_SOFT_CONF	%MY_DOC%/DCB/SoftwareConf
+MY_TMP		%HOME%amp
 
 
 ################################################################################

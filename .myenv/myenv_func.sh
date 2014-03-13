@@ -4,8 +4,7 @@
 
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
-[ -z "$MY_DEV" ]		&& MY_ENV =$HOME/dev
-[ -z "$MY_ENV" ]		&& MY_ENV =$HOME/.myenv
+[ -z "$MY_ENV" ]		&& MY_ENV=$HOME/.myenv
 [ -z "$RVM_HOME" ]		&& RVM_HOME=$HOME/.rvm
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
 [ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
@@ -273,6 +272,7 @@ function func_vi_conditional {
 		# note: seems in ubuntu gui, not need "&" to make it background job
 		#$vi_cmd "$@"
 		$vi_cmd --version | grep -q '+clientserver' && $vi_cmd --servername SINGLE_VIM --remote-tab "$@" || $vi_cmd "$@"
+		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
 	else
 		# cygwin env: win style path + background job
 		parameters=${@:1:$(($#-1))}

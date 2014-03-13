@@ -14,7 +14,7 @@ st=$MY_TMP/stage1
 dl=$MY_TMP/download
 
 # MY_DEV
-dw=$MY_DEV/code_dw
+dw=$MY_FCZ/code_dw
 stage=$MY_DEV/code_stage
 
 # Source code
@@ -30,19 +30,19 @@ tshield=~/.zbox/src/myrepo/myrepo-git/python/tshield
 
 # MY_DOC
 doc=$MY_DOC
-dcb=$MY_DOC/DCB
-dcc=$MY_DOC/DCC
-dcd=$MY_DOC/DCD
-dcm=$MY_DOC/DCM
-dco=$MY_DOC/DCO
-ecb=$MY_DOC/ECB
-ece=$MY_DOC/ECE
-ech=$MY_DOC/ECH
-ecs=$MY_DOC/ECS
-ecz=$MY_DOC/ECZ
-fcb=$MY_DOC/FCB
-fcs=$MY_DOC/FCS
-fcz=$MY_DOC/FCZ
+dcb=$MY_DCB
+dcc=$MY_DCC
+dcd=$MY_DCD
+dcm=$MY_DCM
+dco=$MY_DCO
+ecb=$MY_ECB
+ece=$MY_ECE
+ech=$MY_ECH
+ecs=$MY_ECS
+ecz=$MY_ECZ
+fcb=$MY_FCB
+fcs=$MY_FCS
+fcz=$MY_FCZ
 tcs=$MY_DOC/DCD/Team_CommonService
 noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
 

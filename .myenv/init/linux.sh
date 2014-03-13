@@ -245,7 +245,7 @@ function func_init_os_common() {
 	( ! grep "DISTRIB_CODENAME=\(saucy\|olivia\)" /etc/lsb-release ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
 
 	sudo apt-get install -y vlc				&>> $tmp_init_log
-	sudo apt-get install -y xbindkeys			&>> $tmp_init_log
+	sudo apt-get install -y xbindkeys wmctrl		&>> $tmp_init_log
 	sudo apt-get install -y fcitx-table-wbpy		&>> $tmp_init_log	# Chinese Input Method - Fcitx
 
 	func_init_font						&>> $tmp_init_log
