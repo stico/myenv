@@ -1,0 +1,7 @@
+; for more keys to config, ref ~/.config/nautilus/accels 
+(gtk_accel_path "<Actions>/DirViewActions/Copy To" "F8")
+(gtk_accel_path "<Actions>/DirViewActions/Move To" "F9")
+(gtk_accel_path "<Actions>/DirViewActions/LocationCopy" "<Alt>Insert")
+(gtk_accel_path "<Actions>/DirViewActions/Open With" "F4")
+(gtk_accel_path "<Actions>/ShellActions/Up" "BackSpace")
+(gtk_accel_path "<Actions>/DirViewActions/New Folder" "F7")
