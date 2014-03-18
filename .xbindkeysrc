@@ -45,8 +45,15 @@
 "/usr/bin/xfce4-screenshooter -r -c"
   control+shift+x
 
-"/usr/bin/xfce4-appfinder"
+#"/usr/bin/xfce4-appfinder"	# for XFCE
+"xdotool key --clearmodifiers Super"
   control+shift+z
+
+"xdotool key --clearmodifiers ctrl+Super+Left"		# not work !
+  Control+Shift+Alt+Left
+
+"xdotool key --clearmodifiers ctrl+Super+Right"		# not work !
+  Control+Shift+Alt+Right
 
 "/usr/bin/wmctrl -c :ACTIVE:"
   alt+x
@@ -65,11 +72,10 @@
 
 # m:0x50 is "windows key" detect by "xbindkeys -k"
 # seems Super_R/Super_L works the same?
-#"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
-#  Mod2+Mod4+Super_L+e
-"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
+#"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"	# version used in LinuxMint 15
+"xdg-open ~/amp/download/"
   Mod2+Mod4+Super_R+e
-"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"
+"xdg-open ~/amp/download/"
   control+shift+alt+e
 
 # Examples

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<doublecmd DCVersion="0.5.6 beta" ConfigVersion="7">
+<doublecmd DCVersion="0.5.7 beta" ConfigVersion="7">
   <Configuration Save="True">
     <UseConfigInProgramDir>False</UseConfigInProgramDir>
   </Configuration>
@@ -294,54 +294,6 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCB/Google Drive/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-            </ColumnsView>
-          </FileView>
-          <Options>2</Options>
-          <LockPath>/home/ouyangzhu/program/</LockPath>
-          <Title>pro</Title>
-        </Tab>
-        <Tab>
-          <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
-                  <Path>/home/ouyangzhu/dev/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-            </ColumnsView>
-          </FileView>
-          <Options>2</Options>
-          <LockPath>/home/ouyangzhu/dev/</LockPath>
-          <Title>dev</Title>
-        </Tab>
-        <Tab>
-          <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
                   <Path>/home/ouyangzhu/Desktop/</Path>
                 </Paths>
               </Entry>
@@ -354,40 +306,16 @@
           <LockPath>/home/ouyangzhu/Desktop/</LockPath>
           <Title>DT</Title>
         </Tab>
-        <Tab>
-          <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
-                  <Path>/home/ouyangzhu/dev/code_dw/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-            </ColumnsView>
-          </FileView>
-          <Options>2</Options>
-          <LockPath>/home/ouyangzhu/dev/code_dw/</LockPath>
-          <Title>code_dw</Title>
-        </Tab>
       </Left>
       <Right>
-        <ActiveTab>0</ActiveTab>
+        <ActiveTab>5</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCB/Record/Note/</Path>
+                  <Path>/home/ouyangzhu/Documents/</Path>
                 </Paths>
               </Entry>
             </History>
@@ -398,21 +326,6 @@
           <Options>2</Options>
           <LockPath>/home/ouyangzhu/Documents/</LockPath>
           <Title>Doc</Title>
-        </Tab>
-        <Tab>
-          <FileView Type="columns">
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCM/2012-07 长沙香樟园/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-            </ColumnsView>
-          </FileView>
         </Tab>
         <Tab>
           <FileView Type="columns">
@@ -495,54 +408,6 @@
           <Options>2</Options>
           <LockPath>/home/ouyangzhu/Documents/DCD/</LockPath>
           <Title>DCD</Title>
-        </Tab>
-        <Tab>
-          <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-            </ColumnsView>
-          </FileView>
-          <Options>2</Options>
-          <LockPath>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/</LockPath>
-          <Title>BST</Title>
-        </Tab>
-        <Tab>
-          <FileView Type="columns">
-            <Sortings>
-              <Sorting>
-                <Direction>1</Direction>
-                <Function>0</Function>
-              </Sorting>
-            </Sortings>
-            <History>
-              <Entry Active="True">
-                <FileSource Type="FileSystem"/>
-                <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
-                </Paths>
-              </Entry>
-            </History>
-            <ColumnsView>
-              <ColumnsSet>MyColumns</ColumnsSet>
-            </ColumnsView>
-          </FileView>
-          <Options>2</Options>
-          <LockPath>/home/ouyangzhu/Documents/DCD/Work_BasicServiceTeam/PayPlf/</LockPath>
-          <Title>PayPlf</Title>
         </Tab>
         <Tab>
           <FileView Type="columns">

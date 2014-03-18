@@ -1,6 +1,4 @@
 # Global
-zb=$ZBOX
-zbox=$ZBOX
 me=$MY_ENV
 env=$MY_ENV
 pro=$MY_PRO
@@ -17,9 +15,16 @@ dl=$MY_TMP/download
 dw=$MY_FCZ/code_dw
 stage=$MY_DEV/code_stage
 
+# ZBOX
+zb=$ZBOX
+zbox=$ZBOX
+ins=$ZBOX/ins
+src=$ZBOX/src
+
 # Source code
-src=~/.zbox/src
-myrepo=~/.zbox/src/myrepo/myrepo-git
+ourepo=~/.zbox/src/ourepo/ourepo-git
+oublog=~/.zbox/src/oublog/oublog-git
+outest=~/.zbox/src/outest/outest-local
 php=~/.zbox/src/myrepo/myrepo-git/php
 py=~/.zbox/src/myrepo/myrepo-git/python
 java=~/.zbox/src/myrepo/myrepo-git/java

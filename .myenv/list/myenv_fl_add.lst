@@ -19,6 +19,7 @@ $MY_DEV/eclipse/eclipse.ini
 /.ssh/
 /.subversion/
 /.VirtualBoxVMs/
+/.gitconfig
 /.smbcredentials
 /.m2/settings.xml
 /.config/autostart/

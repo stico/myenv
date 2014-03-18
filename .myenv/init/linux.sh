@@ -1,4 +1,4 @@
-#!/bin/bash
+	#!/bin/bash
 
 # One line cmd
 # V1: curl https://raw.github.com/stico/myenv/master/.myenv/init/linux.sh | bash
@@ -244,9 +244,9 @@ function func_init_os_common() {
 	func_log_echo "${tmp_init_log}" "INFO: OS specific init for common part"
 	( ! grep "DISTRIB_CODENAME=\(saucy\|olivia\)" /etc/lsb-release ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
 
-	sudo apt-get install -y vlc				&>> $tmp_init_log
-	sudo apt-get install -y xbindkeys wmctrl		&>> $tmp_init_log
+	sudo apt-get install -y vlc xclip			&>> $tmp_init_log
 	sudo apt-get install -y fcitx-table-wbpy		&>> $tmp_init_log	# Chinese Input Method - Fcitx
+	sudo apt-get install -y xbindkeys wmctrl xdotool	&>> $tmp_init_log
 
 	func_init_font						&>> $tmp_init_log
 	func_init_soft_clipit					&>> $tmp_init_log
@@ -257,6 +257,8 @@ function func_init_os_common() {
 
 function func_init_os_ubuntu1310() {
 	func_log_echo "${tmp_init_log}" "INFO: OS specific init for ubuntu 13.10"
+
+	sudo apt-get install -y compizconfig-settings-manager	&>> $tmp_init_log	# for unity settings, use cmd "ccsm" to invoke it
 
 	( ! grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) &&				\
 	( ! grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) &&				\
