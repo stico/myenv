@@ -308,7 +308,7 @@
         </Tab>
       </Left>
       <Right>
-        <ActiveTab>5</ActiveTab>
+        <ActiveTab>4</ActiveTab>
         <Tab>
           <FileView Type="columns">
             <History>
@@ -397,7 +397,7 @@
               <Entry Active="True">
                 <FileSource Type="FileSystem"/>
                 <Paths>
-                  <Path>/home/ouyangzhu/Documents/DCD/</Path>
+                  <Path>/home/ouyangzhu/Documents/DCD/A_General/</Path>
                 </Paths>
               </Entry>
             </History>
