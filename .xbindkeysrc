@@ -49,10 +49,12 @@
 "xdotool key --clearmodifiers Super"
   control+shift+z
 
-"xdotool key --clearmodifiers ctrl+Super+Left"		# not work !
+# not work !
+"xdotool key --clearmodifiers Ctrl+Super+Left"
   Control+Shift+Alt+Left
 
-"xdotool key --clearmodifiers ctrl+Super+Right"		# not work !
+# not work !
+"xdotool key --clearmodifiers Ctrl+Super+Right"
   Control+Shift+Alt+Right
 
 "/usr/bin/wmctrl -c :ACTIVE:"
@@ -73,9 +75,9 @@
 # m:0x50 is "windows key" detect by "xbindkeys -k"
 # seems Super_R/Super_L works the same?
 #"/usr/bin/wmctrl -a 'File Manager' || exo-open --launch FileManager"	# version used in LinuxMint 15
-"xdg-open ~/amp/download/ && wmctrl -a download"
+"xdg-open ~/amp/download/ && sleep 1 && wmctrl -a download"
   Mod2+Mod4+Super_R+e
-"xdg-open ~/amp/download/ && wmctrl -a download"
+"xdg-open ~/amp/download/ && sleep 1 && wmctrl -a download"
   control+shift+alt+e
 
 # Examples
