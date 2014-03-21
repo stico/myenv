@@ -45,61 +45,8 @@ MY_TMP		%HOME%amp
 
 
 ################################################################################
-# ENV - App Path/Home/Options. For path, 1st here, last in env!
+# ENV - Misc
 ################################################################################
-JAVA_HOME	%MY_DEV%#jdk
-PATH		%JAVA_HOME%#bin
-
-ANT_HOME	%MY_DEV%#ant
-ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"
-PATH		%ANT_HOME%#bin
-
-M2_HOME		%MY_DEV%#maven
-MAVEN_HOME	%MY_DEV%#maven
-MAVEN_REPO	%HOME%.m2
-PATH		%M2_HOME%#bin
-
-MYSQL_HOME	%MY_DEV%#mysql
-PATH		%MYSQL_HOME%#bin
-
-NODE_HOME	%MY_DEV%#node
-PATH		%NODE_HOME%#bin
-
-PHP_HOME	%MY_DEV%#php
-PATH		%PHP_HOME%#bin
-
-GIT_HOME	%MY_DEV%#git
-PATH		%GIT_HOME%#bin
-
-# Try rvm 
-#RUBY_HOME	%MY_DEV%#ruby
-#PATH		%RUBY_HOME%#bin
-# Use alias 'loadrvm'
-#RVM_HOME	%HOME%.rvm
-#PATH		%RVM_HOME%#bin
-
-HTTPD_HOME	%MY_DEV%#httpd
-PATH		%HTTPD_HOME%#usr#sbin
-
-NGINX_HOME	%MY_DEV%#nginx
-PATH		%NGINX_HOME%#sbin
-
-ECLIPSE_HOME	%MY_DEV%#eclipse
-PATH		%ECLIPSE_HOME%
-
-REDIS_HOME	%MY_DEV%#redis
-PATH		%REDIS_HOME%#bin
-PATH		%REDIS_HOME%#src
-
-TOMCAT_HOME	%MY_DEV%#tomcat
-PATH		%TOMCAT_HOME%#bin
-
-PYTHON_HOME	%MY_DEV%#python
-PATH		%PYTHON_HOME%#bin
-		# for win portable version
-PATH		%PYTHON_HOME%#App
-		# for win portable version
-PATH		%PYTHON_HOME%#App#Scripts
 					# for virtualenvs & virtualenvwrapper
 WORKON_HOME				%HOME%.virtualenvs
 					# virtualenvwrapper need this
@@ -110,7 +57,6 @@ VIRTUALENVWRAPPER_VIRTUALENV_ARGS	'--no-site-packages'
 					# make pip use the same directory for virtualenvs & virtualenvwrapper
 PIP_VIRTUALENV_BASE			%WORKON_HOME%
 PIP_RESPECT_VIRTUALENV			true
-
 
 PATH		%HOME%bin
 PATH		%MY_ENV%
@@ -148,3 +94,61 @@ BYOBU_NO_TITLE	1
 
 		# more compatible for grep --color, the default one is: "ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36"
 GREP_COLORS	ms=31:mc=31:sl=:cx=:fn=35:ln=32:bn=32:se=36
+
+
+################################################################################
+# Deprecated sine using zbox now
+################################################################################
+#JAVA_HOME	%MY_DEV%#jdk
+#PATH		%JAVA_HOME%#bin
+#
+#ANT_HOME	%MY_DEV%#ant
+#ANT_OPTS	"-XX:MaxPermSize=128m -Xmx512m"
+#PATH		%ANT_HOME%#bin
+#
+#M2_HOME	%MY_DEV%#maven
+#MAVEN_HOME	%MY_DEV%#maven
+#MAVEN_REPO	%HOME%.m2
+#PATH		%M2_HOME%#bin
+#
+#MYSQL_HOME	%MY_DEV%#mysql
+#PATH		%MYSQL_HOME%#bin
+#
+#NODE_HOME	%MY_DEV%#node
+#PATH		%NODE_HOME%#bin
+#
+#PHP_HOME	%MY_DEV%#php
+#PATH		%PHP_HOME%#bin
+#
+#GIT_HOME	%MY_DEV%#git
+#PATH		%GIT_HOME%#bin
+#
+## Try rvm 
+##RUBY_HOME	%MY_DEV%#ruby
+##PATH		%RUBY_HOME%#bin
+## Use alias 'loadrvm'
+##RVM_HOME	%HOME%.rvm
+##PATH		%RVM_HOME%#bin
+#
+#HTTPD_HOME	%MY_DEV%#httpd
+#PATH		%HTTPD_HOME%#usr#sbin
+#
+#NGINX_HOME	%MY_DEV%#nginx
+#PATH		%NGINX_HOME%#sbin
+#
+#ECLIPSE_HOME	%MY_DEV%#eclipse
+#PATH		%ECLIPSE_HOME%
+#
+#REDIS_HOME	%MY_DEV%#redis
+#PATH		%REDIS_HOME%#bin
+#PATH		%REDIS_HOME%#src
+#
+#TOMCAT_HOME	%MY_DEV%#tomcat
+#PATH		%TOMCAT_HOME%#bin
+#
+#PYTHON_HOME	%MY_DEV%#python
+#PATH		%PYTHON_HOME%#bin
+#		# for win portable version
+#PATH		%PYTHON_HOME%#App
+#		# for win portable version
+#PATH		%PYTHON_HOME%#App#Scripts

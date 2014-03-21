@@ -7,6 +7,7 @@ plugin_addr["vim-colors-solarized"]="git://github.com/altercation/vim-colors-sol
 plugin_addr["vim-surround"]="git://github.com/tpope/vim-surround.git"
 plugin_addr["vim-pathogen"]="git://github.com/tpope/vim-pathogen.git"
 plugin_addr["vim-repeat"]="git://github.com/tpope/vim-repeat.git"
+plugin_addr["vim-oumg"]="https://github.com/stico/vim-oumg.git"
 plugin_addr["tabular"]="git://github.com/godlygeek/tabular.git"
 plugin_addr["ctrlp.vim"]="git://github.com/kien/ctrlp.vim.git"
 

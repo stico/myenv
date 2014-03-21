@@ -334,6 +334,9 @@ function func_vi {
 	[ -z "$*" ] && func_vi_conditional && return 0
 
 	# shortcut - only one parameter, and exist
+	[ $# -eq 1 ] && [ -e "${1}" ] && func_vi_conditional "${1}" && return 0
+
+	# shortcut - only one tag, and exist
 	tag_eval="`func_tag_value $1`"
 	[ $# -eq 1 ] && func_vi_conditional "$tag_eval" && return 0
 
@@ -546,7 +549,8 @@ function func_collect_files {
 	func_mkdir_cd "$target_base"
 	for tag in ${source_bases[@]}
 	do
-		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
+		#func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
+		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -maxdepth 5 -type f
 		#echo "$include_pattern_str"
 		#echo "$exclude_pattern_str"
 		egrep -i "$include_pattern_str" fl_${tag}.txt | egrep -v -i "$exclude_pattern_str" >> ${target_collection_fl}
@@ -609,7 +613,7 @@ function func_collect_note {
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
 
 	target_base=$MY_ENV/zgen/collection_note
-	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)			# Not included DCM, put DCD first
+	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz fcs)			# Not included DCM, put DCD first
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_note_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)

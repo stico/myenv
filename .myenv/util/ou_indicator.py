@@ -30,6 +30,25 @@ class OuIndicator:
         item.show()
         self.menu.append(item)
 
+        item = gtk.MenuItem("ScreenBoth")
+        item.connect("activate", self.screenBoth)
+        item.show()
+        self.menu.append(item)
+
+        item = gtk.MenuItem("ScreenBigOnly")
+        item.connect("activate", self.screenBigOnly)
+        item.show()
+        self.menu.append(item)
+
+        item = gtk.MenuItem("ScreenSmallOnly")
+        item.connect("activate", self.screenSmallOnly)
+        item.show()
+        self.menu.append(item)
+
+        item = gtk.MenuItem("------")
+        item.show()
+        self.menu.append(item)
+
         item = gtk.MenuItem("CopySelection")
         item.connect("activate", self.copySelection)
         item.show()
@@ -47,10 +66,19 @@ class OuIndicator:
         self.menu.show()
         self.ind.set_menu(self.menu)
 
-    # Not work !
+    # Not work yet !
     def copySelection(self, widget, data=None):
         call(["xdotool", "key Ctrl+Shift+C"])
         #call(["sh", "target=/home/ouyangzhu/Documents/DCB/Record/Note/A_NOTE_Copy.txt ; echo >> $target && /usr/bin/xclip -o >> $target && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"])
+
+    def screenBoth(self, widget, data=None):
+        call(["/usr/bin/xrandr", "--output HDMI1 --auto --output LVDS1 --auto --right-of HDMI1"])
+
+    def screenBigOnly(self, widget, data=None):
+        call(["/usr/bin/xrandr", "--output HDMI1 --auto --output LVDS1 --off"])
+
+    def screenSmallOnly(self, widget, data=None):
+        call(["/usr/bin/xrandr", "--output HDMI1 --off --output LVDS1 --auto"])
 
     def rotate(self, widget, data=None):
         call(["sh", "/home/ouyangzhu/.myenv/util/wacom_rotate.sh"])

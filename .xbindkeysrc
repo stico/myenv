@@ -66,11 +66,11 @@
 "wmctrl -k on"
   control+shift+alt+d
 
-"~/.myenv/conf/myahk/myahk_script_move_next_monitor.sh"
-  control+shift+alt+Next
-
-"~/.myenv/conf/myahk/myahk_script_move_next_monitor.sh"
-  control+shift+alt+Prior
+# Ubuntu has its own solution
+#"~/.myenv/conf/myahk/myahk_script_move_next_monitor.sh"
+#  control+shift+alt+Next
+#"~/.myenv/conf/myahk/myahk_script_move_next_monitor.sh"
+#  control+shift+alt+Prior
 
 # m:0x50 is "windows key" detect by "xbindkeys -k"
 # seems Super_R/Super_L works the same?
