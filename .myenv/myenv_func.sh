@@ -1137,7 +1137,7 @@ function func_backup_dated {
 	srcPath="$1"
 	fileName=$(basename "$srcPath")
 	targetFile=`func_dati`_`uname -n`_"$fileName"
-	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/ampext/backup")
+	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/backup")
 
 	# if path is a directory, zip it first
 	if [ -d "$srcPath" ]; then
@@ -1160,7 +1160,7 @@ function func_backup_dated {
 		fi
 	done
 
-	[ -e $packFile ] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
+	[ -e "${packFile}" ] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
 	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 }
 
