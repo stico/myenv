@@ -14,7 +14,6 @@ $MY_DOC/DCC/Storage_DB_SQL/A_NOTE_SQL.txt
 $MY_DOC/DCC/Storage_DB_Mysql/A_NOTE_MySql.txt
 $MY_DOC/DCB/Software/A_NOTE_Software.txt
 $MY_DOC/DCC/Programming_Ruby/A_NOTE_Ruby.txt
-$MY_FCS/python/A/A_NOTE_python.txt
 $MY_DOC/DCC/OS_Win/A_NOTE_Win.txt
 C:/WINDOWS/system32/drivers/etc/hosts
 $MY_ENV/conf/ahk/mysettings.ahk
@@ -28,7 +27,10 @@ $MY_DOC/DCC/Programming_Java_Spring/A_NOTE_Spring.txt
 $MY_DEV/a_workspaces/A_Project.lst
 $MY_DOC/DCC/Design_UML/A_NOTE_UML.txt
 
-$MY_DOC/DCC/Dev_SCM_Maven/A_NOTE_Maven.txt
+java		mybatis
+python
+tomcat
+maven		nexus
 E:/Documents/DCB/Record/Z/A_NOTE_Investigation.txt
 $MY_DOC/DCE/SIG/P532_VerizonPrivacy_UpdateAndTRFix/A_NOTE_VerizonPrivacyUpdate.txt
 $MY_DOC/DCB/Collection_Note/z_fl_Disc_Book_List.txt
