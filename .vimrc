@@ -106,8 +106,9 @@ let g:netrw_dirhistmax=0
 
 
 """""""""""""""""""""""""""""" H1 - Topic - Completion
+set iskeyword+=35			" (shit, not work) make "#" as part of word, makedown and note syntax use it
+set iskeyword+=#			" (shit, not work) make "#" as part of word, makedown and note syntax use it
 set iskeyword+=45			" make "-" as part of word, auto complete (^N^P) use it
-set iskeyword+=#			" make "#" as part of word, makedown and note syntax use it
 "set iskeyword+=46			" make "." as part of word, auto complete (^N^P) use it
 hi Pmenu	ctermbg=White ctermfg=DarkGrey
 hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue

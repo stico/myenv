@@ -613,7 +613,7 @@ function func_collect_note {
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
 
 	target_base=$MY_ENV/zgen/collection_note
-	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz fcs)			# Not included DCM, put DCD first
+	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)			# Not included DCM, put DCD first
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_note_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
