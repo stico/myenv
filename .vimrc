@@ -4,6 +4,9 @@ endif
 let loaded_settings_of_stico = 1
 
 
+"""""""""""""""""""""""""""""" H1 - 
+set nocompatible		" This might reset some settings (e.g. "iskeyword"), so should happen in the beginning. 
+
 """""""""""""""""""""""""""""" H1 - Topic - Font
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
@@ -105,47 +108,13 @@ let g:netrw_dirhistmax=0
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
 
 
-"""""""""""""""""""""""""""""" H1 - Topic - Completion
-set iskeyword+=35			" (shit, not work) make "#" as part of word, makedown and note syntax use it
-set iskeyword+=#			" (shit, not work) make "#" as part of word, makedown and note syntax use it
-set iskeyword+=45			" make "-" as part of word, auto complete (^N^P) use it
-"set iskeyword+=46			" make "." as part of word, auto complete (^N^P) use it
-hi Pmenu	ctermbg=White ctermfg=DarkGrey
-hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue
-
-"""" Make Completion behavior like IDE
-" menu come up even if only one match.
-set completeopt=menuone
-" Enter key will simply select the highlighted menu item, just as <C-Y> does
-"inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<lt>CR>"
-" the IDE way of completion, 2nd line is for terminal mapping
-imap <C-Space> <C-x><C-o>
-imap <C-@> <C-Space>
-
-" keeps a menu item always highlighted. This way you can keep typing characters to narrow the matches, and the nearest match will be selected so that you can hit Enter at any time to insert it.
-"inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
-" open omni completion menu closing previous if open and opening new menu without changing the text
-"inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
-" simulates <C-X><C-O> to bring up the omni completion menu, then it simulates <C-N><C-P> to remove the longest common text, and finally it simulates <Down> again to keep a match highlighted.
-"inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
-
-"""" For Ruby
-let g:rubycomplete_rails = 1
-let g:rubycomplete_buffer_loading = 1
-let g:rubycomplete_classes_in_global = 1
-
-
-
 """""""""""""""""""""""""""""" H1 - Topic - auto save
 au FocusLost * silent! wa
 set autowriteall
 
-
 """""""""""""""""""""""""""""" H1 - Settings - Misc
 filetype plugin indent on				" type detection, language-dependent indenting
 set dictionary+=$MY_ENV/list/words_us
-set nocompatible					" very important for vim, since we are using vim, not vi
 set nobackup						" won't leave additional file(s) after close VIM
 set nowritebackup					" default is :set writebackup, will keep a backup file while file is being worked. Once VIM is closed; the backup will vanish.
 set noswapfile						" (1) Keep in mind that this option will keep everything in memory. (2) Don't use this for big files, will be memeory consuming and Recovery will be impossible! (3) In essence; if security is a concern, use this option
@@ -198,6 +167,37 @@ set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+
+"""""""""""""""""""""""""""""" H1 - Topic - Completion
+" NOTE: iskeyword MUST after the "set nocompatible"
+set iskeyword+=#
+set iskeyword+=-
+set iskeyword+=.
+hi Pmenu	ctermbg=White ctermfg=DarkGrey
+hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue
+
+"""" Make Completion behavior like IDE
+" menu come up even if only one match.
+set completeopt=menuone
+" Enter key will simply select the highlighted menu item, just as <C-Y> does
+"inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<lt>CR>"
+" the IDE way of completion, 2nd line is for terminal mapping
+imap <C-Space> <C-x><C-o>
+imap <C-@> <C-Space>
+
+" keeps a menu item always highlighted. This way you can keep typing characters to narrow the matches, and the nearest match will be selected so that you can hit Enter at any time to insert it.
+"inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+" open omni completion menu closing previous if open and opening new menu without changing the text
+"inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') . '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+" simulates <C-X><C-O> to bring up the omni completion menu, then it simulates <C-N><C-P> to remove the longest common text, and finally it simulates <Down> again to keep a match highlighted.
+"inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+
+"""" For Ruby
+let g:rubycomplete_rails = 1
+let g:rubycomplete_buffer_loading = 1
+let g:rubycomplete_classes_in_global = 1
+
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 noremap <F11> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
@@ -352,7 +352,6 @@ inoremap <C-A-Down> <Esc>yypi
 inoremap <C-A-Up> <Esc>yyPi
 "vnoremap <A-Down> ddp	
 "vnoremap <A-Up> ddkP
-
 
 """""""""""""""""""""""""""""" H1 - Mapping - Commands
 " the window remains, not need to 'press ...'

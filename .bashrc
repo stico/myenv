@@ -24,11 +24,12 @@ func_ssh_agent_init
 zbox_func=${HOME}/.zbox/zbox_func.sh
 if [ -e "${zbox_func}" ]  ; then
 	source "${zbox_func}"
-	func_zbox_use maven      3.1.1
-	func_zbox_use python     2.7.6
-	func_zbox_use eclipse    4.3.2   std_x64
-	func_zbox_use vim        hg      ouyzhu
-	func_zbox_use oraclejdk  7u21    x64
+	func_zbox use	maven		3.1.1
+	func_zbox use	php		5.5.10
+	func_zbox use	vim		hg		ouyzhu
+	func_zbox use	python		2.7.6
+	func_zbox use	oraclejdk	7u21		x64
+	func_zbox use	eclipse		4.3.2		std_x64
 fi
 
 
@@ -46,10 +47,13 @@ shopt -s histreedit	# puts a failed history substitution back on the command lin
 
 # platform depended operation
 if [ "$os_cygwin" = "false" ] ; then
+	complete -F _known_hosts scpx
+	complete -F _known_hosts sshx
+	complete -F _known_hosts ssht
 	# Auto complete (2013-09-9, LM15 need use ssh <tab> to "init" _ssh, otherwise not work, why?)
-	complete -o default -o nospace -F _scp scpx
-	complete -o default -o nospace -F _ssh sshx
-	complete -o default -o nospace -F _ssh ssht
+	#complete -o default -o nospace -F _scp scpx			# not work in ubuntu 13.04 unless firstly use ssh <tab> "trigger" it first
+	#complete -o default -o nospace -F _ssh sshx
+	#complete -o default -o nospace -F _ssh ssht
 	#`complete | grep -q " dd$"` && complete -r dd			# Check before remove, since alias conflict with /bin/dd, disable /bin/dd complete. 
 	#complete -r vi vim gvim unzip					# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
 

@@ -25,6 +25,7 @@ $MY_DEV/eclipse/eclipse.ini
 /.config/autostart/
 /.thunderbird/profiles.ini
 /.local/share/applications/
+/.kde/share/config/kwalletrc
 /.kde/share/apps/kwallet/kdewallet.kwl
 /.config/fcitx/table/wbpy_LastAutoPhrase.tmp
 /.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml

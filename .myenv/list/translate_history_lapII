@@ -4,3 +4,7 @@ bezel	表圈
 	[[["表圈","bezel","Biǎo quān",""]],,"en",,[["表圈",[1],false,false,623,0,2,0]],[["bezel",1,[["表圈",623,false,false],["挡板",224,false,false],["边框",65,false,false],["圈",51,false,false],["面板",34,false,false]],[[0,5]],"bezel"]],,,[["en"]],1]
 landscape	景观
 	[[["景观","landscape","Jǐngguān",""]],[["noun",["景观","风景","山水","景色","江山"],[["景观",["landscape"],,0.48736107],["风景",["landscape","scenery","scape"],,0.10376516],["山水",["landscape","scape"],,0.07243976],["景色",["view","scenery","scene","landscape","scape"],,0.006530642],["江山",["country","landscape"],,0.00089774455]],"landscape",1]],"en",,[["景观",[1],false,false,507,0,1,0]],[["landscape",1,[["景观",507,false,false],["风景",451,false,false],["山水",39,false,false],["景色",0,false,false],["横向",0,false,false]],[[0,9]],"landscape"]],,,[],2]
+进阶	Advanced
+	[[["Advanced","进阶","","Jìn jiē"]],,"zh-CN",,[["Advanced",[1],true,false,999,0,1,0]],[["进阶",1,[["Advanced",999,true,false],["Advance",0,true,false],["Adv",0,true,false],["The Advanced",0,true,false]],[[0,2]],"进阶"]],,,[["zh-CN"]],2]
+中级	Intermediate
+	[[["Intermediate","中级","","Zhōngjí"]],[["adjective",["intermediate","middle-level"],[["intermediate",["中间","中级"],,0.16071463],["middle-level",["中级"]]],"中级",3]],"zh-CN",,[["Intermediate",[1],true,false,999,0,1,0]],[["中级",1,[["Intermediate",999,true,false],["Middle",0,true,false],["Mid",0,true,false]],[[0,2]],"中级"]],,,[],2]

@@ -28,8 +28,8 @@ $MY_DOC/DCC/Design_UML/A_NOTE_UML.txt
 
 ############################ DCC/xxx/A_NOTE_xxx.txt ############################
 java		tomcat		eclipse		maven		maven-nexus
-php		svn		git		wink		
-python		vim
+php		svn		git		wink		foxit	
+python		vim		osx		pdf		skim
 
 ################################ A_NOTE/xxx.txt ################################
 cassandra	disruptor	markdown	statsd		zookeeper
@@ -39,7 +39,7 @@ ftp		json		statsd		jenkins		clearcase
 graphite	samba		lua		nodejs		actionscript
 tdd		jsp		jetty		resin		hibernate
 netty		font		suse		linuxmint	cygwin
-symbian		tex
+symbian		tex		tool
 
 ############################ DCO/xxx/A_NOTE_xxx.txt ############################
 activity	baby

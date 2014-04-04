@@ -7,11 +7,11 @@
 
 # Local
 root=/ext/Documents
-rootalias = //lapII//ext/Documents -> //X220T_LU//Documents
+rootalias = //lapII//ext/Documents -> //PRIMARY//Documents
 
 # External
-root=/media/ouyangzhu/22D0B554D0B52F43/backup
-rootalias = //lapII//media/ouyangzhu/22D0B554D0B52F43/backup -> //MHD//Documents
+root=ssh://172.19.108.137/Documents
+rootalias = //workpcII//ssh://172.19.108.137/Documents -> //SECOND//Documents
 
 ################################################################################
 # PATH: the -path cmd option not support glob
@@ -27,7 +27,6 @@ path=ECH
 path=ECS
 path=ECZ
 path=FCB
-path=FCS
 
 ################################################################################
 # SETTINGS
@@ -39,11 +38,9 @@ ignorecase=true
 ignoreinodenumbers=true
 #links=false
 
+
 ################################################################################
 # IGNORE: verified works. Regex seem not need suffix ".*" to match the whole name
-# Regex:  Support Posix ERE (Posix extended regular expression)
-#         The starting path is need to sync
-#         The dir ending should NOT end with "/"
 ################################################################################
 ignore = Regex .*/.fl_me.txt
 ignore = Regex .*/.dl_me.txt

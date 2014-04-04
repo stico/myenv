@@ -1239,6 +1239,7 @@ function func_run_file {
 	elif [[ "$file" = *.rb ]] ; then	ruby $file;
 	elif [[ "$file" = *.sh ]] ; then	bash $file;
 	elif [[ "$file" = *.py ]] ; then	python $file;
+	elif [[ "$file" = *.php ]] ; then	php $file;
 	elif [[ "$file" = *.bat ]] ; then	cmd $file;
 	elif [[ "$file" = *.exe ]] ; then	cmd $file;
 	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File ${file//\\/\/}
