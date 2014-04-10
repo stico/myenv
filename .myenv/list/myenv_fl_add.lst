@@ -34,4 +34,4 @@ $MY_DEV/eclipse/eclipse.ini
 
 # TODO: backup script will mix it with /.config/autostart/
 /etc/xdg/autostart/
-
+/etc/resolv.conf
