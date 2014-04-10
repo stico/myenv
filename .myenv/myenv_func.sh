@@ -617,7 +617,7 @@ function func_collect_note {
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_note_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	include_patterns=(A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
+	include_patterns=(/\([^/]*\)/\\1.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
 	exclude_patterns=(.rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash A_NOTE_Copy.txt)
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 }
