@@ -47,17 +47,6 @@ MY_TMP		%HOME%amp
 ################################################################################
 # ENV - Misc
 ################################################################################
-					# for virtualenvs & virtualenvwrapper
-WORKON_HOME				%HOME%.virtualenvs
-					# virtualenvwrapper need this
-PROJECT_HOME				%MY_DEV%#code_repo#python
-VIRTUALENVWRAPPER_PYTHON		%PYTHON_HOME%#bin#python
-VIRTUALENVWRAPPER_VIRTUALENV		%PYTHON_HOME%#bin#virtualenv
-VIRTUALENVWRAPPER_VIRTUALENV_ARGS	'--no-site-packages'
-					# make pip use the same directory for virtualenvs & virtualenvwrapper
-PIP_VIRTUALENV_BASE			%WORKON_HOME%
-PIP_RESPECT_VIRTUALENV			true
-
 PATH		%HOME%bin
 PATH		%MY_ENV%
 PATH		%MY_ENV_UTIL%

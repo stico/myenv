@@ -171,7 +171,7 @@ vnoremap <F1> <ESC>
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 " NOTE: iskeyword MUST after the "set nocompatible"
 set iskeyword+=-
-set iskeyword+=.
+"set iskeyword+=.
 hi Pmenu	ctermbg=White ctermfg=DarkGrey
 hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue
 

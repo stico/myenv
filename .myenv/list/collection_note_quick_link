@@ -26,12 +26,11 @@ $MY_DOC/DCC/Programming_Java_Spring/A_NOTE_Spring.txt
 $MY_DEV/a_workspaces/A_Project.lst
 $MY_DOC/DCC/Design_UML/A_NOTE_UML.txt
 
-############################ DCC/xxx/A_NOTE_xxx.txt ############################
-java		tomcat		eclipse		maven		maven-nexus
+##################################### DCC ######################################
+java		tomcat		eclipse		maven		nexus-maven
 php		svn		git		wink		foxit	
+c		symbian		tex		tool
 python		vim		osx		pdf		skim
-
-################################ A_NOTE/xxx.txt ################################
 cassandra	disruptor	markdown	statsd		zookeeper
 confluence	django		flash		memcached	mercurial (hg)
 zbox		mybatis		logstash	graphviz	elasticsearch
@@ -39,10 +38,9 @@ ftp		json		statsd		jenkins		clearcase
 graphite	samba		lua		nodejs		actionscript
 tdd		jsp		jetty		resin		hibernate
 netty		font		suse		linuxmint	cygwin
-symbian		tex		tool
 
-############################ DCO/xxx/A_NOTE_xxx.txt ############################
-activity	baby
+##################################### DCO ######################################
+activity	baby		zzjj
 
 E:/Documents/DCB/Record/Z/A_NOTE_Investigation.txt
 $MY_DOC/DCE/SIG/P532_VerizonPrivacy_UpdateAndTRFix/A_NOTE_VerizonPrivacyUpdate.txt

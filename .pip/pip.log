@@ -1,31 +1,27 @@
 ------------------------------------------------------------
-/home/ouyangzhu/.virtualenvs/common/bin/pip run on Wed Feb 12 10:41:09 2014
-Downloading/unpacking hamcrest
-
-  Getting page https://pypi.python.org/simple/hamcrest/
-  Could not fetch URL https://pypi.python.org/simple/hamcrest/: HTTP Error 404: Not Found
-  Will skip URL https://pypi.python.org/simple/hamcrest/ when looking for download links for hamcrest
-  Getting page https://pypi.python.org/simple/
-  URLs to search for versions for hamcrest:
-  * https://pypi.python.org/simple/hamcrest/
-  Getting page https://pypi.python.org/simple/hamcrest/
-  Could not fetch URL https://pypi.python.org/simple/hamcrest/: HTTP Error 404: Not Found
-  Will skip URL https://pypi.python.org/simple/hamcrest/ when looking for download links for hamcrest
-  Could not find any downloads that satisfy the requirement hamcrest
-
+/home/ouyangzhu/.virtualenvs/common/bin/pip run on Mon Apr 14 18:16:44 2014
+Obtaining pysvn from svn+http://pysvn.tigris.org/svn/pysvn/tags/pysvn/Extension/1.7.6/#egg=pysvn
+  Checking out http://pysvn.tigris.org/svn/pysvn/tags/pysvn/Extension/1.7.6/ to ./pysvn
+  Found command 'svn' at '/usr/bin/svn'
+  Running command /usr/bin/svn checkout -q http://pysvn.tigris.org/svn/pysvn/tags/pysvn/Extension/1.7.6/ /home/ouyangzhu/.virtualenvs/common/src/pysvn
+  Complete output from command /usr/bin/svn checkout -q http://pysvn.tigris.org/svn/pysvn/tags/pysvn/Extension/1.7.6/ /home/ouyangzhu/.virtualenvs/common/src/pysvn:
+  
+----------------------------------------
 Cleaning up...
-
   Removing temporary dir /home/ouyangzhu/.virtualenvs/common/build...
-No distributions at all found for hamcrest
-
+Command /usr/bin/svn checkout -q http://pysvn.tigris.org/svn/pysvn/tags/pysvn/Extension/1.7.6/ /home/ouyangzhu/.virtualenvs/common/src/pysvn failed with error code -11 in None
 Exception information:
 Traceback (most recent call last):
-  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/basecommand.py", line 134, in main
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/basecommand.py", line 122, in main
     status = self.run(options, args)
-  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/commands/install.py", line 236, in run
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/commands/install.py", line 278, in run
     requirement_set.prepare_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
-  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/req.py", line 1085, in prepare_files
-    url = finder.find_requirement(req_to_install, upgrade=self.upgrade)
-  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/index.py", line 265, in find_requirement
-    raise DistributionNotFound('No distributions at all found for %s' % req)
-DistributionNotFound: No distributions at all found for hamcrest
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/req.py", line 1140, in prepare_files
+    req_to_install.update_editable(not self.is_download)
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/req.py", line 483, in update_editable
+    vcs_backend.obtain(self.source_dir)
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/vcs/subversion.py", line 92, in obtain
+    [self.cmd, 'checkout', '-q'] + rev_options + [url, dest])
+  File "/home/ouyangzhu/.virtualenvs/common/lib/python2.7/site-packages/pip/util.py", line 697, in call_subprocess
+    % (command_desc, proc.returncode, cwd))
+InstallationError: Command /usr/bin/svn checkout -q http://pysvn.tigris.org/svn/pysvn/tags/pysvn/Extension/1.7.6/ /home/ouyangzhu/.virtualenvs/common/src/pysvn failed with error code -11 in None

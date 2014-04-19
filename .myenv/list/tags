@@ -20,6 +20,7 @@ zb=$ZBOX
 zbox=$ZBOX
 ins=$ZBOX/ins
 src=$ZBOX/src
+oumisc=$ZBOX/src/oumisc/oumisc-git
 
 # Source code
 ourepo=~/.zbox/src/ourepo/ourepo-git

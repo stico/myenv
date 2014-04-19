@@ -284,11 +284,18 @@ function func_vi_conditional {
 }
 
 function func_load_virtualenvwrapper {
-	echo "INFO: loading Virtualenvwrapper for Python"
+	echo "INFO: loading virtual env (Virtualenvwrapper) for Python"
 
-	# virtualenvwrapper is for python virtual env
-	source $PYTHON_HOME/bin/virtualenvwrapper.sh
+	[ -z "${PYTHON_HOME}" ] && func_die "ERROR: env PYTHON_HOME not set"
+	export VIRTUALENVWRAPPER_PYTHON=${PYTHON_HOME}/bin/python
 	export PS1="(VirtualEnv) ${PS1}"
+	export WORKON_HOME=${HOME}/.virtualenvs
+	export PROJECT_HOME=${HOME}/amp
+	export VIRTUALENVWRAPPER_VIRTUALENV=${PYTHON_HOME}/bin/virtualenv
+	export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+	export PIP_VIRTUALENV_BASE=${WORKON_HOME}
+	export PIP_RESPECT_VIRTUALENV=true
+	source ${PYTHON_HOME}/bin/virtualenvwrapper.sh
 }
 
 function func_load_rvm {
@@ -357,7 +364,10 @@ function func_cd_tag {
 	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
 
 	# shortcut - only one parameter, and exist in current dir
-	[ $# -eq 1 ] && [ -d "$1" ] && func_cd_conditional "$1" && return 0
+	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_conditional "${1}" && return 0
+
+	# shortcut - start with dot (.)
+	[ $# -eq 1 ] && (echo "${1}" | grep -q "^\.") && func_cd_conditional "${1}" && return 0
 
 	# shortcut - only one parameter, and exist
 	tag_eval="`func_tag_value $1`"
