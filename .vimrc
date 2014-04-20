@@ -366,6 +366,27 @@ command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
 command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
 
+"""""""""""""""""""""""""""""" H1 - Mapping - FileType based mapping
+autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
+autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
+autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>"
+autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
+"TODO: restore mapping: 
+"	redir => oldcrmap
+"	map <CR>
+"	redir END
+"	exec "nnoremap " . substitute(oldcrmap, '[\n\*]\|n ', '', 'g')
+"TODO: just for try, delete later
+"autocmd BufWinEnter quickfix silent! unmap <CR>
+"autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
+"autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
+"autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
+"
+"autocmd BufWinLeave quickfix silent! nnoremap <CR> o<Esc>
+"autocmd BufWinLeave quickfix silent! unmap <ESC>
+"autocmd FileType qf silent! unmap <CR>
+"autocmd FileType qf silent! nnoremap <ESC> :q<CR>
+
 """""""""""""""""""""""""""""" H1 - Script
 
 " Deprecated - cmd g*/g# already did this
