@@ -1,4 +1,4 @@
-	#!/bin/bash
+#!/bin/bash
 
 # One line cmd
 # V1: curl https://raw.github.com/stico/myenv/master/.myenv/init/linux.sh | bash
@@ -258,6 +258,7 @@ function func_init_os_common() {
 function func_init_os_ubuntu1310() {
 	func_log_echo "${tmp_init_log}" "INFO: OS specific init for ubuntu 13.10"
 
+	sudo apt-get install -y ubuntu-restricted-extras	&>> $tmp_init_log	# for rhythmbox to play mp3
 	sudo apt-get install -y compizconfig-settings-manager	&>> $tmp_init_log	# for unity settings, use cmd "ccsm" to invoke it
 
 	( ! grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) &&				\

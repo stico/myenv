@@ -22,3 +22,9 @@ credencial	credencial
 	[[["credencial","credencial","Credencial",""]],,"en",,[["credencial",[1],false,false,1000,0,1,0]],[["credencial",1,[["credencial",1000,false,false]],[[0,10]],"credencial"]],,,[["es"]],8]
 credential	凭据
 	[[["凭据","credential","Píngjù",""]],[["noun",["凭据","印信"],[["凭据",["credential","evidence","proof"],,0.23383839],["印信",["credential"],,6.2054343e-05]],"credential",1]],"en",,[["凭据",[1],false,false,1000,0,1,0]],[["credential",1,[["凭据",1000,false,false],["凭证",0,false,false],["认证",0,false,false],["证书",0,false,false],["的凭据",0,false,false]],[[0,10]],"credential"]],,,[],6]
+猎头	Headhunter
+	[[["Headhunter","猎头","","Liètóu"]],,"zh-CN",,[["Headhunter",[1],true,false,704,0,1,0]],[["猎头",1,[["Headhunter",704,true,false],["Headhunting",212,true,false],["Headhunters",3,true,false],["Executive Search",0,true,false],["Recruiter",0,true,false]],[[0,2]],"猎头"]],,,[["zh-CN"]],2]
+preceding	前
+	[[["前","preceding","Qián",""]],[["adjective",["前","上","过急的"],[["前",["former","previous","preceding","one-time"],,0.37955719],["上",["upper","last","previous","preceding","superior","overhead"],,0.066995822],["过急的",["antecedent","foregoing","former","preceding","previous","prior"]]],"preceding",3]],"en",,[["前",[1],false,false,952,0,1,0]],[["preceding",1,[["前",952,false,false],["上",47,false,false],["前述",0,false,false],["前面",0,false,false],["上述",0,false,false]],[[0,9]],"preceding"]],,[,"precede",[10],,true],[],3]
+hongkong	香港
+	[[["香港","hongkong","Xiānggǎng",""]],,"en",,[["香港",[1],false,false,997,0,1,0]],[["hongkong",1,[["香港",997,false,false],["港",2,false,false]],[[0,8]],"hongkong"]],,["<b><i>hong kong</i></b>","hong kong",[1]],[["de","id","nl","en"]],18]
