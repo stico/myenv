@@ -263,8 +263,13 @@ function func_vi_conditional {
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then				# non-cygwin env: original path style + front job. 
 
 		# use simple version
-		[ -z "$DISPLAY" ] && (command -v vim &> /dev/null) && \vim "$@"
-		[ -z "$DISPLAY" ] && (! command -v vim &> /dev/null) && \vi "$@"
+		if [ -z "$DISPLAY" ] ;then
+			if (command -v vim &> /dev/null) ; then
+				\vim "$@"
+			else
+				\vi "$@"
+			fi
+		fi
 
 		# use GUI version with SIGNLE_VIM
 		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
