@@ -260,18 +260,18 @@ function func_find {
 }
 
 function func_vi_conditional {
-	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
-		# non-cygwin env: original path style + front job. 
+	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then				# non-cygwin env: original path style + front job. 
 
-		# use gvim when GUI running and gvim available, otherwise vim if available, otherwise vi
-		[ -n "$DISPLAY" ] && (command -v gvim &> /dev/null) && vi_cmd=gvim 
-		[ -z "$vi_cmd" ] && (command -v vim &> /dev/null) && vi_cmd=vim
-		[ -z "$vi_cmd" ] && vi_cmd=vi
+		# use simple version
+		[ -z "$DISPLAY" ] && (command -v vim &> /dev/null) && \vim "$@"
+		[ -z "$DISPLAY" ] && (! command -v vim &> /dev/null) && \vi "$@"
 
+		# use GUI version with SIGNLE_VIM
 		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
 		# note: seems in ubuntu gui, not need "&" to make it background job
 		#$vi_cmd "$@"
-		$vi_cmd --version | grep -q '+clientserver' && $vi_cmd --servername SINGLE_VIM --remote-tab "$@" || $vi_cmd "$@"
+		[ -n "$DISPLAY" ] && (command -v gvim &> /dev/null) && vi_cmd=gvim 
+		$vi_cmd --version | \grep -q '+clientserver' && $vi_cmd --servername SINGLE_VIM --remote-tab "$@" || $vi_cmd "$@"
 		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
 	else
 		# cygwin env: win style path + background job
