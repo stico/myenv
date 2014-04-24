@@ -366,11 +366,6 @@ command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
 command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
 
-"""""""""""""""""""""""""""""" H1 - Mapping - FileType based mapping
-autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
-autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
-autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"
-autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
 "TODO: restore mapping: 
 "	redir => oldcrmap
 "	map <CR>
@@ -495,6 +490,37 @@ augroup DimInactiveWindows
   au WinEnter * set cursorline
   au WinLeave * set nocursorline
 augroup END
+
+"""""""""""""""""""""""""""""" H1 - Mapping - FileType based mapping
+function! NoteOutline()
+	call setloclist(0, [])
+	let save_cursor = getpos(".")
+
+	call cursor(1, 1)
+	let flags = 'cW'
+	let file = expand('%')
+	"while search("^\t*[^ \t]\+$", flags) > 0					" NOT work, why?
+	"while search("^\t*[^ \t][^ \t]*$", flags) > 0					" works, but all Chinese becomes outline
+	while search("^\t*[-a-z0-9_\.][-a-z0-9_\.]*[\t ]*$", flags) > 0			" works, but a bit strict
+		let flags = 'W'
+		let title = substitute(getline('.'), '[ \t]*$', '', '')			" remove trailing blanks
+		let titleToShow = substitute(title, '\t', '....', 'g')			" quickfix window removes any preceding blanks
+		let msg = printf('%s:%d:%s', file, line('.'), titleToShow)
+		laddexpr msg
+	endwhile
+
+	call setpos('.', save_cursor)
+	vertical lopen
+	vertical resize 30
+	set conceallevel=2 concealcursor=nc
+	syntax match qfFileName /^.*| / transparent conceal			" plus line above, hide the filename and line number in quickfix window, not sure how it works yet.
+	"syntax match qfFileName /^[^|]*/ transparent conceal
+endfunction
+nnoremap <silent> mo :<C-U>call NoteOutline()<CR>
+autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
+autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
+autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"
+autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  
