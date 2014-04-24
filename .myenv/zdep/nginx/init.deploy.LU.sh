@@ -38,9 +38,9 @@ cp $nginx_conf_mime $conf
 cp $nginx_conf_fcgi $conf
 cp -R $nginx_html $base
 sed -i -e "/#error_log\s\+.*.log;/s/#//" $base/conf/nginx.conf 
-sed -i -e "s=#pid\s\+.*=pid `basename ${pidfile}`;=" $base/conf/nginx.conf 
 sed -i -e "s=\(^[^#]*listen\s\+\)80\s*=\1$port=" $base/conf/nginx.conf 
 sed -i -e '/log_format\s*main/,/;$/s/^\(\s*\)#/\1/' $base/conf/nginx.conf 
+sed -i -e "s=#pid\s\+.*=pid `basename ${pidfile}`;=" $base/conf/nginx.conf 
 sed -i -e "/^[^#]*listen\s\+/,/access_log/s=#access_log\s\+.*=access_log $log_access main;=" $base/conf/nginx.conf 
 
 # Prepare
