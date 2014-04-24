@@ -266,9 +266,12 @@ function func_vi_conditional {
 		if [ -z "$DISPLAY" ] ;then
 			if (command -v vim &> /dev/null) ; then
 				\vim "$@"
+				return 0
 			else
 				\vi "$@"
+				return 0
 			fi
+			return 0
 		fi
 
 		# use GUI version with SIGNLE_VIM
