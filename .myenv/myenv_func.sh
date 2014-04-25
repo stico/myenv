@@ -544,8 +544,8 @@ function deprecated_func_gen_grep_pattern_str {
 function func_collect_files {
 	func_param_check 5 "Usage: $FUNCNAME [target_base] [source_bases] [source_quick_link] [include_patterns] [exclude_patterns]" "$@"
 
-	# TODO: migration: update file path in vimrc and xkeybindings
 	# TODO: make it optional: backup original file feature
+	# TODO: remove source_quick_link
 
 	target_base="$1"
 	source_bases=$2
@@ -556,56 +556,46 @@ function func_collect_files {
 	target_collection_content=$target_base/collection_content.txt
 	target_original_files=/tmp/original_files_$(basename $target_base)
 
-	# clean up old things
-	[ -e "$target_base" ] && rm -rf "$target_base"
-
 	# create patterns for grep cmd
 	include_pattern_str=$(echo ${include_patterns[@]} | sed -e "s/\s/\|/g")
 	exclude_pattern_str=$(echo ${exclude_patterns[@]} | sed -e "s/\s/\|/g")
 
-	# init target dir, gen file lists
-	func_mkdir_cd "$target_base"
-	for tag in ${source_bases[@]}
-	do
+	echo "INFO: cleanup old target, path: ${target_base}"
+	[ -e "${target_base}" ] && rm -rf "${target_base}"
+
+	echo "INFO: generate target file lists for tags: ${source_bases[@]}"
+	func_mkdir_cd "${target_base}"
+	for tag in ${source_bases[@]} ; do
 		#func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
 		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -maxdepth 5 -type f
-		#echo "$include_pattern_str"
-		#echo "$exclude_pattern_str"
 		egrep -i "$include_pattern_str" fl_${tag}.txt | egrep -v -i "$exclude_pattern_str" >> ${target_collection_fl}
 	done
 
-	echo "INFO: start to Collect and backup original file"
+	echo "INFO: collect and backup original file"
 	mkdir $target_original_files
 	[ -n "$source_quick_link" ] && sed -e "" "$source_quick_link" >> ${target_collection_content}
-
 	count=0
 	while read line
 	do
 		source_path="$(func_eval "$line")"
+		func_validate_file_type_text "$source_path" || continue					# won't collect non-text file
 		[ -d "$source_path" ] && echo -e "INFO: skipping dir: $line" && continue
 
-		# backup original files, need udpate file name to avoid name confliction
-		target_file=$(echo "$line" | sed -e 's+/\|:+@+g;s+\$\| \|\(\|\)\|（\|）\|&++g')
+		target_file=$(echo "$source_path" | sed -e 's+/\|:+@+g;s+\$\| \|\(\|\)\|（\|）\|&++g')	# avoid name confliction
 		cp "$source_path" "$target_original_files/$target_file" 
 
-		# won't collect non-text file
-		func_validate_file_type_text "$line" || continue
-
-		# Collect files
-		#if [ -z "${line##*.txt}" ] ; then 
-			echo -e "\n\n>>> $line\n\n"	>> ${target_collection_content}
-			sed -e "s///" "$source_path"	>> ${target_collection_content}
-		#fi
+		echo -e "\n\n>>> $line\n\n"	>> ${target_collection_content}
+		sed -e "s///" "$source_path"	>> ${target_collection_content}
 		
 		count=$(($count + 1)) && [ $(($count % 100)) -eq 0 ] && echo "INFO: collected $count files"
 	done < ${target_collection_fl}
 	echo "INFO: collected $count files"
 
-	# append all file list in the end
+	echo "INFO: append all file lists in collection content"
 	echo -e "\n\n>>> File list of ${source_bases[@]} \n\n" >> ${target_collection_content}
 	cat fl_*.txt >> ${target_collection_content}
 
-	# backup collection
+	echo "INFO: backup collected original files"
 	func_backup_dated "$target_original_files" 
 	rm -rf "$target_original_files"
 
@@ -615,7 +605,7 @@ function func_collect_files {
 
 function func_collect_code {
 	target_base=$MY_ENV/zgen/collection_code
-	source_bases=(dw repo)
+	source_bases=(dw ourepo oumisc)
 	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
@@ -626,8 +616,6 @@ function func_collect_code {
 }
 
 function func_collect_note {
-
-	# TODO: the output file is not utf8?
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
 
 	target_base=$MY_ENV/zgen/collection_note
