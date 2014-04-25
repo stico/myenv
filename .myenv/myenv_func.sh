@@ -564,7 +564,8 @@ function func_collect_files {
 	[ -e "${target_base}" ] && rm -rf "${target_base}"
 
 	echo "INFO: generate target file lists for tags: ${source_bases[@]}"
-	func_mkdir_cd "${target_base}"
+	mkdir -p "${target_base}"
+	pushd "${target_base}"
 	for tag in ${source_bases[@]} ; do
 		#func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
 		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -maxdepth 5 -type f
@@ -587,7 +588,8 @@ function func_collect_files {
 		echo -e "\n\n>>> $line\n\n"	>> ${target_collection_content}
 		sed -e "s///" "$source_path"	>> ${target_collection_content}
 		
-		count=$(($count + 1)) && [ $(($count % 100)) -eq 0 ] && echo "INFO: collected $count files"
+		#count=$(($count + 1)) && [ $(($count % 100)) -eq 0 ] && echo "INFO: collected $count files"
+		count=$(($count + 1)) && (($count%100==0)) && echo "INFO: collected $count files"
 	done < ${target_collection_fl}
 	echo "INFO: collected $count files"
 
@@ -601,6 +603,7 @@ function func_collect_files {
 
 	func_cleanup_dotcache $MY_ENV $MY_ENV_ZGEN
 	\cd - > /dev/null
+	popd
 }
 
 function func_collect_code {
@@ -615,6 +618,18 @@ function func_collect_code {
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
 }
 
+function func_collect_note_link() {
+	count=1 
+	for d in $HOME/Documents/DCC/A_NOTE $HOME/Documents/DCO/A_NOTE ; do
+		for f in $d/* ; do  
+			ff=${f##*/} 
+			printf "%-18s" ${ff%.txt}
+			count=$(($count+1)) && (($count%5==0)) && printf "\n" 
+		done
+	done
+	printf "\n\n\n" 
+}
+
 function func_collect_note {
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
 
@@ -626,6 +641,12 @@ function func_collect_note {
 	include_patterns=(/\([^/]*\)/\\1.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
 	exclude_patterns=(.rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash A_NOTE_Copy.txt)
 	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+
+	std_note=$(func_collect_note_link)
+	mv $target_base/collection_content.txt{,.bak}
+	echo "${std_note}" >> $target_base/collection_content.txt
+	echo -e "\n\n" >> $target_base/collection_content.txt
+	cat $target_base/collection_content.txt.bak >> $target_base/collection_content.txt
 }
 
 function func_repeat {
