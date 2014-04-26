@@ -2,6 +2,7 @@
 
 # source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 
+[ -z "$ZBOX" ]			&& ZBOX=$HOME/.zbox
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
 [ -z "$MY_ENV" ]		&& MY_ENV=$HOME/.myenv
@@ -14,6 +15,12 @@
 [ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
 [ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
 [ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
+
+[ -z "$ME_TAGS_ADDI" ]		&& ME_TAGS_ADDI=$MY_ENV/list/tags_addi
+[ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/list/tags_note
+[ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/list/tags_code
+[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DOC/DCC/A_NOTE $MY_DOC/DCO/A_NOTE)
+[ -z "$ME_CODE_ROOTS" ]		&& ME_CODE_ROOTS=($ZBOX/src/oumisc/oumisc-git)
 
 source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
@@ -84,48 +91,28 @@ function func_cleanup_dotcache() {
 	done
 }
 
-function func_tag_value_raw {
-	tags=$MY_ENV_LIST/tags
-	sed -n -e "s+^${1}=++p" $tags
+function func_tag_value_raw() {
+	sed -n -e "s+^${1}=++p" "${ME_TAGS_ADDI}" "${ME_NOTE_TAGS}" "${ME_CODE_TAGS}"
 }
 
-function func_tag_value {
-	#desc="Desc: translate a tag value, or return itself if not a tag"
-	#usage="Usage: $FUNCNAME [filename]"
-	#[ $# -lt 1 ] && echo -e "${desc}\n${usage}" && exit 1
-
-	# NO translation, empty parameter, empty output
-	[ -z "$*" ] && return 1
-
-	# NO translation, probably path, translate will also cause problem
-	[ "$*" = "." -o "$*" = ".." ] && echo $* && return 0
-
-	# NO translation, contain no-tag char
-	[ $(echo "$*" | grep -c "/\| ") -ge 1 ] && echo $* && return 0
+function func_tag_value() {
+	[ -z "$*" ] && return 1						# NO translation, empty parameter, empty output
+	[ "$*" = "." -o "$*" = ".." ] && echo $* && return 0		# NO translation, probably path, translate will also cause problem
+	[ $(echo "$*" | grep -c "/\| ") -ge 1 ] && echo $* && return 0	# NO translation, contain no-tag char
 
 	tag_value_raw="$(func_tag_value_raw ${1})"
-
-	# not a tag, return itself
-	[ -z "$tag_value_raw" ] && echo $1 && return 0
-
-	# eval
-	func_eval $tag_value_raw
+	[ -z "$tag_value_raw" ] && echo $1 && return 0			# not a tag, return itself
+	func_eval $tag_value_raw					# eval
 }
 
-function func_eval {
+function func_eval() {
 	func_param_check 1 "USAGE: $FUNCNAME <tag>" "$@"
 
-	tag=$*
-
-	# eval value if contains var or cmd substitution, otherwise return itself
-	if [ $(echo $tag | grep -c '`\|$') -ge 1 ] ; then
-		eval echo $tag
-	else
-		echo $tag
-	fi
+	# eval if contains var or cmd, otherwise return itself
+	echo "$*" | grep -q '`\|$' &> /dev/null && eval echo $* || echo $*
 }
 
-function func_eval_path {
+function func_eval_path() {
 	func_param_check 2 "Usage: $FUNCNAME <result_var_name> <pathstr>" "$@"
 
 	# need use variable to "return" result
@@ -143,7 +130,45 @@ function func_eval_path {
 	[ -e "$candidate" ] && eval $result_var_name="$candidate" && return 0
 }
 
-function func_select_line {
+function func_std_gen_tags() {
+	func_delete_dated "${ME_NOTE_TAGS}"
+	local d=""
+	for d in ${ME_NOTE_ROOTS[@]} ; do
+		local note_file=""
+		for note_file in $(find "${d}/.." -maxdepth 3 -regex ".*/\(.*\)/\1.txt") ; do
+			local note_filename="${note_file##*/}"
+			echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
+		done
+	done
+
+	func_delete_dated "${ME_CODE_TAGS}"
+	local d=""
+	for d in ${ME_CODE_ROOTS[@]} ; do
+		local dd=""
+		for dd in ${d}/* ; do
+			echo "${dd##*/}=${dd}" >> "${ME_CODE_TAGS}"
+		done
+	done
+}
+
+function func_std_standarize() {
+	# STD 1: if there is dir and note have same name, there should be a link
+	local d=""
+	for d in ${ME_NOTE_ROOTS[@]} ; do
+		local note_file=""
+		for note_file in ${d}/* ; do
+			local note_filename="${note_file##*/}"
+			local note_basepath="${d}/../${note_filename%.txt}"
+			if [ -d "${note_basepath}" ] && [ ! -f "${note_basepath}/${note_filename}" ] ; then
+				\cd "${note_basepath}" &> /dev/null
+				ln -s "../A_NOTE/${note_filename}" .
+				\cd - &> /dev/null
+			fi
+		done
+	done
+}
+
+function func_select_line() {
 	func_param_check 3 "Usage: $FUNCNAME <result_var_name> <shortest|userselect> <lines>" "$@"
 
 	# need use variable to "return" result
@@ -169,7 +194,7 @@ function func_select_line {
 	eval $result_var_name=$user_selection
 }
 
-function func_log {
+function func_log() {
 	func_param_check 4 "Usage: $FUNCNAME <level> <prefix> <log_path> <str>" "$@"
 
 	local level="$1"
@@ -323,27 +348,6 @@ function func_load_rvm {
 	export PS1="(RVM) ${PS1}"
 }
 
-function func_cd_conditional {
-	# shortcut - home
-	[ -z "$*" ] && \cd && return 0
-
-	# shortcut - last dir
-	if [ "-" = "$*" ] ; then
-		\cd - 
-		# TODO: (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
-		[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd .
-		return 0
-	fi
-
-	# TODO: (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
-	# use rvm's cd function if needed (note, the func_rvm_cd is hacked in .bashrc
-	[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
-
-	# otherwise just cd, use "\cd" to avoid infinite loop, since cd is hacked
-	\cd "$*"
-	func_head_cmd 30 ls
-}
-
 function func_vi {
 	# shortcut - open a new one
 	[ -z "$*" ] && func_vi_conditional && return 0
@@ -366,30 +370,35 @@ function func_vi {
 }
 
 function func_cd_tag {
-	# TODO: seem using "../paygat" will fail, possbile to make it work?
+	# Shortcut
+	[ -z "$*" ]     && func_cd_ls    && return 0	# home
+	[ "-"  = "$*" ] && func_cd_ls -  && return 0	# last dir
+	[ ".." = "$*" ] && func_cd_ls .. && return 0	# parent dir
+	[ "."  = "$*" ] && func_cd_ls .  && return 0	# current dir
 
-	# shortcut - home
-	[ -z "$*" -o "-" = "$*" ] && func_cd_conditional "$*" && return 0
+	# Try tag eval, use its dir if it is a file
+	local base="$(func_tag_value ${1})"
+	[ -f "${base}" ] && base="$(dirname ${base})"
 
-	# shortcut - only one parameter, and exist in current dir
-	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_conditional "${1}" && return 0
+	# Single parameter
+	[ $# -eq 1 ] && [ -d "${base}" ] && func_cd_ls "${base}" && return 0	# goto dir
+	[ $# -eq 1 ] && echo "ERROR: ${base} not exist!"  && return 1		# Path NOT exist
 
-	# shortcut - start with dot (.)
-	[ $# -eq 1 ] && (echo "${1}" | grep -q "^\.") && func_cd_conditional "${1}" && return 0
-
-	# shortcut - only one parameter, and exist
-	tag_eval="`func_tag_value $1`"
-	[ $# -eq 1 ] && [ ! -d $tag_eval ] && echo "ERROR: tag ($1) found, but value ($tag_eval) not directory" && return 0
-	[ $# -eq 1 ] && [ -d $tag_eval ] && func_cd_conditional $tag_eval && return 0
-
-	# otherwise need search
-	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
-
-	# Find target, If cache version return error, try no-cache version
+	# Search: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
+	[ -d "${base}" ] && shift || base="./"
 	func_find_dotcache result_target d $base $* || func_find result_target d $base $*
+	func_cd_ls "${base}/${result_target}"
+}
 
-	[ ! -e $base/$result_target ] && echo "ERROR: $base/$result_target not exist!"
-	[ -d $base/$result_target ] && func_cd_conditional $base/$result_target || func_cd_conditional `dirname $base/$result_target`
+function func_cd_ls() {
+	# Old rvm support
+	# (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
+	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd .
+	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
+
+	[ -z "$*" ] && \cd || \cd "$*"
+	#\ls -lhF --color=auto
+	\ls -hF --color=auto
 }
 
 function func_ls { 
@@ -425,7 +434,7 @@ function func_ls {
 	#find $base $search 
 }
 
-function func_head_cmd {
+function func_head_cmd() {
 	func_param_check 2 "Usage: $FUNCNAME [show_lines] [cmd]" "$@"
 
 	show_lines=$1
@@ -435,7 +444,7 @@ function func_head_cmd {
 	func_head $show_lines "$cmd_result"
 }
 
-function func_gen_filedirlist {
+function func_gen_filedirlist() {
 	# TODO: make a conversion of $type+l_me.txt ?
 	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
 	func_param_check 3 "Usage: $FUNCNAME [base] [listfile] [find_options]" "$@"
@@ -1154,7 +1163,7 @@ function func_delete_dated {
 	targetDir=$MY_TMP/`func_date`
 
 	[[ ! -e $targetDir ]] && mkdir $targetDir
-	mv "$@" $targetDir
+	mv "$@" $targetDir &> /dev/null
 }
 
 function func_backup_dated { 
