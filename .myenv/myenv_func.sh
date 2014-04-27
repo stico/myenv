@@ -1262,34 +1262,50 @@ function func_backup_listed {
 	#$MY_ENV/util/listed_backup.sh
 }
 
-function func_run_file_java {
-	file=$1
-	file_name=`basename $file`
-	tmp_dir=$(func_tag_value tt)/$(func_time)
+function func_run_file_c() {
+	local file="$(readlink -f ${1})"
+	local file_name="$(basename $1)"
+	local tmp_dir="/tmp/vim_f11_c_$(func_dati)/"
 
-	cp -f $file $tmp_dir || return 1
-	func_cd $tmp_dir &> /dev/null
-	rm ${file_name/.java/.class} &> /dev/null
-	javac $file_name
-	java -cp . ${file_name%.java}
+	mkdir "${tmp_dir}" &> /dev/null	|| func_die "ERROR: failed to mkdir: ${tmp_dir}"
+	cp -f "${file}" "${tmp_dir}" || func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${tmp_dir}"
+	\cd ${tmp_dir} &> /dev/null  || func_die "ERROR: failed to change dir to: ${tmp_dir}"
+
+	gcc -o "${file_name%.c}" "${file_name}"
+	./"${file_name%.c}"
+	\cd - &> /dev/null
 }
 
-function func_run_file {
+function func_run_file_java() {
+	local file="$(readlink -f ${1})"
+	local file_name="$(basename $1)"
+	local tmp_dir="/tmp/vim_f11_java_$(func_dati)/"
+
+	mkdir "${tmp_dir}" &> /dev/null	|| func_die "ERROR: failed to mkdir: ${tmp_dir}"
+	cp -f "${file}" "${tmp_dir}"	|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${tmp_dir}"
+	\cd "${tmp_dir}" &> /dev/null	|| func_die "ERROR: failed to change dir to: ${tmp_dir}"
+
+	javac ${file_name}
+	java -cp . ${file_name%.java}
+	\cd - &> /dev/null
+}
+
+function func_run_file() {
 	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 	
 	file=$1
 	[ ! -e "$file" ] && echo "ERROR: $file not exist!" && return 1
 
-	if [[ "$file" = *.java ]] ; then
-		func_run_file_java $file 
-	elif [[ "$file" = *.rb ]] ; then	ruby $file;
-	elif [[ "$file" = *.sh ]] ; then	bash $file;
-	elif [[ "$file" = *.py ]] ; then	python $file;
-	elif [[ "$file" = *.php ]] ; then	php $file;
-	elif [[ "$file" = *.bat ]] ; then	cmd $file;
-	elif [[ "$file" = *.exe ]] ; then	cmd $file;
+	if [[ "$file" = *.c ]] ; then		func_run_file_c $file
+	elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
+	elif [[ "$file" = *.rb ]] ; then	ruby $file
+	elif [[ "$file" = *.sh ]] ; then	bash $file
+	elif [[ "$file" = *.py ]] ; then	python $file
+	elif [[ "$file" = *.php ]] ; then	php $file
+	elif [[ "$file" = *.bat ]] ; then	cmd $file
+	elif [[ "$file" = *.exe ]] ; then	cmd $file
+	elif [[ "$file" = *.groovy ]] ; then	groovy $file
 	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File ${file//\\/\/}
-	elif [[ "$file" = *.groovy ]] ; then	groovy $file;
 	else
 		echo "ERROR: can not run file $file !"
 	fi
