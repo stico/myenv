@@ -17,8 +17,8 @@
 [ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
 
 [ -z "$ME_TAGS_ADDI" ]		&& ME_TAGS_ADDI=$MY_ENV/list/tags_addi
-[ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/list/tags_note
-[ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/list/tags_code
+[ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/zgen/tags_note
+[ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/zgen/tags_code
 [ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DOC/DCC/A_NOTE $MY_DOC/DCO/A_NOTE)
 [ -z "$ME_CODE_ROOTS" ]		&& ME_CODE_ROOTS=($ZBOX/src/oumisc/oumisc-git)
 
@@ -132,30 +132,35 @@ function func_eval_path() {
 
 function func_std_gen_tags() {
 	func_delete_dated "${ME_NOTE_TAGS}"
-	local d=""
+	local d dd note_file note_filename
 	for d in ${ME_NOTE_ROOTS[@]} ; do
-		local note_file=""
-		for note_file in $(find "${d}/.." -maxdepth 3 -regex ".*/\(.*\)/\1.txt") ; do
+		for note_file in ${d}/*.txt ; do
 			local note_filename="${note_file##*/}"
-			echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
+			local note_linkpath="${d}/../${note_filename%.txt}/${note_filename}"
+			if [ -e "${note_linkpath}" ] ; then
+				echo "${note_filename%.txt}=${note_linkpath}" >> "${ME_NOTE_TAGS}"
+			else
+				echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
+			fi
 		done
+		#for note_file in $(find "${d}/.." -maxdepth 3 -regex ".*/\(.*\)/\1.txt") ; do
+		#	local note_filename="${note_file##*/}"
+		#	echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
+		#done
 	done
 
 	func_delete_dated "${ME_CODE_TAGS}"
-	local d=""
 	for d in ${ME_CODE_ROOTS[@]} ; do
-		local dd=""
 		for dd in ${d}/* ; do
 			echo "${dd##*/}=${dd}" >> "${ME_CODE_TAGS}"
 		done
 	done
 }
 
-function func_std_standarize() {
+function func_std_gen_links() {
 	# STD 1: if there is dir and note have same name, there should be a link
-	local d=""
+	local d note_file
 	for d in ${ME_NOTE_ROOTS[@]} ; do
-		local note_file=""
 		for note_file in ${d}/* ; do
 			local note_filename="${note_file##*/}"
 			local note_basepath="${d}/../${note_filename%.txt}"
@@ -166,6 +171,11 @@ function func_std_standarize() {
 			fi
 		done
 	done
+}
+
+function func_std_standarize() {
+	func_std_gen_links
+	func_std_gen_tags
 }
 
 function func_select_line() {
