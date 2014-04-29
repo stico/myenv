@@ -92,7 +92,7 @@ function func_cleanup_dotcache() {
 }
 
 function func_tag_value_raw() {
-	sed -n -e "s+^${1}=++p" "${ME_TAGS_ADDI}" "${ME_NOTE_TAGS}" "${ME_CODE_TAGS}"
+	sed -n -e "s+^${1}=++p" "${ME_TAGS_ADDI}" "${ME_NOTE_TAGS}" "${ME_CODE_TAGS}" | head -1
 }
 
 function func_tag_value() {

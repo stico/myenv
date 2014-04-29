@@ -504,14 +504,18 @@ function! NoteOutline()
 	while search("^\t*[-a-z0-9_\.][-a-z0-9_\.]*[\t ]*$", flags) > 0			" works, but a bit strict
 		let flags = 'W'
 		let title = substitute(getline('.'), '[ \t]*$', '', '')			" remove trailing blanks
-		let titleToShow = substitute(title, '\t', '....', 'g')			" quickfix window removes any preceding blanks
+		let titleToShow = substitute(title, '\t', '........', 'g')		" quickfix window removes any preceding blanks
+		if titleToShow !~ "^\\." 
+			let blank = printf('%s:%d:%s', file, line('.'), "  ")
+			laddexpr blank
+		endif
 		let msg = printf('%s:%d:%s', file, line('.'), titleToShow)
 		laddexpr msg
 	endwhile
 
 	call setpos('.', save_cursor)
 	vertical lopen
-	vertical resize 30
+	vertical resize 40
 	set conceallevel=2 concealcursor=nc
 	syntax match qfFileName /^.*| / transparent conceal			" plus line above, hide the filename and line number in quickfix window, not sure how it works yet.
 	"syntax match qfFileName /^[^|]*/ transparent conceal

@@ -1,8 +1,7 @@
-# Global
+# Misc
+dw=$MY_FCZ/code_dw
 me=$MY_ENV
 env=$MY_ENV
-pro=$MY_PRO
-dev=$MY_DEV
 data=$HOME/data
 
 # MY_TMP
@@ -11,28 +10,18 @@ tmp=$MY_TMP
 st=$MY_TMP/stage1
 dl=$MY_TMP/download
 
-# MY_DEV
-dw=$MY_FCZ/code_dw
-stage=$MY_DEV/code_stage
-
 # ZBOX
 zb=$ZBOX
 zbox=$ZBOX
+cnf=$ZBOX/cnf
 ins=$ZBOX/ins
 src=$ZBOX/src
+stg=$ZBOX/stg
+misc=$ZBOX/src/oumisc/oumisc-git
 oumisc=$ZBOX/src/oumisc/oumisc-git
-
-# Source code
 ourepo=~/.zbox/src/ourepo/ourepo-git
 oublog=~/.zbox/src/oublog/oublog-git
 outest=~/.zbox/src/outest/outest-local
-php=~/.zbox/src/myrepo/myrepo-git/php
-py=~/.zbox/src/myrepo/myrepo-git/python
-java=~/.zbox/src/myrepo/myrepo-git/java
-ruby=~/.zbox/src/myrepo/myrepo-git/ruby
-groovy=~/.zbox/src/myrepo/myrepo-git/groovy
-tsd=~/.zbox/src/myrepo/myrepo-git/python/tshield
-tshield=~/.zbox/src/myrepo/myrepo-git/python/tshield
 
 # MY_DOC
 doc=$MY_DOC
