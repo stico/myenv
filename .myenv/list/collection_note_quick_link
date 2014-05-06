@@ -8,7 +8,6 @@ $MY_DOC/DCC/OS_LU_A/A_NOTE_LU.txt
 $MY_DOC/DCC/OS_LU_A_Tool_A/A_NOTE_LU_Tool.txt
 $MY_DOC/DCC/OS_LU_A_Tool_Shell/A_NOTE_Bash.txt
 $MY_DOC/DCC/OS_LU_LinuxMint/A_NOTE_LinuxMint.txt
-$MY_DOC/DCC/OS_LU_Ubuntu/A_NOTE_Ubuntu.txt
 $MY_DOC/DCC/Storage_DB_SQL/A_NOTE_SQL.txt
 $MY_DOC/DCC/Storage_DB_Mysql/A_NOTE_MySql.txt
 $MY_DOC/DCB/Software/A_NOTE_Software.txt
@@ -17,7 +16,6 @@ $MY_DOC/DCC/OS_Win/A_NOTE_Win.txt
 C:/WINDOWS/system32/drivers/etc/hosts
 $MY_ENV/conf/ahk/mysettings.ahk
 $MY_ENV/conf/ahk/myhotstring.ahk
-$MY_DOC/DCC/A_NOTE_DCC.txt
 $MY_DOC/DCC/Business_Net_Pay/A_NOTE_Pay.txt
 $MY_DOC/DCB/Record/Note/A_NOTE_Schedule.txt
 $MY_DOC/DCB/Record/Note/A_NOTE_Schedule_History.txt
@@ -25,22 +23,6 @@ $MY_DOC/DCC/Programming_Java/A_NOTE_Java.txt
 $MY_DOC/DCC/Programming_Java_Spring/A_NOTE_Spring.txt
 $MY_DEV/a_workspaces/A_Project.lst
 $MY_DOC/DCC/Design_UML/A_NOTE_UML.txt
-
-##################################### DCC ######################################
-java		tomcat		eclipse		maven		nexus-maven
-php		svn		git		wink		foxit	
-c		symbian		tex		tool
-python		vim		osx		pdf		skim
-cassandra	disruptor	markdown	statsd		zookeeper
-confluence	django		flash		memcached	mercurial (hg)
-zbox		mybatis		logstash	graphviz	elasticsearch
-ftp		json		statsd		jenkins		clearcase
-graphite	samba		lua		nodejs		actionscript
-tdd		jsp		jetty		resin		hibernate
-netty		font		suse		linuxmint	cygwin
-
-##################################### DCO ######################################
-activity	baby		zzjj
 
 E:/Documents/DCB/Record/Z/A_NOTE_Investigation.txt
 $MY_DOC/DCE/SIG/P532_VerizonPrivacy_UpdateAndTRFix/A_NOTE_VerizonPrivacyUpdate.txt

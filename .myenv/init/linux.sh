@@ -14,11 +14,11 @@ tmp_init_log=${tmp_init_dir}/init.log
 # Source & Prepare
 umask 077
 mkdir -p ${tmp_init_dir}
-source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
+source $HOME/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 
 # Function
 function func_pre_check() {
-	func_log_echo "${tmp_init_log}" "INFO: pre condition check"
+	echo "INFO: pre condition check"
 
 	# Check username
 	[ "$(whoami)" != "ouyangzhu" ] && func_log_die "${tmp_init_log}" "ERROR: username must be 'ouyangzhu'!" 
@@ -40,7 +40,7 @@ function func_pre_check() {
 }
 
 function func_init_dirs() {
-	func_log_echo "${tmp_init_log}" "INFO: pre condition check"
+	echo "INFO: pre condition check"
 
 	mkdir -p ~/amp/{download,delete}
 }
@@ -51,26 +51,26 @@ function func_init_link() {
 	local source_path="$2"
 
 	# check existence
-	[ ! -e ${source_path} ] && func_log_echo "${tmp_init_log}" "WARN: ${source_path} NOT exist, skip" && return 0
-	[ -h "${target_path}" ] && func_log_echo "${tmp_init_log}" "INFO: ${target_path} (link) already exist, skip" && return 0
+	[ ! -e ${source_path} ] && echo "WARN: ${source_path} NOT exist, skip" && return 0
+	[ -h "${target_path}" ] && echo "INFO: ${target_path} (link) already exist, skip" && return 0
 
 	# if target is an empty dir, will replace it
 	[ -d "${target_path}" ] && (( `ls ${target_path} 2> /dev/null | wc -l` == 0 )) && rmdir "${target_path}"
 
-	func_log_echo "${tmp_init_log}" "INFO: creating link ${target_path} --> ${source_path}"
+	echo "INFO: creating link ${target_path} --> ${source_path}"
 	ln -s "${source_path}" "${target_path}"
 }
 
 function func_init_links() {
-	func_log_echo "${tmp_init_log}" "INFO: init links"
+	echo "INFO: init links"
 
 	func_init_link ${HOME}/.m2              /ext/Documents/FCS/maven/m2_repo
 	func_init_link ${HOME}/Documents        /ext/Documents
 }
 
 function func_init_myenv() {
-	func_log_echo "${tmp_init_log}" "INFO: init myenv"
-	[ -e "${HOME}/.myenv" -a -e "{HOME}/.ssh" ] && func_log_echo "${tmp_init_log}" "INFO: ~/.myenv already exist, skip" && return 0
+	echo "INFO: init myenv"
+	[ -e "${HOME}/.myenv" -a -e "{HOME}/.ssh" ] && echo "INFO: ~/.myenv already exist, skip" && return 0
 
 	if [ -e "${MY_ENV}/init/myenv.sh" ] ; then
 		bash "${MY_ENV}/init/myenv.sh" 
@@ -83,8 +83,8 @@ function func_init_myenv() {
 }
 
 function func_init_sudoer() {
-	func_log_echo "${tmp_init_log}" "INFO: update /etc/sudoers"
-	sudo grep "sudo.*NOPASSWD:" /etc/sudoers &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: /etc/sudoers already updated, skip" && return 0
+	echo "INFO: update /etc/sudoers"
+	sudo grep "sudo.*NOPASSWD:" /etc/sudoers &> /dev/null && echo "INFO: /etc/sudoers already updated, skip" && return 0
 
 	func_bak_file /etc/sudoers
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' /etc/sudoers
@@ -92,17 +92,17 @@ function func_init_sudoer() {
 
 function func_init_apt_config() {
 	local src_files=( /etc/apt/sources.list /etc/apt/sources.list.d/official-package-repositories.list )
-	func_log_echo "${tmp_init_log}" "INFO: apt config update, files: ${src_files}"
+	echo "INFO: apt config update, files: ${src_files}"
 
 	# Update source mirror for speed
 	local need_update="no"
 	local mirror_addr=mirrors.163.com		# another candidate (in China, also 163's): http://ubuntu.cn99.com/ubuntu
 	for src_file in "${src_files[@]}"; do 
-		grep "${mirror_addr}" "${src_file}" &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: ${src_file} already updated, skip" && continue
-		( ! sudo grep "^[^#]*ubuntu.com" "${src_file}" ) &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: ${src_file} NOT need updated, skip" && continue
+		grep "${mirror_addr}" "${src_file}" &> /dev/null && echo "INFO: ${src_file} already updated, skip" && continue
+		( ! sudo grep "^[^#]*ubuntu.com" "${src_file}" ) &> /dev/null && echo "INFO: ${src_file} NOT need updated, skip" && continue
 
 		func_bak_file "${src_file}" 
-		func_log_echo "${tmp_init_log}" "INFO: update ${src_file} with mirror: ${mirror_addr}"
+		echo "INFO: update ${src_file} with mirror: ${mirror_addr}"
 		#sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/${mirror_addr}/" ${src_file}	# reserve original source
 		sudo sed -i -e "s/[^\/]*\.ubuntu\.com/${mirror_addr}/" ${src_file}			# replace original source
 		need_update="yes"
@@ -111,22 +111,22 @@ function func_init_apt_config() {
 }
 
 function func_init_apt_distupgrade() {
-	func_log_echo "${tmp_init_log}" "INFO: apt dist-upgrade"
+	echo "INFO: apt dist-upgrade"
 
 	local apt_upgrade_stamp=/tmp/apt-upgrade-success-stamp
 	[ ! -e $apt_upgrade_stamp ] && touch -t 197101020304 $apt_upgrade_stamp
 
 	local last_stamp=$(( `date +%s` - `stat -c %Y ${apt_upgrade_stamp}` ))
 	if [ -e $apt_upgrade_stamp ] && (( $last_stamp > 86400 )) ; then
-		func_log_echo "${tmp_init_log}" "INFO: execute 'supdo apt-get -y dist-upgrade'"
+		echo "INFO: execute 'supdo apt-get -y dist-upgrade'"
 		sudo apt-get -y dist-upgrade &>> $tmp_init_log && touch $apt_upgrade_stamp
 	else
-		func_log_echo "${tmp_init_log}" "INFO: last update was ${last_stamp} seconds ago, skip..."
+		echo "INFO: last update was ${last_stamp} seconds ago, skip..."
 	fi
 }
 
 function func_init_apt_install_basic() {
-	func_log_echo "${tmp_init_log}" "INFO: install basic softwares"
+	echo "INFO: install basic softwares"
 
 	sudo apt-get install -y dkms				&>> $tmp_init_log	# Dynamic Kernel Module Support
 	sudo apt-get install -y aptitude			&>> $tmp_init_log
@@ -143,14 +143,14 @@ function func_init_apt_install_basic() {
 }
 
 function func_init_font() {
-	func_log_echo "${tmp_init_log}" "INFO: try to init font"
+	echo "INFO: try to init font"
 
 	local font_sys=/usr/share/fonts/fontfiles
 	local font_xhei=${font_sys}/XHei.TTC
 	local font_msyhmono=${font_sys}/MSYHMONO.ttf
 	local font_home=/ext/Documents/DCB/SoftwareConf/Font/
-	[ ! -d "${font_home}" ] && func_log_echo "${tmp_init_log}" "WARN: ${font_home} not exist, can not init font!" && return 1
-	[ -e "${font_xhei}" -a -e "${font_msyhmono}" ] && func_log_echo "${tmp_init_log}" "INFO: font already exist, skip" && return 0
+	[ ! -d "${font_home}" ] && echo "WARN: ${font_home} not exist, can not init font!" && return 1
+	[ -e "${font_xhei}" -a -e "${font_msyhmono}" ] && echo "INFO: font already exist, skip" && return 0
 
 	sudo mkdir -p ${font_sys}
 	sudo cp ${font_home}/XHei.TTC ${font_home}/MSYHMONO.ttf ${font_sys}		# xhei for vim 
@@ -167,8 +167,8 @@ function func_init_soft_ibus() {
 }
 
 function func_init_soft_terminator() { 
-	func_log_echo "${tmp_init_log}" "INFO: try to install soft terminator"
-	command -v terminator &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
+	echo "INFO: try to install soft terminator"
+	command -v terminator &> /dev/null && echo "INFO: alredy installed, skip" && return 0
 
 	sudo apt-get install -y terminator
 	mv ~/.config/terminator{,.bak.$(func_dati)}
@@ -176,8 +176,8 @@ function func_init_soft_terminator() {
 }
 
 function func_init_soft_clipit() { 
-	func_log_echo "${tmp_init_log}" "INFO: try to install soft clipit"
-	command -v clipit &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
+	echo "INFO: try to install soft clipit"
+	command -v clipit &> /dev/null && echo "INFO: alredy installed, skip" && return 0
 
 	sudo apt-get install -y clipit
 	mv ~/.config/clipit{,.bak.$(func_dati)}
@@ -185,8 +185,8 @@ function func_init_soft_clipit() {
 }
 	
 function func_init_soft_virtualbox() { 
-	func_log_echo "${tmp_init_log}" "INFO: try to install soft virtualbox"
-	[ -e /usr/bin/virtualbox ] && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
+	echo "INFO: try to install soft virtualbox"
+	[ -e /usr/bin/virtualbox ] && echo "INFO: alredy installed, skip" && return 0
 
 	if ( grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) && ( grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) ; then
 		wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
@@ -199,14 +199,14 @@ function func_init_soft_virtualbox() {
 		# for functions like USB to work correctly
 		sudo usermod -a -G vboxusers ouyangzhu
 	else
-		func_log_echo "${tmp_init_log}" "WARN: failed to install virtualbox"
+		echo "WARN: failed to install virtualbox"
 	fi
 }
 
 function func_init_soft_chrome() {
-	func_log_echo "${tmp_init_log}" "INFO: try to install soft chrome (apt-get way)"
-	command -v google-chrome           &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
-	dpkg -l | grep -i "google.*chrome" &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
+	echo "INFO: try to install soft chrome (apt-get way)"
+	command -v google-chrome           &> /dev/null && echo "INFO: alredy installed, skip" && return 0
+	dpkg -l | grep -i "google.*chrome" &> /dev/null && echo "INFO: alredy installed, skip" && return 0
 
 	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 	sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
@@ -215,9 +215,9 @@ function func_init_soft_chrome() {
 }
 
 function func_init_soft_chrome_deb() {
-	func_log_echo "${tmp_init_log}" "INFO: try to install soft chrome (.deb way)"
-	command -v google-chrome           &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
-	dpkg -l | grep -i "google.*chrome" &> /dev/null && func_log_echo "${tmp_init_log}" "INFO: alredy installed, skip" && return 0
+	echo "INFO: try to install soft chrome (.deb way)"
+	command -v google-chrome           &> /dev/null && echo "INFO: alredy installed, skip" && return 0
+	dpkg -l | grep -i "google.*chrome" &> /dev/null && echo "INFO: alredy installed, skip" && return 0
 
 	local chrome_url='https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'
 	local chrome_local=${HOME}/Documents/ECS/chrome/google-chrome-stable_current_amd64.deb
@@ -236,13 +236,13 @@ function func_init_soft_chrome_deb() {
 		sudo dpkg -i $chrome_local_bak
 		[ "$?" -ne 0 ] && sudo apt-get -f install				# if error happen, this will force to install
 	else
-		func_log_echo "${tmp_init_log}" "WARN: failed to install chrome!"
+		echo "WARN: failed to install chrome!"
 	fi
 }
 
 function func_init_os_common() {
-	func_log_echo "${tmp_init_log}" "INFO: OS specific init for common part"
-	( ! grep "DISTRIB_CODENAME=\(saucy\|olivia\)" /etc/lsb-release ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
+	echo "INFO: OS specific init for common part"
+	( ! grep "DISTRIB_CODENAME=\(saucy\|olivia\)" /etc/lsb-release ) && echo "INFO: skip since version not matched" && return 0
 
 	sudo apt-get install -y vlc xclip			&>> $tmp_init_log
 	sudo apt-get install -y fcitx-table-wbpy		&>> $tmp_init_log	# Chinese Input Method - Fcitx
@@ -256,20 +256,20 @@ function func_init_os_common() {
 }
 
 function func_init_os_ubuntu1310() {
-	func_log_echo "${tmp_init_log}" "INFO: OS specific init for ubuntu 13.10"
+	echo "INFO: OS specific init for ubuntu 13.10"
 
 	sudo apt-get install -y ubuntu-restricted-extras	&>> $tmp_init_log	# for rhythmbox to play mp3
 	sudo apt-get install -y compizconfig-settings-manager	&>> $tmp_init_log	# for unity settings, use cmd "ccsm" to invoke it
 
 	( ! grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) &&				\
 	( ! grep "DISTRIB_CODENAME=saucy" /etc/lsb-release ) &&				\
-	func_log_echo "${tmp_init_log}" "INFO: skip, since version not matched" &&	\
+	echo "INFO: skip, since version not matched" &&	\
 	return 0
 }
 
 function func_init_os_linuxmint15() {
-	func_log_echo "${tmp_init_log}" "INFO: OS specific init for linuxmint 15"
-	( ! grep "DISTRIB_CODENAME=olivia" /etc/lsb-release ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
+	echo "INFO: OS specific init for linuxmint 15"
+	( ! grep "DISTRIB_CODENAME=olivia" /etc/lsb-release ) && echo "INFO: skip since version not matched" && return 0
 
 	sudo apt-get install -y arandr				&>> $tmp_init_log	# set the screen layout, e.g for dual screen
 	sudo apt-get install -y pulseaudio pulseaudio-utils	&>> $tmp_init_log	# For logitech usb headset, use "PulseAudio Volume Control" to control the device
@@ -280,8 +280,8 @@ function func_init_os_linuxmint15() {
 }
 
 function func_init_de_xfce() {
-	func_log_echo "${tmp_init_log}" "INFO: DE specific init for XFCE"
-	( ! dpkg -l | grep -i "xfce" &> /dev/null ) && func_log_echo "${tmp_init_log}" "INFO: skip since version not matched" && return 0
+	echo "INFO: DE specific init for XFCE"
+	( ! dpkg -l | grep -i "xfce" &> /dev/null ) && echo "INFO: skip since version not matched" && return 0
 
 	# TODO: how to check?
 
@@ -319,10 +319,10 @@ function func_init_de_xfce() {
 }
 
 function func_init_manual_infinality {
-	func_log_echo "${tmp_init_log}" "INFO: install infinality which improve font rendering, need some mannal check, pls install it manually"
+	echo "INFO: install infinality which improve font rendering, need some mannal check, pls install it manually"
 
 	local setting_file=/etc/infinality-settings.sh
-	[ -e "${setting_file}" ] && func_log_echo "${tmp_init_log}" "INFO: ${setting_file} already exist, skip" && return 0
+	[ -e "${setting_file}" ] && echo "INFO: ${setting_file} already exist, skip" && return 0
 
 	# Note 1: this is for better font rendering, seems really better
 	# Note 2: (On linuxmint 15 XFCE), after this need startx manually, following cmd after apt-get install is doing this
@@ -344,11 +344,11 @@ function func_init_manual_infinality {
 } 
 
 function func_init_manual_needed() {
-	func_log_echo "${tmp_init_log}" "INFO: Following steps need manual op (like set password, accept agreement), continue (N) [Y/N]?"
+	echo "INFO: Following steps need manual op (like set password, accept agreement), continue (N) [Y/N]?"
 	read -e continue                                                                                           
-	[ "$continue" != "Y" -a "$continue" != "y" ] && func_log_echo "${tmp_init_log}" "Give up, pls install those soft manually later!" && return 1
+	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
 
-	func_log_echo "${tmp_init_log}" "INFO: add a backup user, remember to change its password which already have record!"
+	echo "INFO: add a backup user, remember to change its password which already have record!"
 	( ! grep "^ouyangzhu2:" /etc/passwd &> /dev/null ) && sudo useradd -m -s /bin/bash -g sudo ouyangzhu2 && sudo passwd ouyangzhu2
 
 	#TODO: test it on ubuntu 13.10

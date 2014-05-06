@@ -19,10 +19,10 @@
 [ -z "$ME_TAGS_ADDI" ]		&& ME_TAGS_ADDI=$MY_ENV/list/tags_addi
 [ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/zgen/tags_note
 [ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/zgen/tags_code
-[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DOC/DCC/A_NOTE $MY_DOC/DCO/A_NOTE)
+[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DOC/DCC/A_NOTE $MY_DOC/DCO/A_NOTE $MY_DCD/Projects/A_NOTE)
 [ -z "$ME_CODE_ROOTS" ]		&& ME_CODE_ROOTS=($ZBOX/src/oumisc/oumisc-git)
 
-source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
+source $HOME/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
 function func_validate_exist() {
 	# TODO: deprecate this wrapper
@@ -561,40 +561,37 @@ function deprecated_func_gen_grep_pattern_str {
 }
 
 function func_collect_files {
-	func_param_check 5 "Usage: $FUNCNAME [target_base] [source_bases] [source_quick_link] [include_patterns] [exclude_patterns]" "$@"
+	func_param_check 4 "Usage: $FUNCNAME [target_base] [source_bases] [include_patterns] [exclude_patterns]" "$@"
 
 	# TODO: make it optional: backup original file feature
-	# TODO: remove source_quick_link
 
-	target_base="$1"
-	source_bases=$2
-	source_quick_link=$3
-	include_patterns=$4
-	exclude_patterns=$5
-	target_collection_fl=$target_base/collection_fl.txt
-	target_collection_content=$target_base/collection_content.txt
-	target_original_files=/tmp/original_files_$(basename $target_base)
+	local target_base="${1}"
+	local source_bases="${2}"
+	local include_patterns="${3}"
+	local exclude_patterns="${4}"
+	local target_collection_fl=${target_base}/collection_fl.txt
+	local target_collection_content=${target_base}/collection_content.txt
+	local target_original_files=/tmp/original_files_$(basename $target_base)
 
 	# create patterns for grep cmd
-	include_pattern_str=$(echo ${include_patterns[@]} | sed -e "s/\s/\|/g")
-	exclude_pattern_str=$(echo ${exclude_patterns[@]} | sed -e "s/\s/\|/g")
+	include_pattern_str="$(echo ${include_patterns} | sed -e "s/\s/\|/g")"
+	exclude_pattern_str="$(echo ${exclude_patterns} | sed -e "s/\s/\|/g")"
 
 	echo "INFO: cleanup old target, path: ${target_base}"
 	[ -e "${target_base}" ] && rm -rf "${target_base}"
 
-	echo "INFO: generate target file lists for tags: ${source_bases[@]}"
+	echo "INFO: generate target file lists for tags: ${source_bases}"
 	mkdir -p "${target_base}"
 	pushd "${target_base}"
-	for tag in ${source_bases[@]} ; do
+	for tag in ${source_bases} ; do
 		#func_gen_filedirlist $tag $target_base/fl_${tag}.txt -type f
 		func_gen_filedirlist $tag $target_base/fl_${tag}.txt -maxdepth 5 -type f
 		egrep -i "$include_pattern_str" fl_${tag}.txt | egrep -v -i "$exclude_pattern_str" >> ${target_collection_fl}
 	done
 
-	echo "INFO: collect and backup original file"
+	local count=0
 	mkdir $target_original_files
-	[ -n "$source_quick_link" ] && sed -e "" "$source_quick_link" >> ${target_collection_content}
-	count=0
+	echo "INFO: collect and backup original file"
 	while read line
 	do
 		source_path="$(func_eval "$line")"
@@ -628,44 +625,68 @@ function func_collect_files {
 function func_collect_code {
 	target_base=$MY_ENV/zgen/collection_code
 	source_bases=(dw ourepo oumisc)
-	source_quick_link=$(eval echo "$MY_ENV/list/collection_code_quick_link")
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	include_patterns=(.bat$ .sh$ .csh$ .groovy$ .cpp$ .c$ .py$ .erb$ .rb$ .sql$ .ruby$ .java$ .html$ .htm$ .jsp$ .js$ .css$ .php$ .ps$ .md$ .markdown$ .xml$)
 	exclude_patterns=(/crashreport /componentsrv /education /client-update-server_branch1 /docs/ /doc/ .doc$ .min.js$ .compressed.js$ /.git/ /target/ /vendor/ /plugins/ /jslib/ /easyui/ /ckeditor/ /operamasks-ui/ /jquery[-.a-zA-Z0-9]*/ jquery[-.a-zA-Z0-9]*.[jc]ss?$ bootstrap[-.a-zA-Z0-9]*.[jc]ss?$)	
 
-	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+	func_collect_files $target_base $source_bases $include_patterns $exclude_patterns
 }
 
-function func_collect_note_link() {
-	count=1 
+function func_collect_note_outline() {
+	local fl=$MY_ENV/zgen/collection_note/collection_fl.txt
+	local ol=$MY_ENV/zgen/collection_note/collection_outline.txt
+	[ ! -e "${fl}" ] && func_die "ERROR: $fl NOT exist for collect_note_outline"
+
+	echo "INFO: generating outline of notes"
+	while read line
+	do
+		[[ "${line}" != *.txt ]] && continue				# Only gather note outline
+		local f="$(func_eval "${line}")"
+		echo ">>> ${f}" >> "${ol}"
+		grep "^\t*[-a-z0-9_\.][-a-z0-9_\.]*[\t ]*$" "${f}" >> "${ol}"	# same pattern in NoteOutline@~/.vimrc
+	done < ${fl}
+}
+
+function func_collect_note_stdnote() {
+	local count=1 
+	local sn=$MY_ENV/zgen/collection_note/collection_stdnote.txt
+
+	echo "INFO: collecting stdnote names"
 	for d in $HOME/Documents/DCC/A_NOTE $HOME/Documents/DCO/A_NOTE ; do
 		for f in $d/* ; do  
 			ff=${f##*/} 
-			printf "%-18s" ${ff%.txt}
-			count=$(($count+1)) && (($count%5==0)) && printf "\n" 
+			printf "%-18s" ${ff%.txt} >> "${sn}"
+			count=$(($count+1)) && (($count%5==0)) && printf "\n" >> "${sn}"
 		done
 	done
-	printf "\n\n\n" 
+	printf "\n\n\n" >> "${sn}"
 }
 
 function func_collect_note {
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
 
-	target_base=$MY_ENV/zgen/collection_note
-	source_bases=(dcd dco dcc dcb   me   ecb ece ech ecs ecz)			# Not included DCM, put DCD first
-	source_quick_link=$(eval echo "$MY_ENV/list/collection_note_quick_link")
+	local target_base=$MY_ENV/zgen/collection_note
+	local source_bases="dcd dco dcc dcb   me   ecb ece ech ecs ecz"			# Not included DCM, put DCD first
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	include_patterns=(/\([^/]*\)/\\1.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$)
-	exclude_patterns=(.rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash A_NOTE_Copy.txt)
-	func_collect_files $target_base $source_bases $source_quick_link $include_patterns $exclude_patterns
+	local include_patterns="/([^/]*)/\\1.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$"
+	local exclude_patterns=".rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash A_NOTE_Copy.txt"
+	
+	func_std_standarize
+	func_collect_files "${target_base}" "${source_bases}" "${include_patterns}" "${exclude_patterns}"
+	func_collect_note_stdnote
+	func_collect_note_outline
 
-	std_note=$(func_collect_note_link)
+	local ql=$MY_ENV/list/collection_note_quick_link
+	local ol=$MY_ENV/zgen/collection_note/collection_outline.txt
+	local sn=$MY_ENV/zgen/collection_note/collection_stdnote.txt
+
 	mv $target_base/collection_content.txt{,.bak}
-	echo "${std_note}" >> $target_base/collection_content.txt
-	echo -e "\n\n" >> $target_base/collection_content.txt
-	cat $target_base/collection_content.txt.bak >> $target_base/collection_content.txt
+	cat "${sn}" 					>> $target_base/collection_content.txt
+	cat "${ql}" 					>> $target_base/collection_content.txt
+	cat "${ol}" 					>> $target_base/collection_content.txt
+	cat $target_base/collection_content.txt.bak	>> $target_base/collection_content.txt
 }
 
 function func_repeat {
