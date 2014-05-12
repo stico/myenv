@@ -1,3 +1,8 @@
+Inbox
+	CodeWeavers是Wine的主要支持公司，有基于Wine的商业产品CrossOver
+	PlayOnLinux是Wine的图形化前端，Python和Bash写的
+	DeepWine是深度论坛（Deepin）社区发起的
+
 Run
 	wine notepad.exe
 	wine 'C:\Program Files\Internet Explorer\iexplore'
