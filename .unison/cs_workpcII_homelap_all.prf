@@ -7,17 +7,27 @@
 
 # Local
 root=/ext/Documents
-rootalias = //homelap//ext/Documents -> //X200S_LU//Documents
+rootalias = //lapII//ext/Documents -> //PRIMARY//Documents
 
 # External
-root=/ext_ntfs/Documents
-rootalias = //homelap//ext_ntfs/Documents -> //X200S_WIN//Documents
+root=ssh://192.168.0.67/Documents
+rootalias = //workpcII//ssh://192.168.0.67/Documents -> //SECOND//Documents
 
 ################################################################################
 # PATH: the -path cmd option not support glob
 ################################################################################
+path=DCB
+path=DCC
+path=DCD
 path=DCM
+path=DCO
+path=ECB
+path=ECE
+path=ECH
+path=ECS
+path=ECZ
 path=FCB
+path=FCS
 
 ################################################################################
 # SETTINGS
@@ -29,11 +39,9 @@ ignorecase=true
 ignoreinodenumbers=true
 #links=false
 
+
 ################################################################################
 # IGNORE: verified works. Regex seem not need suffix ".*" to match the whole name
-# Regex:  Support Posix ERE (Posix extended regular expression)
-#         The starting path is need to sync
-#         The dir ending should NOT end with "/"
 ################################################################################
 ignore = Regex .*/.fl_me.txt
 ignore = Regex .*/.dl_me.txt
@@ -57,18 +65,3 @@ ignore = Regex os_spec_win/program/A_System_FindAndRunRobot_2.77.02_Official-Bas
 ignore = Regex os_spec_win/program/miktex.*
 ignore = Regex os_spec_win/program/graphviz.*
 ignore = Regex os_spec_win/program/LibreOffice.*
-
-
-################################################################################
-# Deprecated
-################################################################################
-#ignore = Regex os_spec_.*/dev/.*/.svn
-#ignore = Regex os_spec_.*/dev/.*/.svn/.*
-#
-#ignore = Regex os_spec_.*/dev/mysql
-#ignore = Regex os_spec_.*/dev/mysql-5.5.11-win32
-#ignore = Regex os_spec_.*/dev/z_deprecated
-#ignore = Regex os_spec_.*/dev/eclipse_ws.*
-#ignore = Regex os_spec_.*/dev/.*/.settings
-#ignore = Regex os_spec_.*/dev/code_.*/target
-#ignore = Regex os_spec_.*/dev/jdk1.6.0_30_x64_src
