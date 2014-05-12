@@ -19,7 +19,7 @@
 [ -z "$ME_TAGS_ADDI" ]		&& ME_TAGS_ADDI=$MY_ENV/list/tags_addi
 [ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/zgen/tags_note
 [ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/zgen/tags_code
-[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DOC/DCC/A_NOTE $MY_DOC/DCO/A_NOTE $MY_DCD/Projects/A_NOTE)
+[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DCC/note $MY_DCO/note $MY_DCD/project/note)
 [ -z "$ME_CODE_ROOTS" ]		&& ME_CODE_ROOTS=($ZBOX/src/oumisc/oumisc-git)
 
 source $HOME/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
@@ -131,8 +131,9 @@ function func_eval_path() {
 }
 
 function func_std_gen_tags() {
-	func_delete_dated "${ME_NOTE_TAGS}"
 	local d dd note_file note_filename
+
+	func_delete_dated "${ME_NOTE_TAGS}"
 	for d in ${ME_NOTE_ROOTS[@]} ; do
 		for note_file in ${d}/*.txt ; do
 			local note_filename="${note_file##*/}"
@@ -166,7 +167,7 @@ function func_std_gen_links() {
 			local note_basepath="${d}/../${note_filename%.txt}"
 			if [ -d "${note_basepath}" ] && [ ! -f "${note_basepath}/${note_filename}" ] ; then
 				\cd "${note_basepath}" &> /dev/null
-				ln -s "../A_NOTE/${note_filename}" .
+				ln -s "../note/${note_filename}" .
 				\cd - &> /dev/null
 			fi
 		done
@@ -601,7 +602,7 @@ function func_collect_files {
 		target_file=$(echo "$source_path" | sed -e 's+/\|:+@+g;s+\$\| \|\(\|\)\|（\|）\|&++g')	# avoid name confliction
 		cp "$source_path" "$target_original_files/$target_file" 
 
-		echo -e "\n\n>>> $line\n\n"	>> ${target_collection_content}
+		echo -e "\n\n@$line\n\n"	>> ${target_collection_content}
 		sed -e "s///" "$source_path"	>> ${target_collection_content}
 		
 		#count=$(($count + 1)) && [ $(($count % 100)) -eq 0 ] && echo "INFO: collected $count files"
@@ -643,17 +644,17 @@ function func_collect_note_outline() {
 	do
 		[[ "${line}" != *.txt ]] && continue				# Only gather note outline
 		local f="$(func_eval "${line}")"
-		echo ">>> ${f}" >> "${ol}"
+		echo "@${f}" >> "${ol}"
 		grep "^\t*[-a-z0-9_\.][-a-z0-9_\.]*[\t ]*$" "${f}" >> "${ol}"	# same pattern in NoteOutline@~/.vimrc
 	done < ${fl}
 }
 
 function func_collect_note_stdnote() {
-	local count=1 
+	local count=0 
 	local sn=$MY_ENV/zgen/collection_note/collection_stdnote.txt
 
 	echo "INFO: collecting stdnote names"
-	for d in $HOME/Documents/DCC/A_NOTE $HOME/Documents/DCO/A_NOTE ; do
+	for d in ${ME_NOTE_ROOTS[@]} ; do
 		for f in $d/* ; do  
 			ff=${f##*/} 
 			printf "%-18s" ${ff%.txt} >> "${sn}"

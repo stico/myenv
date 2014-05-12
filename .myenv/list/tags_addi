@@ -18,6 +18,7 @@ ins=$ZBOX/ins
 src=$ZBOX/src
 stg=$ZBOX/stg
 misc=$ZBOX/src/oumisc/oumisc-git
+oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 oumisc=$ZBOX/src/oumisc/oumisc-git
 ourepo=~/.zbox/src/ourepo/ourepo-git
 oublog=~/.zbox/src/oublog/oublog-git
@@ -39,7 +40,7 @@ fcb=$MY_FCB
 fcs=$MY_FCS
 fcz=$MY_FCZ
 tcs=$MY_DOC/DCD/Team_CommonService
-noteall=$MY_DOC/DCB/Collection_Note/allFile_All.txt
+noteall=$MY_ENV/zgen/collection_note/collection_content.txt
 
 # Function
 tt=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
