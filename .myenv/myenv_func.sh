@@ -657,8 +657,8 @@ function func_collect_note_stdnote() {
 	for d in ${ME_NOTE_ROOTS[@]} ; do
 		for f in $d/* ; do  
 			ff=${f##*/} 
-			printf "%-18s" ${ff%.txt} >> "${sn}"
-			count=$(($count+1)) && (($count%5==0)) && printf "\n" >> "${sn}"
+			printf "%-25s" ${ff%.txt} >> "${sn}"
+			count=$(($count+1)) && (($count%4==0)) && printf "\n" >> "${sn}"
 		done
 	done
 	printf "\n\n\n" >> "${sn}"

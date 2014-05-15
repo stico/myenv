@@ -7,8 +7,6 @@
 # eval result will be path/file
 #[ $(echo `uname -a` | grep -c -x "^Linux .*") -eq 1 ] && echo -e $LOC_HOSTS
 $LOC_HOSTS
-$LOC_FSTAB
-$LOC_FSTABD
 $LOC_CRONTAB
 $LOC_CONF_MYSQL
 $LOC_CONF_SAMBA
@@ -37,5 +35,8 @@ $MY_DEV/eclipse/eclipse.ini
 /cygdrive/c/Users/ouyangzhu/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/reportIpAddr.bat
 
 # TODO: backup script will mix it with /.config/autostart/
-/etc/xdg/autostart/
+/etc/fstab
+/etc/fstab.d
 /etc/resolv.conf
+/etc/xdg/autostart/
+

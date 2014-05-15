@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# NOTE: after upgrade to 14.04. GUESS: python update to 3.x, but this is for 2.x
+#           Screen selection seems not works, command inside are works. There is also alias for this, use that.
+#           Rotation still works
 # https://wiki.ubuntu.com/DesktopExperienceTeam/ApplicationIndicators
 
 import pygtk

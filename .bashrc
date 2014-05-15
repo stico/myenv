@@ -30,7 +30,7 @@ if [ -e "${zbox_func}" ]  ; then
 	func_zbox use	vim		hg		ouyzhu
 	func_zbox use	python		2.7.6
 	func_zbox use	oraclejdk	7u21		x64
-	func_zbox use	eclipse		4.3.2		std_x64
+	func_zbox use	eclipse		4.3.2		jee_x64
 fi
 
 
