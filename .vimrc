@@ -81,15 +81,18 @@ else
 endif
 
 """""""""""""""""""""""""""""" H1 - Plugins
+"""""""" Pathogen
 call pathogen#infect()
 
+"""""""" Solarized
 let g:solarized_italic = 0				" 0 to set comment font NOT use italic
 colorscheme solarized
 
+"""""""" Ctrlp
 "let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
-"let g:ctrlp_user_command = 'find %s -type f'		" custom option forfinding files
-let g:ctrlp_show_hidden = 1
+"let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
+let g:ctrlp_show_hidden = 1
 let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
 let g:ctrlp_custom_ignore = {
 	\ 'dir':  '\v[\/]\.(git|hg|svn|metadata)$|\/target$',
@@ -97,11 +100,19 @@ let g:ctrlp_custom_ignore = {
 	\ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
 	\ }
 
-" disable the creation
-" Option 1
+"""""""" netrw
+" Option 1, disable file creation of .netrwhist
 let g:netrw_dirhistmax=0
-" Option 2
+" Option 2, disable file creation of .netrwhist
 " au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
+
+"""""""" syntastic
+"let g:syntastic_aggregate_errors = 1				" display together the errors found by all checkers
+"let g:syntastic_always_populate_loc_list = 1			" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
+""let g:syntastic_quiet_messages = { "type": "style" }		" filter out some messages types
+"let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']	" checker chain, run one by one (only run laters if current success)
+"let g:syntastic_check_on_open=1				" for what?
+"let g:syntastic_enable_signs=1					" for what?
 
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
@@ -421,15 +432,18 @@ endfunction
 """ OnlyFileNameInTab is for showing only the filename, excluding the path
 set guitablabel=%{OnlyFileNameInTab()}		" invoke the function
 function OnlyFileNameInTab()
-	let bufnrlist = tabpagebuflist(v:lnum) 
+	" special for Oucr
+	if exists('t:OucrRoot')
+		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
+		return tabpagenr() . ":OUCR:" . t:OucrTablabel
+	endif
 	
+	let bufnrlist = tabpagebuflist(v:lnum) 
 	" show only the first 6 letters of the name + ..
 	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
 	let filename = tabpagenr() . ":" . fnamemodify(label,':t')
 
-
 	"if want to show a short filename in the tab, use following
-	"
 	"if strlen(filename) >=8
 	"	let ret = filename[0:9].'..'
 	"else
@@ -440,8 +454,33 @@ function OnlyFileNameInTab()
 	return filename
 endfunction
 
+" code reading mode 
+command! -nargs=0 OucrSet :call OucrSet()
+function! OucrSet()
+	let t:OucrRoot = expand("%:p:h")
+	let t:OucrOldAcd = &autochdir
+	let t:OucrOldRoot = getcwd()
+	call OucrCheck()
+endfunction
+function! OucrCheck()
+	if !(exists('t:OucrRoot'))
+		return
+	endif
+	exec "cd ". t:OucrRoot
+	set noautochdir
+endfunction
+function! OucrRestore()
+	if !(exists('t:OucrRoot'))
+		return
+	endif
+	exec "cd ". t:OucrOldRoot
+	let &autochdir = t:OucrOldAcd
+endfunction
+autocmd TabEnter * call OucrCheck()
+autocmd TabLeave * call OucrRestore()
+
 " Highlight all instances of word under cursor, when idle. Useful when studying strange source code.
-command! -nargs=0 TAutoHighLight	:if ToggleAutoHighlight() | :set hls | endif
+command! -nargs=0 TAutoHighLight :if ToggleAutoHighlight() | :set hls | endif
 function! ToggleAutoHighlight()
   let @/ = ''
   if exists('#auto_highlight')

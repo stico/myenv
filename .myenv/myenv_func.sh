@@ -310,12 +310,11 @@ function func_vi_conditional {
 			return 0
 		fi
 
-		# use GUI version with SIGNLE_VIM
-		# why? seems direct use "vim" will not trigger the "vim" alias which could cause infinite loop
-		# note: seems in ubuntu gui, not need "&" to make it background job
-		#$vi_cmd "$@"
-		[ -n "$DISPLAY" ] && (command -v gvim &> /dev/null) && vi_cmd=gvim 
-		$vi_cmd --version | \grep -q '+clientserver' && $vi_cmd --servername SINGLE_VIM --remote-tab "$@" || $vi_cmd "$@"
+		# NOTE 1: use GUI version with SIGNLE_VIM
+		# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
+		# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
+		# why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
+		LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' && LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@" || LD_LIBRARY_PATH="" gvim "$@"
 		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
 	else
 		# cygwin env: win style path + background job
@@ -387,13 +386,18 @@ function func_cd_tag {
 	[ ".." = "$*" ] && func_cd_ls .. && return 0	# parent dir
 	[ "."  = "$*" ] && func_cd_ls .  && return 0	# current dir
 
+	# exist in current dir
+	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_ls "${1}" && return 0
+
 	# Try tag eval, use its dir if it is a file
 	local base="$(func_tag_value ${1})"
 	[ -f "${base}" ] && base="$(dirname ${base})"
 
-	# Single parameter
-	[ $# -eq 1 ] && [ -d "${base}" ] && func_cd_ls "${base}" && return 0	# goto dir
-	[ $# -eq 1 ] && echo "ERROR: ${base} not exist!"  && return 1		# Path NOT exist
+	# Single tag, just cd to there
+	if [ $# -eq 1 ] ; then
+		[ ! -d "${base}" ] && func_cry "ERROR: ${base} not exist!"
+		func_cd_ls "${base}" && return 0 
+	fi
 
 	# Search: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
 	[ -d "${base}" ] && shift || base="./"
@@ -672,22 +676,18 @@ function func_collect_note {
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
 	local include_patterns="/([^/]*)/\\1.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$"
-	local exclude_patterns=".rtf$ .lnk$ /DCB/DatedBackup/ thunderbird.*trash A_NOTE_Copy.txt"
+	local exclude_patterns=".rtf$ .lnk$ DCB/DatedBackup/ DCD/mail/ A_NOTE_Copy.txt"
 	
 	func_std_standarize
 	func_collect_files "${target_base}" "${source_bases}" "${include_patterns}" "${exclude_patterns}"
 	func_collect_note_stdnote
 	func_collect_note_outline
 
-	local ql=$MY_ENV/list/collection_note_quick_link
-	local ol=$MY_ENV/zgen/collection_note/collection_outline.txt
-	local sn=$MY_ENV/zgen/collection_note/collection_stdnote.txt
-
 	mv $target_base/collection_content.txt{,.bak}
-	cat "${sn}" 					>> $target_base/collection_content.txt
-	cat "${ql}" 					>> $target_base/collection_content.txt
-	cat "${ol}" 					>> $target_base/collection_content.txt
-	cat $target_base/collection_content.txt.bak	>> $target_base/collection_content.txt
+	cat $MY_ENV/zgen/collection_note/collection_stdnote.txt	>> $target_base/collection_content.txt
+	cat $MY_ENV/list/collection_note_quick_link		>> $target_base/collection_content.txt
+	cat $MY_ENV/zgen/collection_note/collection_outline.txt	>> $target_base/collection_content.txt
+	cat $target_base/collection_content.txt.bak		>> $target_base/collection_content.txt
 }
 
 function func_repeat {

@@ -105,6 +105,8 @@ gfproperties		"func_grep_dotcache ./ properties"
 
 			# Head: v - vi/vim
 vi			"func_vi"
+			# python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
+gvim			'LD_LIBRARY_PATH="" gvim'	
 vihosts			"sudo vi %LOC_HOSTS%"
 vimrc			"vi %HOME%/.vimrc"
 vimcdconf		"func_cd_tag %VIM_CONF%"

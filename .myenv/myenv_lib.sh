@@ -15,6 +15,15 @@ function func_die() {
 	exit 1
 }
 
+function func_cry() {
+	local usage="Usage: $FUNCNAME <error_info>" 
+	local desc="Desc: echo error info to stderr and kill current job (exit the function stack without exiting shell)" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	
+	echo -e "$@" 1>&2
+	kill -INT $$
+}
+
 function func_check_exit_code() {
 	# NOTE: should NOT do anything before check, since need check exit status of last command
 	[ "$?" = "0" ]  && echo  "INFO: ${1}" || func_die "ERROR: ${2:-${1}}"
@@ -91,6 +100,7 @@ function func_download_wget() {
 	# TODO: add control to unsecure options?
 	# Command line explain: [Showing File Download Progress Using Wget](http://fitnr.com/showing-file-download-progress-using-wget.html)
 	wget --progress=dot --no-check-certificate ${1}	2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk 'BEGIN{printf("INFO: Download progress:  0%")}{printf("\b\b\b\b%4s", $2)}'
+	echo "" # next line should in new line
 	[ -f "${dl_fullpath}" ] || func_die "ERROR: ${dl_fullpath} not found, seems download faild!"
 	\cd - &> /dev/null
 }

@@ -24,13 +24,13 @@ func_ssh_agent_init
 zbox_func=${HOME}/.zbox/zbox_func.sh
 if [ -e "${zbox_func}" ]  ; then
 	source "${zbox_func}"
-	func_zbox use	maven		3.1.1
-	func_zbox use	mysql		5.6.12
-	func_zbox use	php		5.5.10
-	func_zbox use	vim		hg		ouyzhu
-	func_zbox use	python		2.7.6
-	func_zbox use	oraclejdk	7u21		x64
-	func_zbox use	eclipse		4.3.2		jee_x64
+	func_zbox use maven	3.1.1
+	func_zbox use mysql	5.6.12
+	func_zbox use php	5.5.10
+	func_zbox use vim	hg	ouyzhu
+	func_zbox use python	2.7.6
+	func_zbox use oraclejdk	7u21	x64
+	func_zbox use eclipse	4.3.2	jee_x64
 fi
 
 
