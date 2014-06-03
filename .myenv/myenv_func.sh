@@ -330,10 +330,12 @@ function func_load_virtualenvwrapper {
 	echo "INFO: loading virtual env (Virtualenvwrapper) for Python"
 
 	[ -z "${PYTHON_HOME}" ] && func_die "ERROR: env PYTHON_HOME not set"
+	mkdir -p ${HOME}/amp/workspace/virtualenv &> /dev/null
+
 	export VIRTUALENVWRAPPER_PYTHON=${PYTHON_HOME}/bin/python
 	export PS1="(VirtualEnv) ${PS1}"
 	export WORKON_HOME=${HOME}/.virtualenvs
-	export PROJECT_HOME=${HOME}/amp
+	export PROJECT_HOME=${HOME}/amp/workspace/virtualenv
 	export VIRTUALENVWRAPPER_VIRTUALENV=${PYTHON_HOME}/bin/virtualenv
 	export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
 	export PIP_VIRTUALENV_BASE=${WORKON_HOME}
@@ -675,7 +677,7 @@ function func_collect_note {
 	local source_bases="dcd dco dcc dcb   me   ecb ece ech ecs ecz"			# Not included DCM, put DCD first
 
 	# Note, used "ERE (Extended Regex) to avoid passing "\" around)
-	local include_patterns="/([^/]*)/\\1.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$"
+	local include_patterns="/note/.*.txt A_NOTE --NOTE-- --NOTED-- .bash$ .sh$"
 	local exclude_patterns=".rtf$ .lnk$ DCB/DatedBackup/ DCD/mail/ A_NOTE_Copy.txt"
 	
 	func_std_standarize
@@ -1284,42 +1286,59 @@ function func_backup_listed {
 	#$MY_ENV/util/listed_backup.sh
 }
 
-function func_run_file_c() {
+#function func_run_file_c() {
+#	local file="$(readlink -f ${1})"
+#	local file_name="$(basename ${1})"
+#	local target_dir="$(dirname ${file})/target"
+#
+#	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
+#	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
+#
+#	gcc -o "${file_name%.c}" "${file_name}"
+#	./"${file_name%.c}"
+#	rm "${target_dir}/${file_name}"
+#	\cd - &> /dev/null
+#}
+#
+#function func_run_file_java() {
+#	local file="$(readlink -f ${1})"
+#	local file_name="$(basename ${file})"
+#	local target_dir="$(dirname ${file})/target"
+#
+#	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
+#	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
+#
+#	javac ${file_name}
+#	java -cp . ${file_name%.java}
+#	rm "${target_dir}/${file_name}"
+#	\cd - &> /dev/null
+#}
+
+function func_run_file_compile() {
 	local file="$(readlink -f ${1})"
-	local file_name="$(basename $1)"
-	local tmp_dir="/tmp/vim_f11_c_$(func_dati)/"
+	local file_name="$(basename ${file})"
+	local target_dir="$(dirname ${file})/target"
 
-	mkdir "${tmp_dir}" &> /dev/null	|| func_die "ERROR: failed to mkdir: ${tmp_dir}"
-	cp -f "${file}" "${tmp_dir}" || func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${tmp_dir}"
-	\cd ${tmp_dir} &> /dev/null  || func_die "ERROR: failed to change dir to: ${tmp_dir}"
+	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
+	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
 
-	gcc -o "${file_name%.c}" "${file_name}"
-	./"${file_name%.c}"
-	\cd - &> /dev/null
-}
-
-function func_run_file_java() {
-	local file="$(readlink -f ${1})"
-	local file_name="$(basename $1)"
-	local tmp_dir="/tmp/vim_f11_java_$(func_dati)/"
-
-	mkdir "${tmp_dir}" &> /dev/null	|| func_die "ERROR: failed to mkdir: ${tmp_dir}"
-	cp -f "${file}" "${tmp_dir}"	|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${tmp_dir}"
-	\cd "${tmp_dir}" &> /dev/null	|| func_die "ERROR: failed to change dir to: ${tmp_dir}"
-
-	javac ${file_name}
-	java -cp . ${file_name%.java}
+	${2}
+	${3}
+	#rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
 }
 
 function func_run_file() {
 	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 	
-	file=$1
+	file="${1}"
+	filename="$(basename ${file})"
 	[ ! -e "$file" ] && echo "ERROR: $file not exist!" && return 1
 
-	if [[ "$file" = *.c ]] ; then		func_run_file_c $file
-	elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
+	#if [[ "$file" = *.c ]] ; then		func_run_file_c $file
+	#elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
+	if [[ "$file" = *.c ]] ; then		func_run_file_compile $file "gcc ${filename} -o ${filename%.*}" "./${filename%.*}"
+	elif [[ "$file" = *.java ]] ; then	func_run_file_compile $file "javac ${filename}"                 "java -cp . ${filename%.*}"
 	elif [[ "$file" = *.rb ]] ; then	ruby $file
 	elif [[ "$file" = *.sh ]] ; then	bash $file
 	elif [[ "$file" = *.py ]] ; then	python $file

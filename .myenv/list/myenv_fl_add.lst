@@ -15,6 +15,7 @@ $MY_ENV/zgen
 $MY_DEV/eclipse/eclipse.ini
 
 /.ssh/
+/.hgrc
 /.subversion/
 /.VirtualBoxVMs/
 /.gitconfig
@@ -38,5 +39,6 @@ $MY_DEV/eclipse/eclipse.ini
 /etc/fstab
 /etc/fstab.d
 /etc/resolv.conf
+/etc/updatedb.conf
 /etc/xdg/autostart/
 

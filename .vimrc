@@ -111,8 +111,7 @@ let g:netrw_dirhistmax=0
 "let g:syntastic_always_populate_loc_list = 1			" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
 ""let g:syntastic_quiet_messages = { "type": "style" }		" filter out some messages types
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']	" checker chain, run one by one (only run laters if current success)
-"let g:syntastic_check_on_open=1				" for what?
-"let g:syntastic_enable_signs=1					" for what?
+let g:syntastic_auto_jump = 2					" jump to 1st error (NOT warning)
 
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
@@ -336,11 +335,16 @@ noremap <C-Tab> gt
 inoremap <C-Tab> <Esc>gt
 noremap <C-S-Tab> gT
 inoremap <C-S-Tab> <Esc>gT
-" gnome terminator style windown jump, note vim actually can not distiguish <C-H> and <C-S-H>
+" gnome terminator style window jump, note vim actually can not distiguish <C-H> and <C-S-H>
 nnoremap <C-S-H> <C-w>h
 nnoremap <C-S-J> <C-w>j
 nnoremap <C-S-K> <C-w>k
 nnoremap <C-S-L> <C-w>l
+" gnome terminator style window adjustment, note vim actually can not distiguish <C-Left> and <C-S-Left>
+nnoremap <C-S-Left> <C-w><
+nnoremap <C-S-Right> <C-w>>
+nnoremap <C-S-Up> <C-w>-
+nnoremap <C-S-Down> <C-w>+
 "nnoremap <C-m> :call WindowMaxMinToggle()<CR>	" can not use C-m, which also effects the <enter> key
 nnoremap <C-w>m :call WindowMaxMinToggle()<CR>
 
@@ -484,19 +488,16 @@ command! -nargs=0 TAutoHighLight :if ToggleAutoHighlight() | :set hls | endif
 function! ToggleAutoHighlight()
   let @/ = ''
   if exists('#auto_highlight')
-    au! auto_highlight
+    autocmd! auto_highlight
     augroup! auto_highlight
+    match none
     setl updatetime=4000
     echo 'Highlight current word: OFF'
     return 0
   else
     augroup auto_highlight
-      au!
-      " TODO: when holding nothing, will search all
-      au CursorHold * let text = expand('<cword>') | if strlen(text) | let @/ = '\V'.escape(expand('<cword>'), '\') | endif		" without word boundary, non-empty string
-      "au CursorHold * let @/ = '\V'.escape(expand('<cword>'), '\')		" without word boundary
-      "au CursorHold * let @/ = '\V\<'.escape(expand('<cword>'), '\').'\>'	" with word boundary
-      "au CursorHold * let @/ = '\<'.expand('<cword>').'\>'			" In general the escape is a good idea, but in practice the current word (cword) is unlikely to have punctuation in it that needs escaping. Thoughts?
+      autocmd!
+      autocmd CursorMoved * exe printf('match PmenuSel /\V\<%s\>/', escape(expand('<cword>'), '/\'))
     augroup end
     setl updatetime=500
     echo 'Highlight current word: ON'

@@ -1,5 +1,4 @@
 # Misc
-dw=$MY_FCZ/code_dw
 me=$MY_ENV
 env=$MY_ENV
 data=$HOME/data
@@ -10,6 +9,10 @@ tmp=$MY_TMP
 st=$MY_TMP/stage1
 dl=$MY_TMP/download
 ws=$MY_TMP/workspace
+
+#DW
+dw=$MY_FCZ/code_dw
+damo=$MY_FCZ/code_dw/damo
 
 # ZBOX
 zb=$ZBOX
@@ -40,7 +43,9 @@ ecz=$MY_ECZ
 fcb=$MY_FCB
 fcs=$MY_FCS
 fcz=$MY_FCZ
-tcs=$MY_DOC/DCD/Team_CommonService
+report=$MY_DCD/report
+project=$MY_DCD/project
+project=$MY_DCD/project
 noteall=$MY_ENV/zgen/collection_note/collection_content.txt
 
 # Function

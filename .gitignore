@@ -54,6 +54,7 @@
 
 # IGNORE, for secure reason
 /.ssh/
+/.hgrc
 /.subversion/
 /.myenv/secu/
 /.myenv/secu_*/
