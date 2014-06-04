@@ -224,77 +224,6 @@ function func_log_info {
 	func_log "INFO" "$@"
 }
 
-function func_find_type_dotcache {
-	# NOTE: must keep interface consistency with func_find_type
-	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	find_type=$1
-	base=$2
-	shift;shift
-
-	if [ "$find_type" = "d" ] ; then
-		#func_gen_list d $base $list_file || return 1
-		list_file="$base/$DOT_CACHE_DL" 
-		func_gen_filedirlist "$base" $list_file -type d || return 1
-	else
-		#func_gen_list f $base $list_file || return 1
-		list_file="$base/$DOT_CACHE_FL" 
-		func_gen_filedirlist "$base" $list_file -type f || return 1
-	fi
-
-	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-	targets=`cat $list_file | sed -e "/^$/d" | grep -i "$search"`
-
-	echo "$targets"
-}
-
-function func_find_type {
-	# NOTE: must keep interface consistency with func_find_type_dotcache
-	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	find_type=$1
-	base=$2
-	shift;shift
-
-	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-	targets=`find -P "$base" -iregex "$search" -xtype $find_type | sed -e "/^$/d"`				# 1st try, not follow links
-	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type $find_type | sed -e "/^$/d"`	# not found, follow links maybe works
-	[ -z "$targets" ] && return 1										# not found, return
-
-	echo "$targets"
-}
-
-function func_find_dotcache {
-	# NOTE: must keep interface consistency with func_find
-	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	# need use variable to "return" result
-	result_var_name=$1
-	find_type=$2
-	shift;shift
-	eval $result_var_name=""
-
-	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
-	targets=$(func_find_type_dotcache $find_type $*)
-	[ $? -ne 0 ] && return 1
-
-	func_select_line $result_var_name shortest "$targets"
-}
-
-function func_find {
-	# NOTE: must keep interface consistency with func_find_dotcache
-	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	# need use variable to "return" result
-	result_var_name=$1
-	find_type=$2
-	shift;shift
-	eval $result_var_name=""
-
-	targets=`func_find_type $find_type $*`
-	func_select_line $result_var_name shortest "$targets"
-}
-
 function func_vi_conditional {
 	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then				# non-cygwin env: original path style + front job. 
 
@@ -360,36 +289,53 @@ function func_load_rvm {
 	export PS1="(RVM) ${PS1}"
 }
 
+func_locate() {
+	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
+
+	local type="${1}"
+	local base="$(readlink -f "${2}")"	# important: use the formal path
+	shift; shift
+	local pattern="$(echo "${base}/ $@ " | sed -e "s/\s/.*/g")"
+	locate -i --regex "${pattern}" | while read line; do
+		case "${type}" in
+			FILE)	[ -f "${line}" ] && echo "${line}" && return 0 ;;
+			DIR)	[ -d "${line}" ] && echo "${line}" && return 0 ;;
+		esac
+	done
+}
+
 function func_vi {
 	# shortcut - open a new one
 	[ -z "$*" ] && func_vi_conditional && return 0
 
-	# shortcut - only one parameter, and exist
-	[ $# -eq 1 ] && [ -e "${1}" ] && func_vi_conditional "${1}" && return 0
+	# shortcut - only one parameter
+	[ $# -eq 1 ] && [ -e "${1}" ] && func_vi_conditional "${1}" && return 0			# file exist
+	[ $# -eq 1 ] && [[ "${1}" == *.* ]] && func_vi_conditional "${1}" && return 0		# in form of x.y like abc.txt
 
 	# shortcut - only one tag, and exist
-	tag_eval="`func_tag_value $1`"
-	[ $# -eq 1 ] && func_vi_conditional "$tag_eval" && return 0
+	local base="$(func_tag_value $1)"
+	if [ $# -eq 1 ] ; then
+		[ ! -e "${base}" ] && func_cry "ERROR: ${base} not exist!"
+		func_vi_conditional "${base}" && return 0 
+	fi
 
-	# set base, evaluated tag or just ./
-	[ "$tag_eval" != "$1" ] && base="$tag_eval" && shift || base="./"
+	# Version 2, use locate 
+	[ -d "$base" ] && shift || base="./"
+	func_vi_conditional "$(func_locate "FILE" "${base}" "$@")"
 
+	# Version 1, old .fl_me.txt
 	# Find target, if cache version return error, try no-cache version
-	func_find_dotcache result_target f $base $* || func_find result_target f $base $*
-
-	# use original paramters if no target found
-	[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
+	# func_find_dotcache result_target f $base $* || func_find result_target f $base $*
+	#[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
 }
 
 function func_cd_tag {
 	# Shortcut
-	[ -z "$*" ]     && func_cd_ls    && return 0	# home
-	[ "-"  = "$*" ] && func_cd_ls -  && return 0	# last dir
-	[ ".." = "$*" ] && func_cd_ls .. && return 0	# parent dir
-	[ "."  = "$*" ] && func_cd_ls .  && return 0	# current dir
-
-	# exist in current dir
-	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_ls "${1}" && return 0
+	[ -z "$*" ]     && func_cd_ls    && return 0			# home
+	[ "-"  = "$*" ] && func_cd_ls -  && return 0			# last dir
+	[ ".." = "$*" ] && func_cd_ls .. && return 0			# parent dir
+	[ "."  = "$*" ] && func_cd_ls .  && return 0			# current dir
+	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_ls "${1}" && return 0	# exist in current dir
 
 	# Try tag eval, use its dir if it is a file
 	local base="$(func_tag_value ${1})"
@@ -401,10 +347,14 @@ function func_cd_tag {
 		func_cd_ls "${base}" && return 0 
 	fi
 
-	# Search: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
+	# Version 2, use locate
 	[ -d "${base}" ] && shift || base="./"
-	func_find_dotcache result_target d $base $* || func_find result_target d $base $*
-	func_cd_ls "${base}/${result_target}"
+	func_cd_ls "$(func_locate "DIR" "${base}" "$@")"
+
+	# Version 1, old .dl_me.txt: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
+	#[ -d "${base}" ] && shift || base="./"
+	#func_find_dotcache result_target d $base $* || func_find result_target d $base $*
+	#func_cd_ls "${base}/${result_target}"
 }
 
 function func_cd_ls() {
@@ -414,41 +364,7 @@ function func_cd_ls() {
 	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
 
 	[ -z "$*" ] && \cd || \cd "$*"
-	#\ls -lhF --color=auto
 	\ls -hF --color=auto
-}
-
-function func_ls { 
-	# TODO: seem using "../paygat" will fail, possbile to make it work?
-
-	# shortcut - home
-	[ -z "$*" -o "-" = "$*" ] && func_ls_conditional "$*" && return 0
-
-	# shortcut - only one parameter, and exist
-	tag_eval="`func_tag_value $1`"
-	[ $# -eq 1 ] && [ -d $tag_eval ] && func_ls_conditional $tag_eval && return 0
-
-	# FOR_DEV: w | !source /home/ouyangzhu/.myenv/env_func_bash; func_ls dev
-
-	# TODO: how to distiguish ll/ls/lla etc
-	# TODO: Avoid Filename_Expansion
-	# TODO: For Cmd History: ls the cmd output dir?
-
-	# Translate tag
-	base="./"
-	if [[ -n "`func_tag_text_value $1`" ]] ;then 
-		base="`func_tag_value $1`/"
-		shift
-	fi
-	pathPattern=`echo "$*" | sed -e '/^$/q;s/ /*\//g;s/$/*/'`
-
-	echo ------------------------------------"$base/$pathPattern"
-	ls -lhtrF --color=auto $base/$pathPattern
-
-	# Tmp Cmd
-	#search=`echo "$*" | sed -e '/^$/q;s/ \|^\|$/.*/g'`
-	#[[ -n $search ]] && search="-iregex $search"
-	#find $base $search 
 }
 
 function func_head_cmd() {
@@ -1537,3 +1453,80 @@ function func_apt_add_repo() {
 
 	sudo add-apt-repository -y "${apt_repo_name}" &> /dev/null
 }
+
+################################### Deprecated ###################################
+# deprecated by func_locate
+function func_find_dotcache {
+	# NOTE: must keep interface consistency with func_find
+	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	# need use variable to "return" result
+	result_var_name=$1
+	find_type=$2
+	shift;shift
+	eval $result_var_name=""
+
+	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
+	targets=$(func_find_type_dotcache $find_type $*)
+	[ $? -ne 0 ] && return 1
+
+	func_select_line $result_var_name shortest "$targets"
+}
+
+# deprecated by func_locate
+function func_find {
+	# NOTE: must keep interface consistency with func_find_dotcache
+	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	# need use variable to "return" result
+	result_var_name=$1
+	find_type=$2
+	shift;shift
+	eval $result_var_name=""
+
+	targets=`func_find_type $find_type $*`
+	func_select_line $result_var_name shortest "$targets"
+}
+
+# deprecated by func_locate
+function func_find_type_dotcache {
+	# NOTE: must keep interface consistency with func_find_type
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	find_type=$1
+	base=$2
+	shift;shift
+
+	if [ "$find_type" = "d" ] ; then
+		#func_gen_list d $base $list_file || return 1
+		list_file="$base/$DOT_CACHE_DL" 
+		func_gen_filedirlist "$base" $list_file -type d || return 1
+	else
+		#func_gen_list f $base $list_file || return 1
+		list_file="$base/$DOT_CACHE_FL" 
+		func_gen_filedirlist "$base" $list_file -type f || return 1
+	fi
+
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	targets=`cat $list_file | sed -e "/^$/d" | grep -i "$search"`
+
+	echo "$targets"
+}
+
+# deprecated by func_locate
+function func_find_type {
+	# NOTE: must keep interface consistency with func_find_type_dotcache
+	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+
+	find_type=$1
+	base=$2
+	shift;shift
+
+	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	targets=`find -P "$base" -iregex "$search" -xtype $find_type | sed -e "/^$/d"`				# 1st try, not follow links
+	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type $find_type | sed -e "/^$/d"`	# not found, follow links maybe works
+	[ -z "$targets" ] && return 1										# not found, return
+
+	echo "$targets"
+}
+
