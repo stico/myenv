@@ -633,73 +633,6 @@ function func_grep_cmd {
 	eval "$@" | grep -i "$search_str"
 }
 
-function func_grep_dotcache {
-
-	# TODO
-	# - seems can not support grepfile "aaa\|bbb"
-	# - seems can not add more options
-	func_param_check 3 "Usage: $FUNCNAME [base] [suffix] [search]*" "$@"
-
-	base=$1
-	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
-	shift;shift
-
-	#func_gen_list f $base $DOT_CACHE_FL || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
-	func_gen_filedirlist "$base" "$base/$DOT_CACHE_FL" -type f || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
-
-
-	# Get search string and options
-		# Case need handle
-		# no options, just search string
-		# "-" or " -" in search string
-		# multiple options with values
-
-		# Option 1
-		# TODO: can not support multiple option, like " -a a -b b"
-		# TODO: option is whole string if no option there
-		#parameters="$*"
-		#options=${parameters/#* -/ -}
-		#search=${parameters/% -*/}
-
-		# Option 2
-		# TODO: can not support multiple option, like " -a a -b b", since sed not support non-greedy regex
-		# TODO: how to avoid " -" in quoted string, since " or ' is not there after pipe
-		options=`echo "$*" | sed -e '/ -/!d;s/^.* -/ -/'`					# first " -" not in " or '
-		search=`[ -z "$options" ] && echo "$*" || echo "$*" | sed -e "s/$options//;"`		# remove all options, $options empty will cause sed have error
-
-	# we treat path in search text as .
-	search=${search//\\/.}							# make the path sep compatible
-	search=${search//\//.}							# make the sed (tput) coloring works
-
-	# Jump to base, since the DOT_CACHE_FL is using relative path
-	func_cd $base
-	grep $suffix'$' $DOT_CACHE_FL	| \
-	# Step: remove files not need to grep (for "grepfile")
-	sed -e "/\/.svn\//d" 		| \
-	sed -e "/\/.hg\//d" 		| \
-	sed -e "/\/.git\//d"		| \
-	sed -e "/\/.lnk\//d"		| \
-	sed -e "/\/.metadata\//d"	| \
-	sed -e "/\/.class$\//d"		| \
-	sed -e "/$DOT_CACHE_DL/d"	| \
-	sed -e "/$DOT_CACHE_FL/d"	| \
-	sed -e "/$DOT_CACHE_GREP/d"	| \
-	sed -e "/\/.jar$\//d"		| \
-	# Step: special removal, the target is mvn, but might cause miss-hit!
-	sed -e "/\/target\//d"		| \
-	# Step: remove the fileist itself
-	sed -e "/$DOT_CACHE_FL$/d"	| \
-	# Step: grep result, -I: ignore binary, -oE & .{0.20}: only matched part and 20 char around
-	xargs --delimiter="\n" grep -d skip -I -i $options -oE ".{0,20}$search.{0,20}" | \
-	# store result for later ref
-	tee $DOT_CACHE_GREP		| \
-	# re-color the result, since pipe swiped color even using "--color" in grep
-	sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
-
-	# Jump back
-	\cd -
-}
-
 function func_grep_myenv {
 	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
@@ -1455,78 +1388,163 @@ function func_apt_add_repo() {
 }
 
 ################################### Deprecated ###################################
-# deprecated by func_locate
-function func_find_dotcache {
-	# NOTE: must keep interface consistency with func_find
-	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+## deprecated by func_locate
+#function func_find_dotcache {
+#	# NOTE: must keep interface consistency with func_find
+#	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+#
+#	# need use variable to "return" result
+#	result_var_name=$1
+#	find_type=$2
+#	shift;shift
+#	eval $result_var_name=""
+#
+#	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
+#	targets=$(func_find_type_dotcache $find_type $*)
+#	[ $? -ne 0 ] && return 1
+#
+#	func_select_line $result_var_name shortest "$targets"
+#}
+#
+## deprecated by func_locate
+#function func_find {
+#	# NOTE: must keep interface consistency with func_find_dotcache
+#	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+#
+#	# need use variable to "return" result
+#	result_var_name=$1
+#	find_type=$2
+#	shift;shift
+#	eval $result_var_name=""
+#
+#	targets=`func_find_type $find_type $*`
+#	func_select_line $result_var_name shortest "$targets"
+#}
+#
+## deprecated by func_locate
+#function func_find_type_dotcache {
+#	# NOTE: must keep interface consistency with func_find_type
+#	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+#
+#	find_type=$1
+#	base=$2
+#	shift;shift
+#
+#	if [ "$find_type" = "d" ] ; then
+#		#func_gen_list d $base $list_file || return 1
+#		list_file="$base/$DOT_CACHE_DL" 
+#		func_gen_filedirlist "$base" $list_file -type d || return 1
+#	else
+#		#func_gen_list f $base $list_file || return 1
+#		list_file="$base/$DOT_CACHE_FL" 
+#		func_gen_filedirlist "$base" $list_file -type f || return 1
+#	fi
+#
+#	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+#	targets=`cat $list_file | sed -e "/^$/d" | grep -i "$search"`
+#
+#	echo "$targets"
+#}
+#
+## deprecated by func_locate
+#function func_find_type {
+#	# NOTE: must keep interface consistency with func_find_type_dotcache
+#	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
+#
+#	find_type=$1
+#	base=$2
+#	shift;shift
+#
+#	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+#	targets=`find -P "$base" -iregex "$search" -xtype $find_type | sed -e "/^$/d"`				# 1st try, not follow links
+#	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type $find_type | sed -e "/^$/d"`	# not found, follow links maybe works
+#	[ -z "$targets" ] && return 1										# not found, return
+#
+#	echo "$targets"
+#}
+#
+func_grep_file() {
+	func_param_check 2 "Usage: $FUNCNAME [suffix] [options and search_str]*" "$@"
+	local base="$(readlink -f ./)"
+	local suffix="${1}"
+	shift
 
-	# need use variable to "return" result
-	result_var_name=$1
-	find_type=$2
-	shift;shift
-	eval $result_var_name=""
-
-	#targets=`func_find_type $find_type $*`			# (2013-05-23) works, non cache version	
-	targets=$(func_find_type_dotcache $find_type $*)
-	[ $? -ne 0 ] && return 1
-
-	func_select_line $result_var_name shortest "$targets"
+	# below is a single cmd line
+	locate -i --regex "${base}.*${suffix}$"				| \
+		sed -e "/\/.svn\/\|\/.hg\/\|\/.git\//d;
+			/\/.metadata\//d;
+			/\/target\/classes\//d;
+			/\.class$/d;"					| \
+		# ignore dir/binary(-I)/case(-i)
+		xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
+		# use relative path which is shorter
+		sed -e "s+^${base}+.+"					| \
+		# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
+		grep --color "$@"
 }
-
-# deprecated by func_locate
-function func_find {
-	# NOTE: must keep interface consistency with func_find_dotcache
-	func_param_check 4 "Usage: $FUNCNAME [result_var_name] [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	# need use variable to "return" result
-	result_var_name=$1
-	find_type=$2
-	shift;shift
-	eval $result_var_name=""
-
-	targets=`func_find_type $find_type $*`
-	func_select_line $result_var_name shortest "$targets"
-}
-
-# deprecated by func_locate
-function func_find_type_dotcache {
-	# NOTE: must keep interface consistency with func_find_type
-	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	find_type=$1
-	base=$2
-	shift;shift
-
-	if [ "$find_type" = "d" ] ; then
-		#func_gen_list d $base $list_file || return 1
-		list_file="$base/$DOT_CACHE_DL" 
-		func_gen_filedirlist "$base" $list_file -type d || return 1
-	else
-		#func_gen_list f $base $list_file || return 1
-		list_file="$base/$DOT_CACHE_FL" 
-		func_gen_filedirlist "$base" $list_file -type f || return 1
-	fi
-
-	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-	targets=`cat $list_file | sed -e "/^$/d" | grep -i "$search"`
-
-	echo "$targets"
-}
-
-# deprecated by func_locate
-function func_find_type {
-	# NOTE: must keep interface consistency with func_find_type_dotcache
-	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [pattern]" "$@"
-
-	find_type=$1
-	base=$2
-	shift;shift
-
-	search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
-	targets=`find -P "$base" -iregex "$search" -xtype $find_type | sed -e "/^$/d"`				# 1st try, not follow links
-	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type $find_type | sed -e "/^$/d"`	# not found, follow links maybe works
-	[ -z "$targets" ] && return 1										# not found, return
-
-	echo "$targets"
-}
-
+#
+## deprecated by func_grep_file
+#function func_grep_dotcache {
+#	# TODO
+#	# - seems can not support grepfile "aaa\|bbb"
+#	# - seems can not add more options
+#	func_param_check 3 "Usage: $FUNCNAME [base] [suffix] [search]*" "$@"
+#
+#	base=$1
+#	file_suffix=`[ "$2" = "ALL" ] && echo "" || echo ".$2"`
+#	shift;shift
+#
+#	#func_gen_list f $base $DOT_CACHE_FL || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
+#	func_gen_filedirlist "$base" "$base/$DOT_CACHE_FL" -type f || func_die "ERROR: failed to gen $base/$DOT_CACHE_FL"
+#
+#	# Get search string and options
+#		# Case need handle
+#		# no options, just search string
+#		# "-" or " -" in search string
+#		# multiple options with values
+#
+#		# Option 1
+#		# TODO: can not support multiple option, like " -a a -b b"
+#		# TODO: option is whole string if no option there
+#		#parameters="$*"
+#		#options=${parameters/#* -/ -}
+#		#search=${parameters/% -*/}
+#
+#		# Option 2
+#		# TODO: can not support multiple option, like " -a a -b b", since sed not support non-greedy regex
+#		# TODO: how to avoid " -" in quoted string, since " or ' is not there after pipe
+#		options=`echo "$*" | sed -e '/ -/!d;s/^.* -/ -/'`					# first " -" not in " or '
+#		search=`[ -z "$options" ] && echo "$*" || echo "$*" | sed -e "s/$options//;"`		# remove all options, $options empty will cause sed have error
+#
+#	# we treat path in search text as .
+#	search=${search//\\/.}							# make the path sep compatible
+#	search=${search//\//.}							# make the sed (tput) coloring works
+#
+#	# Jump to base, since the DOT_CACHE_FL is using relative path
+#	func_cd $base
+#	grep $suffix'$' $DOT_CACHE_FL	| \
+#	# Step: remove files not need to grep (for "grepfile")
+#	sed -e "/\/.svn\//d" 		| \
+#	sed -e "/\/.hg\//d" 		| \
+#	sed -e "/\/.git\//d"		| \
+#	sed -e "/\/.lnk\//d"		| \
+#	sed -e "/\/.metadata\//d"	| \
+#	sed -e "/\/.class$\//d"		| \
+#	sed -e "/$DOT_CACHE_DL/d"	| \
+#	sed -e "/$DOT_CACHE_FL/d"	| \
+#	sed -e "/$DOT_CACHE_GREP/d"	| \
+#	sed -e "/\/.jar$\//d"		| \
+#	# Step: special removal, the target is mvn, but might cause miss-hit!
+#	sed -e "/\/target\//d"		| \
+#	# Step: remove the fileist itself
+#	sed -e "/$DOT_CACHE_FL$/d"	| \
+#	# Step: grep result, -I: ignore binary, -oE & .{0.20}: only matched part and 20 char around
+#	xargs --delimiter="\n" grep -d skip -I -i $options -oE ".{0,20}$search.{0,20}" | \
+#	# store result for later ref
+#	tee $DOT_CACHE_GREP		| \
+#	# re-color the result, since pipe swiped color even using "--color" in grep
+#	sed -e "s/$search/$(tput setaf 1)&$(tput sgr0)/I"
+#
+#	# Jump back
+#	\cd -
+#}
