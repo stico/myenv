@@ -19,7 +19,7 @@
 [ -z "$ME_TAGS_ADDI" ]		&& ME_TAGS_ADDI=$MY_ENV/list/tags_addi
 [ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/zgen/tags_note
 [ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/zgen/tags_code
-[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DCC/note $MY_DCO/note $MY_DCD/project/note)
+[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DCC $MY_DCO $MY_DCD/project)
 [ -z "$ME_CODE_ROOTS" ]		&& ME_CODE_ROOTS=($ZBOX/src/oumisc/oumisc-git)
 
 source $HOME/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
@@ -162,9 +162,10 @@ function func_std_gen_links() {
 	# STD 1: if there is dir and note have same name, there should be a link
 	local d note_file
 	for d in ${ME_NOTE_ROOTS[@]} ; do
-		for note_file in ${d}/* ; do
+		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
+		for note_file in ${d}/note/* ; do
 			local note_filename="${note_file##*/}"
-			local note_basepath="${d}/../${note_filename%.txt}"
+			local note_basepath="${d}/${note_filename%.txt}"
 			if [ -d "${note_basepath}" ] && [ ! -f "${note_basepath}/${note_filename}" ] ; then
 				\cd "${note_basepath}" &> /dev/null
 				ln -s "../note/${note_filename}" .
