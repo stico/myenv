@@ -132,22 +132,18 @@ function func_eval_path() {
 
 function func_std_gen_tags() {
 	local d dd note_file note_filename
-
 	func_delete_dated "${ME_NOTE_TAGS}"
 	for d in ${ME_NOTE_ROOTS[@]} ; do
-		for note_file in ${d}/*.txt ; do
+		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
+		for note_file in ${d}/note/*.txt ; do
 			local note_filename="${note_file##*/}"
-			local note_linkpath="${d}/../${note_filename%.txt}/${note_filename}"
-			if [ -e "${note_linkpath}" ] ; then
-				echo "${note_filename%.txt}=${note_linkpath}" >> "${ME_NOTE_TAGS}"
+			local topic_linkpath="${d}/${note_filename%.txt}/${note_filename}"
+			if [ -e "${topic_linkpath}" ] ; then
+				echo "${note_filename%.txt}=${topic_linkpath}" >> "${ME_NOTE_TAGS}"
 			else
 				echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
 			fi
 		done
-		#for note_file in $(find "${d}/.." -maxdepth 3 -regex ".*/\(.*\)/\1.txt") ; do
-		#	local note_filename="${note_file##*/}"
-		#	echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
-		#done
 	done
 
 	func_delete_dated "${ME_CODE_TAGS}"
@@ -163,11 +159,11 @@ function func_std_gen_links() {
 	local d note_file
 	for d in ${ME_NOTE_ROOTS[@]} ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
-		for note_file in ${d}/note/* ; do
+		for note_file in ${d}/note/*.txt ; do
 			local note_filename="${note_file##*/}"
-			local note_basepath="${d}/${note_filename%.txt}"
-			if [ -d "${note_basepath}" ] && [ ! -f "${note_basepath}/${note_filename}" ] ; then
-				\cd "${note_basepath}" &> /dev/null
+			local topic_basepath="${d}/${note_filename%.txt}"
+			if [ -d "${topic_basepath}" ] && [ ! -f "${topic_basepath}/${note_filename}" ] ; then
+				\cd "${topic_basepath}" &> /dev/null
 				ln -s "../note/${note_filename}" .
 				\cd - &> /dev/null
 			fi
