@@ -248,3 +248,11 @@ swift	迅速
 	[[["Coefficient","系数","","Xìshù"]],[["noun",["coefficient","modulus"],[["coefficient",["系数"],,0.26914635],["modulus",["系数"],,0.0017853782]],"系数",1]],"zh-CN",,[["Coefficient",[1],true,false,1000,0,1,0]],[["系数",1,[["Coefficient",1000,true,false],["Coefficients",0,true,false],["Factor",0,true,false],["Coefficient of",0,true,false],["The coefficient",0,true,false]],[[0,2]],"系数"]],,,[],2]
 canola	油菜
 	[[["油菜","canola","Yóucài",""]],,"en",,[["油菜",[1],false,false,418,0,1,0]],[["canola",1,[["油菜",418,false,false],["油菜籽",396,false,false],["菜籽油",177,false,false],["芥花",5,false,false],["双低油菜籽",1,false,false]],[[0,6]],"canola"]],,,[["en"]],3]
+Immutale	Immutale
+	[[["Immutale","Immutale","Immutale",""]],,"en",,[["Immutale",[1],false,false,1000,0,1,0]],[["Immutale",1,[["Immutale",1000,false,false]],[[0,8]],"Immutale"]],,["<b><i>Immutable</i></b>","Immutable",[1]],[["en"]],7]
+Immigration	入境事务处
+	[[["入境事务处","Immigration","Rùjìng shìwù chù",""]],[["noun",["迁居移民"],[["迁居移民",["immigration"]]],"immigration",1]],"en",,[["入境事务处",[1],false,false,560,0,3,0]],[["Immigration",1,[["入境事务处",560,false,false],["移民局",165,false,false],["出入境",142,false,false],["入境处",99,false,false],["入境事务",31,false,false]],[[0,11]],"Immigration"]],,,[],2]
+Emigration	移民
+	[[["移民","Emigration","Yímín",""]],,"en",,[["移民",[70],false,false,982,0,1,1]],[["Emigration",70,[["移民",982,false,false],["移民潮",12,false,false],["移居",2,false,false],["出境",2,false,false],["移民的",0,false,false]],[[0,10]],"Emigration"]],,,[["en"]],28]
+migration	迁移
+	[[["迁移","migration","Qiānyí",""]],[["noun",["洄游","徒动"],[["洄游",["migration"],,0.0017576985],["徒动",["migration"]]],"migration",1]],"en",,[["迁移",[1],false,false,608,0,1,0]],[["migration",1,[["迁移",608,false,false],["移民",328,false,false],["迁徙",42,false,false],["移植",18,false,false],["迁移的",1,false,false]],[[0,9]],"migration"]],,,[],2]
