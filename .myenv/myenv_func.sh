@@ -188,15 +188,15 @@ function func_select_line() {
 	[ -z "$*" ] && return 1
 	
 	# direct return for shortest
-	select_type=$1
+	local select_type=$1
 	shift
-	[ "shortest" = "$select_type" ] && eval $result_var_name=`echo "$*" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1` && return 0
+	[ "shortest" = "${select_type}" ] && eval $result_var_name="$(echo "$*" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1)" && return 0
 
 	targets_lines=$(echo "$*" | wc -l)
 	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
 
 	func_head 20 "$*" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"
-	echo "NOT SINGLE CANDIDATES, PLS SELECT ONE:"
+	echo "MULTIPLE CANDIDATES, PLS SELECT ONE:"
 	read -e selection
 	user_selection=`echo "$*" | sed -n -e "${selection}p"`
 	eval $result_var_name=$user_selection
@@ -673,23 +673,51 @@ function func_show_resp {
 	| sed -e '/^$/d'
 }
 
-function func_mvn_gen { 
-	func_param_check 2 "Usage: $FUNCNAME [name] [type(war/jar)]" "$@"
-	
-	name=$1
-	type=$2
-	case "$type" in
-	war)
-		#mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
-		mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeCatalog=local -DarchetypeGroupId=com.tpl.archetype -DarchetypeArtifactId=tpl-war-archetype -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false
-		mkdir -p $name/src/main/java
-		;;
-	jar)
-		mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
-		mkdir -p $name/src/main/resources
-		;;
+func_mvn_run() { 
+	func_param_check 0 "Usage: $FUNCNAME [class]" "$@"
+
+	# search candidates
+	if [ -n "${1}" ] ; then
+		# based on param, support (part of) filename, classname, path, etc
+		local candidates="$(find src/{main,test}/java -iregex ".*${1}.*" 2> /dev/null | sed -e '/\.java$/!d')"
+	else
+		# otherwise find all java file, exclude "test" dir to shorten the result
+		local candidates="$(find src/main/java -name "*.java" 2> /dev/null )"
+	fi
+
+	# select candidate
+	if [ "$(echo "${candidates}" | wc -l)" = "1" ] ; then
+		mvn_run_file="${candidates}"
+	else
+		func_select_line mvn_run_file userselect "${candidates}"
+	fi
+
+	# execute
+	mvn_run_class="$(echo ${mvn_run_file} | sed -e "s+src/main/java/++;s+/+.+g;s+.java$++")"
+	func_mvn_run_class "${mvn_run_class}" | sed -e "/^\[INFO\] /d;/^\[WARNING\] Warning: killAfter is now deprecated/d"
+}
+
+func_mvn_run_class() { 
+	func_param_check 1 "Usage: $FUNCNAME [class]" "$@"
+
+	[ -z "${1}" ] && func_cry "ERROR: not classname to run!"
+	[ ! -f pom.xml -o ! -d src/main/java ] && func_cry "ERROR: pom.xml or src/main/java NOT exist, seems not a maven project!"
+
+	mvn compile
+	mvn exec:java -Dexec.mainClass="${1}"
+}
+
+func_mvn_gen() { 
+	func_param_check 2 "Usage: $FUNCNAME [pkg(war/jar/oujar/ouwar)] [name]" "$@"
+
+	case "${1}" in
+	#mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+	jar)	mvn archetype:generate              -DgroupId=com.test   -DartifactId="${2}"                                                                        -DarchetypeArtifactId=maven-archetype-quickstart                             -DinteractiveMode=false ; mkdir -p $name/src/main/resources ;;
+	war)	mvn archetype:generate              -DgroupId=com.test   -DartifactId="${2}" -DarchetypeCatalog=local -DarchetypeGroupId=com.tpl.archetype          -DarchetypeArtifactId=tpl-war-archetype      -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false ; mkdir -p $name/src/main/java ;;
+	oujar)	mvn archetype:generate -U --offline -DgroupId=com.oumisc -DartifactId="${2}" -DarchetypeCatalog=local -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-oujar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false ;;
+	ouwar)	mvn archetype:generate -U --offline -DgroupId=com.oumisc -DartifactId="${2}" -DarchetypeCatalog=local -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-ouwar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false ;;
 	*)
-		echo "ERROR: type must be war/jar"
+		echo "ERROR: pkg type must be war/jar/oujar/ouwar"
 		exit 1
 	esac
 }
@@ -1132,35 +1160,43 @@ function func_backup_listed {
 	#$MY_ENV/util/listed_backup.sh
 }
 
-#function func_run_file_c() {
-#	local file="$(readlink -f ${1})"
-#	local file_name="$(basename ${1})"
-#	local target_dir="$(dirname ${file})/target"
-#
-#	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
-#	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
-#
-#	gcc -o "${file_name%.c}" "${file_name}"
-#	./"${file_name%.c}"
-#	rm "${target_dir}/${file_name}"
-#	\cd - &> /dev/null
-#}
-#
-#function func_run_file_java() {
-#	local file="$(readlink -f ${1})"
-#	local file_name="$(basename ${file})"
-#	local target_dir="$(dirname ${file})/target"
-#
-#	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
-#	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
-#
-#	javac ${file_name}
-#	java -cp . ${file_name%.java}
-#	rm "${target_dir}/${file_name}"
-#	\cd - &> /dev/null
-#}
+func_run_file_c() {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 
-function func_run_file_compile() {
+	local file="$(readlink -f ${1})"
+	local file_name="$(basename ${1})"
+	local target_dir="$(dirname ${file})/target"
+
+	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
+	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
+
+	gcc -o "${file_name%.c}" "${file_name}"
+	./"${file_name%.c}"
+	rm "${target_dir}/${file_name}"
+	\cd - &> /dev/null
+}
+
+func_run_file_java() {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+
+	local file_relative="${1}"
+	local file_absolute="$(readlink -f ${1})"
+	local subpath_class="$(grep "^package " "${file_absolute}" | sed -e "s/package//;s/\s\|;//g;s/\./\//g;" )"
+
+	# simple java file without maven
+	[ -z "${subpath_class}" ] && func_run_file_java_simple "${file_relative}" && return
+
+	# java file in maven project
+	local path_proj="${file_absolute%${subpath_class}*}/../../.."
+	[ ! -d "${path_proj}" ] && func_die "ERROR: "${path_proj}" NOT exist!"
+	\cd "${path_proj}" &> /dev/null
+	func_mvn_run "${file_relative}"
+	\cd - &> /dev/null
+}
+
+func_run_file_java_simple() {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+
 	local file="$(readlink -f ${1})"
 	local file_name="$(basename ${file})"
 	local target_dir="$(dirname ${file})/target"
@@ -1168,23 +1204,21 @@ function func_run_file_compile() {
 	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
 	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
 
-	${2}
-	${3}
-	#rm "${target_dir}/${file_name}"
+	javac ${file_name}
+	java -cp . ${file_name%.java}
+	rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
 }
 
 function func_run_file() {
 	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 	
-	file="${1}"
-	filename="$(basename ${file})"
-	[ ! -e "$file" ] && echo "ERROR: $file not exist!" && return 1
+	local file="${1}"
+	#filename="$(basename ${file})"
+	[ ! -e "${file}" ] && echo "ERROR: $file not exist!" && return 1
 
-	#if [[ "$file" = *.c ]] ; then		func_run_file_c $file
-	#elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
-	if [[ "$file" = *.c ]] ; then		func_run_file_compile $file "gcc ${filename} -o ${filename%.*}" "./${filename%.*}"
-	elif [[ "$file" = *.java ]] ; then	func_run_file_compile $file "javac ${filename}"                 "java -cp . ${filename%.*}"
+	if [[ "$file" = *.c ]] ; then		func_run_file_c $file
+	elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
 	elif [[ "$file" = *.rb ]] ; then	ruby $file
 	elif [[ "$file" = *.sh ]] ; then	bash $file
 	elif [[ "$file" = *.py ]] ; then	python $file
@@ -1545,3 +1579,21 @@ func_grep_file() {
 #	# Jump back
 #	\cd -
 #}
+
+# deprected by func_run_file_java/c
+#if [[ "$file" = *.c ]] ; then		func_run_file_compile $file "gcc ${filename} -o ${filename%.*}" "./${filename%.*}"
+#elif [[ "$file" = *.java ]] ; then	func_run_file_compile $file "javac ${filename}"                 "java -cp . ${filename%.*}"
+#function func_run_file_compile() {
+#	local file="$(readlink -f ${1})"
+#	local file_name="$(basename ${file})"
+#	local target_dir="$(dirname ${file})/target"
+#
+#	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
+#	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
+#
+#	${2}
+#	${3}
+#	#rm "${target_dir}/${file_name}"
+#	\cd - &> /dev/null
+#}
+

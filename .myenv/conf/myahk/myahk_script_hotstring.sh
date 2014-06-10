@@ -2,6 +2,9 @@
 
 hotstring=$(zenity --entry --text "Hotstirng?" --entry-text "ffdate")
 case "$hotstring" in
+	"ffweb")
+		xdotool type --delay 10 --clearmodifiers "g-cs@yy.com ;g-yy-web@yy.com ;g-java-bpt@yy.com ;linyi6@yy.com"
+		;;
 	"ffdate")
 		xdotool type --delay 10 --clearmodifiers "$(date "+%Y-%m-%d")"
 		;;
