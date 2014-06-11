@@ -10,17 +10,15 @@
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
 [ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
 [ -z "$MY_ENV_LOG" ]		&& MY_ENV_LOG=$MY_ENV/zgen/log
-[ -z "$PYTHON_HOME" ]		&& PYTHON_HOME=$MY_DEV/python
-[ -z "$MY_CODE_MISC" ]		&& MY_CODE_MISC=$MY_DEV/code_misc
 [ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
 [ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
 [ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
 
 [ -z "$ME_TAGS_ADDI" ]		&& ME_TAGS_ADDI=$MY_ENV/list/tags_addi
-[ -z "$ME_NOTE_TAGS" ]		&& ME_NOTE_TAGS=$MY_ENV/zgen/tags_note
-[ -z "$ME_CODE_TAGS" ]		&& ME_CODE_TAGS=$MY_ENV/zgen/tags_code
-[ -z "$ME_NOTE_ROOTS" ]		&& ME_NOTE_ROOTS=($MY_DCC $MY_DCO $MY_DCD/project)
-[ -z "$ME_CODE_ROOTS" ]		&& ME_CODE_ROOTS=($ZBOX/src/oumisc/oumisc-git)
+[ -z "$ME_TAGS_NOTE" ]		&& ME_TAGS_NOTE=$MY_ENV/zgen/tags_note
+[ -z "$ME_TAGS_CODE" ]		&& ME_TAGS_CODE=$MY_ENV/zgen/tags_code
+[ -z "$ME_ROOTS_NOTE" ]		&& ME_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD/project)
+[ -z "$ME_ROOTS_CODE" ]		&& ME_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
 
 source $HOME/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
@@ -80,7 +78,7 @@ func_filter_comments() {
 }
 
 func_tag_value_raw() {
-	sed -n -e "s+^${1}=++p" "${ME_TAGS_ADDI}" "${ME_NOTE_TAGS}" "${ME_CODE_TAGS}" | head -1
+	sed -n -e "s+^${1}=++p" "${ME_TAGS_ADDI}" "${ME_TAGS_NOTE}" "${ME_TAGS_CODE}" | head -1
 }
 
 func_tag_value() {
@@ -140,24 +138,24 @@ func_eval_path() {
 
 func_std_gen_tags() {
 	local d dd note_file note_filename
-	func_delete_dated "${ME_NOTE_TAGS}"
-	for d in ${ME_NOTE_ROOTS[@]} ; do
+	func_delete_dated "${ME_TAGS_NOTE}"
+	for d in ${ME_ROOTS_NOTE[@]} ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
 		for note_file in ${d}/note/*.txt ; do
 			local note_filename="${note_file##*/}"
 			local topic_linkpath="${d}/${note_filename%.txt}/${note_filename}"
 			if [ -e "${topic_linkpath}" ] ; then
-				echo "${note_filename%.txt}=${topic_linkpath}" >> "${ME_NOTE_TAGS}"
+				echo "${note_filename%.txt}=${topic_linkpath}" >> "${ME_TAGS_NOTE}"
 			else
-				echo "${note_filename%.txt}=${note_file}" >> "${ME_NOTE_TAGS}"
+				echo "${note_filename%.txt}=${note_file}" >> "${ME_TAGS_NOTE}"
 			fi
 		done
 	done
 
-	func_delete_dated "${ME_CODE_TAGS}"
-	for d in ${ME_CODE_ROOTS[@]} ; do
+	func_delete_dated "${ME_TAGS_CODE}"
+	for d in ${ME_ROOTS_CODE[@]} ; do
 		for dd in ${d}/* ; do
-			echo "${dd##*/}=${dd}" >> "${ME_CODE_TAGS}"
+			echo "${dd##*/}=${dd}" >> "${ME_TAGS_CODE}"
 		done
 	done
 }
@@ -165,7 +163,7 @@ func_std_gen_tags() {
 func_std_gen_links() {
 	# STD 1: if there is dir and note have same name, there should be a link
 	local d note_file
-	for d in ${ME_NOTE_ROOTS[@]} ; do
+	for d in ${ME_ROOTS_NOTE[@]} ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
 		for note_file in ${d}/note/*.txt ; do
 			local note_filename="${note_file##*/}"
@@ -502,11 +500,12 @@ func_collect_all() {
 	sudo updatedb
 
 	echo "INFO: collecting stdnote"
+	local count=0
 	local stdnote_content=${base}/stdnote_content.txt
 	local stdnote_outline=${base}/stdnote_outline.txt
 	local stdnote_filelist=${base}/stdnote_filelist.txt
 	local stdnote_quicklist=${base}/stdnote_quicklist.txt
-	for d in ${ME_NOTE_ROOTS[@]} ; do
+	for d in ${ME_ROOTS_NOTE[@]} ; do
 		for f in $d/note/* ; do  
 			local filename=${f##*/} 
 			local dirname=$(echo ${d}/note)
@@ -534,34 +533,40 @@ func_collect_all() {
 		sed -e "s///" "${line}" >> "${miscnote_content}"
 	done
 
-	# myenv
 	echo "INFO: collecting myenv"
 	local myenv_content=${base}/myenv_content.txt
 	local myenv_filelist=${base}/myenv_filelist.txt
 	for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
-		func_validate_file_type_text "${f}" || continue
-
 		echo "${f}" >> "${myenv_filelist}"
+
+		func_validate_file_type_text "${f}" || continue
 
 		echo -e "\n\n@${f}\n"  >> "${myenv_content}"
 		sed -e "s///" "${f}" >> "${myenv_content}"
 	done
 
-	# code
-	# TODO
+	echo "INFO: collecting code"
+	local code_content=${base}/code_content.txt
+	local code_filelist=${base}/code_filelist.txt
+	for d in ${ME_ROOTS_CODE[@]} ; do
+		\cd "${d}" &> /dev/null
+		git ls-files | sed -e "s+^+${d}/+" >> "${code_filelist}"
+		\cd - &> /dev/null
+	done
+	cat "${code_filelist}" | while read line ; do
+		func_validate_file_type_text "${line}" || continue
+		echo -e "\n\n@${line}\n"  >> "${code_content}"
+		sed -e "s///" "${line}" >> "${code_content}"
+	done
 
 	echo "INFO: collecting all"
 	local all_content=${base}/all_content.txt
-	cat "${stdnote_quicklist}" >> "${all_content}"
-	cat "${stdnote_outline}"   >> "${all_content}"
-	cat "${stdnote_content}"   >> "${all_content}"
-	cat "${miscnote_content}"  >> "${all_content}"
-	cat "${myenv_content}"     >> "${all_content}"
-	cat "${stdnote_filelist}"  >> "${all_content}"
-	cat "${miscnote_filelist}" >> "${all_content}"
-	cat "${myenv_filelist}"    >> "${all_content}"
+	cat "${stdnote_quicklist}"	"${stdnote_outline}"							>> "${all_content}"
+	cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"	"${code_content}"	>> "${all_content}"
+	cat "${stdnote_filelist}"	"${miscnote_filelist}"	"${myenv_filelist}"	"${code_filelist}"	>> "${all_content}"
 
 	echo "INFO: shorten file path"
+	sed -i -e 's+^\(@*\)/home/ouyangzhu/.myenv/+\1$MY_ENV/+' "${all_content}"
 	sed -i -e 's+^\(@*\)\(/ext\|/home/ouyangzhu\)/Documents/\([DEF]C.\)/+\1$MY_\3/+' "${all_content}"
 }
 
@@ -660,7 +665,7 @@ func_collect_note_stdnote() {
 	local sn=$MY_ENV/zgen/collection_note/collection_stdnote.txt
 
 	echo "INFO: collecting stdnote names"
-	for d in ${ME_NOTE_ROOTS[@]} ; do
+	for d in ${ME_ROOTS_NOTE[@]} ; do
 		for f in $d/note/* ; do  
 			ff=${f##*/} 
 			printf "%-25s" ${ff%.txt} >> "${sn}"
@@ -903,6 +908,19 @@ func_ssh_with_jump() {
 	# Demo: func_ssh_with_jump 222.88.95.197 
 }
 
+func_translate_ip() {
+	func_param_check 1 "Usage: $FUNCNAME [domain/host name]" "$@"
+
+	ping -c 1 "${1}" | head -1 | sed -e "s/[^(]*(//;s/).*//"
+}
+
+func_scp_with_jump_translate_remote() {
+	func_param_check 1 "Usage: $FUNCNAME [addr]" "$@"
+
+	echo ${1} | grep -q -v ":" && echo "${1}" && return 0
+	echo "$(func_translate_ip ${1%:*}):${1#*:}"
+}
+
 func_scp_with_jump() {
 	func_param_check 2 "Usage: $FUNCNAME [source] [target]" "$@"
 
@@ -916,6 +934,9 @@ func_scp_with_jump() {
 	targetDir=$(dirname ${target##*:})
 	targetCmd="mkdir -p $targetDir"
 	targetAddr=${target%%:*}
+
+	source=$(func_scp_with_jump_translate_remote "${source}")
+	target=$(func_scp_with_jump_translate_remote "${target}")
 
 	if [[ $(echo $1 | grep -c ":") == 1 ]] 
 	then
@@ -1339,58 +1360,6 @@ func_mount_iso() {
 	sudo mount -t iso9660 -o ro,loop,noauto $2 $1
 }
  
-func_build_prepare_source() {
-	func_param_check 3 "Usage: $FUNCNAME <source_base> <local_addr> <remote_addr>" "$@" 
-
-	# remote first
-	[ -n "$3" ] && func_build_prepare_source_remote "$1" "$3" || func_build_prepare_source_local "$1" "$2"
-}
-
-func_build_prepare_source_remote() {
-	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
-
-	# TODO: func_download to download?
-	case "$*" in
-		*/hg/*)		func_build_prepare_source_remote_hg "$@" ;;
-		*/git/*)	func_build_prepare_source_remote_git "$@" ;;
-		*)		echo "ERROR: unable to handle build address: $*" ;;
-	esac
-}
-
-func_build_prepare_source_remote_hg() {
-	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
-
-	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-HG-
-	source_base_name=$(basename ${1})
-	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-HG-
-
-	mkdir -p $MY_CODE_MISC
-	[ -e "$source_base_remote" ] && hg pull && hg update || hg clone "$2" "$source_base_remote"
-	rm -rf "$1" ; ln -s "$source_base_remote" "$1"
-}
-
-func_build_prepare_source_remote_git() {
-	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
-
-	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-GIT-
-	source_base_name=$(basename ${1})
-	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-GIT-
-
-	mkdir -p $MY_CODE_MISC
-	[ -e "$source_base_remote" ] && git pull || git clone "$2" "$source_base_remote"
-	rm -rf "$1" ; ln -s "$source_base_remote" "$1"
-}
-
-func_build_prepare_source_remote_download() {
-	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
-	echo "ERROR: not implement yet"
-}
-
-func_build_prepare_source_local() {
-	func_param_check 1 "Usage: $FUNCNAME <local_addr>" "$@" 
-	echo "ERROR: not implement yet"
-}
-
 func_mytask_all() {
 	local base=$MY_ENV_ZGEN/mytask
 	local log=$base/a.log
@@ -1676,5 +1645,66 @@ func_apt_add_repo() {
 #	${3}
 #	#rm "${target_dir}/${file_name}"
 #	\cd - &> /dev/null
+#}
+#
+# deprecated by zbox
+#[ -z "$MY_CODE_MISC" ]		&& MY_CODE_MISC=$MY_DEV/code_misc
+#
+# deprecated by zbox
+#func_build_prepare_source() {
+#	func_param_check 3 "Usage: $FUNCNAME <source_base> <local_addr> <remote_addr>" "$@" 
+#
+#	# remote first
+#	[ -n "$3" ] && func_build_prepare_source_remote "$1" "$3" || func_build_prepare_source_local "$1" "$2"
+#}
+#
+# deprecated by zbox
+#func_build_prepare_source_remote() {
+#	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
+#
+#	# TODO: func_download to download?
+#	case "$*" in
+#		*/hg/*)		func_build_prepare_source_remote_hg "$@" ;;
+#		*/git/*)	func_build_prepare_source_remote_git "$@" ;;
+#		*)		echo "ERROR: unable to handle build address: $*" ;;
+#	esac
+#}
+#
+# deprecated by zbox
+#func_build_prepare_source_remote_hg() {
+#	func_param_check 2 "Usage: $FUNCNAME <source_base> <remote_addr>" "$@" 
+#
+#	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-HG-
+#	source_base_name=$(basename ${1})
+#	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-HG-
+#
+#	mkdir -p $MY_CODE_MISC
+#	[ -e "$source_base_remote" ] && hg pull && hg update || hg clone "$2" "$source_base_remote"
+#	rm -rf "$1" ; ln -s "$source_base_remote" "$1"
+#}
+#
+# deprecated by zbox
+#func_build_prepare_source_remote_git() {
+#	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
+#
+#	# Naming rule: /tmp/source_base_vim, will get ~/dev/code_misc/vim_-GIT-
+#	source_base_name=$(basename ${1})
+#	source_base_remote=$MY_CODE_MISC/"${source_base_name##*_}"_-GIT-
+#
+#	mkdir -p $MY_CODE_MISC
+#	[ -e "$source_base_remote" ] && git pull || git clone "$2" "$source_base_remote"
+#	rm -rf "$1" ; ln -s "$source_base_remote" "$1"
+#}
+#
+# deprecated by zbox
+#func_build_prepare_source_remote_download() {
+#	func_param_check 1 "Usage: $FUNCNAME <remote_addr>" "$@" 
+#	echo "ERROR: not implement yet"
+#}
+#
+# deprecated by zbox
+#func_build_prepare_source_local() {
+#	func_param_check 1 "Usage: $FUNCNAME <local_addr>" "$@" 
+#	echo "ERROR: not implement yet"
 #}
 

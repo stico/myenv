@@ -9,10 +9,10 @@
 "/home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/Documents/DCB/Record/Note/A_NOTE_TmpRecord.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
   control+alt+q
 
-"/home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
+"/home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
   control+alt+a
 
-"/usr/bin/wmctrl -a 'SINGLE_VIM' || /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection_note/collection_content.txt"
+"/usr/bin/wmctrl -a 'SINGLE_VIM' || /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt"
   control+alt+z
 
 "/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
