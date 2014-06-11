@@ -488,6 +488,84 @@ deprecated_func_gen_grep_pattern_str() {
 	eval $result_var_name=$result_pattern_str
 }
 
+func_collect_all() {
+	# vars
+	local f d line
+	local base=$MY_ENV_ZGEN/collection
+
+	echo "INFO: backup and clean old collection"
+	func_backup_dated "${base}"
+	func_delete_dated "${base}"
+	mkdir -p "${base}"
+
+	echo "INFO: update locate db"
+	sudo updatedb
+
+	echo "INFO: collecting stdnote"
+	local stdnote_content=${base}/stdnote_content.txt
+	local stdnote_outline=${base}/stdnote_outline.txt
+	local stdnote_filelist=${base}/stdnote_filelist.txt
+	local stdnote_quicklist=${base}/stdnote_quicklist.txt
+	for d in ${ME_NOTE_ROOTS[@]} ; do
+		for f in $d/note/* ; do  
+			local filename=${f##*/} 
+			local dirname=$(echo ${d}/note)
+			local fullpath=${d}/note/${f#${dirname}}
+
+			echo "${fullpath}" >> "${stdnote_filelist}"
+
+			echo -e "\n\n@${fullpath}\n" >> "${stdnote_content}"
+			sed -e "s///" "${f}"       >> "${stdnote_content}"
+			
+			printf "%-25s" ${filename%.txt}                       >> "${stdnote_quicklist}"
+			count=$(($count+1)) && (($count%4==0)) && printf "\n" >> "${stdnote_quicklist}"
+
+			echo -e "\n\n@${fullpath}\n"                                     >> "${stdnote_outline}"
+			grep "^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$" "${fullpath}" >> "${stdnote_outline}"
+		done
+	done
+
+	echo "INFO: collecting miscnote"
+	local miscnote_content=${base}/miscnote_content.txt
+	local miscnote_filelist=${base}/miscnote_filelist.txt
+	locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
+	cat "${miscnote_filelist}" | while read line ; do
+		echo -e "\n\n@${line}\n"  >> "${miscnote_content}"
+		sed -e "s///" "${line}" >> "${miscnote_content}"
+	done
+
+	# myenv
+	echo "INFO: collecting myenv"
+	local myenv_content=${base}/myenv_content.txt
+	local myenv_filelist=${base}/myenv_filelist.txt
+	for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
+		func_validate_file_type_text "${f}" || continue
+
+		echo "${f}" >> "${myenv_filelist}"
+
+		echo -e "\n\n@${f}\n"  >> "${myenv_content}"
+		sed -e "s///" "${f}" >> "${myenv_content}"
+	done
+
+	# code
+	# TODO
+
+	echo "INFO: collecting all"
+	local all_content=${base}/all_content.txt
+	cat "${stdnote_quicklist}" >> "${all_content}"
+	cat "${stdnote_outline}"   >> "${all_content}"
+	cat "${stdnote_content}"   >> "${all_content}"
+	cat "${miscnote_content}"  >> "${all_content}"
+	cat "${myenv_content}"     >> "${all_content}"
+	cat "${stdnote_filelist}"  >> "${all_content}"
+	cat "${miscnote_filelist}" >> "${all_content}"
+	cat "${myenv_filelist}"    >> "${all_content}"
+
+	echo "INFO: shorten file path"
+	sed -i -e 's+^\(@*\)\(/ext\|/home/ouyangzhu\)/Documents/\([DEF]C.\)/+\1$MY_\3/+' "${all_content}"
+}
+
+# deprecated by func_collect_all
 func_collect_files() {
 	func_param_check 4 "Usage: $FUNCNAME [target_base] [source_bases] [include_patterns] [exclude_patterns]" "$@"
 
@@ -548,6 +626,7 @@ func_collect_files() {
 	popd
 }
 
+# deprecated by func_collect_all
 func_collect_code() {
 	target_base=$MY_ENV/zgen/collection_code
 	source_bases=(dw ourepo oumisc)
@@ -559,6 +638,7 @@ func_collect_code() {
 	func_collect_files $target_base $source_bases $include_patterns $exclude_patterns
 }
 
+# deprecated by func_collect_all
 func_collect_note_outline() {
 	local fl=$MY_ENV/zgen/collection_note/collection_fl.txt
 	local ol=$MY_ENV/zgen/collection_note/collection_outline.txt
@@ -574,13 +654,14 @@ func_collect_note_outline() {
 	done < ${fl}
 }
 
+# deprecated by func_collect_all
 func_collect_note_stdnote() {
 	local count=0 
 	local sn=$MY_ENV/zgen/collection_note/collection_stdnote.txt
 
 	echo "INFO: collecting stdnote names"
 	for d in ${ME_NOTE_ROOTS[@]} ; do
-		for f in $d/* ; do  
+		for f in $d/note/* ; do  
 			ff=${f##*/} 
 			printf "%-25s" ${ff%.txt} >> "${sn}"
 			count=$(($count+1)) && (($count%4==0)) && printf "\n" >> "${sn}"
@@ -589,6 +670,7 @@ func_collect_note_stdnote() {
 	printf "\n\n\n" >> "${sn}"
 }
 
+# deprecated by func_collect_all
 func_collect_note() {
 	# TODO: if want collect .bat file, update (blank and encoding type) $MY_DOC/DCC/OS_Win/Useful MS-DOS batch files and tricks/SCANZ.BAT
 
@@ -1071,11 +1153,13 @@ func_translate_microsoft() {
 func_delete_dated() { 
 	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
 
-	# the path might have blank, so use $*, and embrace with "" (many place used this)
-	targetDir=$MY_TMP/`func_date`
+	local targetDir=$MY_TMP/$(func_date)
+	[[ ! -e $targetDir ]] && mkdir ${targetDir}
 
-	[[ ! -e $targetDir ]] && mkdir $targetDir
-	mv "$@" $targetDir &> /dev/null
+	for t in "$@" ; do
+		mv "${t}" "${targetDir}/$(basename ${t})_$(func_time)"
+	done
+	#mv "$@" ${targetDir} &> /dev/null
 }
 
 func_backup_dated() { 

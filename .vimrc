@@ -539,7 +539,8 @@ function! NoteOutline()
 	call cursor(1, 1)
 	let flags = 'cW'
 	let file = expand('%')
-	"while search("^\t*[^ \t]\+$", flags) > 0					" NOT work, why?
+	"while search("^\t*[^ \t]\+$", flags) > 0					" NOT works, why?
+	"while search("^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$", flags) > 0		" NOT works, since vim not fully support POSIX regex syntax
 	"while search("^\t*[^ \t][^ \t]*$", flags) > 0					" works, but all Chinese becomes outline
 	while search("^\t*[-a-z0-9_\.][-a-z0-9_\.]*[\t ]*$", flags) > 0			" works, but a bit strict
 		let flags = 'W'
