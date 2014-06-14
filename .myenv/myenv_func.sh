@@ -19,6 +19,7 @@
 [ -z "$ME_TAGS_CODE" ]		&& ME_TAGS_CODE=$MY_ENV/zgen/tags_code
 [ -z "$ME_ROOTS_NOTE" ]		&& ME_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD/project)
 [ -z "$ME_ROOTS_CODE" ]		&& ME_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
+[ -z "$ME_NOTIFY_MAIL" ]	&& ME_NOTIFY_MAIL=focits@gmail.com
 
 source $HOME/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
@@ -466,7 +467,6 @@ func_gen_list_f_me() {
 
 deprecated_func_gen_grep_pattern_str() {
 	# Deprecated: passing array between functions is painful!
-	
 	func_param_check 2 "Usage: $FUNCNAME [result_var_name] [patterns]" "$@"
 
 	# need use variable to "return" result
@@ -486,13 +486,32 @@ deprecated_func_gen_grep_pattern_str() {
 	eval $result_var_name=$result_pattern_str
 }
 
+func_notify_mail() {
+	func_param_check 2 "Usage: $FUNCNAME [title] [content]" "$@"
+
+	local title="${1}"
+	shift
+	echo "$*" | mutt -s "$title" ${ME_NOTIFY_MAIL}
+}
+
+func_check_cronlog() {
+	local log=/home/ouyangzhu/.myenv/zgen/cron.log 
+	local result="$(grep -i "error" ${log})"
+
+	if [ -n "${result}" ] ; then
+		echo "Found err message in ${log}, sending notifications"
+		func_notify_mail "[MYENV Notyfy] cronlog has ERROR!" "$result"
+	else
+		echo "No err found in ${log}, not notificaton needed"
+	fi
+}
+
 func_collect_all() {
 	# vars
 	local f d line
 	local base=$MY_ENV_ZGEN/collection
 
 	echo "INFO: backup and clean old collection"
-	func_backup_dated "${base}"
 	func_delete_dated "${base}"
 	mkdir -p "${base}"
 
@@ -818,8 +837,8 @@ func_mvn_gen() {
 func_svn_backup() { 
 	[ -n "$1" ] && src_path="$1" || src_path="."
 
-	src_name=$(basename $(readlink -f $src_path))
-	tmp_path=$MY_TMP/${src_name}_svn_export
+	local src_name=$(basename $(readlink -f $src_path))
+	local tmp_path=$MY_TMP/${src_name}_svn_export
 
 	# current dir is already project
 	[ -e ./.svn ] && svn export $src_path $tmp_path && return 0
@@ -1275,12 +1294,14 @@ func_run_file_c() {
 	local file="$(readlink -f ${1})"
 	local file_name="$(basename ${1})"
 	local target_dir="$(dirname ${file})/target"
+	local executable="${target_dir}/${file_name%.c}"
 
 	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
 	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
+	func_delete_dated "${executable}"
 
-	gcc -o "${file_name%.c}" "${file_name}"
-	./"${file_name%.c}"
+	gcc -o "${executable}" "${file_name}"
+	${executable}
 	rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
 }
@@ -1308,13 +1329,15 @@ func_run_file_java_simple() {
 
 	local file="$(readlink -f ${1})"
 	local file_name="$(basename ${file})"
+	local classname=${file_name%.java}
 	local target_dir="$(dirname ${file})/target"
 
 	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
 	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
+	func_delete_dated "${classname}"
 
 	javac ${file_name}
-	java -cp . ${file_name%.java}
+	java -cp . ${classname}
 	rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
 }

@@ -23,6 +23,7 @@ else
 	envFuncSrc=(myenv_func.sh)
 	envAliasSrc=(env_alias env_alias_lu)
 fi
+[[ -e $HOME/.myenv/secu/env_var_secu ]] && envVarSrc+=(secu/env_var_secu)
 [[ -e $HOME/.myenv/secu/env_alias_secu ]] && envAliasSrc+=(secu/env_alias_secu)
 
 # even could directly set env, still better have file record left to trace

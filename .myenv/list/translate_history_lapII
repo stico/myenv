@@ -258,3 +258,25 @@ migration	迁移
 	[[["迁移","migration","Qiānyí",""]],[["noun",["洄游","徒动"],[["洄游",["migration"],,0.0017576985],["徒动",["migration"]]],"migration",1]],"en",,[["迁移",[1],false,false,608,0,1,0]],[["migration",1,[["迁移",608,false,false],["移民",328,false,false],["迁徙",42,false,false],["移植",18,false,false],["迁移的",1,false,false]],[[0,9]],"migration"]],,,[],2]
 cheating	作弊
 	[[["作弊","cheating","Zuòbì",""]],,"en",,[["作弊",[1],false,false,931,0,1,0]],[["cheating",1,[["作弊",931,false,false],["欺骗",61,false,false],["欺诈",6,false,false],["作弊行为",0,false,false]],[[0,8]],"cheating"]],,,[["en"]],3]
+prospectuses	招股书
+	[[["招股书","prospectuses","Zhāogǔ shū",""]],,"en",,[["招股书",[1],false,false,374,0,2,0]],[["prospectuses",1,[["招股书",374,false,false],["章程",290,false,false],["招股章程",194,false,false],["招股说明书",91,false,false],["招股",48,false,false]],[[0,12]],"prospectuses"]],,,[["en"]],33]
+statutory	法定的
+	[[["法定的","statutory","Fǎdìng de",""]],[["adjective",["成文","法定的","法令的"],[["成文",["written","statutory"],,0.00047307814],["法定的",["decretory","lawful","statutory"]],["法令的",["decretal","decretive","statutable","statutory"]]],"statutory",3]],"en",,[["法定的",[1],false,false,1000,0,2,0]],[["statutory",1,[["法定的",1000,false,false],["法定",0,false,false],["的法定",0,false,false],["法例",0,false,false],["法律",0,false,false]],[[0,9]],"statutory"]],,,[],2]
+saturation	饱和
+	[[["饱和","saturation","Bǎohé",""]],[["noun",["饱和"],[["饱和",["saturation"],,0.53526145]],"saturation",1]],"en",,[["饱和",[1],false,false,1000,0,1,0]],[["saturation",1,[["饱和",1000,false,false],["饱和度",0,false,false],["的饱和",0,false,false],["饱和状态",0,false,false],["饱",0,false,false]],[[0,10]],"saturation"]],,,[],3]
+empirical
+	<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">实证</string>
+empirical	经验
+	[[["经验","empirical","Jīngyàn",""]],[["adjective",["经验"],[["经验",["empirical","empiric"],,0.24891968]],"empirical",3]],"en",,[["经验",[1],false,false,1000,0,1,0]],[["empirical",1,[["经验",1000,false,false],["实证",0,false,false],["的经验",0,false,false],["经验性",0,false,false],["实验",0,false,false]],[[0,9]],"empirical"]],,,[],2]
+plot	情节
+	[[["情节","plot","Qíngjié",""]],[["noun",["情节","阴谋","畦","策划","计谋","谋","策略","田地"],[["情节",["plot","circumstances","story"],,0.10057265],["阴谋",["conspiracy","plot","scheme","cabal","pitfall"],,0.043255754],["畦",["plot","furrow"],,0.002943591],["策划",["plan","plot","scheme"],,0.0025574362],["计谋",["scheme","plot","stratagem"],,0.0010495697],["谋",["plan","plot","scheme","stratagem","strategy"],,0.000721358],["策略",["tactics","ploy","plot"],,0.00015358598],["田地",["farmland","field","plot","condition"],,0.00011062383]],"plot",1],["verb",["图谋","密谋","暗算","谋","划分","同谋","猷"],[["图谋",["plot","scheme","conspire","contrive"],,0.0068440544],["密谋",["plot","conspire","scheme"],,0.0029899459],["暗算",["plot"],,0.0020873186],["谋",["seek","plan","plot","scheme","consult"],,0.000721358],["划分",["divide","partition","differentiate","plot","compartmentalize","set off"],,0.0004957816],["同谋",["conspire","plot"],,1.4971308e-05],["猷",["scheme","conspire","plan","plot"],,9.8184237e-06]],"plot",2]],"en",,[["情节",[1],false,false,700,0,1,0]],[["plot",1,[["情节",700,false,false],["阴谋",298,false,false],["图谋",1,false,false],["畦",0,false,false],["积",0,false,false]],[[0,4]],"plot"]],,,[],2]
+logarithmic	对数的
+	[[["对数的","logarithmic","Duì shǔ de",""]],[["adjective",["对数的"],[["对数的",["logarithmic"]]],"logarithmic",3]],"en",,[["对数的",[1],false,false,1000,0,3,0]],[["logarithmic",1,[["对数的",1000,false,false],["对数",0,false,false],["数",0,false,false],["的对数",0,false,false]],[[0,11]],"logarithmic"]],,,[],9]
+对数	Logarithmic
+	[[["Logarithmic","对数","","Duì shù"]],[["noun",["logarithm"],[["logarithm",["对数"]]],"对数",1]],"zh-CN",,[["Logarithmic",[1],true,false,971,0,1,0]],[["对 数",1,[["Logarithmic",971,true,false],["Logarithms",23,true,false],["Log",0,true,false],["The logarithm",0,true,false],["The logarithmic",0,true,false]],[[0,2]],"对数"]],,,[],11]
+syllabus	教学大纲
+	[[["教学大纲","syllabus","Jiàoxué dàgāng",""]],,"en",,[["教学大纲",[1],false,false,795,0,1,0]],[["syllabus",1,[["教学大纲",795,false,false],["课程大纲",102,false,false],["考试大纲",51,false,false],["大纲",47,false,false],["提纲",2,false,false]],[[0,8]],"syllabus"]],,,[["en"]],2]
+quardratic	二次无
+	[[["二次无","quardratic","Èr cì wú",""]],,"en",,[["二次无",[1],false,false,1000,0,2,0]],[["quardratic",1,[["二次无",1000,false,false]],[[0,10]],"quardratic"]],,["<b><i>quadratic</i></b>","quadratic",[1]],[["it","en"]],7]
+exponential	指数
+	[[["指数","exponential","Zhǐshù",""]],[["noun",["幂数的"],[["幂数的",["exponential"]]],"exponential",1]],"en",,[["指数",[7],false,false,982,0,1,1]],[["exponential",7,[["指数",982,false,false],["指数型",14,false,false],["指数的",1,false,false],["指数级",0,false,false],["的指数",0,false,false]],[[0,11]],"exponential"]],,,[],3]
