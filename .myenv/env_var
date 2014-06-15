@@ -42,6 +42,7 @@ MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
 MY_TMP		%HOME%amp
+MY_JAVA_LANG	%HOME%Documents#FCS#oumisc#oumisc-git#java-lang
 
 
 ################################################################################

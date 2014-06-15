@@ -563,7 +563,8 @@ function! NoteOutline()
 endfunction
 nnoremap <silent> mo :<C-U>call NoteOutline()<CR>
 autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
-autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
+"autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
+autocmd BufWinEnter quickfix silent! nnoremap <ESC> :exec "bd " . g:qfix_win<CR>
 autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"
 autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
 

@@ -21,3 +21,5 @@ history_key=<Ctrl><Shift>V
 actions_key=
 menu_key=
 search_key=
+offline_key=<Ctrl><Alt>O
+offline_mode=true

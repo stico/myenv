@@ -280,3 +280,35 @@ quardratic	二次无
 	[[["二次无","quardratic","Èr cì wú",""]],,"en",,[["二次无",[1],false,false,1000,0,2,0]],[["quardratic",1,[["二次无",1000,false,false]],[[0,10]],"quardratic"]],,["<b><i>quadratic</i></b>","quadratic",[1]],[["it","en"]],7]
 exponential	指数
 	[[["指数","exponential","Zhǐshù",""]],[["noun",["幂数的"],[["幂数的",["exponential"]]],"exponential",1]],"en",,[["指数",[7],false,false,982,0,1,1]],[["exponential",7,[["指数",982,false,false],["指数型",14,false,false],["指数的",1,false,false],["指数级",0,false,false],["的指数",0,false,false]],[[0,11]],"exponential"]],,,[],3]
+组合	Combination
+	[[["Combination","组合","","Zǔhé"]],[["noun",["combination","association"],[["combination",["组合","合并","结伙"],,0.17107983],["association",["协会","会","联想","学会","组合","交往"],,0.00051957468]],"组合",1],["verb",["assemble","compose","constitute","build up","make up"],[["assemble",["组合","聚集","集合","集聚","组成","调集"],,0.0012660227],["compose",["撰写","组成","构成","编写","组合","合成"],,0.00054450962],["constitute",["构成","组成","占","组合"],[27170],4.4003122e-05],["build up",["积聚","组成","聚积","组合","起家","组装"],,7.5280464e-06],["make up",["弥补","组成","补","构成","补偿","组合"],[27170],3.6326799e-07]],"组合",2]],"zh-CN",,[["Combination",[1],true,false,1000,0,1,0]],[["组合",1,[["Combination",1000,true,false],["Combination of",0,true,false],["Combinations",0,true,false],["Portfolio",0,true,false],["A combination",0,true,false]],[[0,2]],"组合"]],,,[],2]
+optimal	最佳
+	[[["最佳","optimal","Zuì jiā",""]],[["adjective",["最佳"],[["最佳",["optimal"],,0.26914635]],"optimal",3]],"en",,[["最佳",[1],false,false,1000,0,1,0]],[["optimal",1,[["最佳",1000,false,false],["最优",0,false,false],["优化",0,false,false],["最佳的",0,false,false],["最优的",0,false,false]],[[0,7]],"optimal"]],,,[],3]
+quadratic	二次
+	[[["二次","quadratic","Èr cì",""]],,"en",,[["二次",[1],false,false,954,0,1,0]],[["quadratic",1,[["二次",954,false,false],["二次方程",24,false,false],["二次方",9,false,false],["二次型",6,false,false],["平方",5,false,false]],[[0,9]],"quadratic"]],,,[["it","pt","ca","la","en"]],2]
+proove	坡口
+	[[["坡口","proove","Pō kǒu",""]],,"en",,[["坡口",[1],false,false,1000,0,2,0]],[["proove",1,[["坡口",1000,false,false]],[[0,6]],"proove"]],,["<b><i>prove</i></b>","prove",[1]],[["et","is","ht"]],18]
+prove	证明
+	[[["证明","prove","Zhèngmíng",""]],[["verb",["证明","证","验","征","著"],[["证明",["prove","certificate","certify","confirm the truth of"],,0.56978285],["证",["certificate","prove","confirm"],,0.012011689],["验",["test","check","verify","examine","prove","confirm"],,0.00034074541],["征",["impose","ask for","attack","impose on","prove","testify"],,3.0719129e-05],["著",["receive","suffer","make known","prove","show","write"]]],"prove",2]],"en",,[["证明",[1],false,false,991,0,1,0]],[["prove",1,[["证明",991,false,false],["证",8,false,false],["证实",0,false,false],["验证",0,false,false],["被证明",0,false,false]],[[0,5]],"prove"]],,,[],4]
+permanent	永久
+	[[["永久","permanent","Yǒngjiǔ",""]],[["adjective",["永久","常驻","常任","常设","恒","经久","续","绎"],[["永久",["permanent","perpetual","lasting","everlasting"],,0.30498278],["常驻",["permanent","resident"],,0.27768996],["常任",["permanent"],,0.16324551],["常设",["permanent","standing"],,0.10539922],["恒",["permanent","lasting","usual","common"],,0.0052475184],["经久",["prolonged","durable","permanent","sustained","protracted","continued"],,5.8294663e-05],["续",["continuous","incessant","nonstop","unremitting","permanent"],,4.2228512e-06],["绎",["constant","incessant","nonstop","permanent","unbroken","uninterrupted"],,3.2887599e-06]],"permanent",3]],"en",,[["永久",[1],false,false,946,0,1,0]],[["permanent",1,[["永久",946,false,false],["恒",37,false,false],["常驻",9,false,false],["常设",4,false,false],["常任",2,false,false]],[[0,9]],"permanent"]],,,[],2]
+asymptotic	渐近
+	[[["渐近","asymptotic","Jiàn jìn",""]],,"en",,[["渐近",[1],false,false,983,0,1,0]],[["asymptotic",1,[["渐近",983,false,false],["渐进",15,false,false],["的渐近",0,false,false],["渐近的",0,false,false],["渐近性",0,false,false]],[[0,10]],"asymptotic"]],,,[["en"]],2]
+loitor	loitor
+	[[["loitor","loitor","Loitor",""]],,"en",,[["loitor",[1],false,false,1000,0,1,0]],[["loitor",1,[["loitor",1000,false,false]],[[0,6]],"loitor"]],,,[["en"]],8]
+loitorin	loitorin
+	[[["loitorin","loitorin","Loitorin",""]],,"en",,[["loitorin",[1],false,false,1000,0,1,0]],[["loitorin",1,[["loitorin",1000,false,false]],[[0,8]],"loitorin"]],,["<b><i>loitering</i></b>","loitering",[1]],[["en"]],12]
+loitoring	loitoring
+	[[["loitoring","loitoring","Loitoring",""]],,"en",,[["loitoring",[1],false,false,1000,0,1,0]],[["loitoring",1,[["loitoring",1000,false,false]],[[0,9]],"loitoring"]],,["<b><i>loitering</i></b>","loitering",[1]],[["en"]],7]
+loiter	游荡
+	[[["游荡","loiter","Yóudàng",""]],[["verb",["游荡","浪荡","滞留","闲混"],[["游荡",["loiter","stray","drift","go astray","get lost","wander away"],,0.36787945],["浪荡",["hang around","loiter","loaf about"],,0.02706876],["滞留",["delay","linger around","loiter","retard","be behind","linger about"],,0.0050860695],["闲混",["loiter"]]],"loiter",2]],"en",,[["游荡",[1],false,false,988,0,1,0]],[["loiter",1,[["游荡",988,false,false],["浪荡",11,false,false],["徘徊",0,false,false],["闲逛",0,false,false],["流连",0,false,false]],[[0,6]],"loiter"]],,,[],3]
+caveat	警告
+	[[["警告","caveat","Jǐnggào",""]],,"en",,[["警告",[3],false,false,533,0,1,1]],[["caveat",3,[["警告",533,false,false],["需要注意的",174,false,false],["需要注意",145,false,false],["告诫",130,false,false],["需要说明",16,false,false]],[[0,6]],"caveat"]],,,[["en"]],2]
+amortized	摊销
+	[[["摊销","amortized","Tān xiāo",""]],[["verb",["缓冲","分期清偿"],[["缓冲",["amortize","buff"],,0.15097742],["分期清偿",["amortize"]]],"amortize",2]],"en",,[["摊销",[1],false,false,968,0,1,0]],[["amortized",1,[["摊销",968,false,false],["平均摊销",7,false,false],["摊余",7,false,false],["分摊",4,false,false]],[[0,9]],"amortized"]],,[,"amortize",[10],,true],[],3]
+wether	羯羊
+	[[["羯羊","wether","Jié yáng",""]],[["noun",["羯羊"],[["羯羊",["wether"],,0.021750359]],"wether",1]],"en",,[["羯羊",[1],false,false,1000,0,1,0]],[["wether",1,[["羯羊",1000,false,false],["阉羊",0,false,false],["阉",0,false,false]],[[0,6]],"wether"]],,["<b><i>weather</i></b>","weather",[1]],[],11]
+weither	weither
+	[[["weither","weither","Weither",""]],,"en",,[["weither",[1],false,false,1000,0,1,0]],[["weither",1,[["weither",1000,false,false]],[[0,7]],"weither"]],,["<b><i>weather</i></b>","weather",[1]],[["en"]],11]
+是否	Whether
+	[[["Whether","是否","","Shìfǒu"]],[["conjunction",["whether","if","whether ... or"],[["whether",["是否","不论"],,0.27338478],["if",["如果","如","是否","倘","假如","倘若"],,0.052998058],["whether ... or",["不论","是否"],,4.5921377e-07]],"是否",7]],"zh-CN",,[["Whether",[1],true,false,946,0,1,0]],[["是否",1,[["Whether",946,true,false],["If",53,true,false],["Are",0,true,false],["Whether the",0,true,false],["Is",0,true,false]],[[0,2]],"是否"]],,,[],3]
