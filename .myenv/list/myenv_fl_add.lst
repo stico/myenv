@@ -26,8 +26,8 @@ $MY_DEV/eclipse/eclipse.ini
 /.local/share/applications/
 /.zbox/src/feihu/feihu-git/
 /.zbox/src/oublog/oublog-git/
-/.zbox/src/oumisc/oumisc-git/
-/.zbox/src/ourepo/ourepo-git/
+# too big #/.zbox/src/oumisc/oumisc-git/
+# too big #/.zbox/src/ourepo/ourepo-git/
 /.kde/share/config/kwalletrc
 /.kde/share/apps/kwallet/kdewallet.kwl
 /.config/fcitx/table/wbpy_LastAutoPhrase.tmp

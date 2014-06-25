@@ -231,34 +231,28 @@ func_log_info() {
 }
 
 func_vi_conditional() {
-	if func_sys_info | grep -q "cygwin"  ; then	# non-cygwin env: original path style + front job. 
-
-		# use simple version
-		if [ -z "$DISPLAY" ] ;then
-			if (command -v vim &> /dev/null) ; then
-				\vim "$@"
-				return 0
-			else
-				\vi "$@"
-				return 0
-			fi
-			return 0
-		fi
-
-		# NOTE 1: use GUI version with SIGNLE_VIM
-		# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
-		# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
-		# why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-		LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' && LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@" || LD_LIBRARY_PATH="" gvim "$@"
-		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
-	else
-		# cygwin env: win style path + background job
+	# cygwin env: win style path + background job
+	if func_sys_info | grep -q "cygwin"  ; then	
 		parameters=${@:1:$(($#-1))}
 		target_origin=${@:$#}
-
 		[ -z "$target_origin" ] && target_cyg="" || target_cyg=`cygpath -w "$target_origin"`
 		( \\gvim $parameters $target_cyg & ) &> /dev/null
+		return 0
 	fi
+
+	# simple version for text gui
+	if [ -z "$DISPLAY" ] && (command -v vim &> /dev/null) ; then
+		\vim "$@"
+		return 0
+	fi
+
+	# GUI env
+	# NOTE 1: use GUI version with SIGNLE_VIM
+	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
+	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
+	# why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
+	LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' && LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@" || LD_LIBRARY_PATH="" gvim "$@"
+	[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
 }
 
 func_load_virtualenvwrapper() {
@@ -1174,7 +1168,7 @@ func_run_file_c() {
 	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
 	func_delete_dated "${executable}"
 
-	gcc -o "${executable}" "${file_name}"
+	gcc -g -o "${executable}" "${file_name}"
 	${executable}
 	rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
@@ -1202,16 +1196,19 @@ func_run_file_java_simple() {
 	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
 
 	local file="$(readlink -f ${1})"
+	local dir_name="$(dirname ${file})"
 	local file_name="$(basename ${file})"
-	local classname=
-	local target_dir="$(dirname ${file})/target"
+	local target_dir="${dir_name}/target"
+
+	local class_path="."
+	[ -d "${dir_name}/lib" ] && local class_path="${class_path}:${dir_name}/lib/*"
 
 	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
 	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
-	func_delete_dated ${file_name/%.java/.class}
+	func_delete_dated ${file_name/%.java/.class} &> /dev/null
 
-	javac ${file_name}
-	java -cp . ${file_name%.java}
+	javac -cp "${class_path}" ${file_name}
+	java  -cp "${class_path}" ${file_name%.java}
 	rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
 }
