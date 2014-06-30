@@ -21,6 +21,7 @@ MY_DOC		%HOME%Documents
 MY_DCB		%HOME%Documents#DCB
 MY_DCC		%HOME%Documents#DCC
 MY_DCD		%HOME%Documents#DCD
+MY_DCD_PROJ	%HOME%Documents#DCD#project
 MY_DCM		%HOME%Documents#DCM
 MY_DCO		%HOME%Documents#DCO
 MY_ECB		%HOME%Documents#ECB
@@ -42,6 +43,7 @@ MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
 MY_TMP		%HOME%amp
+MY_DSAA		%HOME%Documents#FCS#oumisc#oumisc-git#dsaa
 MY_JAVA_LANG	%HOME%Documents#FCS#oumisc#oumisc-git#java-lang
 
 

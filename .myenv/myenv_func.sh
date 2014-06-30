@@ -19,7 +19,7 @@
 [ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/list/tags_addi
 [ -z "$MY_TAGS_NOTE" ]		&& MY_TAGS_NOTE=$MY_ENV/zgen/tags_note
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
-[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD/project)
+[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD_PROJ)
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
@@ -531,7 +531,7 @@ func_collect_all() {
 			echo -e "\n\n@${fullpath}\n" >> "${stdnote_content}"
 			sed -e "s///" "${f}"       >> "${stdnote_content}"
 			
-			printf "%-25s" ${filename%.txt}                       >> "${stdnote_quicklist}"
+			printf "%-26s" ${filename%.txt}                       >> "${stdnote_quicklist}"
 			count=$(($count+1)) && (($count%4==0)) && printf "\n" >> "${stdnote_quicklist}"
 
 			echo -e "\n\n@${fullpath}\n"                                     >> "${stdnote_outline}"
@@ -574,11 +574,38 @@ func_collect_all() {
 		sed -e "s///" "${line}" >> "${code_content}"
 	done
 
+	echo "INFO: collecting mydoc filelist"
+	local mydoc_filelist=${base}/mydoc_filelist.txt
+	for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do
+		locate $(readlink -f "${MY_DOC}/${d}")		|\
+		sed -e "/\/\.\(git\|svn\|hg\)\//d"		\
+		-e "/\/target\//d" `# for maven project`	\
+		-e "/open.yy.com_trunk\//d" `# match prefix`	\
+		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`	\
+		-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
+		-e "/\/vendor\/ZF2\//d"				\
+		-e "/\/framework\/i18n\//d"			\
+		-e "/\/extjs\/resources\//d"			\
+		-e "/\/FCS\/vim\/vim-hg\//d"			\
+		-e "/\/FCS\/maven\/m2_repo\//d"			\
+		-e "/\/FCS\/eclipse\/plugins\//d"		\
+		-e "/\/vendor\/zendframework\//d"		\
+		-e "/\/xiage_trunk\/static\/image\//d"		\
+		-e "/\/xiage_trunk\/source\/class\//d"		\
+		-e "/\/xiage_trunk\/source\/plugin\//d"		\
+		-e "/\/xiage_trunk\/static\/image\//d"		\
+		-e "/\/xiage_trunk\/source\/class\//d"		\
+		-e "/\/xiage_trunk\/source\/plugin\//d"		\
+		-e "/\/appstore.yy.com_trunk\/framework\//d"	>> ${mydoc_filelist}
+		#| sed -e "/\/\(\.git\|\.svn\|\.hg\|target\)\//d;" | wc -l
+	done
+
 	echo "INFO: collecting all"
 	local all_content=${base}/all_content.txt
 	cat "${stdnote_quicklist}"	"${stdnote_outline}"							>> "${all_content}"
 	cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"	"${code_content}"	>> "${all_content}"
 	cat "${stdnote_filelist}"	"${miscnote_filelist}"	"${myenv_filelist}"	"${code_filelist}"	>> "${all_content}"
+	cat "${mydoc_filelist}"											>> "${all_content}"
 
 	echo "INFO: shorten file path"
 	sed -i -e 's+^\(@*\)/home/ouyangzhu/.myenv/+\1$MY_ENV/+' "${all_content}"
@@ -1065,7 +1092,8 @@ func_delete_dated() {
 	[[ ! -e $targetDir ]] && mkdir ${targetDir}
 
 	for t in "$@" ; do
-		mv "${t}" "${targetDir}/$(basename ${t})_$(func_time)"
+		[ ! -e "${t}" ] && echo "WARN: ${t} inexist, will NOT perform dated delete!" && continue
+		mv "${t}" "${targetDir}/$(basename "${t}")_$(func_time)"
 	done
 	#mv "$@" ${targetDir} &> /dev/null
 }
@@ -1169,7 +1197,12 @@ func_run_file_c() {
 	func_delete_dated "${executable}"
 
 	gcc -g -o "${executable}" "${file_name}"
-	${executable}
+	${executable} 
+
+	# TODO: not only handle the "segmentation fault" exit/status code, other code will still swallowed if run this function in subshell
+	# "Segmentation fault" is NOT a stderr/stdout msg, instead, is it a exit/status code !!! Also note the status code offset (128) might vary in diff shell !!!
+	if [ $? = $(( 128 + 11 )) ] ; then echo "Segmentation fault" 1>&2 ; fi		
+
 	rm "${target_dir}/${file_name}"
 	\cd - &> /dev/null
 }
@@ -1220,7 +1253,8 @@ func_run_file() {
 	#filename="$(basename ${file})"
 	[ ! -e "${file}" ] && echo "ERROR: $file not exist!" && return 1
 
-	if [[ "$file" = *.c ]] ; then		func_run_file_c $file
+	if [[ "$file" = *.c ]] ; then		(func_run_file_c $file)		# use subshell, could make sure "stay in current dir" even used ^C, but subshell stderr seems lost (can NOT get msg like "Segmentation fault", also NOTE, the "Segmentation fault" msg is print by shell, not by the crashed app)
+	#if [[ "$file" = *.c ]] ; then		func_run_file_c $file		# not using subshell, current dir might change to "target" when use ^C
 	elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
 	elif [[ "$file" = *.rb ]] ; then	ruby $file
 	elif [[ "$file" = *.sh ]] ; then	bash $file
