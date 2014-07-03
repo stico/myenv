@@ -113,6 +113,12 @@ let g:netrw_dirhistmax=0
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']	" checker chain, run one by one (only run laters if current success)
 let g:syntastic_auto_jump = 2					" jump to 1st error (NOT warning)
 
+"""""""" auto-format
+let g:formatprg_c = "astyle"
+let g:formatprg_args_c = "--mode=c --style=ansi"
+let g:formatprg_java = "astyle"
+let g:formatprg_args_java = "--mode=java --style=java"
+
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 

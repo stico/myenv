@@ -21,8 +21,8 @@
 "/usr/bin/wmctrl -a 'Mozilla Thunderbird' || /usr/bin/thunderbird"
   control+alt+m
 
-"/usr/bin/wmctrl -a 'Double Commander' || ~/program/doublecmd/doublecmd"
-  control+alt+f
+#"/usr/bin/wmctrl -a 'Double Commander' || ~/program/doublecmd/doublecmd"
+#  control+alt+f
 
 "/usr/bin/wmctrl -a 'SINGLE_TERMINATOR' || /usr/bin/terminator --title SINGLE_TERMINATOR"
   control+alt+x
@@ -46,10 +46,10 @@
 "target=~/Documents/DCB/Record/Note/A_NOTE_Copy.txt ; echo >> $target && /usr/bin/xclip -o >> $target && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"	# works for a long time, just the notify-send timeout option not works
   control+shift+c
 
-"/usr/bin/xfce4-screenshooter -r -c"
+"~/.myenv/conf/myahk/myahk_script_screenshot.sh"
   control+shift+x
 
-#"/usr/bin/xfce4-appfinder"	# for XFCE
+#"/usr/bin/xfce4-appfinder"		# for XFCE
 "xdotool key --clearmodifiers Super"
   control+shift+z
 

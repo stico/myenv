@@ -247,6 +247,7 @@ function func_init_os_common() {
 	sudo apt-get install -y vlc xclip			&>> $tmp_init_log
 	sudo apt-get install -y fcitx-table-wbpy		&>> $tmp_init_log	# Chinese Input Method - Fcitx
 	sudo apt-get install -y xbindkeys wmctrl xdotool	&>> $tmp_init_log
+	sudo apt-get install -y tidy astyle python-autopep8	&>> $tmp_init_log	# code formatters, see ~auto-format@vim
 
 	func_init_font						&>> $tmp_init_log
 	func_init_soft_clipit					&>> $tmp_init_log
