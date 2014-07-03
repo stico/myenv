@@ -2,14 +2,14 @@
 /*
 
 # INCLUDE, DIR, need 2 line for one dir
-!/.vim/
-!/.vim/*
+#!/.vim/
+#!/.vim/*
 !/.fonts/
 !/.fonts/*
 !/.myenv/
 !/.myenv/*
-!/vimfiles/
-!/vimfiles/*
+#!/vimfiles/
+#!/vimfiles/*
 !/.screenlayout/
 !/.screenlayout/*
 
