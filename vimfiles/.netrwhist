@@ -1,7 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =5
-let g:netrw_dirhist_1='E:/program/A_System_Cygwin_1.7.17'
-let g:netrw_dirhist_2='E:/amp/myenv_full'
-let g:netrw_dirhist_3='E:\amp\myenv_full'
-let g:netrw_dirhist_4='E:/amp/myenv_full'
-let g:netrw_dirhist_5='E:\amp\myenv_full'

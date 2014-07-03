@@ -1,2 +1,0 @@
-https://code.google.com/p/conque/
-version 2.3 installed at 2013-04-16

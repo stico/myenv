@@ -551,7 +551,17 @@ func_collect_all() {
 	echo "INFO: collecting myenv"
 	local myenv_content=${base}/myenv_content.txt
 	local myenv_filelist=${base}/myenv_filelist.txt
-	for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
+	#for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
+	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
+	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_LIST/myenv_addi | xargs -I{}  echo echo {} )")"
+	echo 111111111111111111111111
+	echo "$myenv_git" "$myenv_addi" 
+	echo 22222222222222222222222
+	for f in "$myenv_git" "$myenv_addi" ; do
+		echo 333333333333333333333333333333
+		[ ! -e "$f" ] && echo "WARN: ${f} not exist" && continue
+
+		echo 444444444444444444444444444444
 		echo "${f}" >> "${myenv_filelist}"
 
 		func_validate_file_type_text "${f}" || continue
@@ -1134,7 +1144,6 @@ func_backup_dated() {
 
 func_backup_listed() { 
 	# TODO: merge with dated_backup?
-	# source ~/.myenv/env_func_bash ; func_backup_listed myenv_full $MY_ENV/zgen/myenv_fl_git2.lst $MY_ENV/list/myenv_fl_add.lst
 
 	func_param_check 2 "Usage: $FUNCNAME <tag> <filelists>*" "$@" 
 
