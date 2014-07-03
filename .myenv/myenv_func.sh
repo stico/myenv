@@ -108,17 +108,17 @@ func_grep_file() {
 	shift
 
 	# below is a single cmd line
-	locate -i --regex "${base}.*${suffix}$"				| \
-		sed -e "/\/.svn\/\|\/.hg\/\|\/.git\//d;
-			/\/.metadata\//d;
-			/\/target\/classes\//d;
-			/\.class$/d;"					| \
-		# ignore dir/binary(-I)/case(-i)
-		xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
-		# use relative path which is shorter
-		sed -e "s+^${base}+.+"					| \
-		# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
-		grep --color "$@"
+	locate -i --regex "${base}.*${suffix}$"			| \
+	sed -e "/\/.svn\/\|\/.hg\/\|\/.git\//d;
+		/\/.metadata\//d;
+		/\/target\/classes\//d;
+		/\.class$/d;"					| \
+	# ignore dir/binary(-I)/case(-i)
+	xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
+	# use relative path which is shorter
+	sed -e "s+^${base}+.+"					| \
+	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
+	grep --color "$@"
 }
 
 func_eval_path() {
@@ -426,62 +426,6 @@ func_gen_list() {
 	\cd - &> /dev/null
 }
 
-func_gen_list_f_me_git_only() { 
-	src_git=$HOME/.git
-	src_add=$MY_ENV/list/myenv_fl_add.lst
-	target=$MY_ENV/zgen/myenv_fl_git1.lst
-	target_small=$MY_ENV/zgen/myenv_fl_git2.lst
-
-	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists!" && exit 1
-
-	echo -e "INFO: Generating git file list to: $target"
-	func_cd $HOME 
-	git ls-files > $target
-	\cd - &> /dev/null
-
-	echo -e "INFO: Generating git compact file list to: $target_small"
-	sed -e "s/\/.*//;" $target | sort -u > $target_small
-}
-
-func_gen_list_f_me() { 
-	filelist_all=$MY_ENV/$DOT_CACHE_FL
-	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
-	src_add=$MY_ENV/list/myenv_fl_add.lst
-
-	[ -e $filelist_all ] && return 0
-
-	echo -e "INFO: Generating full file list to: $filelist_all"
-	[ ! -e $filelist_git ] && func_gen_list_f_me_git_only
-
-	sed -e "s/^/..\//" $filelist_git > $filelist_all
-	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
-		func_eval_path candidate $line
-		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
-		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
-	done
-}
-
-deprecated_func_gen_grep_pattern_str() {
-	# Deprecated: passing array between functions is painful!
-	func_param_check 2 "Usage: $FUNCNAME [result_var_name] [patterns]" "$@"
-
-	# need use variable to "return" result
-	result_var_name="$1"
-	eval $result_var_name=""
-	shift
-	patterns=$*
-
-	result_pattern_str='\\\('
-	for pattern in ${patterns[@]}
-	do
-		#pattern=${pattern/./\\\\.}'\\\|'
-		result_pattern_str=${result_pattern_str}${pattern}
-	done
-	result_pattern_str=${result_pattern_str%%\\\\\\\|}'\\\)'
-
-	eval $result_var_name=$result_pattern_str
-}
-
 func_notify_mail() {
 	func_param_check 2 "Usage: $FUNCNAME [title] [content]" "$@"
 
@@ -507,7 +451,7 @@ func_collect_all() {
 	local f d line
 	local base=$MY_ENV_ZGEN/collection
 
-	echo "INFO: backup and clean old collection"
+	echo "INFO: clean old collection"
 	func_delete_dated "${base}"
 	mkdir -p "${base}"
 
@@ -554,14 +498,9 @@ func_collect_all() {
 	#for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
 	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
 	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_LIST/myenv_addi | xargs -I{}  echo echo {} )")"
-	echo 111111111111111111111111
-	echo "$myenv_git" "$myenv_addi" 
-	echo 22222222222222222222222
-	for f in "$myenv_git" "$myenv_addi" ; do
-		echo 333333333333333333333333333333
+	for f in $myenv_git $myenv_addi ; do
 		[ ! -e "$f" ] && echo "WARN: ${f} not exist" && continue
 
-		echo 444444444444444444444444444444
 		echo "${f}" >> "${myenv_filelist}"
 
 		func_validate_file_type_text "${f}" || continue
@@ -650,8 +589,12 @@ func_grep_cmd() {
 func_grep_myenv() {
 	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
-	func_gen_list_f_me
-	func_grep_dotcache $MY_ENV ALL "$*"
+	cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
+	xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
+	# use relative path which is shorter
+	sed -e "s+^${base}+.+"					| \
+	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
+	grep --color "$@"
 }
 
 func_head() {
@@ -790,8 +733,7 @@ func_git_commit_push() {
 	git add -A				&&
 	git commit -a -m "$comment" 		&&
 	git push origin				&&
-	git status 				&&
-	func_gen_list_f_me
+	git status
 }
 
 
@@ -1144,6 +1086,7 @@ func_backup_dated() {
 
 func_backup_listed() { 
 	# TODO: merge with dated_backup?
+	# TODO: seems only ebackup use it, could simplify: 1) no eval needed, 2) no $HOME/ possible check
 
 	func_param_check 2 "Usage: $FUNCNAME <tag> <filelists>*" "$@" 
 
@@ -1178,7 +1121,7 @@ func_backup_listed() {
 			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir/*
 
 		# dirty check 2, for myenv bak, not want the .unison log file 
-		[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm &> /dev/null
+		#[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm &> /dev/null
 	done
 
 	func_backup_dated $tmp_dir
@@ -1772,3 +1715,59 @@ func_apt_add_repo() {
 #	cat $MY_ENV/zgen/collection_note/collection_outline.txt	>> $target_base/collection_content.txt
 #	cat $target_base/collection_content.txt.bak		>> $target_base/collection_content.txt
 #}
+#func_gen_list_f_me_git_only() { 
+#	src_git=$HOME/.git
+#	src_add=$MY_ENV/list/myenv_fl_add.lst
+#	target=$MY_ENV/zgen/myenv_fl_git1.lst
+#	target_small=$MY_ENV/zgen/myenv_fl_git2.lst
+#
+#	[ ! -e $src_git -o ! -e $src_add ] && echo -e "ERROR: ${src_git} or ${src_add} not exists!" && exit 1
+#
+#	echo -e "INFO: Generating git file list to: $target"
+#	func_cd $HOME 
+#	git ls-files > $target
+#	\cd - &> /dev/null
+#
+#	echo -e "INFO: Generating git compact file list to: $target_small"
+#	sed -e "s/\/.*//;" $target | sort -u > $target_small
+#}
+#
+#func_gen_list_f_me() { 
+#	filelist_all=$MY_ENV/$DOT_CACHE_FL
+#	filelist_git=$MY_ENV/zgen/myenv_fl_git1.lst
+#	src_add=$MY_ENV/list/myenv_fl_add.lst
+#
+#	[ -e $filelist_all ] && return 0
+#
+#	echo -e "INFO: Generating full file list to: $filelist_all"
+#	[ ! -e $filelist_git ] && func_gen_list_f_me_git_only
+#
+#	sed -e "s/^/..\//" $filelist_git > $filelist_all
+#	sed -e "/^\s*$/d;/^\s*#/d;" $src_add | while read line; do
+#		func_eval_path candidate $line
+#		[ -f "$candidate" ] && echo "$candidate" >> $filelist_all 
+#		[ -d "$candidate" ] && find "$candidate" -type f >> $filelist_all 
+#	done
+#}
+#
+#deprecated_func_gen_grep_pattern_str() {
+#	# Deprecated: passing array between functions is painful!
+#	func_param_check 2 "Usage: $FUNCNAME [result_var_name] [patterns]" "$@"
+#
+#	# need use variable to "return" result
+#	result_var_name="$1"
+#	eval $result_var_name=""
+#	shift
+#	patterns=$*
+#
+#	result_pattern_str='\\\('
+#	for pattern in ${patterns[@]}
+#	do
+#		#pattern=${pattern/./\\\\.}'\\\|'
+#		result_pattern_str=${result_pattern_str}${pattern}
+#	done
+#	result_pattern_str=${result_pattern_str%%\\\\\\\|}'\\\)'
+#
+#	eval $result_var_name=$result_pattern_str
+#}
+

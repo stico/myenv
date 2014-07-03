@@ -59,7 +59,7 @@ dbackup			"func_backup_dated"
 
 			# Head: e - myenv 
 egf			"func_grep_myenv"
-ebackup			"func_gen_list_f_me; func_backup_listed myenv_full %MY_ENV%/zgen/myenv_fl_git2.lst %MY_ENV%/list/myenv_fl_add.lst"
+ebackup			"func_backup_listed myenv_full %MY_ENV%/zgen/collection/myenv_filelist.txt"
 eload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 ehostsupdate		"sudo -E bash hosts_append.sh"
 #eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
