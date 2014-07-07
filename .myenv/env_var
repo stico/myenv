@@ -9,9 +9,6 @@
 ################################################################################
 CUR_OS_LU	lu
 CUR_OS_WIN	win
-DOT_CACHE_DL	.dl_me.txt
-DOT_CACHE_FL	.fl_me.txt
-DOT_CACHE_GREP	.grep_me.txt
 
 ################################################################################
 # ENV - Main Path
@@ -89,8 +86,15 @@ GREP_COLORS	ms=31:mc=31:sl=:cx=:fn=35:ln=32:bn=32:se=36
 
 
 ################################################################################
-# Deprecated sine using zbox now
+# Deprecated 
 ################################################################################
+# Deprecated by locate
+#DOT_CACHE_DL	.dl_me.txt
+#DOT_CACHE_FL	.fl_me.txt
+#DOT_CACHE_GREP	.grep_me.txt
+#
+# Deprecated by zbox
+#
 #JAVA_HOME	%MY_DEV%#jdk
 #PATH		%JAVA_HOME%#bin
 #

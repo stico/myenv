@@ -12,7 +12,6 @@ ws=$MY_TMP/workspace
 
 #DW
 dw=$MY_FCZ/code_dw
-damo=$MY_FCZ/code_dw/damo
 
 # ZBOX
 zb=$ZBOX

@@ -10,12 +10,6 @@
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
 [ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
 [ -z "$MY_ENV_LOG" ]		&& MY_ENV_LOG=$MY_ENV/zgen/log
-
-# TODO: remove these
-[ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
-[ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
-[ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
-
 [ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/list/tags_addi
 [ -z "$MY_TAGS_NOTE" ]		&& MY_TAGS_NOTE=$MY_ENV/zgen/tags_note
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
@@ -375,36 +369,6 @@ func_head_cmd() {
 
 	cmd_result=`eval "$*"`
 	func_head $show_lines "$cmd_result"
-}
-
-func_gen_filedirlist() {
-	# TODO: make a conversion of $type+l_me.txt ?
-	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
-	func_param_check 3 "Usage: $FUNCNAME [base] [listfile] [find_options]" "$@"
-
-	base=$1
-	listfile=$2
-	shift;shift
-	find_options="$*"
-
-	# for better compatibility, always: 1) use relative path (./) or path start with variable
-	tag_value_raw="$(func_tag_value_raw ${base})"
-	if [ -n "$tag_value_raw" ]; then
-		base=$(func_eval $tag_value_raw)
-		base_raw=$tag_value_raw
-	else
-		base=$base
-		base_raw="."
-	fi
-
-	[ -e "$listfile" ] && return 0
-	[ ! -e "$base" ] && echo "ERROR: $base not exist" && return 1
-	[ ! -w "$(dirname $listfile)" ] && echo "ERROR: $(dirname $listfile) not exist or not writable" && return 1
-
-	echo "$listfile not exist, create it..." 1>&2
-	func_cd $base &> /dev/null
-	[ -w ./ ] && find -L ./ $find_options | sed -e "s+^./+${base_raw}/+" > $listfile || echo "ERROR: no write permisson for $PWD!"
-	\cd - &> /dev/null
 }
 
 func_gen_list() {
@@ -1126,14 +1090,6 @@ func_backup_listed() {
 
 	func_backup_dated $tmp_dir
 	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
-
-	#sed -e '/`\|\$/p;/^\s*$/d;/^\s*#/d;s/\/.*//;' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
-	#awk '/^\s*$/{};/^\s*#/{};/`\|\$/{print $0;next;};/\//{gsub("\/.*","",$0);print $0};' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
-	#awk '/^\s*$/{print "----"$0};/^\s*#/{print "----"$0};/`\|\$/{print $0;next;};' $source | sort -u >> $tmp_dir/$DOT_CACHE_FL
-
-	#func_gen_list_f_me	
-	#bash $MY_ENV/util/listed_backup.sh myenv_full $MY_ENV/zgen/myenv.lst $MY_ENV/list/myenv_add.lst
-	#$MY_ENV/util/listed_backup.sh
 }
 
 func_run_file_c() {
@@ -1770,4 +1726,37 @@ func_apt_add_repo() {
 #
 #	eval $result_var_name=$result_pattern_str
 #}
+#
+#func_gen_filedirlist() {
+#	# TODO: make a conversion of $type+l_me.txt ?
+#	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
+#	func_param_check 3 "Usage: $FUNCNAME [base] [listfile] [find_options]" "$@"
+#
+#	base=$1
+#	listfile=$2
+#	shift;shift
+#	find_options="$*"
+#
+#	# for better compatibility, always: 1) use relative path (./) or path start with variable
+#	tag_value_raw="$(func_tag_value_raw ${base})"
+#	if [ -n "$tag_value_raw" ]; then
+#		base=$(func_eval $tag_value_raw)
+#		base_raw=$tag_value_raw
+#	else
+#		base=$base
+#		base_raw="."
+#	fi
+#
+#	[ -e "$listfile" ] && return 0
+#	[ ! -e "$base" ] && echo "ERROR: $base not exist" && return 1
+#	[ ! -w "$(dirname $listfile)" ] && echo "ERROR: $(dirname $listfile) not exist or not writable" && return 1
+#
+#	echo "$listfile not exist, create it..." 1>&2
+#	func_cd $base &> /dev/null
+#	[ -w ./ ] && find -L ./ $find_options | sed -e "s+^./+${base_raw}/+" > $listfile || echo "ERROR: no write permisson for $PWD!"
+#	\cd - &> /dev/null
+#}
+#[ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
+#[ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
+#[ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
 
