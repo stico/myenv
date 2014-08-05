@@ -12,7 +12,8 @@
 "LD_LIBRARY_PATH='' /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt && /usr/bin/wmctrl -a 'SINGLE_VIM'"
   control+alt+a
 
-"/usr/bin/wmctrl -a 'SINGLE_VIM' || LD_LIBRARY_PATH='' /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt"
+#"/usr/bin/wmctrl -a 'SINGLE_VIM' || ( export PS1='to_cheat_bashrc' && source /home/ouyangzhu/.bashrc && LD_LIBRARY_PATH='' /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt ) " 
+"/usr/bin/wmctrl -a 'SINGLE_VIM' || /bin/bash -c ' export PS1=to_cheat_bashrc && source /home/ouyangzhu/.bashrc && LD_LIBRARY_PATH= /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt ' " 
   control+alt+z
 
 "/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
@@ -27,8 +28,14 @@
 "/usr/bin/wmctrl -a 'SINGLE_TERMINATOR' || /usr/bin/terminator --title SINGLE_TERMINATOR"
   control+alt+x
 
-"/usr/bin/wmctrl -a 'workvmIII'"
+"/usr/bin/wmctrl -a 'workvmIII' || /usr/lib/virtualbox/VirtualBox --comment 'workvmIII' --startvm 'bd0a6b1d-1951-48f5-a406-2fe4ad19bb5a'"
   control+alt+w
+
+"/usr/bin/wmctrl -a 'Eclipse' || eclipse"
+  control+alt+e
+
+"/usr/bin/wmctrl -a 'Okular' || /usr/bin/okular"
+  control+alt+o
 
 "~/.myenv/conf/myahk/myahk_script_hotstring.sh"
   control+alt+h
@@ -46,7 +53,7 @@
 "target=~/Documents/DCB/Record/Note/A_NOTE_Copy.txt ; echo >> $target && /usr/bin/xclip -o >> $target && notify-send -t 1000 'Copied to A_A_NOTE_Copy.txt'"	# works for a long time, just the notify-send timeout option not works
   control+shift+c
 
-"~/.myenv/conf/myahk/myahk_script_screenshot.sh"
+"zenity --info --text=MyahkScreenShotInvoked ; ~/.myenv/conf/myahk/myahk_script_screenshot.sh"
   control+shift+x
 
 #"/usr/bin/xfce4-appfinder"		# for XFCE

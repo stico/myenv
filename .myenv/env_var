@@ -40,7 +40,10 @@ MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
 MY_TMP		%HOME%amp
+MY_BLOG		%HOME%Documents#FCS#oublog#oublog-git#_posts
 MY_DSAA		%HOME%Documents#FCS#oumisc#oumisc-git#dsaa
+MY_WEB_DEMO	%HOME%Documents#FCS#oumisc#oumisc-git#web-demo
+MY_MVN_DEMO	%HOME%Documents#FCS#oumisc#oumisc-git#mvn-demo
 MY_JAVA_LANG	%HOME%Documents#FCS#oumisc#oumisc-git#java-lang
 
 

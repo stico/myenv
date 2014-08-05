@@ -112,7 +112,7 @@ func_grep_file() {
 	# use relative path which is shorter
 	sed -e "s+^${base}+.+"					| \
 	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
-	grep --color "$@"
+	grep -i --color "$@"
 }
 
 func_eval_path() {
@@ -135,7 +135,7 @@ func_eval_path() {
 
 func_std_gen_tags() {
 	local d dd note_file note_filename
-	func_delete_dated "${MY_TAGS_NOTE}"
+	rm "${MY_TAGS_NOTE}"
 	for d in ${MY_ROOTS_NOTE[@]} ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
 		for note_file in ${d}/note/*.txt ; do
@@ -149,7 +149,7 @@ func_std_gen_tags() {
 		done
 	done
 
-	func_delete_dated "${MY_TAGS_CODE}"
+	rm "${MY_TAGS_CODE}"
 	for d in ${MY_ROOTS_CODE[@]} ; do
 		for dd in ${d}/* ; do
 			echo "${dd##*/}=${dd}" >> "${MY_TAGS_CODE}"
@@ -636,10 +636,11 @@ func_mvn_gen() {
 
 	case "${1}" in
 	#mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
-	jar)	mvn archetype:generate              -DgroupId=com.test   -DartifactId="${2}"                                                                        -DarchetypeArtifactId=maven-archetype-quickstart                             -DinteractiveMode=false ; mkdir -p $name/src/main/resources ;;
-	war)	mvn archetype:generate              -DgroupId=com.test   -DartifactId="${2}" -DarchetypeCatalog=local -DarchetypeGroupId=com.tpl.archetype          -DarchetypeArtifactId=tpl-war-archetype      -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false ; mkdir -p $name/src/main/java ;;
-	oujar)	mvn archetype:generate -U --offline -DgroupId=com.oumisc -DartifactId="${2}" -DarchetypeCatalog=local -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-oujar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false ;;
-	ouwar)	mvn archetype:generate -U --offline -DgroupId=com.oumisc -DartifactId="${2}" -DarchetypeCatalog=local -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-ouwar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false ;;
+	jar)	mvn archetype:generate       -DgroupId=com.test      -DartifactId="${2}"                                               -DarchetypeArtifactId=maven-archetype-quickstart                             -DinteractiveMode=false                          ; mkdir -p $name/src/main/resources ;;
+	war)	mvn archetype:generate       -DgroupId=com.test      -DartifactId="${2}" -DarchetypeGroupId=com.tpl.archetype          -DarchetypeArtifactId=tpl-war-archetype      -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ; mkdir -p $name/src/main/java ;;
+	oujar)	mvn archetype:generate -o -U -DgroupId=com.oumisc    -DartifactId="${2}" -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-oujar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ;;
+	ouwar)	mvn archetype:generate -o -U -DgroupId=com.oumisc    -DartifactId="${2}" -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-ouwar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ;;
+	csstd)	mvn archetype:generate -o -U -DgroupId="com.yy.${2}" -DartifactId="${2}" -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-mm-archetype    -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ;;
 	*)
 		echo "ERROR: pkg type must be war/jar/oujar/ouwar"
 		exit 1

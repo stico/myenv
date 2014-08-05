@@ -88,6 +88,9 @@ call pathogen#infect()
 let g:solarized_italic = 0				" 0 to set comment font NOT use italic
 colorscheme solarized
 
+"""""""" NERDCommenter
+let NERDSpaceDelims = 1					" add space for comment
+
 """""""" Ctrlp
 "let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
 "let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
@@ -183,6 +186,12 @@ set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+
+"""""""""""""""""""""""""""""" H1 - Mapping - move in insert mode
+inoremap <C-H> <Left>
+inoremap <C-J> <Down>
+inoremap <C-K> <Up>
+inoremap <C-L> <Right>
 
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 " NOTE: iskeyword MUST after the "set nocompatible"
@@ -571,8 +580,10 @@ nnoremap <silent> mo :<C-U>call NoteOutline()<CR>
 autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
 "autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
 autocmd BufWinEnter quickfix silent! nnoremap <ESC> :exec "bd " . g:qfix_win<CR>
-autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"
-autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
+"autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"	" seems not need delete the buffer anymore (because of what? vim updates? plugin updates?)
+autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>zt"
+autocmd BufLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
+"autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif	" use BufLeave, seems BufWinLeave NOT triggered when hit <Enter> in outline(quickfix) window
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  

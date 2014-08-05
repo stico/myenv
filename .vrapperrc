@@ -14,3 +14,4 @@ set autochdir		" help for :e command to edit files
 
 nmap <Enter> o<Esc>
 nmap <Space> i<Space><Esc>
+nmap <C-q> <C-V>

@@ -26,16 +26,20 @@ repeat			"func_repeat"
 repeat1			"func_repeat 1 111"
 repeat2			"func_repeat 2 222"
 fullpath		"readlink -f "
-unisoncs		"unison cs_workpcII_lapII_all"
 showresp		"func_show_resp"
 translate		"func_translate"
+genymotion		"/ext/Documents/FCZ/virtualbox/genymotion/genymotion &"
 mountiso		"func_mount_iso /mnt/iso"
 readconf		"func_filter_comments"
 rdesklm			"rdesktop -uouyangzhu -r clipboard:PRIMARYCLIPBOARD 172.19.108.137 &"
 rdeskwin		"rdesktop -uouyangzhu -r clipboard:PRIMARYCLIPBOARD -r disk:R_Amp=/home/ouyangzhu/amp,R_Doc=/home/ouyangzhu/Documents -r sound:local 172.19.11.1 &"
+restclient		"java -jar /ext/Documents/ECS/restclient/restclient_3.4/restclient-ui-3.4-jar-with-dependencies.jar"
 screenBoth		"xrandr --output HDMI1 --auto --output LVDS1 --auto --right-of HDMI1"
 screenBigOnly		"xrandr --output HDMI1 --auto --output LVDS1 --off"
 screenSmallOnly		"xrandr --output HDMI1 --off --output LVDS1 --auto"
+
+unison_fs_lapII_all		"unison fs_lapII_all"
+unison_cs_lapII_workpcII	"unison cs_workpcII_lapII_all"
 
 # Alias - By Topic (<topic><action><obj/arg>)
 
@@ -131,6 +135,7 @@ cddl			"func_cd_tag %MY_TMP%/download"
 cdpf			"func_cd_tag %WIN_PF%"
 cdtt			"func_cd_tag tt"
 cdtm			"func_cd_tag tm"
+cdty			"func_cd_tag ty"
 
 ################################################################################
 # Depreated

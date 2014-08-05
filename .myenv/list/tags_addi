@@ -48,9 +48,10 @@ project=$MY_DCD/project
 noteall=$MY_ENV/zgen/collection_note/collection_content.txt
 
 # Function
-tt=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
-td=`tt_dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $tt_dir;echo $tt_dir`
-tm=`tt_dir=$MY_TMP/$(date '+%Y-%m');mkdir -p $tt_dir;echo $tt_dir`
+tt=`dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $dir;echo $dir`
+td=`dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $dir;echo $dir`
+tm=`dir=$MY_TMP/$(date '+%Y-%m');mkdir -p $dir;echo $dir`
+ty=`dir=$MY_TMP/$(date '+%Y');mkdir -p $dir;echo $dir`
 
 # Deprecated
 #ampdl=$MY_TMP/download
