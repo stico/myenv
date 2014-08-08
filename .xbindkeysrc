@@ -37,6 +37,10 @@
 "/usr/bin/wmctrl -a 'Okular' || /usr/bin/okular"
   control+alt+o
 
+#"/usr/bin/wmctrl -a 'Foxit' || /bin/bash -c ' export PS1=to_cheat_bashrc && source /home/ouyangzhu/.bashrc && wine C:\\Program\ Files\ (x86)\\Foxit\ Software\\Foxit\ Reader\\Foxit\ Reader.exe > /dev/null 2>&1 ' " 
+"/usr/bin/wmctrl -a 'Foxit'"
+  control+alt+f
+
 "~/.myenv/conf/myahk/myahk_script_hotstring.sh"
   control+alt+h
 

@@ -557,7 +557,7 @@ function! NoteOutline()
 	"while search("^\t*[^ \t]\+$", flags) > 0					" NOT works, why?
 	"while search("^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$", flags) > 0		" NOT works, since vim not fully support POSIX regex syntax
 	"while search("^\t*[^ \t][^ \t]*$", flags) > 0					" works, but all Chinese becomes outline
-	while search("^\t*[-a-z0-9_\.][-a-z0-9_\.]*[\t ]*$", flags) > 0			" works, but a bit strict
+	while search("^\t*[-_a-z0-9\/\.][-_a-z0-9\/\.]*[\t ]*$", flags) > 0		" works, but a bit strict
 		let flags = 'W'
 		let title = substitute(getline('.'), '[ \t]*$', '', '')			" remove trailing blanks
 		let titleToShow = substitute(title, '\t', '........', 'g')		" quickfix window removes any preceding blanks

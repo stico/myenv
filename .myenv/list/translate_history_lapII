@@ -354,3 +354,9 @@ modal	语气
 	[[["语气","modal","Yǔqì",""]],[["adjective",["语气","型的"],[["语气",["modal"],,0.053832658],["型的",["modal"]]],"modal",3]],"en",,[["语气",[1],false,false,1000,0,1,0]],[["modal",1,[["语气",1000,false,false],["模态",0,false,false],["强制回应",0,false,false],["模",0,false,false],["模式的",0,false,false]],[[0,5]],"modal"]],,,[],3]
 cardinality	基数
 	[[["基数","cardinality","Jīshù",""]],,"en",,[["基数",[16],false,false,994,0,1,1]],[["cardinality",16,[["基数",994,false,false],["势",3,false,false],["的基数",1,false,false],["基数的",0,false,false]],[[0,11]],"cardinality"]],,,[["en"]],3]
+accumulator	累加器
+	[[["累加器","accumulator","Lěijiā qì",""]],[["noun",["累加器"],[["累加器",["accumulator"],,0.56094915]],"accumulator",1]],"en",,[["累加器",[958],false,false,527,0,1,1]],[["accumulator",958,[["累加器",527,false,false],["蓄能器",239,false,false],["蓄电池",155,false,false],["蓄",54,false,false],["蓄能",22,false,false]],[[0,11]],"accumulator"]],,,[],18]
+cumulative	累计
+	[[["累计","cumulative","Lěijì",""]],[["adjective",["累积的"],[["累积的",["accumulative","additive","cumulate","cumulative"]]],"cumulative",3]],"en",,[["累计",[1],false,false,694,0,1,0]],[["cumulative",1,[["累计",694,false,false],["累积",291,false,false],["累积的",9,false,false],["累加",3,false,false],["积累",0,false,false]],[[0,10]],"cumulative"]],,,[],3]
+reluctant	舍不得
+	[[["舍不得","reluctant","Shěbudé",""]],[["adjective",["厌恶"],[["厌恶",["loath","reluctant","unwilling","wary"],,0.00019720831]],"reluctant",3]],"en",,[["舍不得",[1],false,false,380,0,1,0]],[["reluctant",1,[["舍不得",380,false,false],["勉强",203,false,false],["不愿意",155,false,false],["不情愿",131,false,false],["不愿",129,false,false]],[[0,9]],"reluctant"]],,,[],3]

@@ -1022,7 +1022,7 @@ func_backup_dated() {
 	srcPath="$1"
 	fileName=$(basename "$srcPath")
 	targetFile=`func_dati`_`uname -n`_"$fileName"
-	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/backup")
+	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
 
 	# if path is a directory, zip it first
 	if [ -d "$srcPath" ]; then
