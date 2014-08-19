@@ -12,6 +12,8 @@ ws=$MY_TMP/workspace
 
 #DW
 dw=$MY_FCZ/code_dw
+model=$MY_FCZ/code_dw/model
+sct=$MY_FCZ/code_dw/service-center_trunk
 
 # ZBOX
 zb=$ZBOX

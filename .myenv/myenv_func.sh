@@ -411,6 +411,8 @@ func_check_cronlog() {
 }
 
 func_collect_all() {
+	# Tips: find encoding error files: grep "^@/" code_content.txt | sed -e 's/^@/file -e soft "/;s/$/"/' | bash | tee /tmp/1 | grep -v "\(ASCII text\|UTF-8 Unicode\)"
+
 	# vars
 	local f d line
 	local base=$MY_ENV_ZGEN/collection
@@ -730,9 +732,8 @@ func_ssh_with_jump() {
 
 	port=32200
 	jump_machine=dw
-	
 	shift
-	ssh -t $jump_machine "ssh -p $port $ip_addr $@"
+	ssh -t $jump_machine "ssh -p $port $ip_addr $@"			# V1, simple version
 
 	# TODO: check the $1, if it is a ip, should not parse as unique_name
 	# TODO: add function for run cmd on multiple host

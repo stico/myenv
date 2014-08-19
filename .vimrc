@@ -248,8 +248,6 @@ nnoremap g# #
 
 """""""""""""""""""""""""""""" H1 - Mapping - Win Behave (mostly copied from mswin.vim)
 behave mswin
-" backspace in Visual mode deletes selection
-vnoremap <BS> d
 " CTRL-X and SHIFT-Del are Cut
 vnoremap <C-X> "+x
 " CTRL-C and CTRL-Insert are Copy
@@ -278,7 +276,6 @@ exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
 imap <S-Insert>		<C-V>
 vmap <S-Insert>		<C-V>>
 
-
 " Use CTRL-Q to do what CTRL-V used to do, since CTRL-V has been used or paste
 " Use CTRL-S for saving, also in Insert mode
 " NOTE: C-S, C-Q in many system is Stop/resume session! (which makes screen froozen!)
@@ -290,22 +287,6 @@ inoremap <C-S>		<C-O>:update<CR>
 if !has("unix")
   set guioptions-=a
 endif
-" CTRL-Z is Undo; not in cmdline though
-noremap <C-Z> u
-inoremap <C-Z> <C-O>u
-" CTRL-A is Select all
-noremap <C-A> gggH<C-O>G
-inoremap <C-A> <C-O>gg<C-O>gH<C-O>G
-cnoremap <C-A> <C-C>gggH<C-O>G
-onoremap <C-A> <C-C>gggH<C-O>G
-snoremap <C-A> <C-C>gggH<C-O>G
-xnoremap <C-A> <C-C>ggVG
-" CTRL-F4 is Close window
-noremap <C-F4> <C-W>c
-inoremap <C-F4> <C-O><C-W>c
-cnoremap <C-F4> <C-C><C-W>c
-onoremap <C-F4> <C-C><C-W>c
-
 
 """""""""""""""""""""""""""""" H1 - Mapping - Input
 " mswin.vim mapped this to ^Y as undo cmd in windows, but this shield the useful auto complete cmd in vim (auto input the char above)
@@ -599,18 +580,6 @@ if has('mouse')
 endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" SKILLS            "
-"""""""""""""""""""""
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" TODO List         "
-"""""""""""""""""""""
-" done:
-" 	1 How to set the right click command "Edit with Vim" 	
-"
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deprecated
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "	" Deprecated as used vim-colors-solarized
@@ -664,3 +633,23 @@ endif
 "  endif
 "  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
 "endfunction
+"
+" WINDOWNS map: Some win behavior seems not really used
+" backspace in Visual mode deletes selection
+"vnoremap <BS> d
+" CTRL-Z is Undo; not in cmdline though
+"noremap <C-Z> u
+"inoremap <C-Z> <C-O>u
+" CTRL-F4 is Close window
+"noremap <C-F4> <C-W>c
+"inoremap <C-F4> <C-O><C-W>c
+"cnoremap <C-F4> <C-C><C-W>c
+"onoremap <C-F4> <C-C><C-W>c
+" Select all, BUT seems the orginal increment is more useful
+"noremap <C-A> gggH<C-O>G		
+"inoremap <C-A> <C-O>gg<C-O>gH<C-O>G
+"cnoremap <C-A> <C-C>gggH<C-O>G
+"onoremap <C-A> <C-C>gggH<C-O>G
+"snoremap <C-A> <C-C>gggH<C-O>G
+"xnoremap <C-A> <C-C>ggVG
+

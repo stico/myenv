@@ -62,11 +62,13 @@ if [ "$os_cygwin" = "false" ] ; then
 	# set diff prompt for internal machine and external machine 
 	internetIpCount=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|127.0.0.1\|fc00::\|fe80::\|::1\)')
 	if `grep -q "bash_prompt_color=green" ~/.myenv/zgen/sys_info_local &> /dev/null` ; then
-		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"	# Green line with $ in same line
+		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
 	elif [ "$internetIpCount" -ge 1 ] ; then 
-		export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"	# Red line with $ in next line
+		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				# Red line with $ in next line
+		export PS1="\[\e[31m\]\u@$(hostname -I | sed "s/ .*//"):\w\n\$\[\e[0m\]"	# Red line with $ in next line, prompt as scp address
 	else 
-		export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"	# Blue line with $ in same line
+		#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				# Blue line with $ in same line
+		export PS1="\[\e[34m\]\u@$(hostname -I | sed "s/ .*//"):\w\$\[\e[0m\]"		# Blue line with $ in same line, prompt as scp address
 	fi
 else
 	# Green line with $ in same line
