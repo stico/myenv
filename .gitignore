@@ -29,9 +29,7 @@
 !/.cshrc
 !/.bashrc
 !/.curlrc
-!/.muttrc
 !/.XWinrc
-!/.msmtprc
 !/.inputrc
 !/.xinitrc
 !/.xprofile
@@ -46,10 +44,6 @@
 !/.startxwinrc
 !/.bash_profile
 !/.gitattributes
-!/.backupMyenv.sh
-!/.backupMyenv.bat
-!/.restoreMyenv.sh
-!/.restoreMyenv.bat
 
 # IGNORE, for secure reason
 /.ssh/
@@ -80,8 +74,22 @@ gVim.exe.stackdump
 /.myenv/conf/doublecmd/searchhistory.txt
 /.myenv/conf/doublecmd/replacehistory.txt
 
+############################################################
 # Deprecated
+############################################################
+#
+# Deprecated since might contain IP for backup
 #!/.unison/
 #/.unison/*
 #!/.unison/*.prf
 #!/.unison/deprecated
+#
+# Deprecated since might contain mailbox password, or other sensitive info
+#!/.msmtprc
+#!/.muttrc
+#
+# Deprecated since become useless
+#!/.backupMyenv.sh
+#!/.backupMyenv.bat
+#!/.restoreMyenv.sh
+#!/.restoreMyenv.bat
