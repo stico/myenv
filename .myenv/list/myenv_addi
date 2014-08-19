@@ -24,14 +24,15 @@ $HOME/.m2/settings.xml
 $HOME/.config/autostart/
 $HOME/.thunderbird/profiles.ini
 $HOME/.local/share/applications/
-$HOME/.zbox/src/feihu/feihu-git/
-$HOME/.zbox/src/oublog/oublog-git/
 $HOME/.kde/share/config/kwalletrc
 $HOME/.kde/share/apps/kwallet/kdewallet.kwl
 $HOME/.config/fcitx/table/wbpy_LastAutoPhrase.tmp
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
 $HOME/cygdrive/c/Users/ouyangzhu/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/reportIpAddr.bat
+
+#$HOME/.zbox/src/feihu/feihu-git/
+#$HOME/.zbox/src/oublog/oublog-git/
 # too big #$HOME/.zbox/src/oumisc/oumisc-git/
 # too big #$HOME/.zbox/src/ourepo/ourepo-git/
 

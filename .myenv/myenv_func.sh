@@ -1017,81 +1017,35 @@ func_delete_dated() {
 }
 
 func_backup_dated() { 
-	func_param_check 1 "Usage: $FUNCNAME <path>" "$@" 
-	[ $# -ge 2 ] && func_die "ERROR: only one path/parameter supported"
+	func_param_check 1 "Usage: $FUNCNAME <path>\n\tLast argument 'FL' will treat as FileList." "$@" 
 
-	srcPath="$1"
-	fileName=$(basename "$srcPath")
-	targetFile=`func_dati`_`uname -n`_"$fileName"
-	bakPath=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
+	local srcPath="$1"
+	local fileName=$(basename "$srcPath")
+	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
+	local packFile=$MY_TMP/${targetFile}.zip
+	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
 
-	# if path is a directory, zip it first
-	if [ -d "$srcPath" ]; then
-		# need update the var to packed ones
-		targetFile=$targetFile.zip 
-		packFile=$MY_TMP/$targetFile
-		echo -e "INFO: Creating zip file for backup: $packFile"
-		zip -rq "$packFile" "$srcPath"
-		srcPath="$packFile"
+	# For filelist, use as file list. Magic here: use as filelist if last argument is 'FL'
+	if [[ "${@: -1}" == "FL" && -f "${srcPath}" ]] ; then
+		echo -e "INFO: Creating zip file from filelist, target: $packFile"
+		cat "${srcPath}" | zip -rq "${packFile}" -@ || func_die "ERROR: failed to zip file: $srcPath"
+	# For dir, zip it before backup
+	elif [ -d "$srcPath" ]; then		
+		echo -e "INFO: Creating zip file for backup, target: $packFile"
+		zip -rq "$packFile" "$srcPath" || func_die "ERROR: failed to zip file: $srcPath"
 	fi
 
-	for path in "${bakPath[@]}"
-	do
-		if [ -e "$path" ]; then
-			cp "$srcPath" "$path/$targetFile"
-			[ -e "$path/$targetFile" ] && echo -e "INFO: backup success: `ls -lh \"$path/$targetFile\"`" 
-			copied=$success
-		else
-			echo -e "WARN: backup failed, path not exist ($path)" 
-		fi
+	# Backup to target places
+	for bakPath in "${bakPaths[@]}" ; do
+		[ ! -e "${bakPath}" ] && echo "WARN: path NOT exist ($bakPath)" && continue
+
+		echo "INFO: backup to path ${bakPath}"
+		[ -e "${packFile}" ] && cp "${packFile}" "${bakPath}/" || cp "${srcPath}" "${bakPath}/${targetFile}"
+		ls -lh "$bakPath" | grep "${targetFile}" || echo "WARN: failed to backup to path: ${bakPath}"
 	done
 
+	# Clean and Last check
 	[ -e "${packFile}" ] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
-	[[ $copied != $success ]] && echo -e "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n! Failed to do any backup!\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-}
-
-func_backup_listed() { 
-	# TODO: merge with dated_backup?
-	# TODO: seems only ebackup use it, could simplify: 1) no eval needed, 2) no $HOME/ possible check
-
-	func_param_check 2 "Usage: $FUNCNAME <tag> <filelists>*" "$@" 
-
-	tmp_dir=$MY_TMP/$1
-	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
-	mkdir -p $tmp_dir
-	shift
-	source=$*
-
-	for fl in $source ; do 
-		[ ! -e $fl ] && echo -e "WARN: file list ($fl) not exist!" && continue
-		sub_name=`basename ${fl}`
-		sub_dir=$tmp_dir/${sub_name%%.*}
-		mkdir $sub_dir
-
-		# TODO duplicated code block - start - evalfl1
-		sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
-			# eval path, check empty value
-			[ -n "$line" ] && candidate=`func_eval $line` || continue
-			[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $line !" && continue
-
-			# Try $HOME as base (myenv backup need this for git listed files)
-			[ -e "$HOME/$candidate" ] && cp --no-preserve=all -R "$HOME/$candidate" $sub_dir && continue
-			[ -e "$candidate" ] && cp --no-preserve=all -R "$candidate" $sub_dir || continue
-		done
-		# TODO duplicated code block - end - evalfl1
-
-		# dirty check 1, for myenv bak, change its ACL, otherwise can not open/delete that dir
-		dirty_dir=fstab.d
-		[ -e $sub_dir/$dirty_dir ] && 					\
-			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir &&	\
-			getfacl $MY_TMP | setfacl -f - $sub_dir/$dirty_dir/*
-
-		# dirty check 2, for myenv bak, not want the .unison log file 
-		#[ -e $sub_dir/.unison ] && find $sub_dir/.unison/ -type f | grep -v ".*.prf" | xargs rm &> /dev/null
-	done
-
-	func_backup_dated $tmp_dir
-	[ -e "$tmp_dir" ] && rm -rf $tmp_dir
 }
 
 func_run_file_c() {
@@ -1761,4 +1715,47 @@ func_apt_add_repo() {
 #[ -z "$DOT_CACHE_DL" ]		&& DOT_CACHE_DL=.dl_me.txt
 #[ -z "$DOT_CACHE_FL" ]		&& DOT_CACHE_FL=.fl_me.txt
 #[ -z "$DOT_CACHE_GREP" ]	&& DOT_CACHE_GREP=.grep_me.txt
+#
+# Deprecated by func_backup_dated
+#func_backup_listed() { 
+#	# TODO: merge with dated_backup?
+#	# TODO: seems only ebackup use it, could simplify: 1) no eval needed, 2) no $HOME/ possible check
+#
+#	func_param_check 2 "Usage: $FUNCNAME <tag> <filelists>*" "$@" 
+#
+#	local tmp_dir="$(mktemp -d)/$1"
+#	shift
+#
+#	echo -e "INFO: start to backup, tmp dir: $tmp_dir"
+#	for fl in "$@" ; do 
+#		[ ! -e $fl ] && echo -e "WARN: file list ($fl) NOT exist!" && continue
+#
+#		local fl_name=$(basename ${fl})
+#		local fl_bakdir=${tmp_dir}/${fl_name%%.*}
+#		mkdir -p $fl_bakdir
+#
+#		sed -e "/^\s*$/d;/^\s*#/d;" $fl | while read line; do
+#			#[ ! -e "$line" ] && echo -e "WARN: candiate NOT exist: $line !" && continue
+#			cp --no-preserve=all --parents -R "$line" $fl_bakdir
+#
+#			#[ -n "$line" ] && candidate=`func_eval $line` || continue
+#			#[ -z "$candidate" ] && echo -e "WARN: candiate path empty: $line !" && continue
+#
+#			# Try $HOME as base (myenv backup need this for git listed files)
+#			#[ -e "$HOME/$candidate" ] && cp --no-preserve=all -R "$HOME/$candidate" $fl_bakdir && continue
+#			#[ -e "$candidate" ] && cp --no-preserve=all -R "$candidate" $fl_bakdir || continue
+#		done
+#
+#		# dirty check 1, for myenv bak, change its ACL, otherwise can not open/delete that dir
+#		#dirty_dir=fstab.d
+#		#[ -e $fl_bakdir/$dirty_dir ] && 					\
+#		#	getfacl $MY_TMP | setfacl -f - $fl_bakdir/$dirty_dir &&	\
+#		#	getfacl $MY_TMP | setfacl -f - $fl_bakdir/$dirty_dir/*
+#
+#		# dirty check 2, for myenv bak, not want the .unison log file 
+#		#[ -e $fl_bakdir/.unison ] && find $fl_bakdir/.unison/ -type f | grep -v ".*.prf" | xargs rm &> /dev/null
+#	done
+#
+#	func_backup_dated $tmp_dir
+#}
 
