@@ -14,10 +14,6 @@
 !/.screenlayout/*
 
 # INCLUDE, only some file in sub dir
-!/.unison/
-/.unison/*
-!/.unison/*.prf
-!/.unison/deprecated
 !/.w3m/
 !/.w3m/*
 !/.pip/
@@ -83,3 +79,9 @@ gVim.exe.stackdump
 /.myenv/conf/doublecmd/dirhistory.txt
 /.myenv/conf/doublecmd/searchhistory.txt
 /.myenv/conf/doublecmd/replacehistory.txt
+
+# Deprecated
+#!/.unison/
+#/.unison/*
+#!/.unison/*.prf
+#!/.unison/deprecated
