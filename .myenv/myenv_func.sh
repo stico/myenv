@@ -1022,7 +1022,7 @@ func_backup_dated() {
 	local srcPath="$1"
 	local fileName=$(basename "$srcPath")
 	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
-	local packFile=$MY_TMP/${targetFile}.zip
+	local packFile="$(mktemp -d)/${targetFile}.zip"
 	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
 
 	# For filelist, use as file list. Magic here: use as filelist if last argument is 'FL'
@@ -1041,11 +1041,9 @@ func_backup_dated() {
 
 		echo "INFO: backup to path ${bakPath}"
 		[ -e "${packFile}" ] && cp "${packFile}" "${bakPath}/" || cp "${srcPath}" "${bakPath}/${targetFile}"
-		ls -lh "$bakPath" | grep "${targetFile}" || echo "WARN: failed to backup to path: ${bakPath}"
+		find "$bakPath" -name "${targetFile}*" | xargs ls -lh
+		#ls -lh "$bakPath" | grep "${targetFile}" || echo "WARN: failed to backup to path: ${bakPath}"
 	done
-
-	# Clean and Last check
-	[ -e "${packFile}" ] && echo -e "INFO: Deleting tmp zip file: $packFile" && rm "$packFile"
 }
 
 func_run_file_c() {
@@ -1758,4 +1756,3 @@ func_apt_add_repo() {
 #
 #	func_backup_dated $tmp_dir
 #}
-
