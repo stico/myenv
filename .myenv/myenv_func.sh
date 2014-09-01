@@ -95,24 +95,15 @@ func_eval() {
 	echo "$*" | grep -q '`\|$' &> /dev/null && eval echo $* || echo $*
 }
 
-func_grep_file() {
-	func_param_check 2 "Usage: $FUNCNAME [suffix] [options and search_str]*" "$@"
-	local base="$(readlink -f ./)"
-	local suffix="${1}"
-	shift
+func_grep_myenv() {
+	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
-	# below is a single cmd line
-	locate -i --regex "${base}.*${suffix}$"			| \
-	sed -e "/\/.svn\/\|\/.hg\/\|\/.git\//d;
-		/\/.metadata\//d;
-		/\/target\/classes\//d;
-		/\.class$/d;"					| \
-	# ignore dir/binary(-I)/case(-i)
+	cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
 	xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
 	# use relative path which is shorter
 	sed -e "s+^${base}+.+"					| \
 	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
-	grep -i --color "$@"
+	grep --color "$@"
 }
 
 func_eval_path() {
@@ -404,7 +395,7 @@ func_check_cronlog() {
 
 	if [ -n "${result}" ] ; then
 		echo "Found err message in ${log}, sending notifications"
-		func_notify_mail "[MYENV Notyfy] cronlog has ERROR!" "$result"
+		func_notify_mail "[MYENV Notyfy] cronlog has ERROR ($(hostname))!" "$result"
 	else
 		echo "No err found in ${log}, not notificaton needed"
 	fi
@@ -552,17 +543,6 @@ func_grep_cmd() {
 	eval "$@" | grep -i "$search_str"
 }
 
-func_grep_myenv() {
-	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
-
-	cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
-	xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
-	# use relative path which is shorter
-	sed -e "s+^${base}+.+"					| \
-	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
-	grep --color "$@"
-}
-
 func_head() {
 	func_param_check 2 "Usage: $FUNCNAME [show_lines] [text]" "$@"
 
@@ -599,6 +579,19 @@ func_show_resp() {
 	| sed -e '/^$/d'
 }
 
+func_mvn_clean() { 
+	local log=$(mktemp)
+
+	pushd . &> /dev/null
+	echo "INFO: start to do 'mvn clean', check log at: $log"
+	for p in $(find "$PWD" -name pom.xml) ; do
+		local d=$(dirname "$p")
+		echo "INFO: cd $d && mvn clean"
+		\cd "$d" && mvn clean >> $log 2>&1
+	done
+	popd &> /dev/null
+}
+
 func_mvn_run() { 
 	func_param_check 0 "Usage: $FUNCNAME [class]" "$@"
 
@@ -629,24 +622,29 @@ func_mvn_run_class() {
 	[ -z "${1}" ] && func_cry "ERROR: not classname to run!"
 	[ ! -f pom.xml -o ! -d src/main/java ] && func_cry "ERROR: pom.xml or src/main/java NOT exist, seems not a maven project!"
 
-	mvn compile
-	mvn exec:java -Dexec.mainClass="${1}"
+	echo "INFO: run command: mvn clean compile exec:java -Dexec.mainClass=${1}"
+	mvn clean compile exec:java -Dexec.mainClass="${1}"
 }
 
 func_mvn_gen() { 
-	func_param_check 2 "Usage: $FUNCNAME [pkg(war/jar/oujar/ouwar)] [name]" "$@"
+	func_param_check 2 "Usage: $FUNCNAME [pkg(war/jar/oujar/ouwar/csmm/cswar)] [name]" "$@"
 
+	local cmd=""
 	case "${1}" in
 	#mvn archetype:generate -DgroupId=com.test -DartifactId=$name -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
-	jar)	mvn archetype:generate       -DgroupId=com.test      -DartifactId="${2}"                                               -DarchetypeArtifactId=maven-archetype-quickstart                             -DinteractiveMode=false                          ; mkdir -p $name/src/main/resources ;;
-	war)	mvn archetype:generate       -DgroupId=com.test      -DartifactId="${2}" -DarchetypeGroupId=com.tpl.archetype          -DarchetypeArtifactId=tpl-war-archetype      -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ; mkdir -p $name/src/main/java ;;
-	oujar)	mvn archetype:generate -o -U -DgroupId=com.oumisc    -DartifactId="${2}" -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-oujar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ;;
-	ouwar)	mvn archetype:generate -o -U -DgroupId=com.oumisc    -DartifactId="${2}" -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-ouwar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ;;
-	csstd)	mvn archetype:generate -o -U -DgroupId="com.yy.${2}" -DartifactId="${2}" -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-mm-archetype    -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ;;
+	jar)	cmd="mvn archetype:generate    -DgroupId=com.test    -DartifactId=${2}                                               -DarchetypeArtifactId=maven-archetype-quickstart                             -DinteractiveMode=false                          ; mkdir -p $name/src/main/resources ";;
+	war)	cmd="mvn archetype:generate    -DgroupId=com.test    -DartifactId=${2} -DarchetypeGroupId=com.tpl.archetype          -DarchetypeArtifactId=tpl-war-archetype      -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ; mkdir -p $name/src/main/java ";;
+	oujar)	cmd="mvn archetype:generate -U -DgroupId=com.oumisc  -DartifactId=${2} -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-oujar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ";;
+	ouwar)	cmd="mvn archetype:generate -U -DgroupId=com.oumisc  -DartifactId=${2} -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-ouwar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ";;
+	csmm)	cmd="mvn archetype:generate -U -DgroupId=com.yy.${2} -DartifactId=${2} -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-mm-archetype    -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ";;
+	cswar)	cmd="mvn archetype:generate -U -DgroupId=com.yy.${2} -DartifactId=${2} -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-war-archetype   -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ";;
 	*)
 		echo "ERROR: pkg type must be war/jar/oujar/ouwar"
 		exit 1
 	esac
+
+	echo "INFO: run mvn cmd: $cmd"
+	$cmd
 }
 
 func_svn_backup() { 
@@ -1019,8 +1017,8 @@ func_delete_dated() {
 func_backup_dated() { 
 	func_param_check 1 "Usage: $FUNCNAME <path>\n\tLast argument 'FL' will treat as FileList." "$@" 
 
-	local srcPath="$1"
-	local fileName=$(basename "$srcPath")
+	local srcPath="$(readlink -f $"1")"
+	local fileName="$(basename "$srcPath")"
 	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
 	local packFile="$(mktemp -d)/${targetFile}.zip"
 	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
@@ -1756,3 +1754,28 @@ func_apt_add_repo() {
 #
 #	func_backup_dated $tmp_dir
 #}
+#
+# Deprecated by directly use grep cmd
+#func_grep_file() {
+#	# simple version: works
+#	#\grep -rIinH --color --exclude-dir=\.{svn,git,bzr,hg,metadata} --exclude-dir=target "$@"
+#
+#	# Version 1: works, SUPPORT multiple level exclude (via sed), but NOT always accurate since depend on updatedb/locate
+#	func_param_check 2 "Usage: $FUNCNAME [suffix] [options and search_str]*" "$@"
+#	local base="$(readlink -f ./)"
+#	local suffix="${1}"
+#	[[ "$suffix" = "all" || "$suffix" = "-" || "$suffix" = "a" ]] && suffix=''
+#	shift
+#	locate -i --regex "${base}.*${suffix}$"				| \
+#	sed -e "/\/.svn\/\|\/.hg\/\|\/.git\//d;
+#		/\/.metadata\//d;
+#		/\/target\/classes\//d;
+#		/\.class$/d;"						| \
+#	# ignore dir(-d skip), ignore binary(-I), ignore case(-i), show linenumber(-n), show filename (-H)
+#	xargs --delimiter="\n" grep -d skip -H -I -i -n "$@" 2>&1	| \
+#	# use relative path which is shorter
+#	sed -e "s+^${base}+.+"						| \
+#	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
+#	grep -i --color "$@"
+#}
+

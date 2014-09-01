@@ -147,6 +147,10 @@ set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
+set grepprg=\\cd\ %:p:h;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+
+"set grepprg=\\cd\ %:p:h;func_grep_file\ $*		" reuse the func, note need the "set shellcmdflag=-ic"
+"set shellcmdflag=-ic					" run cmd (via :!) in interactive mode, so could use shell alias/function. BUT will slow down all operation which need run shell cmd
 "set shell=bash\ --login				" will source .bashrc everytime
 "set cursorcolumn					" highlight current column
 "set relativenumber
@@ -311,17 +315,17 @@ noremap <C-Left> b
 noremap <C-Right> w
 " visual selection
 nnoremap <S-Right> vl
-nnoremap <C-S-Right> ve
+"nnoremap <C-S-Right> ve
 nnoremap <S-Left> lvh
-nnoremap <C-S-Left> lvb
+"nnoremap <C-S-Left> lvb
 inoremap <S-Right> <ESC>lvl
-inoremap <C-S-Right> <ESC>lve
+"inoremap <C-S-Right> <ESC>lve
 inoremap <S-Left> <ESC>lvh
-inoremap <C-S-Left> <ESC>lvb
+"inoremap <C-S-Left> <ESC>lvb
 vnoremap <S-Right> l
-vnoremap <C-S-Right> e
+"vnoremap <C-S-Right> e
 vnoremap <S-Left> h
-vnoremap <C-S-Left> b
+"vnoremap <C-S-Left> b
 " y in visual mode also copy to clipboard
 vnoremap y "+y
 vnoremap d "+d
@@ -336,7 +340,7 @@ nnoremap <C-S-H> <C-w>h
 nnoremap <C-S-J> <C-w>j
 nnoremap <C-S-K> <C-w>k
 nnoremap <C-S-L> <C-w>l
-" gnome terminator style window adjustment, note vim actually can not distiguish <C-Left> and <C-S-Left>
+" gnome terminator style window adjustment, note vim actually can not distiguish <C-Left> and <C-S-Left> since depends on cursor in which window
 nnoremap <C-S-Left> <C-w><
 nnoremap <C-S-Right> <C-w>>
 nnoremap <C-S-Up> <C-w>-
@@ -553,17 +557,25 @@ function! NoteOutline()
 	call setpos('.', save_cursor)
 	vertical lopen
 	vertical resize 40
+
+	" hide filename and line number in quickfix window, not sure how it works yet.
 	set conceallevel=2 concealcursor=nc
-	syntax match qfFileName /^.*| / transparent conceal			" plus line above, hide the filename and line number in quickfix window, not sure how it works yet.
+	syntax match qfFileName /^.*| / transparent conceal
 	"syntax match qfFileName /^[^|]*/ transparent conceal
 endfunction
 nnoremap <silent> mo :<C-U>call NoteOutline()<CR>
-autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
-"autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
-autocmd BufWinEnter quickfix silent! nnoremap <ESC> :exec "bd " . g:qfix_win<CR>
-"autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"	" seems not need delete the buffer anymore (because of what? vim updates? plugin updates?)
-autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>zt"
-autocmd BufLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
+
+" Works for "[Quickfix List]": keep cursor in quickfix window and show content above 
+" Works for "[Location List]": jump to corresponding location (loc window closed). (how it works?)
+au FileType qf nmap <buffer> <esc> :close<cr>
+au FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>
+" Deprecated by above lines
+""autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
+""autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"	" seems not need delete the buffer anymore (because of what? vim updates? plugin updates?)
+"autocmd BufWinEnter "Location List" let g:qfix_win = bufnr("$")
+"autocmd BufWinEnter "Location List" silent! nnoremap <ESC> :exec "bd " . g:qfix_win<CR>
+"autocmd BufWinEnter "Location List" silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>zt"
+"autocmd BufLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
 "autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif	" use BufLeave, seems BufWinLeave NOT triggered when hit <Enter> in outline(quickfix) window
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
