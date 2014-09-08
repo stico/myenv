@@ -90,6 +90,7 @@ colorscheme solarized
 
 """""""" NERDCommenter
 let NERDSpaceDelims = 1					" add space for comment
+let NERDTreeWinSize = 45				" tree window width, default is 31
 
 """""""" Ctrlp
 "let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
@@ -147,7 +148,10 @@ set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
+
 set grepprg=\\cd\ %:p:h;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+" seems not possible to use getcwd(), while %: is supported/expanded but only for filename related. Have to use :exec xxx . getcwd() . "yyy" form
+"set grepprg=\\cd\ getcwd();\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
 
 "set grepprg=\\cd\ %:p:h;func_grep_file\ $*		" reuse the func, note need the "set shellcmdflag=-ic"
 "set shellcmdflag=-ic					" run cmd (via :!) in interactive mode, so could use shell alias/function. BUT will slow down all operation which need run shell cmd
@@ -436,25 +440,17 @@ endfunction
 """ OnlyFileNameInTab is for showing only the filename, excluding the path
 set guitablabel=%{OnlyFileNameInTab()}		" invoke the function
 function OnlyFileNameInTab()
-	" special for Oucr
+	" Show root name in ~Oucr mode
 	if exists('t:OucrRoot')
 		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
 		return tabpagenr() . ":OUCR:" . t:OucrTablabel
 	endif
 	
+	" Show tab index and filename/basename
 	let bufnrlist = tabpagebuflist(v:lnum) 
-	" show only the first 6 letters of the name + ..
 	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
 	let filename = tabpagenr() . ":" . fnamemodify(label,':t')
 
-	"if want to show a short filename in the tab, use following
-	"if strlen(filename) >=8
-	"	let ret = filename[0:9].'..'
-	"else
-	"	let ret = filename
-	"endif
-	"return ret  
-	
 	return filename
 endfunction
 
@@ -472,6 +468,11 @@ function! OucrCheck()
 	endif
 	exec "cd ". t:OucrRoot
 	set noautochdir
+	exec "NERDTree"				
+	" disable syntastic for mvn project, since too slow
+        if(filereadable("pom.xml"))
+		exec "SyntasticToggleMode"	
+	endif
 endfunction
 function! OucrRestore()
 	if !(exists('t:OucrRoot'))

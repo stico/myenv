@@ -285,6 +285,7 @@ func_locate() {
 		case "${type}" in
 			FILE)	[ -f "${line}" ] && echo "${line}" && return 0 ;;
 			DIR)	[ -d "${line}" ] && echo "${line}" && return 0 ;;
+			*)	echo "ERROR: func_locate need a TYPE parameter! 1>&2"
 		esac
 	done
 }
@@ -636,8 +637,8 @@ func_mvn_gen() {
 	war)	cmd="mvn archetype:generate    -DgroupId=com.test    -DartifactId=${2} -DarchetypeGroupId=com.tpl.archetype          -DarchetypeArtifactId=tpl-war-archetype      -DarchetypeVersion=1.1-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ; mkdir -p $name/src/main/java ";;
 	oujar)	cmd="mvn archetype:generate -U -DgroupId=com.oumisc  -DartifactId=${2} -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-oujar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ";;
 	ouwar)	cmd="mvn archetype:generate -U -DgroupId=com.oumisc  -DartifactId=${2} -DarchetypeGroupId=com.oumisc.maven.archetype -DarchetypeArtifactId=archetype-ouwar-simple -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeCatalog=local ";;
-	csmm)	cmd="mvn archetype:generate -U -DgroupId=com.yy.${2} -DartifactId=${2} -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-mm-archetype    -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ";;
-	cswar)	cmd="mvn archetype:generate -U -DgroupId=com.yy.${2} -DartifactId=${2} -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-war-archetype   -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ";;
+	csmm)	cmd="mvn archetype:generate -o -DgroupId=com.yy.${2} -DartifactId=${2} -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-mm-archetype    -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ";;
+	cswar)	cmd="mvn archetype:generate -o -DgroupId=com.yy.${2} -DartifactId=${2} -DarchetypeGroupId=com.yy.maven.archetype     -DarchetypeArtifactId=cs-std-war-archetype   -DarchetypeVersion=1.0-SNAPSHOT -DinteractiveMode=false -DarchetypeRepository=http://jrepo2.yypm.com/nexus/content/repositories/snapshots/ ";;
 	*)
 		echo "ERROR: pkg type must be war/jar/oujar/ouwar"
 		exit 1
@@ -1017,7 +1018,7 @@ func_delete_dated() {
 func_backup_dated() { 
 	func_param_check 1 "Usage: $FUNCNAME <path>\n\tLast argument 'FL' will treat as FileList." "$@" 
 
-	local srcPath="$(readlink -f $"1")"
+	local srcPath="$(readlink -f "$1")"
 	local fileName="$(basename "$srcPath")"
 	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
 	local packFile="$(mktemp -d)/${targetFile}.zip"
