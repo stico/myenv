@@ -14,6 +14,7 @@ genymotion		"tmp_cmd=genymotion; command -v genymotion &> /dev/null || echo Can 
 androidstudio		"studio.sh &> /dev/null &"
 adtbundle		"adtbundle &> /dev/null &"
 eclipse			"eclipse &> /dev/null &"
+opcpdf			"func_op_compressed_file pdf "
 wl			"wc -l"
 df			"df -h"
 du			"du -h"

@@ -1264,6 +1264,22 @@ func_apt_add_repo() {
 	sudo add-apt-repository -y "${apt_repo_name}" &> /dev/null
 }
 
+func_op_compressed_file() {
+	func_param_check 1 "USAGE: $FUNCNAME <file-suffix> <compressed-file>" "$@"
+	local file_suffix="${1}"
+	local compressed_file="${2}"
+	local target_dir="$(mktemp -d)"
+	echo "${compressed_file}" 
+	echo "${target_dir}" 
+	func_uncompress "${compressed_file}" "${target_dir}" || func_cry "ERROR: can NOT uncompress file: ${compressed_file}"
+	echo 111111111111111
+	cd "${target_dir}"
+	echo 111111111111111
+	local target_file="$(\ls | grep "${file_suffix}")"
+	echo 22222
+	[ $(echo "${target_file}" | wc -l) -eq 1 ] && xdg-open "${target_file}" || echo "WARN: more than one file with suffix: ${file_suffix}, pls open manually!"
+	echo 33333
+}
 ################################### Deprecated ###################################
 ## deprecated by func_locate
 #function func_find_dotcache {
