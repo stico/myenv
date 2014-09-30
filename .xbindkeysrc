@@ -16,6 +16,18 @@
 "/usr/bin/wmctrl -a 'SINGLE_VIM' || /bin/bash -c ' export PS1=to_cheat_bashrc && source /home/ouyangzhu/.bashrc && LD_LIBRARY_PATH= /home/ouyangzhu/.zbox/ins/vim/vim-hg-ouyzhu/bin/gvim --servername SINGLE_VIM --remote-tab ~/.myenv/zgen/collection/all_content.txt ' " 
   control+alt+z
 
+"/usr/bin/wmctrl -a 'Foxit'"
+  control+alt+f
+
+"/usr/bin/wmctrl -a 'Eclipse' || eclipse"
+  control+alt+e
+
+"/usr/bin/wmctrl -a 'Zeal' || /usr/bin/zeal"
+  control+alt+r
+
+"/usr/bin/wmctrl -a 'Okular' || /usr/bin/okular"
+  control+alt+o
+
 "/usr/bin/wmctrl -a 'Google Chrome' || /usr/bin/google-chrome"
   control+alt+d
 
@@ -28,18 +40,11 @@
 "/usr/bin/wmctrl -a 'SINGLE_TERMINATOR' || /usr/bin/terminator --title SINGLE_TERMINATOR"
   control+alt+x
 
+"/usr/bin/wmctrl -a 'Intellij IDEA' || /home/ouyangzhu//.zbox/ins/intellij/intellij-13.1/bin/idea.sh &> /dev/null &"
+  control+alt+i
+
 "/usr/bin/wmctrl -a 'workvmIII' || /usr/lib/virtualbox/VirtualBox --comment 'workvmIII' --startvm 'bd0a6b1d-1951-48f5-a406-2fe4ad19bb5a'"
   control+alt+w
-
-"/usr/bin/wmctrl -a 'Eclipse' || eclipse"
-  control+alt+e
-
-"/usr/bin/wmctrl -a 'Okular' || /usr/bin/okular"
-  control+alt+o
-
-#"/usr/bin/wmctrl -a 'Foxit' || /bin/bash -c ' export PS1=to_cheat_bashrc && source /home/ouyangzhu/.bashrc && wine C:\\Program\ Files\ (x86)\\Foxit\ Software\\Foxit\ Reader\\Foxit\ Reader.exe > /dev/null 2>&1 ' " 
-"/usr/bin/wmctrl -a 'Foxit'"
-  control+alt+f
 
 "~/.myenv/conf/myahk/myahk_script_hotstring.sh"
   control+alt+h

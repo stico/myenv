@@ -27,6 +27,7 @@
 !/.netrc
 !/.rvmrc
 !/.cshrc
+!/.npmrc
 !/.bashrc
 !/.curlrc
 !/.XWinrc
