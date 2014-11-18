@@ -12,13 +12,12 @@ $LOC_CONF_MYSQL
 $LOC_CONF_SAMBA
 $MY_ENV/secu
 $MY_ENV/zgen
-$MY_DEV/eclipse/eclipse.ini
 
 $HOME/.ssh/
 $HOME/.hgrc
-$HOME/.subversion/
-$HOME/.VirtualBoxVMs/
 $HOME/.gitconfig
+$HOME/.subversion/
+$HOME/.VirtualBox/
 $HOME/.smbcredentials
 $HOME/.m2/settings.xml
 $HOME/.config/autostart/

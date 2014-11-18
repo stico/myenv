@@ -124,6 +124,12 @@ func_eval_path() {
 	[ -e "$candidate" ] && eval $result_var_name="$candidate" && return 0
 }
 
+func_fullpath() {
+	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
+	# clipit put stuff in clipboard, use -p or xclip to put in primary
+	readlink -f "${1}" | tr -d '\n' | clipit -c | sed -e '$a\'
+}
+
 func_std_gen_tags() {
 	local d dd note_file note_filename
 	rm "${MY_TAGS_NOTE}"
@@ -510,11 +516,13 @@ func_collect_all() {
 	echo "INFO: collecting all"
 	local all_content=${base}/all_content.txt
 	cat "${stdnote_quicklist}"	"${stdnote_outline}"							>> "${all_content}"
-	cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"	"${code_content}"	>> "${all_content}"
+	#cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"	"${code_content}"	>> "${all_content}"
+	cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"				>> "${all_content}"
 	cat "${stdnote_filelist}"	"${miscnote_filelist}"	"${myenv_filelist}"	"${code_filelist}"	>> "${all_content}"
 	cat "${mydoc_filelist}"											>> "${all_content}"
 
 	echo "INFO: shorten file path"
+	sed -i -e "1i${code_content}\n" "${all_content}"
 	sed -i -e 's+^\(@*\)/home/ouyangzhu/.myenv/+\1$MY_ENV/+' "${all_content}"
 	sed -i -e 's+^\(@*\)\(/ext\|/home/ouyangzhu\)/Documents/\([DEF]C.\)/+\1$MY_\3/+' "${all_content}"
 }
@@ -1264,6 +1272,22 @@ func_apt_add_repo() {
 	sudo add-apt-repository -y "${apt_repo_name}" &> /dev/null
 }
 
+func_find_space() {
+	echo -e "INFO: 1st check"
+	du -sh ~/amp				2>&1 | sed -e "/Permission denied/d"
+	du -sh ~/.zbox				2>&1 | sed -e "/Permission denied/d"
+	du -sh ~/.myenv				2>&1 | sed -e "/Permission denied/d"
+	du -sh ~/.android			2>&1 | sed -e "/Permission denied/d"
+	du -sh ~/.Genymobile			2>&1 | sed -e "/Permission denied/d"
+	du -sh ~/.local/share/Trash		2>&1 | sed -e "/Permission denied/d"
+
+	echo -e "\n\n\nINFO: 2nd check"
+	du -sh /data				2>&1 | sed -e "/Permission denied/d"
+
+	echo -e "\n\n\nINFO: 3rd check"
+	du -sh ~/Documents/{D,E,F}C*		2>&1 | sed -e "/Permission denied/d"
+}
+
 func_op_compressed_file() {
 	func_param_check 1 "USAGE: $FUNCNAME <file-suffix> <compressed-file>" "$@"
 	local file_suffix="${1}"
@@ -1279,6 +1303,20 @@ func_op_compressed_file() {
 	echo 22222
 	[ $(echo "${target_file}" | wc -l) -eq 1 ] && xdg-open "${target_file}" || echo "WARN: more than one file with suffix: ${file_suffix}, pls open manually!"
 	echo 33333
+}
+
+func_mon_and_run() {
+	watch_path="$1"
+	shift
+	watch_cmd="$*"
+
+	# NEED: sudo apt-get install inotify-tools
+	inotifywait -mr --timefmt '%Y-%m-%d %H:%M:%S' --format '%T %w %f' -e close_write "${watch_path}" | \
+	while read date time dir file; do
+	       updated_file=${dir}${file}
+	       ${watch_cmd}
+	       echo "Target updatd at ${date} ${time}, updated file: ${updated_file}"
+	done
 }
 ################################### Deprecated ###################################
 ## deprecated by func_locate
