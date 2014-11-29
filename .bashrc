@@ -33,7 +33,7 @@ if [ -e "${zbox_func}" ]  ; then
 	func_zbox use python		3.3.4
 	func_zbox use springloaded	1.2.0.RELEASE
 
-	func_zbox use intellij		13.1
+	func_zbox use idea		14.0.1
 	func_zbox use androidsdk	23.0.2
 	func_zbox use vim		hg		ouyzhu
 	func_zbox use eclipse		4.3.2		jee_x64

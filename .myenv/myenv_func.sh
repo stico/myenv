@@ -690,6 +690,10 @@ func_svn_update() {
 	sudo updatedb
 }
 
+func_svn_status() { 
+	svn status | sed -e '/^\s*$/d;/\s*X\s\+/d;/Performing status on external item at /d'
+}
+
 func_git_pull() { 
 	git pull origin master && git status
 	sudo updatedb
@@ -1125,6 +1129,7 @@ func_run_file() {
 	if [[ "$file" = *.c ]] ; then		(func_run_file_c $file)		# use subshell, could make sure "stay in current dir" even used ^C, but subshell stderr seems lost (can NOT get msg like "Segmentation fault", also NOTE, the "Segmentation fault" msg is print by shell, not by the crashed app)
 	#if [[ "$file" = *.c ]] ; then		func_run_file_c $file		# not using subshell, current dir might change to "target" when use ^C
 	elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
+	elif [[ "$file" = *.js ]] ; then	node $file
 	elif [[ "$file" = *.rb ]] ; then	ruby $file
 	elif [[ "$file" = *.sh ]] ; then	bash $file
 	elif [[ "$file" = *.py ]] ; then	python $file
@@ -1136,6 +1141,12 @@ func_run_file() {
 	else
 		echo "ERROR: can not run file $file !"
 	fi
+}
+
+func_run_file_format_output() {
+	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+
+	func_run_file "${1}" | column -t -s "|"
 }
 
 func_ctrl_me() {

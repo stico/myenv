@@ -436,3 +436,19 @@ inconsequential	无关紧要
 	[[["Testability","可测试性","","Kě cèshì xìng"]],,"zh-CN",,[["Testability",[1],true,false,998,0,1,0]],[["可 测试 性",1,[["Testability",998,true,false],["Testable",0,true,false],["For testability",0,true,false],["The testability",0,true,false]],[[0,4]],"可测试性"]],,,[["zh-CN"]],34]
 押金	Deposit
 	[[["Deposit","押金","","Yājīn"]],[["noun",["deposit","cash pledge"],[["deposit",["存款","沉积","押金","沉淀","产卵","储藏"],,0.15335497],["cash pledge",["押金"]]],"押金",1]],"zh-CN",,[["Deposit",[1],true,false,1000,0,1,0]],[["押金",1,[["Deposit",1000,true,false],["Deposit required",0,true,false],["Deposits",0,true,false],["Deposits are",0,true,false],["A deposit",0,true,false]],[[0,2]],"押金"]],,,[],4]
+视力	Vision
+	[[["Vision","视力","","Shìlì"]],[["noun",["vision","sight"],[["vision",["视力","眼光","梦见","目光","目力","眼力"],[76732],0.27338478],["sight",["视力","视觉","景象","看见","风光","看"],[76732],0.029729217]],"视力",1]],"zh-CN",,[["Vision",[1],true,false,926,0,1,0]],[["视力",1,[["Vision",926,true,false],["Sight",73,true,false],["Visual acuity",0,true,false],["Visual",0,true,false],["Eyesight",0,true,false]],[[0,2]],"视力"]],,,[],7]
+underperform	弱于大盘
+	[[["弱于大盘","underperform","Ruò yú dàpán",""]],,"en",,[["弱于大盘",[1],false,false,452,0,2,0]],[["underperform",1,[["弱于大盘",452,false,false],["弱于大市",229,false,false],["表现不佳",165,false,false],["落后大市",138,false,false],["跑输大盘",14,false,false]],[[0,12]],"underperform"]],,,[["en"]],16]
+八进制	Octal
+	[[["Octal","八进制","","Bājìnzhì"]],,"zh-CN",,[["Octal",[1],true,false,788,0,1,0]],[["八 进制",1,[["Octal",788,true,false],["The octal",0,true,false],["An octal",0,true,false],["Octet",0,true,false]],[[0,3]],"八进制"]],,,[["zh-CN"]],66]
+奇怪的	Strange
+	[[["Strange","奇怪的","","Qíguài de"]],[["adjective",["grotesque"],[["grotesque",["滑稽可笑的","奇怪的"]]],"奇怪的",3]],"zh-CN",,[["Strange",[1],true,false,977,0,1,0]],[["奇怪 的",1,[["Strange",977,true,false],["Weird",0,true,false],["Curious",0,true,false],["Odd",0,true,false],["Strangely",0,true,false]],[[0,3]],"奇怪的"]],,,[],3]
+operand	操作
+	[[["操作","operand","Cāozuò",""]],,"en",,[["操作",[1],false,false,592,0,1,0]],[["operand",1,[["操作",592,false,false],["操作数",407,false,false],["的操作数",0,false,false],["操作数的",0,false,false],["运算数",0,false,false]],[[0,7]],"operand"]],,,[["en"]],3]
+circuit	电路
+	[[["电路","circuit","Diànlù",""]],[["verb",["巡回","环行","周"],[["巡回",["tour","circuit","go around","roam"],,0.022440789],["环行",["circuit","round"]],["周",["circuit","help out"]]],"circuit",2],["noun",["线路","道","环行","流程","周"],[["线路",["line","circuit","route"],,0.022092877],["道",["road","path","way","circuit","doctrine","method"]],["环行",["annulus","circuit"]],["流程",["circuit"]],["周",["week","periphery","circumference","Zhou Dynasty","circuit","cycle"]]],"circuit",1]],"en",,[["电路",[18],false,false,929,0,1,1]],[["circuit",18,[["电路",929,false,false],["线路",70,false,false],["回路",0,false,false],["的电路",0,false,false],["电路的",0,false,false]],[[0,7]],"circuit"]],,,[],3]
+小数	Decimal
+	[[["Decimal","小数","","Xiǎoshù"]],,"zh-CN",,[["Decimal",[1],true,false,836,0,1,0]],[["小数",1,[["Decimal",836,true,false],["Decimals",90,true,false],["Fractional",5,true,false],["Decimal places",2,true,false],["The fractional",0,true,false]],[[0,2]],"小数"]],,,[["zh-CN"]],5]
+小数位数	Decimal places
+	[[["Decimal places","小数位数","","Xiǎoshù wèi shù"]],,"zh-CN",,[["Decimal places",[1],true,false,900,0,2,0]],[["小数 位数",1,[["Decimal places",900,true,false],["Decimal",81,true,false],["Decimals",16,true,false],["Number of decimal places",0,true,false],["Decimal digits",0,true,false]],[[0,4]],"小数位数"]],,,[["zh-CN"]],3]

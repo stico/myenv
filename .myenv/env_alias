@@ -14,6 +14,7 @@ genymotion		"tmp_cmd=genymotion; command -v genymotion &> /dev/null || echo Can 
 androidstudio		"studio.sh &> /dev/null &"
 adtbundle		"adtbundle &> /dev/null &"
 eclipse			"eclipse &> /dev/null &"
+zeal			"zeal &> /dev/null &"
 opcpdf			"func_op_compressed_file pdf "
 wl			"wc -l"
 df			"df -h"
@@ -52,7 +53,7 @@ unison_cs_lapII_workpcII	"unison cs_workpcII_lapII_all"
 # Alias - By Topic (<topic><action><obj/arg>)
 
 			# Head: svn
-svnstatus		"svn status"
+svnstatus		"func_svn_status"
 svnupdate		"func_svn_update"
 svnbackup		"func_svn_backup"
 
