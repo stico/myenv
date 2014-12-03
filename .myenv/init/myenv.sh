@@ -14,6 +14,8 @@ init_myenv_tmp=/tmp/init_myenv/`date "+%Y%m%d_%H%M%S"`
 # Source & Prepare
 umask 077
 mkdir -p ${init_myenv_tmp}
+
+# TODO: should not rely on these script, search "func_"
 source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 
 # Functions
@@ -130,6 +132,8 @@ function func_init_myenv_secure {
 	local tmp1=${myenv_full_bak%.zip}
 	local myenv_full_bak_name=${tmp1##*/}
 	rm -rf $init_myenv_tmp/$myenv_full_bak_name 
+
+	#TODO: use unzip instead!!!
 	func_uncompress $myenv_full_bak $init_myenv_tmp/$myenv_full_bak_name 
 
 	# Find and copy
