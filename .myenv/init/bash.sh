@@ -16,11 +16,11 @@ genEnvFunc=$genShPath/envFuncAll
 if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 	# winVer=`cmd /C win_ver.bat`			# works in cygwin/bash, not in GIT/bash
 	envVarSrc=(env_var env_var_win_cyg env_var_win)
-	envFuncSrc=(myenv_func.sh)
+	envFuncSrc=(myenv_func.sh myenv_dev.sh)
 	envAliasSrc=(env_alias env_alias_win)
 else
 	envVarSrc=(env_var_lu env_var)
-	envFuncSrc=(myenv_func.sh)
+	envFuncSrc=(myenv_func.sh myenv_dev.sh)
 	envAliasSrc=(env_alias env_alias_lu)
 fi
 [[ -e $HOME/.myenv/secu/env_var_secu ]] && envVarSrc+=(secu/env_var_secu)

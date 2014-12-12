@@ -2,6 +2,7 @@
 
 [ -z $VIM_CONF ] && echo 'ERROR: env $VIM_CONF not set, pls check!' && exit
 
+# Plugin List
 declare -A plugin_addr
 plugin_addr["vim-colors-solarized"]="git://github.com/altercation/vim-colors-solarized.git"
 #plugin_addr["YouCompleteMe"]="https://github.com/Valloric/YouCompleteMe.git"		# might need re-compile for big updates, see ~YouCompleteMe@vim
@@ -17,13 +18,18 @@ plugin_addr["vim-oumg"]="https://github.com/stico/vim-oumg.git"
 plugin_addr["tabular"]="git://github.com/godlygeek/tabular.git"
 plugin_addr["ctrlp.vim"]="git://github.com/kien/ctrlp.vim.git"
 
+# Plugin List String
 plugin_candidates=""
 for plugin in "${!plugin_addr[@]}" ; do
 	plugin_candidates="$plugin_candidates $plugin"
 done
 [ -n "$*" ] && plugin_names=$* ||  plugin_names=$plugin_candidates
 
-# update plugins
+# Init env
+[ -e "$VIM_CONF/bundle" ] || mkdir -p "$VIM_CONF/bundle"
+[ -e "$VIM_CONF/autoload" ] || mkdir -p "$VIM_CONF/autoload"
+
+# Init or Update Plugins
 for plugin in $plugin_names ; do
 	[ -z ${plugin_addr[$plugin]} ] && echo "ERROR: $plugin not exist in plugin candidates list ($plugin_candidates), pls check!" && continue
 

@@ -575,19 +575,6 @@ func_ip() {
 	fi
 }
 
-func_show_resp() { 
-	func_param_check 1 "Usage: $FUNCNAME [url]" "$@"
-
-	echo "sending request to: $1"
-	wget --timeout=2 --tries=1 -O - 2>&1 "$1"	\
-	| sed -e '/'${1//\//.}'/d'			\
-	| sed -e '/^Resolving/d'			\
-	| sed -e '/^Length/d'				\
-	| sed -e '/^Saving/d;/100%.*=.*s/d'		\
-	| sed -e '/0K.*0.00.=0s/d'			\
-	| sed -e '/^$/d'
-}
-
 func_mvn_clean() { 
 	local log=$(mktemp)
 

@@ -452,3 +452,5 @@ circuit	电路
 	[[["Decimal","小数","","Xiǎoshù"]],,"zh-CN",,[["Decimal",[1],true,false,836,0,1,0]],[["小数",1,[["Decimal",836,true,false],["Decimals",90,true,false],["Fractional",5,true,false],["Decimal places",2,true,false],["The fractional",0,true,false]],[[0,2]],"小数"]],,,[["zh-CN"]],5]
 小数位数	Decimal places
 	[[["Decimal places","小数位数","","Xiǎoshù wèi shù"]],,"zh-CN",,[["Decimal places",[1],true,false,900,0,2,0]],[["小数 位数",1,[["Decimal places",900,true,false],["Decimal",81,true,false],["Decimals",16,true,false],["Number of decimal places",0,true,false],["Decimal digits",0,true,false]],[[0,4]],"小数位数"]],,,[["zh-CN"]],3]
+职级	Rank
+	[[["Rank","职级","","Zhíjí"]],,"zh-CN",,[["Rank",[1],true,false,977,0,1,0]],[["职 级",1,[["Rank",977,true,false],["Ranks",22,true,false],["Grades",0,true,false],["The rank",0,true,false],["The rank of",0,true,false]],[[0,2]],"职级"]],,,[["zh-CN"]],3]

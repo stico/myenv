@@ -1,6 +1,7 @@
 [global_config]
   title_transmit_bg_color = "#91aff5"
   dbus = True
+  inactive_color_offset = 0.66
 [keybindings]
   cycle_prev = <Ctrl><Shift>p
   close_window = ""
