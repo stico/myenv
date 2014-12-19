@@ -30,6 +30,9 @@ MY_FCB		%HOME%Documents#FCB
 MY_FCS		%HOME%Documents#FCS
 MY_FCZ		%HOME%Documents#FCZ
 MY_ENV		%HOME%.myenv
+MY_TMP		%HOME%amp
+MY_BLOG		%HOME%Documents#FCS#oublog#oublog-git#_posts
+MY_DEMO		%HOME%Documents#FCS#oumisc#oumisc-git#demo
 MY_ENV_CONF	%HOME%.myenv#conf
 MY_ENV_INIT	%HOME%.myenv#init
 MY_ENV_CTRL	%HOME%.myenv#ctrl
@@ -39,12 +42,6 @@ MY_ENV_TOOL	%HOME%.myenv#tool
 MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
-MY_TMP		%HOME%amp
-MY_BLOG		%HOME%Documents#FCS#oublog#oublog-git#_posts
-MY_DSAA		%HOME%Documents#FCS#oumisc#oumisc-git#dsaa
-MY_WEB_DEMO	%HOME%Documents#FCS#oumisc#oumisc-git#web-demo
-MY_MVN_DEMO	%HOME%Documents#FCS#oumisc#oumisc-git#mvn-demo
-MY_JAVA_LANG	%HOME%Documents#FCS#oumisc#oumisc-git#java-lang
 
 
 ################################################################################

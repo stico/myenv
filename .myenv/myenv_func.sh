@@ -422,7 +422,7 @@ func_collect_all() {
 	echo "INFO: update locate db"
 	sudo updatedb
 
-	echo "INFO: collecting stdnote"
+	echo "INFO: collecting stdnote and gen quicklist"
 	local count=0
 	local stdnote_content=${base}/stdnote_content.txt
 	local stdnote_outline=${base}/stdnote_outline.txt
@@ -460,7 +460,7 @@ func_collect_all() {
 	local myenv_content=${base}/myenv_content.txt
 	local myenv_filelist=${base}/myenv_filelist.txt
 	#for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
-	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
+	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+" | sed -e '/list\/words_us/d')"
 	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_LIST/myenv_addi | xargs -I{}  echo echo {} )")"
 	for f in $myenv_git $myenv_addi ; do
 		[ ! -e "$f" ] && echo "WARN: ${f} not exist" && continue
@@ -481,7 +481,18 @@ func_collect_all() {
 		git ls-files | sed -e "s+^+${d}/+" >> "${code_filelist}"
 		\cd - &> /dev/null
 	done
-	cat "${code_filelist}" | while read line ; do
+	sed -e "/Test_Record.txt/d;/SIG_Messaging.xml/d"	\
+	-e "/dump1.out/d;/sockjs.js/d;/struts-tags.tld/d"	\
+	-e "/\/note\/dc[cdo]/d" `# already in stdnote`		\
+	-e "/\/zbase\/sql\//d"					\
+	-e "/\/thrift\/gen\//d"					\
+	-e "/\/sysop_fed_lib\//d"				\
+	-e "/\/html\/ref_html.*.htm/d"				\
+	-e "/\/cs-base\/.*.\(html\|css\|js\)/d"			\
+	-e "/\/service-center\/.*.\(html\|css\|js\)/d"		\
+	-e "/\/css\/\(style\|bootstrap\|reveal\).*.css/d"	\
+	-e "/\/js\/\(Markdown\|reveal\|bootstrap\).*.js/d"	\
+	"${code_filelist}" | while read line ; do
 		func_validate_file_type_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
 		sed -e "s///" "${line}" >> "${code_content}"
@@ -489,42 +500,46 @@ func_collect_all() {
 
 	echo "INFO: collecting mydoc filelist"
 	local mydoc_filelist=${base}/mydoc_filelist.txt
-	for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do
+	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do
+	for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  FCB  ECS ; do # put ECS in the end
 		locate $(readlink -f "${MY_DOC}/${d}")		|\
 		sed -e "/\/\.\(git\|svn\|hg\)\//d"		\
 		-e "/\/target\//d" `# for maven project`	\
 		-e "/open.yy.com_trunk\//d" `# match prefix`	\
-		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`	\
-		-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
-		-e "/\/vendor\/ZF2\//d"				\
-		-e "/\/framework\/i18n\//d"			\
-		-e "/\/extjs\/resources\//d"			\
-		-e "/\/FCS\/vim\/vim-hg\//d"			\
-		-e "/\/FCS\/maven\/m2_repo\//d"			\
-		-e "/\/FCS\/eclipse\/plugins\//d"		\
-		-e "/\/vendor\/zendframework\//d"		\
-		-e "/\/xiage_trunk\/static\/image\//d"		\
-		-e "/\/xiage_trunk\/source\/class\//d"		\
-		-e "/\/xiage_trunk\/source\/plugin\//d"		\
-		-e "/\/xiage_trunk\/static\/image\//d"		\
-		-e "/\/xiage_trunk\/source\/class\//d"		\
-		-e "/\/xiage_trunk\/source\/plugin\//d"		\
-		-e "/\/appstore.yy.com_trunk\/framework\//d"	>> ${mydoc_filelist}
+		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`	>> ${mydoc_filelist}
+		#-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
+		#-e "/\/vendor\/ZF2\//d"				\
+		#-e "/\/framework\/i18n\//d"				\
+		#-e "/\/extjs\/resources\//d"				\
+		#-e "/\/FCS\/vim\/vim-hg\//d"				\
+		#-e "/\/FCS\/maven\/m2_repo\//d"			\
+		#-e "/\/FCS\/eclipse\/plugins\//d"			\
+		#-e "/\/vendor\/zendframework\//d"			\
+		#-e "/\/xiage_trunk\/static\/image\//d"			\
+		#-e "/\/xiage_trunk\/source\/class\//d"			\
+		#-e "/\/xiage_trunk\/source\/plugin\//d"		\
+		#-e "/\/xiage_trunk\/static\/image\//d"			\
+		#-e "/\/xiage_trunk\/source\/class\//d"			\
+		#-e "/\/xiage_trunk\/source\/plugin\//d"		\
+		#-e "/\/appstore.yy.com_trunk\/framework\//d"		\
 		#| sed -e "/\/\(\.git\|\.svn\|\.hg\|target\)\//d;" | wc -l
 	done
 
 	echo "INFO: collecting all"
 	local all_content=${base}/all_content.txt
 	cat "${stdnote_quicklist}"	"${stdnote_outline}"							>> "${all_content}"
-	#cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"	"${code_content}"	>> "${all_content}"
-	cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"				>> "${all_content}"
+	cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"	"${code_content}"	>> "${all_content}"
+	#cat "${stdnote_content}"	"${miscnote_content}"	"${myenv_content}"				>> "${all_content}"
 	cat "${stdnote_filelist}"	"${miscnote_filelist}"	"${myenv_filelist}"	"${code_filelist}"	>> "${all_content}"
 	cat "${mydoc_filelist}"											>> "${all_content}"
 
 	echo "INFO: shorten file path"
-	sed -i -e "1i${code_content}\n" "${all_content}"
 	sed -i -e 's+^\(@*\)/home/ouyangzhu/.myenv/+\1$MY_ENV/+' "${all_content}"
 	sed -i -e 's+^\(@*\)\(/ext\|/home/ouyangzhu\)/Documents/\([DEF]C.\)/+\1$MY_\3/+' "${all_content}"
+	sed -i -e 's+^\(@*\)/home/ouyangzhu/+\1$HOME/+' "${all_content}"
+
+	#echo "INFO: add extra quicklink at the beginning"
+	#sed -i -e "1i${code_content}\n" "${all_content}"
 }
 
 func_repeat() {
