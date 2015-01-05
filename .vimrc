@@ -10,7 +10,7 @@ set nocompatible		" This might reset some settings (e.g. "iskeyword"), so should
 """""""""""""""""""""""""""""" H1 - Topic - Font
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
-	set guifont=XHei\ Mono\ 11
+	set guifont=XHei\ Mono\ 12
 endif
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
 nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
@@ -117,16 +117,15 @@ let g:netrw_dirhistmax=0
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']	" checker chain, run one by one (only run laters if current success)
 let g:syntastic_auto_jump = 2					" jump to 1st error (NOT warning)
 
-"""""""" auto-format
+"""""""" AutoFormat/auto-format, @astyle
 let g:formatprg_c = "astyle"
 let g:formatprg_args_c = "--mode=c --style=ansi"
 let g:formatprg_java = "astyle"
-let g:formatprg_args_java = "--mode=java --style=java"
+let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --unpad-paren --add-brackets"
 
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
-
 
 """""""""""""""""""""""""""""" H1 - Topic - auto save
 au FocusLost * silent! wa
@@ -469,11 +468,19 @@ function! OucrCheck()
 	endif
 	exec "cd ". t:OucrRoot
 	set noautochdir
-	exec "NERDTree"				
+
 	" disable syntastic for mvn project, since too slow
         if(filereadable("pom.xml"))
 		exec "SyntasticToggleMode"	
 	endif
+
+	" open NERDTree if not opened
+	for bufnr in tabpagebuflist()
+		if bufname(bufnr) =~ "NERD_Tree_\d*"
+			return
+		endif
+	endfor
+	exec "NERDTree"				
 endfunction
 function! OucrRestore()
 	if !(exists('t:OucrRoot'))

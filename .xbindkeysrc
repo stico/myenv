@@ -78,7 +78,7 @@
   Control+Shift+Alt+Right
 
 "/usr/bin/wmctrl -c :ACTIVE:"
-  alt+x
+  control+shift+alt+x
 
 "/usr/bin/wmctrl -c :ACTIVE: -b toggle,maximized_vert,maximized_horz"
   alt+z

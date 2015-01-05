@@ -464,3 +464,31 @@ rudimentary	初步
 	[[["初步","rudimentary","Chūbù",""]],[["adjective",["初步","起码","低级"],[["初步",["preliminary","initial","abecedarian","elementary","inchoate","rudimentary"],,0.056416139],["起码",["minimum","elementary","rudimentary"],,0.028814545],["低级",["low","elementary","rudimentary","vulgar"]]],"rudimentary",3]],"en",,[["初步",[1],false,false,848,0,1,0]],[["rudimentary",1,[["初步",848,false,false],["起码",151,false,false],["基本的",0,false,false],["简陋",0,false,false],["起码的",0,false,false]],[[0,11]],"rudimentary"]],,,[],3]
 入侵	Invade
 	[[["Invade","入侵","","Rùqīn"]],[["verb",["invade","irrupt"],[["invade",["入侵","侵入","侵略","侵","侵袭","进犯"],,0.01319226],["irrupt",["进犯","侵犯","侵入","入侵"]]],"入侵",2]],"zh-CN",,[["Invade",[5],true,false,1000,0,1,1]],[["入侵",5,[["Invade",1000,true,false],["Invasion",0,true,false],["Intrusion",0,true,false],["Invasion of",0,true,false],["The invasion",0,true,false]],[[0,2]],"入侵"]],,,[],2]
+误差	Error
+	[[["Error","误差","","Wùchā"]],[["noun",["error","deviation","mistake"],[["error",["错误","误差","差错","故障","差","蹉"],[45271],0.37367269],["deviation",["偏差","误差","偏向","倾","倾向"]],["mistake",["错误","误","差错","傎","过错","误差"],[45271]]],"误差",1]],"zh-CN",,[["Error",[110],true,false,999,0,1,1]],[["误差",110,[["Error",999,true,false],["Deviation",0,true,false],["Errors",0,true,false],["The error",0,true,false],["Error of",0,true,false]],[[0,2]],"误差"]],,,[],3]
+prime broker	经纪商
+	[[["经纪商","prime broker","Jīngjì shāng",""]],,"en",,[["经纪商",[1],false,false,525,0,1,0]],[["prime broker",1,[["经纪商",525,false,false],["主要经纪",36,false,false],["主要经纪人",33,false,false],["主要经纪商",0,false,false],["机构经纪",0,false,false]],[[0,12]],"prime broker"]],,,[["en"]],16]
+Waiver	放弃
+	[[["放弃","Waiver","Fàngqì",""]],[["noun",["放弃"],[["放弃",["abandonment","abjuration","abnegation","demission","disclaimer","waiver"],,0.18498141]],"waiver",1]],"en",,[["放弃",[1],false,false,1000,0,1,0]],[["Waiver",1,[["放弃",1000,false,false],["豁免",0,false,false],["减免",0,false,false],["弃权",0,false,false]],[[0,6]],"Waiver"]],,,[],3]
+Net Liquidation Value	净清算价值
+	[[["净清算价值","Net Liquidation Value","Jìng qīngsuàn jiàzhí",""]],,"en",,[["净清算价值",[1],false,false,926,0,3,0]],[["Net Liquidation Value",1,[["净清算价值",926,false,false],["净清算价值的",0,false,false]],[[0,21]],"Net Liquidation Value"]],,,[["en"]],21]
+margin call	补仓
+	[[["补仓","margin call","Bǔcāng",""]],,"en",,[["补仓",[1],false,false,545,0,1,0]],[["margin call",1,[["补仓",545,false,false],["保证金追缴",288,false,false],["追加保证金",116,false,false],["追缴保证金",47,false,false],["追加保证金通知",0,false,false]],[[0,11]],"margin call"]],,,[["en"]],7]
+liquidate	肃清
+	[[["肃清","liquidate","Sùqīng",""]],[["verb",["废止","肃清"],[["废止",["repeal","abolish","annihilate","annul","cancel","liquidate"]],["肃清",["eliminate","abolish","clean","clean out","cleanse","liquidate"]]],"liquidate",2]],"en",,[["肃清",[1],false,false,1000,0,1,0]],[["liquidate",1,[["肃清",1000,false,false],["清算",0,false,false],["清偿",0,false,false],["变现",0,false,false],["斩仓",0,false,false]],[[0,9]],"liquidate"]],,,[],17]
+affiliate	子公司
+	[[["子公司","affiliate","Zǐ gōngsī",""]],[["verb",["加上","使 ... 加入"],[["加上",["affiliate","subjoin"]],["使 ... 加入",["affiliate"]]],"affiliate",2]],"en",,[["子公司",[1],false,false,942,0,1,0]],[["affiliate",1,[["子公司",942,false,false],["分支机构",33,false,false],["附属",13,false,false],["联属",11,false,false],["的联盟",0,false,false]],[[0,9]],"affiliate"]],,,[],3]
+issuer's books	发行人的书
+	[[["发行人的书","issuer's books","Fāxíng rén de shū",""]],,"en",,[["发行人的",[1],false,false,582,0,3,0],["书",[2],false,false,404,3,4,0]],[["issuer 's",1,[["发行人的",582,false,false],["发行人",47,false,false],["颁发者的",0,false,false],["发布者的",0,false,false],["发行者",0,false,false]],[[0,8]],"issuer's books"],["books",2,[["书",404,false,false],["书籍",111,false,false],["著作",39,false,false],["的书",28,false,false],["本本",26,false,false]],[[9,14]],""]],,,[["en"]],16]
+escrow agent	托管代理
+	[[["托管代理","escrow agent","Tuōguǎn dàilǐ",""]],,"en",,[["托管代理",[1],false,false,988,0,2,0]],[["escrow agent",1,[["托管代理",988,false,false],["托管代理人",0,false,false],["托管机构",0,false,false],["托管代理人的",0,false,false],["提存",0,false,false]],[[0,12]],"escrow agent"]],,,[["en"]],7]
+neutral	中性
+	[[["中性","neutral","Zhōng xìng",""]],[["adjective",["中性","中立"],[["中性",["neutral"],,0.38553435],["中立",["neutral"],,0.16581626]],"neutral",3],["noun",["中立国","中立者"],[["中立国",["neutral"]],["中立者",["neutral"]]],"neutral",1]],"en",,[["中性",[1],false,false,893,0,1,0]],[["neutral",1,[["中性",893,false,false],["中立",106,false,false],["中立的",0,false,false],["中性的",0,false,false],["的中性",0,false,false]],[[0,7]],"neutral"]],,,[],3]
+obfuscated	混淆
+	[[["混淆","obfuscated","Hùnxiáo",""]],,"en",,[["混淆",[1],false,false,384,0,1,0]],[["obfuscated",1,[["混淆",384,false,false],["模糊处理",225,false,false],["迷惑",211,false,false],["模糊",172,false,false],["模糊的",5,false,false]],[[0,10]],"obfuscated"]],,,[["de","su","af","ms","uz"]],66]
+运营	Operations
+	[[["Operations","运营","","Yùnyíng"]],,"zh-CN",,[["Operations",[1],true,false,996,0,1,0]],[["运营",1,[["Operations",996,true,false],["Operators",0,true,false],["Operational",0,true,false],["Operator",0,true,false],["Operating",0,true,false]],[[0,2]],"运营"]],,,[["zh-CN"]],2]
+运维	Operation and maintenance
+	[[["Operation and maintenance","运维","","Yùn wéi"]],,"zh-CN",,[["Operation and maintenance",[1],true,false,998,0,3,0]],[["运 维",1,[["Operation and maintenance",998,true,false],["O & M",1,true,false],["Operation and maintenance of",0,true,false],["The operation and maintenance",0,true,false],["OAM",0,true,false]],[[0,2]],"运维"]],,,[["zh-CN"]],16]
+automaton	自动机
+	[[["自动机","automaton","Zìdòng jī",""]],,"en",,[["自动机",[1],false,false,778,0,2,0]],[["automaton",1,[["自动机",778,false,false],["自动",221,false,false],["自动机的",0,false,false],["的自动机",0,false,false]],[[0,9]],"automaton"]],,,[["en"]],3]

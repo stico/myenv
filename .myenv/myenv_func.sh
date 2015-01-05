@@ -231,18 +231,25 @@ func_vi_conditional() {
 		return 0
 	fi
 
-	# simple version for text gui
+	# non GUI version: use vim (text)
 	if [ -z "$DISPLAY" ] && (command -v vim &> /dev/null) ; then
 		\vim "$@"
 		return 0
 	fi
 
-	# GUI env
-	# NOTE 1: use GUI version with SIGNLE_VIM
+	# GUI env: use gvim (gui)
+	# NOTE 1: use window title "SINGLE_VIM" to identify
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
 	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
-	# why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' && LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@" || LD_LIBRARY_PATH="" gvim "$@"
+	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
+	if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
+		LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@"
+	else
+		LD_LIBRARY_PATH="" gvim "$@"
+	fi
+
+	# why? if not sleep after init (1st time), will open 2 files, currently 1s is enough
+	[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -l | grep -q 'SINGLE_VIM' || sleep 1
 	[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
 }
 
@@ -492,6 +499,7 @@ func_collect_all() {
 	-e "/\/service-center\/.*.\(html\|css\|js\)/d"		\
 	-e "/\/css\/\(style\|bootstrap\|reveal\).*.css/d"	\
 	-e "/\/js\/\(Markdown\|reveal\|bootstrap\).*.js/d"	\
+	-e "/\/yyembed-server-data\/pindaoblacklist.thrift/d"	\
 	"${code_filelist}" | while read line ; do
 		func_validate_file_type_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
@@ -1330,6 +1338,21 @@ func_mon_and_run() {
 	       ${watch_cmd}
 	       echo "Target updatd at ${date} ${time}, updated file: ${updated_file}"
 	done
+}
+
+func_find_non_utf8_in_content() {
+	func_param_check 1 "USAGE: $FUNCNAME <filelist>" "$@"
+
+	local tmp_filelist=$(mktemp)
+	echo "INFO: grep filelist into: ${tmp_filelist}"
+	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > ${tmp_filelist}
+
+	local tmp_suspect=$(mktemp)
+	echo "INFO: grep suspected files into: ${tmp_suspect}"
+	cat ${tmp_filelist} | xargs -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > ${tmp_suspect}
+
+	echo "INFO: suspected files are:"
+	cat ${tmp_suspect}
 }
 ################################### Deprecated ###################################
 ## deprecated by func_locate
