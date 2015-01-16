@@ -415,6 +415,23 @@ func_check_cronlog() {
 	fi
 }
 
+func_collect_statistics() {
+	# MNT: stats of collect, to help reduce the file size
+
+	local f 
+	local base=$MY_ENV_ZGEN/collection
+
+	for f in ${base}/* ; do
+		echo ${f}
+		# TODO
+
+		# use function in pipe
+		#export -f func_param_check
+		#export -f func_validate_file_type_text
+		#cat myenv_filelist.txt | xargs -n 1 -I{} bash -c 'func_validate_file_type_text {} && wc -l {}' | sort -n | tee /tmp/2
+	done
+}
+
 func_collect_all() {
 	# Tips: find encoding error files: grep "^@/" code_content.txt | sed -e 's/^@/file -e soft "/;s/$/"/' | bash | tee /tmp/1 | grep -v "\(ASCII text\|UTF-8 Unicode\)"
 

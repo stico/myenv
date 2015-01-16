@@ -19,7 +19,10 @@
 "/usr/bin/wmctrl -a 'Foxit'"
   control+alt+f
 
-"/usr/bin/wmctrl -a 'Eclipse' || eclipse"
+"/usr/bin/wmctrl -a 'IDEA' || /usr/bin/wmctrl -a 'Eclipse'"
+  control+alt+i
+
+"/usr/bin/wmctrl -a 'Eclipse' || /usr/bin/wmctrl -a 'IDEA'"
   control+alt+e
 
 "/usr/bin/wmctrl -a 'Zeal' || /usr/bin/zeal"

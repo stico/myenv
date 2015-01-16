@@ -148,8 +148,11 @@ set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
 
-set grepprg=\\cd\ %:p:h;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
-" seems not possible to use getcwd(), while %: is supported/expanded but only for filename related. Have to use :exec xxx . getcwd() . "yyy" form
+"MNT: using quickfix@vim
+set grepprg=\\cd\ $PWD;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+"MNT: in OUCR mode, %:p:h not the "root", should use $PWD instead
+"set grepprg=\\cd\ %:p:h;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+"MNT: seems not possible to use getcwd(), while %: is supported/expanded but only for filename related. Have to use :exec xxx . getcwd() . "yyy" form
 "set grepprg=\\cd\ getcwd();\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
 
 "set grepprg=\\cd\ %:p:h;func_grep_file\ $*		" reuse the func, note need the "set shellcmdflag=-ic"
