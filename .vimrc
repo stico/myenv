@@ -352,8 +352,6 @@ nnoremap <C-S-Left> <C-w><
 nnoremap <C-S-Right> <C-w>>
 nnoremap <C-S-Up> <C-w>-
 nnoremap <C-S-Down> <C-w>+
-"nnoremap <C-m> :call WindowMaxMinToggle()<CR>	" can not use C-m, which also effects the <enter> key
-nnoremap <C-w>m :call WindowMaxMinToggle()<CR>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Jump
 " <C-I> equals <Tab>, since <Tab> is mapped in normal mode, need another key for function "jump next",  C-N in normal mode is useless, so use it
@@ -406,26 +404,10 @@ command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'n
 
 """""""""""""""""""""""""""""" H1 - Script
 
-" Deprecated - cmd g*/g# already did this
-" the vim's * add word boundary, usually I prefer not
-"nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>n
-"function! SearchCurrentWordWithoutBoundary()
-"	let @/ = '\V'.escape(expand('<cword>'), '\')
-"endfunction
-
-""" copied from vimrc_example.vim, see comments there
-if has("autocmd") && !exists("autocommands_loaded")
-	let autocommands_loaded = 1
-	" add to a group, and clean the previous cmds
-	augroup vimrcEx							
-		au!
-		" goto the last position last edit before quit
-		autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-	augroup END
-endif
-
-"""
-function WindowMaxMinToggle()
+""" OuToggleWinMaxRestore: Toggle window size between max/restore state
+"nnoremap <C-m> :call OuToggleWinMaxRestore()<CR>	" can not use C-m, which also effects the <enter> key
+nnoremap <C-w>m :call OuToggleWinMaxRestore()<CR>
+function OuToggleWinMaxRestore()
 	if exists('t:window_max_min_sizes') && (t:window_max_min_sizes.after == winrestcmd())
 		silent! exe t:window_max_min_sizes.before
 		if t:window_max_min_sizes.before != winrestcmd()
@@ -440,9 +422,9 @@ function WindowMaxMinToggle()
 	normal! ze
 endfunction
 
-""" OnlyFileNameInTab is for showing only the filename, excluding the path
-set guitablabel=%{OnlyFileNameInTab()}		" invoke the function
-function OnlyFileNameInTab()
+""" OuFilenameAsTabLabel: Use filename as tab label, excluding file path
+set guitablabel=%{OuFilenameAsTabLabel()}
+function OuFilenameAsTabLabel()
 	" Show root name in ~Oucr mode
 	if exists('t:OucrRoot')
 		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
@@ -457,8 +439,9 @@ function OnlyFileNameInTab()
 	return filename
 endfunction
 
-" code reading mode 
-command! -nargs=0 OucrSet :call OucrSet()
+""" OuCodeReading: (alias: Oucr) use code reading mode
+command! -nargs=0 Oucr :call OucrSet()		
+command! -nargs=0 OuCodeReading :call OucrSet()
 function! OucrSet()
 	let t:OucrRoot = expand("%:p:h")
 	let t:OucrOldAcd = &autochdir
@@ -495,9 +478,9 @@ endfunction
 autocmd TabEnter * call OucrCheck()
 autocmd TabLeave * call OucrRestore()
 
-" Highlight all instances of word under cursor, when idle. Useful when studying strange source code.
-command! -nargs=0 TAutoHighLight :if ToggleAutoHighlight() | :set hls | endif
-function! ToggleAutoHighlight()
+""" OuToggleAutoHighlight: Ou Toggle Auto highlight, highlight all instances of word under cursor
+command! -nargs=0 OuToggleAutoHighlight :if OuToggleAutoHighlight() | :set hls | endif
+function! OuToggleAutoHighlight()
   let @/ = ''
   if exists('#auto_highlight')
     autocmd! auto_highlight
@@ -517,8 +500,16 @@ function! ToggleAutoHighlight()
   endif
 endfunction
 
-" Dim inactive windows, using 'colorcolumn', usefull but 1) tends to slow down redrawing. 2) only work with lines containing text (i.e. not '~'). Based on https://groups.google.com/d/msg/vim_use/IJU-Vk-QLJE/xz4hjPjCRBUJ
-function! s:DimInactiveWindows()
+""" OuDimInactiveWindows: Dim inactive windows, using 'colorcolumn', 
+""" usefull but 1) tends to slow down redrawing. 2) only work with lines containing text (i.e. not '~'). 
+""" Based on https://groups.google.com/d/msg/vim_use/IJU-Vk-QLJE/xz4hjPjCRBUJ
+augroup OuDimInactiveWindows
+  au!
+  au WinEnter * call s:OuDimInactiveWindows()
+  au WinEnter * set cursorline
+  au WinLeave * set nocursorline
+augroup END
+function! s:OuDimInactiveWindows()
   for i in range(1, tabpagewinnr(tabpagenr(), '$'))
     let l:range = ""
     if i != winnr()
@@ -536,13 +527,108 @@ function! s:DimInactiveWindows()
     call setwinvar(i, '&colorcolumn', l:range)
   endfor
 endfunction
-augroup DimInactiveWindows
-  au!
-  au WinEnter * call s:DimInactiveWindows()
-  au WinEnter * set cursorline
-  au WinLeave * set nocursorline
-augroup END
 
+""" OuCopyToClipboard: copy to clipboard instead of register, support BOTH count and motion
+""" TODO: sort following stuff
+" Copied from http://vim.wikia.com/wiki/Act_on_text_objects_with_custom_functions which adapted from unimpaired.vim by Tim Pope.
+function! s:DoAction(algorithm,type)
+	echo "---------" . a:type
+  " backup settings that we will change
+  let sel_save = &selection
+  let cb_save = &clipboard
+  " make selection and clipboard work the way we need
+  set selection=inclusive clipboard-=unnamed clipboard-=unnamedplus
+  " backup the unnamed register, which we will be yanking into
+  let reg_save = @@
+  " yank the relevant text, and also set the visual selection (which will be reused if the text needs to be replaced)
+  if a:type =~ '^\d\+$'				" if type is a number, then select that many lines
+    silent exe 'normal! V'.a:type.'$y'
+  elseif a:type =~ '^.$'			" if type is 'v', 'V', or '<C-V>' (i.e. 0x16) then reselect the visual region
+    silent exe "normal! `<" . a:type . "`>y"
+  elseif a:type == 'line'			" line-based text motion
+    "silent exe "normal! '[V']y"
+    silent exe "normal! '[V']"
+  elseif a:type == 'block'			" block-based text motion
+    silent exe "normal! `[\<C-V>`]y"
+  else						" char-based text motion
+    silent exe "normal! `[v`]y"
+  endif
+  " call the user-defined function, passing it the contents of the unnamed register
+  let repl = s:{a:algorithm}(@@)
+  " if the function returned a value, then replace the text
+  if type(repl) == 1
+    " put the replacement text into the unnamed register, and also set it to be a
+    " characterwise, linewise, or blockwise selection, based upon the selection type of the
+    " yank we did above
+    call setreg('@', repl, getregtype('@'))
+    " relect the visual region and paste
+    normal! gvp
+  endif
+  " restore saved settings and register value
+  let @@ = reg_save
+  let &selection = sel_save
+  let &clipboard = cb_save
+endfunction
+function! s:ActionOpfunc(type)
+  return s:DoAction(s:encode_algorithm, a:type)
+endfunction
+function! s:ActionSetup(algorithm)
+  let s:encode_algorithm = a:algorithm
+  let &opfunc = matchstr(expand('<sfile>'), '<SNR>\d\+_').'ActionOpfunc'
+endfunction
+function! MapAction(algorithm, key)
+  exe 'nnoremap <silent> <Plug>actions'    .a:algorithm.' :<C-U>call <SID>ActionSetup("'.a:algorithm.'")<CR>g@'
+  exe 'xnoremap <silent> <Plug>actions'    .a:algorithm.' :<C-U>call <SID>DoAction("'.a:algorithm.'",visualmode())<CR>'
+  exe 'nnoremap <silent> <Plug>actionsLine'.a:algorithm.' :<C-U>call <SID>DoAction("'.a:algorithm.'",v:count1)<CR>'
+  exe 'nmap '.a:key.'  <Plug>actions'.a:algorithm
+  exe 'xmap '.a:key.'  <Plug>actions'.a:algorithm
+  exe 'nmap '.a:key.a:key[strlen(a:key)-1].' <Plug>actionsLine'.a:algorithm
+endfunction
+function! s:ReverseString(str)
+  let out = join(reverse(split(a:str, '\zs')), '')
+  " Remove a trailing newline that reverse() moved to the front.
+  let out = substitute(out, '^\n', '', '')
+  return out
+endfunction
+call MapAction('ReverseString', '<leader>r')
+function! s:OpenUrl(str)
+  silent execute "!firefox ".shellescape(a:str, 1)
+  redraw!
+endfunction
+call MapAction('OpenUrl','<leader>u')
+function! s:ComputeMD5(str)
+  let out = system('md5sum |cut -b 1-32', a:str)
+  " Remove trailing newline.
+  let out = substitute(out, '\n$', '', '')
+  return out
+endfunction
+call MapAction('ComputeMD5','<leader>M')
+""" NOTE: 3myj get 2 lines, my3j get 4 lines, so just always use my<motion>
+function! s:CopyToClipboard(str)
+  let @+ = a:str
+  "echo "COPY TO CLIPBOARD: " . a:str
+  "return a:str
+endfunction
+call MapAction('CopyToClipboard','my')
+
+""" copied from vimrc_example.vim, see comments there
+if has("autocmd") && !exists("autocommands_loaded")
+	let autocommands_loaded = 1
+	" add to a group, and clean the previous cmds
+	augroup vimrcEx							
+		au!
+		" goto the last position last edit before quit
+		autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+	augroup END
+endif
+
+" Deprecated - cmd g*/g# already did this
+" the vim's * add word boundary, usually I prefer not
+"nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>n
+"function! SearchCurrentWordWithoutBoundary()
+"	let @/ = '\V'.escape(expand('<cword>'), '\')
+"endfunction
+"
 """""""""""""""""""""""""""""" H1 - Mapping - FileType based mapping
 function! NoteOutline()
 	call setloclist(0, [])
