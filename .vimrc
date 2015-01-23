@@ -148,9 +148,11 @@ set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
 
-"MNT: using quickfix@vim
-set grepprg=\\cd\ $PWD;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
-"MNT: in OUCR mode, %:p:h not the "root", should use $PWD instead
+"MNT: buildin grep is using quickfix@vim. 
+set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+"MNT: NOT need to change current dir in OuCodeReading mode, since it already changes. Why want to do this at the first place?!!!
+"set grepprg=\\cd\ $PWD;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+"MNT: in OuCodeReading mode, %:p:h not the "root", should use $PWD instead
 "set grepprg=\\cd\ %:p:h;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
 "MNT: seems not possible to use getcwd(), while %: is supported/expanded but only for filename related. Have to use :exec xxx . getcwd() . "yyy" form
 "set grepprg=\\cd\ getcwd();\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
@@ -439,8 +441,8 @@ function OuFilenameAsTabLabel()
 	return filename
 endfunction
 
-""" OuCodeReading: (alias: Oucr) use code reading mode
-command! -nargs=0 Oucr :call OucrSet()		
+""" OuCodeReading: (short for: Oucr) use code reading mode
+"command! -nargs=0 Oucr :call OucrSet()		
 command! -nargs=0 OuCodeReading :call OucrSet()
 function! OucrSet()
 	let t:OucrRoot = expand("%:p:h")
@@ -452,6 +454,8 @@ function! OucrCheck()
 	if !(exists('t:OucrRoot'))
 		return
 	endif
+
+	" update current dir and disable auto change (is "lcd" enough? since "cd" is global, "lcd" is per window)
 	exec "cd ". t:OucrRoot
 	set noautochdir
 
@@ -532,7 +536,6 @@ endfunction
 """ TODO: sort following stuff
 " Copied from http://vim.wikia.com/wiki/Act_on_text_objects_with_custom_functions which adapted from unimpaired.vim by Tim Pope.
 function! s:DoAction(algorithm,type)
-	echo "---------" . a:type
   " backup settings that we will change
   let sel_save = &selection
   let cb_save = &clipboard

@@ -16,3 +16,4 @@ echo ' Underline       $(tput sgr 0 1)'
 echo ' Reset           $(tput sgr0)'
 echo
 
+echo "message to stderr" 1>&2 2> >(while read line; do echo -e "\e[01;31m$line\e[0m" >&2; done)
