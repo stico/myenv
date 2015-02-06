@@ -22,6 +22,12 @@
 /.w3m/cookie
 /.w3m/history
 
+# (?) should deprecated since might contain IP for backup
+!/.unison/
+/.unison/*
+!/.unison/*.prf
+!/.unison/deprecated
+
 # INCLUDE, FILE
 !/.vimrc
 !/.netrc
@@ -79,11 +85,6 @@ gVim.exe.stackdump
 # Deprecated
 ############################################################
 #
-# Deprecated since might contain IP for backup
-#!/.unison/
-#/.unison/*
-#!/.unison/*.prf
-#!/.unison/deprecated
 #
 # Deprecated since might contain mailbox password, or other sensitive info
 #!/.msmtprc

@@ -1,0 +1,70 @@
+################################################################################
+# ROOT: value of root should NOT end with "/"
+################################################################################
+root=/home/ouyangzhu/Documents
+rootalias = //workpc//home/ouyangzhu/Documents -> //PC_WIN//Documents
+root=/cygdrive/g/backup
+rootalias = //workpc//cygdrive/g/backup -> //MHD//Documents
+
+
+################################################################################
+# PATH: the -path cmd option not support glob
+################################################################################
+path = DCB
+path = DCC
+path = DCD
+path = DCM
+path = DCO
+path = ECB
+path = ECE
+path = ECS
+path = os_spec_lu
+path = os_spec_win/m2_repo
+path = os_spec_win/program
+path = os_spec_win/dev/code_dw
+path = os_spec_win/dev/code_repo
+path = os_spec_win/dev/code_misc
+path = os_spec_win/dev/eclipse_plugins
+path = os_spec_win/dev/eclipse-3.7.1-jee_x64
+path = os_spec_win/dev/eclipse-4.2.2_x64
+path = os_spec_win/dev/nginx_workspace
+
+
+################################################################################
+# SETTINGS
+################################################################################
+perms=0
+fastcheck=yes
+dontchmod=true
+ignorecase=true
+ignoreinodenumbers=true
+#links=false
+
+
+################################################################################
+# IGNORE: verified works. Regex seem not need suffix ".*" to match the whole name
+################################################################################
+ignore = Regex .*/.fl_me.txt
+ignore = Regex .*/.dl_me.txt
+ignore = Regex .*/.fl_files.txt
+ignore = Regex .*/.grep_result.txt
+ignore = Regex DC./SyncToy_.*.dat
+ignore = Regex EC./SyncToy_.*.dat
+ignore = Regex os_spec_.*/dev/mysql
+ignore = Regex os_spec_.*/dev/mysql-5.5.11-win32
+ignore = Regex os_spec_.*/dev/z_deprecated
+ignore = Regex os_spec_.*/dev/eclipse_ws.*
+ignore = Regex os_spec_.*/dev/.*/.settings
+ignore = Regex os_spec_.*/dev/code_.*/target
+ignore = Regex os_spec_.*/dev/jdk1.6.0_30_x64_src
+ignore = Regex os_spec_.*/m2_repo/repository/.cache
+ignore = Regex os_spec_.*/program/.*[dD]itto.*/Ditto.db
+ignore = Regex os_spec_win/program/A_System_Cygwin_1.7.17/tmp/.*
+
+
+################################################################################
+# Deprecated
+################################################################################
+
+#ignore = Regex os_spec_.*/dev/.*/.svn
+#ignore = Regex os_spec_.*/dev/.*/.svn/.*

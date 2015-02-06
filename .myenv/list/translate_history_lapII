@@ -498,3 +498,25 @@ Dividend	红利
 	[[["红利","Dividend","Hónglì",""]],,"en",,[["红利",[484],false,false,907,0,1,1]],[["Dividend",484,[["红利",907,false,false],["股利",92,false,false],["股息",0,false,false],["分红",0,false,false],["派息",0,false,false]],[[0,8]],"Dividend"]],,,[["en"]],3]
 Dividend Yield	股息收益率
 	[[["股息收益率","Dividend Yield","Gǔxí shōuyì lǜ",""]],,"en",,[["股息收益率",[1],false,false,999,0,3,0]],[["Dividend Yield",1,[["股息收益率",999,false,false],["股息率",0,false,false],["股息收益",0,false,false],["股利收益率",0,false,false],["的股息收益率",0,false,false]],[[0,14]],"Dividend Yield"]],,,[["en"]],66]
+guru	领袖
+	[[["领袖","guru","Lǐngxiù",""]],[["noun",["领袖"],[["领袖",["leader","cacique","chief","father figure","guru","head"]]],"guru",1]],"en",,[["领袖",[1],false,false,1000,0,1,0]],[["guru",1,[["领袖",1000,false,false],["大师",0,false,false],["宗师",0,false,false],["教主",0,false,false],["导师",0,false,false]],[[0,4]],"guru"]],,,[],3]
+chamber	房间
+	[[["房间","chamber","Fángjiān",""]],[["adjective",["室内的"],[["室内的",["chamber"]]],"chamber",3],["verb",["关在室内"],[["关在室内",["chamber"]]],"chamber",2],["noun",["房间","议院"],[["房间",["room","apartment","chamber","suite"]],["议院",["chamber","legislative assembly","parliament"]]],"chamber",1]],"en",,[["房间",[1],false,false,1000,0,1,0]],[["chamber",1,[["房间",1000,false,false],["室",0,false,false],["腔",0,false,false],["腔室",0,false,false],["室内",0,false,false]],[[0,7]],"chamber"]],,,[],3]
+牛人堂	Cattle Church
+	[[["Cattle Church","牛人堂","","Niúrén táng"]],,"zh-CN",,[["Cattle",[1],true,false,635,0,1,0],["Church",[2],true,false,484,1,2,0]],[["牛 人",1,[["Cattle",635,true,false],["Cattle were",0,true,false],["Cow",0,true,false],["Cattle people",0,true,false],["Of cattle",0,true,false]],[[0,2]],"牛人堂"],["堂",2,[["Church",484,true,false],["Hall",150,true,false],["Tong",0,true,false],["Tang",0,true,false],["the Church",0,true,false]],[[2,3]],""]],,,[["zh-CN"]],21]
+证券执业资格	Securities qualification
+	[[["Securities qualification","证券执业资格","","Zhèngquàn zhíyè zīgé"]],,"zh-CN",,[["Securities",[1],true,false,832,0,1,0],["qualification",[2],true,false,832,1,2,0]],[["证券",1,[["Securities",832,true,false],["Securities and",0,true,false],["The Securities",0,true,false],["Of securities",0,true,false],["Security",0,true,false]],[[0,2]],"证券执业资格"],["执业 资格",2,[["qualification",832,true,false],["qualifications",0,true,false],["Licensing",0,true,false],["the Licensing",0,true,false]],[[2,6]],""]],,,[["zh-CN"]],29]
+gundlach	冈拉克
+	[[["冈拉克","gundlach","Gāng lākè",""]],,"en",,[["冈拉克",[1],false,false,1000,0,1,0]],[["gundlach",1,[["冈拉克",1000,false,false],["刚迪拉克",0,false,false],["贡德拉克",0,false,false]],[[0,8]],"gundlach"]],,,[["en"]],8]
+closed-end	封闭式
+	[[["封闭式","closed-end","Fēngbì shì",""]],,"en",,[["封闭式",[1],false,false,999,0,1,0]],[["closed - end",1,[["封闭式",999,false,false],["只封闭式",0,false,false],["闭合端部",0,false,false],["有底",0,false,false],["的封闭式",0,false,false]],[[0,10]],"closed-end"]],,,[["en"]],17]
+meager	微薄
+	[[["微薄","meager","Wéibó",""]],[["adjective",["微薄","薄","可怜","浅薄","浅陋","清瘦","微薄的"],[["微薄",["meager","meagre"],,0.351033],["薄",["thin","meagre","flimsy","infertile","lacking in warmth","meager"]],["可怜",["pitiful","meager","meagre","wretched"]],["浅薄",["shallow","superficial","meager","meagre"]],["浅陋",["shallow","meager","meagre","mean"]],["清瘦",["meager","meagre"]],["微薄的",["scant","scanty","scrimp","sparing","meager","meagre"]]],"meager",3]],"en",,[["微薄",[1],false,false,909,0,1,0]],[["meager",1,[["微薄",909,false,false],["微薄的",90,false,false],["菲薄",0,false,false],["贫乏",0,false,false],["少得可怜",0,false,false]],[[0,6]],"meager"]],,,[],9]
+plunged	暴跌
+	[[["暴跌","plunged","Bàodié",""]],,"en",,[["暴跌",[1],false,false,769,0,1,0]],[["plunged",1,[["暴跌",769,false,false],["大跌",143,false,false],["骤降",54,false,false],["下跌",29,false,false],["陷入",3,false,false]],[[0,7]],"plunged"]],,,[["en"]],18]
+utility	效用
+	[[["效用","utility","Xiàoyòng",""]],[["noun",["效用","裨","裨补","裨益","公益事业"],[["效用",["utility","effectiveness","usefulness"],,0.050571099],["裨",["behoof","utility","assistant"]],["裨补",["advantage","avail","behoof","benefit","gain","utility"]],["裨益",["benefit","advantage","avail","behoof","gain","utility"]],["公益事业",["utility"]]],"utility",1]],"en",,[["效用",[19],false,false,1000,0,1,1]],[["utility",19,[["效用",1000,false,false],["实用程序",0,false,false],["实用",0,false,false],["工具",0,false,false],["实用工具",0,false,false]],[[0,7]],"utility"]],,,[],3]
+dividend rate	股息率
+	[[["股息率","dividend rate","Gǔxí lǜ",""]],,"en",,[["股息率",[1],false,false,703,0,2,0]],[["dividend rate",1,[["股息率",703,false,false],["分红率",181,false,false],["红利率",0,false,false],["股利率",0,false,false],["年股息率",0,false,false]],[[0,13]],"dividend rate"]],,,[["en"]],11]
+Pediatrics	儿科
+	[[["儿科","Pediatrics","Érkē",""]],[["noun",["儿科","儿科学"],[["儿科",["pediatrics","paediatrics"],,0.37955719],["儿科学",["pediatrics","paediatrics"],,0.088755049]],"pediatrics",1]],"en",,[["儿科",[7],false,false,836,0,1,1]],[["Pediatrics",7,[["儿科",836,false,false],["儿科学",163,false,false],["儿科杂志",0,false,false],["小儿科",0,false,false],["小儿",0,false,false]],[[0,10]],"Pediatrics"]],,,[],3]

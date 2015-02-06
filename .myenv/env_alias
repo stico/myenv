@@ -5,6 +5,8 @@
 #
 # Problem: for windows, currently can not deal with this alias contains "|", ")"
 
+# Temp
+cdf3			"cd $HOME/Documents/FCZ/code_dw/finance.yyembed.yy.com_branch_for_v3.0"
 
 # Alias - Misc
 terminator		"func_terminator"
