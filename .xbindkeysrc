@@ -68,18 +68,6 @@
 "zenity --info --text=MyahkScreenShotInvoked ; ~/.myenv/conf/myahk/myahk_script_screenshot.sh"
   control+shift+x
 
-#"/usr/bin/xfce4-appfinder"		# for XFCE
-"xdotool key --clearmodifiers Super"
-  control+shift+z
-
-# not work !
-"xdotool key --clearmodifiers Ctrl+Super+Left"
-  Control+Shift+Alt+Left
-
-# not work !
-"xdotool key --clearmodifiers Ctrl+Super+Right"
-  Control+Shift+Alt+Right
-
 "/usr/bin/wmctrl -c :ACTIVE:"
   control+shift+alt+x
 
@@ -107,6 +95,21 @@
 # specify a mouse button
 #"xbindkeys_show"
 #  control + b:2
+
+###########################
+# Deprecated
+###########################
+#"/usr/bin/xfce4-appfinder"		# for XFCE
+#"xdotool key --clearmodifiers Super"
+#  control+shift+z
+
+# not work !
+#"xdotool key --clearmodifiers Ctrl+Super+Left"
+#  Control+Shift+Alt+Left
+
+# not work !
+#"xdotool key --clearmodifiers Ctrl+Super+Right"
+#  Control+Shift+Alt+Right
 
 ###########################
 # below are gen by "xbindkeys -d", everything below are commented

@@ -520,3 +520,9 @@ dividend rate	股息率
 	[[["股息率","dividend rate","Gǔxí lǜ",""]],,"en",,[["股息率",[1],false,false,703,0,2,0]],[["dividend rate",1,[["股息率",703,false,false],["分红率",181,false,false],["红利率",0,false,false],["股利率",0,false,false],["年股息率",0,false,false]],[[0,13]],"dividend rate"]],,,[["en"]],11]
 Pediatrics	儿科
 	[[["儿科","Pediatrics","Érkē",""]],[["noun",["儿科","儿科学"],[["儿科",["pediatrics","paediatrics"],,0.37955719],["儿科学",["pediatrics","paediatrics"],,0.088755049]],"pediatrics",1]],"en",,[["儿科",[7],false,false,836,0,1,1]],[["Pediatrics",7,[["儿科",836,false,false],["儿科学",163,false,false],["儿科杂志",0,false,false],["小儿科",0,false,false],["小儿",0,false,false]],[[0,10]],"Pediatrics"]],,,[],3]
+clip	夹
+	[[["夹","clip","Jiā",""]],[["noun",["夹","修剪","弹夹"],[["夹",["folder","clip","narrow lane"],,0.42342663],["修剪",["clip"],,0.01319226],["弹夹",["clip","charger"]]],"clip",1],["verb",["修剪","剪","卡","缩减","撱"],[["修剪",["trim","prune","crop","clip","dub"],,0.01319226],["剪",["clip","exterminate","cut with scissors","trim","wipe out"]],["卡",["stop","be choked","clip","fasten","wedge"]],["缩减",["reduce","cut","bobtail","clip","prune","trim"]],["撱",["clip","shorten","throw away"]]],"clip",2]],"en",,[["夹",[1],false,false,1000,0,1,0]],[["clip",1,[["夹",1000,false,false],["剪辑",0,false,false],["片段",0,false,false],["夹子",0,false,false],["剪贴",0,false,false]],[[0,4]],"clip"]],,,[],3]
+clipped	修剪
+	[[["修剪","clipped","Xiūjiǎn",""]],[["adjective",["发音清楚的","省略一部分的"],[["发音清楚的",["clipped"]],["省略一部分的",["clipped"]]],"clipped",3]],"en",,[["修剪",[1],false,false,442,0,1,0]],[["clipped",1,[["修剪",442,false,false],["裁剪",197,false,false],["剪辑",158,false,false],["剪切",125,false,false],["剪裁",76,false,false]],[[0,7]],"clipped"]],,,[],4]
+struts	支柱
+	[[["支柱","struts","Zhīzhù",""]],,"en",,[["支柱",[1],false,false,891,0,1,0]],[["struts",1,[["支柱",891,false,false],["撑杆",84,false,false],["撑",24,false,false],["支杆",0,false,false],["的struts",0,false,false]],[[0,6]],"struts"]],,,[["en"]],3]
