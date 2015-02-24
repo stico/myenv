@@ -34,11 +34,12 @@
 !/.rvmrc
 !/.cshrc
 !/.npmrc
+!/.xvimrc
 !/.bashrc
 !/.curlrc
 !/.XWinrc
 !/.inputrc
-!/.xinitrc
+!/.xinitrc.linux
 !/.xprofile
 !/.screenrc
 !/.gtkrc-2.0
@@ -47,6 +48,7 @@
 !/.tmux.conf
 !/.gitignore
 !/.dir_colors
+!/.bashrc.me.*
 !/.xbindkeysrc
 !/.startxwinrc
 !/.bash_profile

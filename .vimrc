@@ -168,7 +168,7 @@ set incsearch						" set the increase search
 set hlsearch						" highlighting the last used search pattern.
 set ignorecase						" useful when using ^n, ^p
 set smartcase						" become case sensitive when have uppercase in search string
-set infercase						" won't change exist case for ^n, need ignorecase open
+"set infercase						" won't change exist case for ^n, need ignorecase open
 
 """""""""""""""""""""""""""""" H1 - Settings - Encoding
 "set fileencodings=utf-8,gbk,ucs-bom,cp936		" set the encodings, it is the sequence vim will try to open a doc
@@ -305,10 +305,7 @@ endif
 " mswin.vim mapped this to ^Y as undo cmd in windows, but this shield the useful auto complete cmd in vim (auto input the char above)
 inoremap <C-Y> <C-Y>
 noremap <C-Y> <C-Y>
-" for copy 
 noremap Y y$
-inoremap <A-S-Y> <Esc>l"+y$
-nnoremap <A-S-Y> <Esc>"+y$
 " to insert a line/tab/space in normal mode
 nnoremap <CR> o<Esc>
 nnoremap <S-CR> O<Esc>j
@@ -706,6 +703,10 @@ endif
 "	"au BufEnter <buffer> hi Comment	ctermfg=DarkGrey guifg=DarkGrey		" need this way to override the hi defined by filetype specifiy one
 "	"au FileType *	hi Comment	cterm=italic ctermfg=DarkCyan gui=italic guifg=DarkCyan " seems better than line above, as could match filetype  
 "	au FileType *	hi Comment	ctermbg=Grey ctermfg=DarkCyan guibg=LightGrey guifg=DarkCyan " seems better than line above, as could match filetype  
+"
+"Deprecated my OuCopyToClipboard
+"inoremap <A-S-Y> <Esc>l"+y$
+"nnoremap <A-S-Y> <Esc>"+y$
 "
 "Deprecated as moved the logic into bash function
 "command! -nargs=* RInCmd		:wa | :silent	! cmd.exe		<args> "%:p" & pause

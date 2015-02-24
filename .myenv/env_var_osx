@@ -1,0 +1,10 @@
+PATH		/bin
+PATH		/sbin
+PATH		/usr/bin
+PATH		/usr/sbin
+PATH		/usr/local/bin
+PATH		/opt/X11/bin
+PATH		/opt/local/bin
+
+		# to use coreutils without prefix ‘g’, e.g. gawk
+PATH		/opt/local/libexec/gnubin/

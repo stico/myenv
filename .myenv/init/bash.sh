@@ -1,13 +1,16 @@
 #!/bin/bash
 
+# check bash version
+echo $BASH_VERSION | grep -q "^[123]\." && echo "ERROR: bash version must 4+" && return 1
+
 # make it simple, we works under the .myenv dir
 \cd $HOME/.myenv
 
 # var 
 genShPath=zgen/lu_bash
 genEnvVar=$genShPath/envVarAll
-genEnvAlias=$genShPath/envAliasAll
 genEnvFunc=$genShPath/envFuncAll
+genEnvAlias=$genShPath/envAliasAll
 
 # need to ensure the HOME var end with a "/"
 #[[ $(echo $HOME | grep -c "/$") == 0 ]] && export HOME="${HOME}/"
@@ -16,13 +19,15 @@ genEnvFunc=$genShPath/envFuncAll
 if [[ `uname -s` == CYGWIN* ]] || [[ `uname -s` == MINGW* ]] ; then
 	# winVer=`cmd /C win_ver.bat`			# works in cygwin/bash, not in GIT/bash
 	envVarSrc=(env_var env_var_win_cyg env_var_win)
-	envFuncSrc=(myenv_func.sh myenv_dev.sh)
 	envAliasSrc=(env_alias env_alias_win)
+elif [[ `uname -s` == Darwin* ]] ; then 
+	envVarSrc=(env_var env_var_lu env_var_osx)
+	envAliasSrc=(env_alias env_alias_lu env_alias_osx)
 else
 	envVarSrc=(env_var_lu env_var)
-	envFuncSrc=(myenv_func.sh myenv_dev.sh)
 	envAliasSrc=(env_alias env_alias_lu)
 fi
+envFuncSrc=(myenv_func.sh myenv_dev.sh)
 [[ -e $HOME/.myenv/secu/env_var_secu ]] && envVarSrc+=(secu/env_var_secu)
 [[ -e $HOME/.myenv/secu/env_alias_secu ]] && envAliasSrc+=(secu/env_alias_secu)
 

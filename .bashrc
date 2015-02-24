@@ -5,43 +5,41 @@
 
 # set flags
 [ $(uname -s | grep -c CYGWIN) -eq 1 ] && os_cygwin="true" || os_cygwin="false"
-[ $(uname -s | grep -c MINGW) -eq 1 ] && os_mingw="true" || os_mingw="false"
+[ $(uname -s | grep -c MINGW) -eq 1 ]  && os_mingw="true"  || os_mingw="false"
+[ $(uname -s | grep -c Darwin) -eq 1 ] && os_osx="true"    || os_osx="false"
 
-# init basic env
+# os specific
 [ "$os_cygwin" = "true" -o "$os_mingw" = "true" ] && umask 000 || umask 077
 [ "$os_cygwin" = "false" -a -f /etc/bash_completion ] && source /etc/bash_completion 	# very slow in cygwin, run it first, init/bash.sh need turn off some completion on cygwin
-SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
+if [ "$os_osx" = "true" ] ; then
+	# NOTE: since myenv depends on GNU utilities, so NEED set PATH at beginning, even the PATH will be overwrite by later script
+	# Macports Path
+	macports_path="/opt/local"
+	[ -e $macports_path ] && export PATH=$macports_path:$macports_path/bin:$macports_path/libexec/gnubin/:$PATH:
+
+	# Fink Path
+	#fink_cu_path="/sw/lib/coreutils/bin"
+	#test -r /sw/bin/init.sh && . /sw/bin/init.sh	# will add "/sw/bin:/sw/sbin:"
+	#[ -e $fink_cu_path ] && export PATH=$PATH:$fink_cu_path || echo "WARN: missing basic commands, try 'sudo apt-get install coreutils' (via fink)"
+fi
 
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
+# init basic env
+SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
+
+# for login shell we not want this variable set, but osx need this
+uname | grep -q Darwin || export DISPLAY=
+
 # Init myenv, including common functions
-source $HOME/.myenv/init/bash.sh
-[ -e $HOME/.bashrc_local ] && source $HOME/.bashrc_local
+bash_init=$HOME/.myenv/init/bash.sh
+bash_local=$HOME/.myenv/init/bashrc.$(hostname)
+[ -e $bash_init ] && source $bash_init
+[ -e $bash_local ] && source $bash_local
+
+# Init ssh agent
 func_ssh_agent_init
-
-# Init zbox
-zbox_func=${HOME}/.zbox/zbox_func.sh
-if [ -e "${zbox_func}" ]  ; then
-	source "${zbox_func}"
-	func_zbox use ant		1.9.4
-	func_zbox use php		5.5.10
-	func_zbox use maven		3.1.1
-	func_zbox use mysql		5.6.12
-	func_zbox use gradle		1.12
-	func_zbox use nodejs		0.10.29
-	func_zbox use python		3.3.4
-	func_zbox use springloaded	1.2.0.RELEASE
-
-	func_zbox use idea		14.0.1
-	func_zbox use androidsdk	23.0.2
-	func_zbox use vim		hg		ouyzhu
-	func_zbox use eclipse		4.3.2		jee_x64
-	func_zbox use oraclejdk		7u51		linux_x64
-	#func_zbox use adtbundle	20140702	x64
-	#func_zbox use androidstudio	135.1339820
-fi
-
 
 stty -ixon		# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
@@ -69,7 +67,7 @@ if [ "$os_cygwin" = "false" ] ; then
 
 	# set diff prompt for internal machine and external machine 
 	internetIpCount=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|127.0.0.1\|fc00::\|fe80::\|::1\)')
-	if `grep -q "bash_prompt_color=green" ~/.myenv/zgen/sys_info_local &> /dev/null` ; then
+	if `grep -q "bash_prompt_color=green" ~/.myenv/init/bashrc.$(hostname) &> /dev/null` ; then
 		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
 	elif [ "$internetIpCount" -ge 1 ] ; then 
 		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				# Red line with $ in next line

@@ -237,20 +237,27 @@ func_vi_conditional() {
 		return 0
 	fi
 
-	# GUI env: use gvim (gui)
+	# GUI env: use gvim/macvim (gui)
 	# NOTE 1: use window title "SINGLE_VIM" to identify
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
 	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
 	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
-		LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@"
-	else
-		LD_LIBRARY_PATH="" gvim "$@"
-	fi
+	if uname | grep -q Darwin ; then
+		# pre condition: '+clientserver', 
+		# -g mean use GUI version
+		# directly use "vim -g" behaves wired (mess up terminal)
+		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
+	else	
+		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
+			LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@"
+		else
+			LD_LIBRARY_PATH="" gvim "$@"
+		fi
 
-	# why? if not sleep after init (1st time), will open 2 files, currently 1s is enough
-	[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -l | grep -q 'SINGLE_VIM' || sleep 1
-	[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
+		# why? if not sleep after init (1st time), will open 2 files, currently 1s is enough
+		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -l | grep -q 'SINGLE_VIM' || sleep 1
+		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
+	fi
 }
 
 func_load_virtualenvwrapper() {
@@ -443,8 +450,8 @@ func_collect_all() {
 	func_delete_dated "${base}"
 	mkdir -p "${base}"
 
-	echo "INFO: update locate db"
-	sudo updatedb
+	echo "INFO: update locate db (osx will just skip)"
+	uname | grep -q Darwin || sudo updatedb
 
 	echo "INFO: collecting stdnote and gen quicklist"
 	local count=0
@@ -474,7 +481,9 @@ func_collect_all() {
 	echo "INFO: collecting miscnote"
 	local miscnote_content=${base}/miscnote_content.txt
 	local miscnote_filelist=${base}/miscnote_filelist.txt
-	locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
+	uname | grep -q Darwin											\
+		&& mdfind -name NOTE | sed -e '/txt$/!d;/NOTE/!d;/\/amp\//d' >> "${miscnote_filelist}"		\
+		|| locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
 	cat "${miscnote_filelist}" | while read line ; do
 		echo -e "\n\n@${line}\n"  >> "${miscnote_content}"
 		sed -e "s///" "${line}" >> "${miscnote_content}"
@@ -527,11 +536,14 @@ func_collect_all() {
 	local mydoc_filelist=${base}/mydoc_filelist.txt
 	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do
 	for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  FCB  ECS ; do # put ECS in the end
-		locate $(readlink -f "${MY_DOC}/${d}")		|\
+		(uname | grep -q Darwin					\
+			&& find "${MY_DOC}/${d}" -type f		\
+			|| locate $(readlink -f "${MY_DOC}/${d}")	)|\
 		sed -e "/\/\.\(git\|svn\|hg\)\//d"		\
 		-e "/\/target\//d" `# for maven project`	\
 		-e "/open.yy.com_trunk\//d" `# match prefix`	\
 		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`	>> ${mydoc_filelist}
+
 		#-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
 		#-e "/\/vendor\/ZF2\//d"				\
 		#-e "/\/framework\/i18n\//d"				\

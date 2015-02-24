@@ -5,9 +5,6 @@ if [ -f ~/.bashrc ]; then
    source ~/.bashrc
 fi
 
-# for login shell we not want this variable set
-export DISPLAY=
-
 # following is for key auth
 #SSHAGENT=/usr/bin/ssh-agent
 #SSHAGENTARGS="-s"
