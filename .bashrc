@@ -30,7 +30,7 @@ fi
 SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
 
 # for login shell we not want this variable set, but osx need this
-uname | grep -q Darwin || export DISPLAY=
+#uname | grep -q Darwin || export DISPLAY=
 
 # Init myenv, including common functions
 bash_init=$HOME/.myenv/init/bash.sh
