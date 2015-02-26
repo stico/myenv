@@ -15,7 +15,7 @@ if [ -e "${zbox_func}" ]  ; then
 
 	func_zbox use idea		14.0.1
 	func_zbox use androidsdk	23.0.2
-	func_zbox use vim		hg		ouyzhu
+	func_zbox use vim		hg
 	func_zbox use eclipse		4.3.2		jee_x64
 	func_zbox use oraclejdk		7u51		linux_x64
 	#func_zbox use adtbundle	20140702	x64
