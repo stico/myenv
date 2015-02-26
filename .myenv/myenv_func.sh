@@ -304,6 +304,39 @@ func_locate_dbupdate() {
 func_locate() {
 	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
 
+	uname | grep -q Darwin		\
+	&& func_locate_via_find "$@"	\
+	|| func_locate_via_locate "$@"
+}
+
+func_locate_via_find() {
+	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
+
+	# get and check parameters
+	local type="${1}"
+	local base="$(readlink -f "${2}")"	# important: use the formal path
+	func_validate_path_exist "${base}"	# the base should be exist. NOTE, tag should be translated before use this funciton
+	shift; shift;
+
+	# parepare parameters for "find"
+	local find_type
+	case "${type}" in
+		FILE)	find_type=f ;;
+		DIR)	find_type=d ;;
+		*)	echo "ERROR: func_locate_via_find need a TYPE parameter (either FILE or DIR)! 1>&2"
+	esac
+	local search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+
+	targets=`find -P "$base" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d"`			# 1st, try not follow links
+	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type ${find_type} | sed -e "/^$/d"`	# 2nd, try follow links 
+	[ -z "$targets" ] && return 1										# 3rd, just return error
+
+	echo "$targets" | head -1
+}
+
+func_locate_via_locate() {
+	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
+
 	local type="${1}"
 	local base="$(readlink -f "${2}")"	# important: use the formal path
 	shift; shift
@@ -312,7 +345,7 @@ func_locate() {
 		case "${type}" in
 			FILE)	[ -f "${line}" ] && echo "${line}" && return 0 ;;
 			DIR)	[ -d "${line}" ] && echo "${line}" && return 0 ;;
-			*)	echo "ERROR: func_locate need a TYPE parameter! 1>&2"
+			*)	echo "ERROR: func_locate_via_locate need a TYPE parameter! 1>&2"
 		esac
 	done
 }
@@ -343,28 +376,31 @@ func_vi() {
 }
 
 func_cd_tag() {
-	# Shortcut
+
+	# 1) shortcuts
 	[ -z "$*" ]     && func_cd_ls    && return 0			# home
 	[ "-"  = "$*" ] && func_cd_ls -  && return 0			# last dir
 	[ ".." = "$*" ] && func_cd_ls .. && return 0			# parent dir
 	[ "."  = "$*" ] && func_cd_ls .  && return 0			# current dir
+
+	# 2) inside current dir
 	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_ls "${1}" && return 0	# exist in current dir
 
-	# Try tag eval, use its dir if it is a file
+	# 3.1) try tag eval, use its dir if it is a file
 	local base="$(func_tag_value ${1})"
 	[ -f "${base}" ] && base="$(dirname ${base})"
 
-	# Single tag, just cd to there
+	# 3.2) direct cd for single tag
 	if [ $# -eq 1 ] ; then
 		[ ! -d "${base}" ] && func_cry "ERROR: ${base} not exist!"
 		func_cd_ls "${base}" && return 0 
 	fi
 
-	# Version 2, use locate
+	# 3.3) find target. Version 2, use locate
 	[ -d "${base}" ] && shift || base="./"
 	func_cd_ls "$(func_locate "DIR" "${base}" "$@")"
 
-	# Version 1, old .dl_me.txt: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
+	# 3.3) find target. Version 1, old .dl_me.txt: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
 	#[ -d "${base}" ] && shift || base="./"
 	#func_find_dotcache result_target d $base $* || func_find result_target d $base $*
 	#func_cd_ls "${base}/${result_target}"
@@ -388,25 +424,6 @@ func_head_cmd() {
 
 	cmd_result=`eval "$*"`
 	func_head $show_lines "$cmd_result"
-}
-
-func_gen_list() {
-	# Deprecated: use func_tag_value_raw !
-	# TODO: make a conversion of $type+l_me.txt ?
-	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
-	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [listfile]" "$@"
-
-	find_type=$1
-	base=$2
-	listfile=$3
-	[ -e "$base/$listfile" ] && return 0
-	[ ! -w "$base" ] && return 1
-
-	# make the path relative to the base, for better compitability
-	echo "$base/$listfile not exist, create it..." 1>&2
-	func_cd $base &> /dev/null
-	[ -w ./ ] && find -L ./ -type $find_type > $listfile || echo "ERROR: no write permisson for $PWD!"
-	\cd - &> /dev/null
 }
 
 func_notify_mail() {
@@ -1422,6 +1439,26 @@ func_find_non_utf8_in_content() {
 #
 #	targets=`func_find_type $find_type $*`
 #	func_select_line $result_var_name shortest "$targets"
+#}
+#
+## deprecated by func_locate
+#func_gen_list() {
+#	# Deprecated: use func_tag_value_raw !
+#	# TODO: make a conversion of $type+l_me.txt ?
+#	#[ "`realpath $base`" = "`realpath $HOME`" ] && echo yes || echo no
+#	func_param_check 3 "Usage: $FUNCNAME [find_type (f,file;d,dir)] [base] [listfile]" "$@"
+#
+#	find_type=$1
+#	base=$2
+#	listfile=$3
+#	[ -e "$base/$listfile" ] && return 0
+#	[ ! -w "$base" ] && return 1
+#
+#	# make the path relative to the base, for better compitability
+#	echo "$base/$listfile not exist, create it..." 1>&2
+#	func_cd $base &> /dev/null
+#	[ -w ./ ] && find -L ./ -type $find_type > $listfile || echo "ERROR: no write permisson for $PWD!"
+#	\cd - &> /dev/null
 #}
 #
 ## deprecated by func_locate
