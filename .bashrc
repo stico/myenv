@@ -67,7 +67,7 @@ if [ "$os_cygwin" = "false" ] ; then
 
 	# set diff prompt for internal machine and external machine 
 	internetIpCount=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|127.0.0.1\|fc00::\|fe80::\|::1\)')
-	if `grep -q "bash_prompt_color=green" ~/.myenv/init/bashrc.$(hostname) &> /dev/null` ; then
+	if `grep -q "^bash_prompt_color=green" $HOME/.myenv/init/bashrc.$(hostname) &> /dev/null` ; then
 		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
 	elif [ "$internetIpCount" -ge 1 ] ; then 
 		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				# Red line with $ in next line
