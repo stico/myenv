@@ -47,7 +47,7 @@ ignoreinodenumbers=true
 ################################################################################
 ignore = Regex .*/.fl_me.txt
 ignore = Regex .*/.dl_me.txt
-ignore = Regex .*/.fl_files.txt
+ignore = Regex .*/.DS_Store
 ignore = Regex .*/.grep_result.txt
 ignore = Regex DC./SyncToy_.*.dat
 ignore = Regex EC./SyncToy_.*.dat
