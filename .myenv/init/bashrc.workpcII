@@ -1,4 +1,4 @@
-#bash_prompt_color=green
+bash_prompt_color=green
 
 # Init zbox
 zbox_func=${HOME}/.zbox/zbox_func.sh
