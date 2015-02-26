@@ -294,6 +294,13 @@ func_load_rvm() {
 	export PS1="(RVM) ${PS1}"
 }
 
+func_locate_dbupdate() {
+	# skip for OSX
+	uname | grep -q Darwin && return
+
+	sudo updatedb
+}
+
 func_locate() {
 	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
 
@@ -451,7 +458,7 @@ func_collect_all() {
 	mkdir -p "${base}"
 
 	echo "INFO: update locate db (osx will just skip)"
-	uname | grep -q Darwin || sudo updatedb
+	func_locate_dbupdate
 
 	echo "INFO: collecting stdnote and gen quicklist"
 	local count=0
@@ -726,7 +733,7 @@ func_svn_update() {
 		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
 		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ 
 	done
-	sudo updatedb
+	func_locate_dbupdate
 }
 
 func_svn_status() { 
@@ -735,7 +742,7 @@ func_svn_status() {
 
 func_git_pull() { 
 	git pull origin master && git status
-	sudo updatedb
+	func_locate_dbupdate
 }
 
 func_git_status() { 
