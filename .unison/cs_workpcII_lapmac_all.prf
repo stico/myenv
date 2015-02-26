@@ -21,12 +21,12 @@ path=DCC
 path=DCD
 path=DCM
 path=DCO
-path=ECB
-path=ECE
-path=ECH
-path=ECS
-path=ECZ
-path=FCB
+#path=ECB
+#path=ECE
+path=DCH
+path=DCS
+#path=ECZ
+path=DCZ
 path=FCS
 
 ################################################################################

@@ -17,7 +17,7 @@ rootalias = //homelap//ext_ntfs/Documents -> //X200S_WIN//Documents
 # PATH: the -path cmd option not support glob
 ################################################################################
 path=DCM
-path=FCB
+path=DCZ
 
 ################################################################################
 # SETTINGS
