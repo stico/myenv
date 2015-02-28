@@ -6,7 +6,7 @@ set realname="myenv_notify"
 set from=myenv_notify@163.com
 set envelope_from=yes
 
-# Mail google - Works 2013-08-06 - alone
+# Mail google - Works 2013-08-06 - alone (not need .msmtprc)
 #set imap_user = "ouyzhu@gmail.com"
 ##set imap_pass = ""
 #set smtp_url = "smtp://ouyzhu@smtp.gmail.com:587/"
@@ -21,7 +21,7 @@ set envelope_from=yes
 #set certificate_file=~/.mutt/certificates
 #set move = no
 
-# Mail 163 - Works 2013-08-06 - alone
+# Mail 163 - Works 2013-08-06 - alone (not need .msmtprc)
 #set imap_user = "myenv_notify@163.com"
 #set imap_pass = "myenv_notify123"
 #set smtp_url = "smtp://myenv_notify@smtp.163.com:25"

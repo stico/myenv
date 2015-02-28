@@ -147,6 +147,7 @@ set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
+set relativenumber
 
 "MNT: buildin grep is using quickfix@vim. 
 set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target

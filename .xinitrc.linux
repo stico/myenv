@@ -1,5 +1,6 @@
 # from 13.04, ubuntu use xkb instead of xmodmap, so following line not work (but also seems no harm)
 # from 14.04, could make xmodmap run on login as Startup App, BUT restores after suspend/hibernate
+# 2015-02-27, seems following command only need execute once. After rename (because of osx), the mapping still works!
 xmodmap ~/.xmodmaprc
 
 # seems the platform check NOT work, this makes x11 failed to start on osx
