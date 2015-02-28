@@ -127,7 +127,9 @@ func_eval_path() {
 func_fullpath() {
 	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
 	# clipit put stuff in clipboard, use -p or xclip to put in primary
-	readlink -f "${1}" | tr -d '\n' | clipit -c | sed -e '$a\'
+	[ -z "${DISPLAY}"]						\
+	&& readlink -f "${1}" | tr -d '\n' | sed -e '$a\'		\
+	|| readlink -f "${1}" | tr -d '\n' | clipit -c | sed -e '$a\'
 }
 
 func_std_gen_tags() {
@@ -439,10 +441,10 @@ func_check_cronlog() {
 	local result="$(grep -i "error" ${log})"
 
 	if [ -n "${result}" ] ; then
-		echo "Found err message in ${log}, sending notifications"
-		func_notify_mail "[MYENV Notyfy] cronlog has ERROR ($(hostname))!" "$result"
+		echo "ERROR: Found error message in ${log}, sending notifications"
+		func_notify_mail "ERROR: [MYENV Notify] cronlog has ERROR ($(hostname))!" "$result"
 	else
-		echo "No err found in ${log}, not notificaton needed"
+		echo "INFO: No err found in ${log}, not notificaton needed"
 	fi
 }
 
