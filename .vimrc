@@ -148,6 +148,7 @@ set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
 set relativenumber
+set noimdisable						" default is imdisable/noimdisable on macvim/vim, so unify it. MacVim need this to work with input method, also need to set defaults "defaults write org.vim.MacVim MMUseInlineIm 0" on osx command line
 
 "MNT: buildin grep is using quickfix@vim. 
 set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target

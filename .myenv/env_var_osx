@@ -1,3 +1,7 @@
+		# if need specific version: "/usr/libexec/java_home -v 1.7", note to make sure that version is installed
+JAVA_HOME	$(/usr/libexec/java_home)
+
+PATH		JAVA_HOME
 PATH		/bin
 PATH		/sbin
 PATH		/usr/bin
