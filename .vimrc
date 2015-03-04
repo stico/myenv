@@ -17,6 +17,23 @@ nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(s
 
 
 """""""""""""""""""""""""""""" H1 - Input Method
+
+" osx + ~rime@tool
+if has("unix")
+	let s:uname = system("uname -s")
+	if s:uname == "Darwin"
+		" For macvim to work with input method (otherwise will NOT work properly):
+		" 1) need set "noimdisable"
+		" 2) need set iminsert
+		" 3) need set defaults "defaults write org.vim.MacVim MMUseInlineIm 0" on osx command line
+		" 4) need disable a setting: (in macvim) press M+, > Advanced > (disable) "Draw marked text inline"
+		set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
+		"set iminsert=0		" NOT work, will input CN in search mode. seems it changes frequently, so static set will, default value on macvim/vim is 2/0
+		"autocmd! InsertLeave * set imdisable|set iminsert=0	" NOT work, can NOT reserve CN mode when to back to insert mode
+		"autocmd! InsertEnter * set noimdisable|set iminsert=0
+	endif
+endif
+
 " Option 1: FCITX, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
 if executable('fcitx-remote') && has('unix')
 	" TODO: search CN and then press "n", will not goto next, how to improve? Seems the WinCmdEnter/Leave works not smoothly
@@ -147,8 +164,7 @@ set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
 set autochdir						" automatically change current dir
-set relativenumber
-set noimdisable						" default is imdisable/noimdisable on macvim/vim, so unify it. MacVim need this to work with input method, also need to set defaults "defaults write org.vim.MacVim MMUseInlineIm 0" on osx command line
+set relativenumber					" show number of lines related to current line
 
 "MNT: buildin grep is using quickfix@vim. 
 set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
@@ -386,6 +402,8 @@ command! -nargs=? XClipboardOriginal	:.,.+<args>-1 d + | :let @+=substitute(@+,'
 command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 d + | :let @+=substitute(@+,'\_.\%$','','') | :silent! /never-epect-to-exist-string
 command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
 command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
+
+command! -nargs=0 OuCaa		:tabnew ~/.myenv/zgen/collection/all_content.txt
 
 "TODO: restore mapping: 
 "	redir => oldcrmap

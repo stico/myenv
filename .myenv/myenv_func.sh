@@ -126,10 +126,17 @@ func_eval_path() {
 
 func_fullpath() {
 	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
-	# clipit put stuff in clipboard, use -p or xclip to put in primary
-	[ -z "${DISPLAY}"]						\
-	&& readlink -f "${1}" | tr -d '\n' | sed -e '$a\'		\
-	|| readlink -f "${1}" | tr -d '\n' | clipit -c | sed -e '$a\'
+
+	local fullpath="$(readlink -f "${1}")"
+	if uname | grep -q Darwin ; then
+		echo "${fullpath}" | tr -d '\n' | pbcopy
+		echo "${fullpath}"
+		return
+	else
+		# clipit put stuff in clipboard, use -p or xclip to put in primary
+		echo "${fullpath}" | tr -d '\n' | clipit -c | sed -e '$a\'
+		return
+	fi
 }
 
 func_std_gen_tags() {
@@ -1100,6 +1107,9 @@ func_backup_dated() {
 	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
 	local packFile="$(mktemp -d)/${targetFile}.zip"
 	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
+
+	echo "INFO: check if source exist, srcPath: ${srcPath}"
+	func_validate_path_exist "${srcPath}" 
 
 	# For filelist, use as file list. Magic here: use as filelist if last argument is 'FL'
 	if [[ "${@: -1}" == "FL" && -f "${srcPath}" ]] ; then

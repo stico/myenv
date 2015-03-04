@@ -12,12 +12,12 @@ if [ -e "${zbox_func}" ]  ; then
 
 	func_zbox use macvim		git
 	func_zbox use maven		3.1.1
+	func_zbox use nodejs            0.12.0
 
        #func_zbox use ant               1.9.4
        #func_zbox use php               5.5.10
        #func_zbox use mysql             5.6.12
        #func_zbox use gradle            1.12
-       #func_zbox use nodejs            0.10.29
        #func_zbox use python            3.3.4
        #func_zbox use springloaded      1.2.0.RELEASE
        #func_zbox use androidstudio     135.1339820
