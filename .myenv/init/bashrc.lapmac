@@ -13,6 +13,7 @@ if [ -e "${zbox_func}" ]  ; then
 	func_zbox use macvim		git
 	func_zbox use maven		3.1.1
 	func_zbox use nodejs            0.12.0
+	func_zbox use androidsdk        24.0.2
 
        #func_zbox use ant               1.9.4
        #func_zbox use php               5.5.10
@@ -22,7 +23,6 @@ if [ -e "${zbox_func}" ]  ; then
        #func_zbox use springloaded      1.2.0.RELEASE
        #func_zbox use androidstudio     135.1339820
        #func_zbox use idea              14.0.1
-       #func_zbox use androidsdk        23.0.2
        #func_zbox use eclipse           4.3.2           jee_x64
        #func_zbox use adtbundle         20140702        x64
 

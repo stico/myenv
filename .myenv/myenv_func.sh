@@ -6,7 +6,6 @@
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
 [ -z "$MY_ENV" ]		&& MY_ENV=$HOME/.myenv
-[ -z "$RVM_HOME" ]		&& RVM_HOME=$HOME/.rvm
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
 [ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
 [ -z "$MY_ENV_LOG" ]		&& MY_ENV_LOG=$MY_ENV/zgen/log
@@ -289,15 +288,18 @@ func_load_virtualenvwrapper() {
 func_load_rvm() {
 	echo "INFO: loading Ruby Version Manager, note the 'cd' cmd will be hijacked"
 
+	[ -z "$RVM_HOME" ] && export RVM_HOME=$HOME/.rvm && export PATH="$PATH:$RVM_HOME/bin"
+
 	# step 1: rvm hacks command "cd", record it before myenv loads func_cd_tag
 	local init_src="$RVM_HOME/scripts/rvm"
 	[ -e "${init_src}" ] && source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
 
 	# step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
-	local use_ver="$($RVM_HOME/bin/rvm list | sed -n -e "s/^=.*ruby-\([^ ]*\)\s*\[.*/\1/p" | head -1)"
-	[ -n "${use_ver}" ] && echo "INFO: use version ruby-${use_ver}@global" && rvm use "ruby-${use_ver}@global" --default || func_die "ERROR: can not find any usable version"
-	#$RVM_HOME/bin/rvm use "ruby-${use_ver}@global" --default	# why not work? just prefixed with $RVM_HOME/bin
+	local ver="$($RVM_HOME/bin/rvm list | sed -n -e "s/^=.*ruby-\([^ ]*\)\s*\[.*/\1/p" | head -1)"
+	local ver_gemset="ruby-${ver}@global"
+	[ -n "${ver}" ] && echo "INFO: use version ${ver_gemset}" && rvm use "${ver_gemset}" --default || func_die "ERROR: can not find any usable version"
+	#$RVM_HOME/bin/rvm use "ruby-${ver}@global" --default	# why not work? just prefixed with $RVM_HOME/bin
 
 	# step 3: update PS1
 	export PS1="(RVM) ${PS1}"
