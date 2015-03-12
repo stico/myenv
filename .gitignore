@@ -65,11 +65,12 @@
 /.smbcredentials
 
 # IGNORE, for those really not needed, or for secure reason
-.fl_files.txt
-.grep_result.txt
+.DS_Store
 .dl_me.txt
 .fl_me.txt
 .grep_me.txt
+.fl_files.txt
+.grep_result.txt
 bash.exe.stackdump
 gVim.exe.stackdump
 /.myenv/zgen/
