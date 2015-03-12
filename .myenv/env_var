@@ -19,14 +19,11 @@ MY_DCB		%HOME%Documents#DCB
 MY_DCC		%HOME%Documents#DCC
 MY_DCD		%HOME%Documents#DCD
 MY_DCD_PROJ	%HOME%Documents#DCD#project
+MY_DCH		%HOME%Documents#DCH
 MY_DCM		%HOME%Documents#DCM
 MY_DCO		%HOME%Documents#DCO
-MY_ECB		%HOME%Documents#ECB
-MY_ECE		%HOME%Documents#ECE
-MY_ECH		%HOME%Documents#ECH
-MY_ECS		%HOME%Documents#ECS
-MY_ECZ		%HOME%Documents#ECZ
-MY_FCB		%HOME%Documents#FCB
+MY_DCS		%HOME%Documents#DCS
+MY_DCZ		%HOME%Documents#DCZ
 MY_FCS		%HOME%Documents#FCS
 MY_FCZ		%HOME%Documents#FCZ
 MY_ENV		%HOME%.myenv

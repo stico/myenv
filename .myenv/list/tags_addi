@@ -1,19 +1,13 @@
-# Misc
-me=$MY_ENV
-env=$MY_ENV
-data=$HOME/data
-
 # MY_TMP
 amp=$MY_TMP
 tmp=$MY_TMP
-st=$MY_TMP/stage1
 dl=$MY_TMP/download
 ws=$MY_TMP/workspace
 
-#DW
+# DW
 dw=$MY_FCZ/code_dw
-model=$MY_FCZ/code_dw/model
-sct=$MY_FCZ/code_dw/service-center_trunk
+report=$MY_DCD/report
+project=$MY_DCD/project
 
 # ZBOX
 zb=$ZBOX
@@ -22,31 +16,30 @@ cnf=$ZBOX/cnf
 ins=$ZBOX/ins
 src=$ZBOX/src
 stg=$ZBOX/stg
+
+# OUMISC
 misc=$ZBOX/src/oumisc/oumisc-git
-oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 oumisc=$ZBOX/src/oumisc/oumisc-git
-ourepo=~/.zbox/src/ourepo/ourepo-git
-oublog=~/.zbox/src/oublog/oublog-git
-outest=~/.zbox/src/outest/outest-local
+ourepo=$ZBOX/src/ourepo/ourepo-git
+oublog=$ZBOX/src/oublog/oublog-git
+outest=$ZBOX/src/outest/outest-local
 
 # MY_DOC
 doc=$MY_DOC
 dcb=$MY_DCB
 dcc=$MY_DCC
 dcd=$MY_DCD
+cdh=$MY_DCH
 dcm=$MY_DCM
 dco=$MY_DCO
-ecb=$MY_ECB
-ece=$MY_ECE
-ech=$MY_ECH
-ecs=$MY_ECS
-ecz=$MY_ECZ
-fcb=$MY_FCB
+dcs=$MY_DCS
+dcz=$MY_DCZ
 fcs=$MY_FCS
 fcz=$MY_FCZ
-report=$MY_DCD/report
-project=$MY_DCD/project
-project=$MY_DCD/project
+
+# myenv
+me=$MY_ENV
+env=$MY_ENV
 noteall=$MY_ENV/zgen/collection_note/collection_content.txt
 
 # Function
@@ -60,3 +53,8 @@ ty=`dir=$MY_TMP/$(date '+%Y');mkdir -p $dir;echo $dir`
 #tmpdl=$MY_TMP/download
 #amptt=$MY_TMP/`date "+%Y-%m-%d"`
 #tmptt=$MY_TMP/`date "+%Y-%m-%d"`
+#data=$HOME/data
+#st=$MY_TMP/stage1
+#model=$MY_FCZ/code_dw/model
+#sct=$MY_FCZ/code_dw/service-center_trunk
+#oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim

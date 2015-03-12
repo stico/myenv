@@ -338,11 +338,14 @@ func_locate_via_find() {
 	esac
 	local search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
 
+	echo ----- 1>&2
+	echo find -P "$base" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d" 1>&2
 	targets=`find -P "$base" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d"`			# 1st, try not follow links
 	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type ${find_type} | sed -e "/^$/d"`	# 2nd, try follow links 
 	[ -z "$targets" ] && return 1										# 3rd, just return error
 
-	echo "$targets" | head -1
+	# use the shortest result
+	echo "$targets" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1
 }
 
 func_locate_via_locate() {
