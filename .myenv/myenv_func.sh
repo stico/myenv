@@ -338,8 +338,6 @@ func_locate_via_find() {
 	esac
 	local search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
 
-	echo ----- 1>&2
-	echo find -P "$base" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d" 1>&2
 	targets=`find -P "$base" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d"`			# 1st, try not follow links
 	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type ${find_type} | sed -e "/^$/d"`	# 2nd, try follow links 
 	[ -z "$targets" ] && return 1										# 3rd, just return error
@@ -392,13 +390,13 @@ func_vi() {
 func_cd_tag() {
 
 	# 1) shortcuts
-	[ -z "$*" ]     && func_cd_ls    && return 0			# home
-	[ "-"  = "$*" ] && func_cd_ls -  && return 0			# last dir
-	[ ".." = "$*" ] && func_cd_ls .. && return 0			# parent dir
-	[ "."  = "$*" ] && func_cd_ls .  && return 0			# current dir
+	[ -z "$*" ]     && func_cd_smart    && return 0			# home
+	[ "-"  = "$*" ] && func_cd_smart -  && return 0			# last dir
+	[ ".." = "$*" ] && func_cd_smart .. && return 0			# parent dir
+	[ "."  = "$*" ] && func_cd_smart .  && return 0			# current dir
 
 	# 2) inside current dir
-	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_ls "${1}" && return 0	# exist in current dir
+	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_smart "${1}" && return 0	# exist in current dir
 
 	# 3.1) try tag eval, use its dir if it is a file
 	local base="$(func_tag_value ${1})"
@@ -407,27 +405,39 @@ func_cd_tag() {
 	# 3.2) direct cd for single tag
 	if [ $# -eq 1 ] ; then
 		[ ! -d "${base}" ] && func_cry "ERROR: ${base} not exist!"
-		func_cd_ls "${base}" && return 0 
+		func_cd_smart "${base}" && return 0 
 	fi
 
 	# 3.3) find target. Version 2, use locate
 	[ -d "${base}" ] && shift || base="./"
-	func_cd_ls "$(func_locate "DIR" "${base}" "$@")"
+	func_cd_smart "$(func_locate "DIR" "${base}" "$@")"
 
 	# 3.3) find target. Version 1, old .dl_me.txt: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
 	#[ -d "${base}" ] && shift || base="./"
 	#func_find_dotcache result_target d $base $* || func_find result_target d $base $*
-	#func_cd_ls "${base}/${result_target}"
+	#func_cd_smart "${base}/${result_target}"
 }
 
-func_cd_ls() {
+func_cd_smart() {
 	# Old rvm support
 	# (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
 	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd .
 	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
 
 	[ -z "$*" ] && \cd || \cd "$*"
+
+	# ls
 	\ls -hF --color=auto
+
+	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
+	if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
+		[ -e ".hg" ] && (command -v hg &> /dev/null) && hg status
+		[ -e ".svn" ] && (command -v svn &> /dev/null) && svn status
+		[ -e ".git" ] && (command -v git &> /dev/null) && git status
+	fi
+
+	# status code always success, otherwise func_cd_tag NOT work
+	:
 }
 
 func_head_cmd() {
