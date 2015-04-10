@@ -28,8 +28,12 @@ if has("unix")
 		" 3) need set defaults "defaults write org.vim.MacVim MMUseInlineIm 0" on osx command line
 		" 4) need disable a setting: (in macvim) press M+, > Advanced > (disable) "Draw marked text inline"
 		set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
-		"set iminsert=0		" NOT work, will input CN in search mode. seems it changes frequently, so static set will, default value on macvim/vim is 2/0
-		"autocmd! InsertLeave * set imdisable|set iminsert=0	" NOT work, can NOT reserve CN mode when to back to insert mode
+
+		" NOT work, will input CN in search mode. seems it changes frequently, so static set will, default value on macvim/vim is 2/0
+		"set iminsert=0		
+		
+		" NOT work, can NOT reserve CN mode when to back to insert mode
+		"autocmd! InsertLeave * set imdisable|set iminsert=0	
 		"autocmd! InsertEnter * set noimdisable|set iminsert=0
 	endif
 endif
@@ -140,6 +144,19 @@ let g:formatprg_args_c = "--mode=c --style=ansi"
 let g:formatprg_java = "astyle"
 let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --unpad-paren --add-brackets"
 
+"""""""" YCM/YouCompleteMe
+"highlight Pmenu ctermfg=2 ctermbg=3 guifg=#005f87 guibg=#EEE8D5		" 菜单补全菜单配色
+"highlight PmenuSel ctermfg=2 ctermbg=3 guifg=#AFD700 guibg=#106900	" 选中项补全菜单配色
+"let g:ycm_complete_in_comments=1					" 补全功能在注释中同样有效
+"let g:ycm_confirm_extra_conf=0						" 允许 vim 加载 .ycm_extra_conf.py 文件，不再提示
+"let g:ycm_collect_identifiers_from_tags_files=1				" 开启 YCM 标签补全引擎
+"set tags+=/data/misc/software/misc./vim/stdcpp.tags			" 引入 C++ 标准库tags
+"inoremap <leader>; <C-x><C-o>						" YCM 集成 OmniCppComplete 补全引擎，设置其快捷键
+"set completeopt-=preview						" 补全内容不以分割子窗口形式出现，只显示补全列表
+"let g:ycm_min_num_of_chars_for_completion=1				" 从第一个键入字符就开始罗列匹配项
+"let g:ycm_cache_omnifunc=0						" 禁止缓存匹配项，每次都重新生成匹配项
+"let g:ycm_seed_identifiers_with_syntax=1				" 语法关键字补全         
+
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
@@ -150,11 +167,13 @@ set autowriteall
 
 """""""""""""""""""""""""""""" H1 - Settings - Misc
 filetype plugin indent on				" type detection, language-dependent indenting
+set autoread						" auto read if file updated (e.g. by other soft)
+set autochdir						" automatically change current dir
+set autoindent						" auto indent the new line to the previous one
 set dictionary+=$MY_ENV/list/words_us
 set nobackup						" won't leave additional file(s) after close VIM
 set nowritebackup					" default is :set writebackup, will keep a backup file while file is being worked. Once VIM is closed; the backup will vanish.
 set noswapfile						" (1) Keep in mind that this option will keep everything in memory. (2) Don't use this for big files, will be memeory consuming and Recovery will be impossible! (3) In essence; if security is a concern, use this option
-set autoindent						" autoindent the new line to the previous one
 set history=50						" set the cmd history
 set ruler						" show the current position in the bottom
 set showcmd						" show the cmd in the bottom, like 'dw'
@@ -163,7 +182,6 @@ set linebreak						" won't break words as wrapping a line, need wrap set
 set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
 set shell=bash						" use bash as shell for :!
-set autochdir						" automatically change current dir
 set relativenumber					" show number of lines related to current line
 
 "MNT: buildin grep is using quickfix@vim. 
@@ -443,6 +461,7 @@ endfunction
 
 """ OuFilenameAsTabLabel: Use filename as tab label, excluding file path
 set guitablabel=%{OuFilenameAsTabLabel()}
+"set guitablabel=%M%t		" this works the same on macvim (TODO: test on linux)
 function OuFilenameAsTabLabel()
 	" Show root name in ~Oucr mode
 	if exists('t:OucrRoot')

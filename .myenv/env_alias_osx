@@ -1,3 +1,5 @@
+op		"open"
+
 killvim		"killall vim Vim MacVim"
 grepvim		"ps -ef | grep -i vim"
 cdvim		"cd /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/"

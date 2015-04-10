@@ -4,7 +4,7 @@
 echo $BASH_VERSION | grep -q "^[123]\." && echo "ERROR: bash version must 4+" && return 1
 
 # make it simple, we works under the .myenv dir
-\cd $HOME/.myenv
+\pushd $HOME/.myenv &> /dev/null
 
 # var 
 genShPath=zgen/lu_bash
@@ -27,7 +27,7 @@ else
 	envVarSrc=(env_var_lu env_var)
 	envAliasSrc=(env_alias env_alias_lu)
 fi
-envFuncSrc=(myenv_func.sh myenv_dev.sh)
+envFuncSrc=(myenv_func.sh myenv_dev.sh secu/myenv_func_secu.sh)
 [[ -e $HOME/.myenv/secu/env_var_secu ]] && envVarSrc+=(secu/env_var_secu)
 [[ -e $HOME/.myenv/secu/env_alias_secu ]] && envAliasSrc+=(secu/env_alias_secu)
 
@@ -71,7 +71,7 @@ done
 # gen env function
 for funcFile in "${envFuncSrc[@]}"
 do
-	cat $funcFile >> $genEnvFunc
+	cat $funcFile 2>/dev/null >> $genEnvFunc
 done
 
 # seems need new line in the end
@@ -83,4 +83,4 @@ echo -e "\n" >> $genEnvAlias
 . $genEnvFunc
 . $genEnvAlias
 
-\cd $HOME
+\popd &> /dev/null

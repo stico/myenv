@@ -138,6 +138,23 @@ func_fullpath() {
 	fi
 }
 
+func_to_clipboard() {
+	# read from stdin
+	#func_param_check 1 "Usage: $FUNCNAME <data>" "$@"
+
+	# put data into clipboard, each line as an entry
+	while read line ; do echo $line
+		if uname | grep -q Darwin ; then
+			echo "${line}" | tr -d '\n' | pbcopy
+		else
+			echo "${line}" | tr -d '\n' | clipit -c | sed -e '$a\'
+		fi
+		# osx need wait some time, 0.2 seems too short, why? 
+		sleep 0.5
+	done
+	#done < <(echo "$*")
+}
+
 func_std_gen_tags() {
 	local d dd note_file note_filename
 	rm "${MY_TAGS_NOTE}"
@@ -430,11 +447,12 @@ func_cd_smart() {
 	\ls -hF --color=auto
 
 	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
-	if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
+	# the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
+	#if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
 		[ -e ".hg" ] && (command -v hg &> /dev/null) && hg status
 		[ -e ".svn" ] && (command -v svn &> /dev/null) && svn status
 		[ -e ".git" ] && (command -v git &> /dev/null) && git status
-	fi
+	#fi
 
 	# status code always success, otherwise func_cd_tag NOT work
 	:
@@ -582,8 +600,9 @@ func_collect_all() {
 
 	echo "INFO: collecting mydoc filelist"
 	local mydoc_filelist=${base}/mydoc_filelist.txt
-	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do
-	for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  FCB  ECS ; do # put ECS in the end
+	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do	# v1, deprecated
+	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  FCB  ECS ; do		# v2, deprecated, put ECS in the end
+	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCB FCS ; do				# v3, compacted docs
 		(uname | grep -q Darwin					\
 			&& find "${MY_DOC}/${d}" -type f		\
 			|| locate $(readlink -f "${MY_DOC}/${d}")	)|\
