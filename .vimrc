@@ -661,59 +661,6 @@ if has("autocmd") && !exists("autocommands_loaded")
 	augroup END
 endif
 
-" Deprecated - cmd g*/g# already did this
-" the vim's * add word boundary, usually I prefer not
-"nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>n
-"function! SearchCurrentWordWithoutBoundary()
-"	let @/ = '\V'.escape(expand('<cword>'), '\')
-"endfunction
-"
-"""""""""""""""""""""""""""""" H1 - Mapping - FileType based mapping
-function! NoteOutline()
-	call setloclist(0, [])
-	let save_cursor = getpos(".")
-
-	call cursor(1, 1)
-	let flags = 'cW'
-	let file = expand('%')
-	"while search("^\t*[^ \t]\+$", flags) > 0					" NOT works, why?
-	"while search("^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$", flags) > 0		" NOT works, since vim not fully support POSIX regex syntax
-	"while search("^\t*[^ \t][^ \t]*$", flags) > 0					" works, but all Chinese becomes outline
-	while search("^\t*[-_a-z0-9\/\.][-_a-z0-9\/\.]*[\t ]*$", flags) > 0		" works, but a bit strict
-		let flags = 'W'
-		let title = substitute(getline('.'), '[ \t]*$', '', '')			" remove trailing blanks
-		let titleToShow = substitute(title, '\t', '........', 'g')		" quickfix window removes any preceding blanks
-		if titleToShow !~ "^\\." 
-			let blank = printf('%s:%d:%s', file, line('.'), "  ")
-			laddexpr blank
-		endif
-		let msg = printf('%s:%d:%s', file, line('.'), titleToShow)
-		laddexpr msg
-	endwhile
-
-	call setpos('.', save_cursor)
-	vertical lopen
-	vertical resize 40
-
-	" hide filename and line number in quickfix window, not sure how it works yet.
-	set conceallevel=2 concealcursor=nc
-	syntax match qfFileName /^.*| / transparent conceal
-	"syntax match qfFileName /^[^|]*/ transparent conceal
-endfunction
-nnoremap <silent> mo :<C-U>call NoteOutline()<CR>
-
-" Works for "[Quickfix List]": keep cursor in quickfix window and show content above 
-" Works for "[Location List]": jump to corresponding location (loc window closed). (how it works?)
-au FileType qf nmap <buffer> <esc> :close<cr>
-au FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>
-" Deprecated by above lines
-""autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
-""autocmd BufWinEnter quickfix silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>:bd ". g:qfix_win . "<CR>zt"	" seems not need delete the buffer anymore (because of what? vim updates? plugin updates?)
-"autocmd BufWinEnter "Location List" let g:qfix_win = bufnr("$")
-"autocmd BufWinEnter "Location List" silent! nnoremap <ESC> :exec "bd " . g:qfix_win<CR>
-"autocmd BufWinEnter "Location List" silent! exec "unmap <CR>" | exec "nnoremap <CR> <CR>zt"
-"autocmd BufLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
-"autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif	" use BufLeave, seems BufWinLeave NOT triggered when hit <Enter> in outline(quickfix) window
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  
@@ -743,6 +690,13 @@ endif
 "	"au FileType *	hi Comment	cterm=italic ctermfg=DarkCyan gui=italic guifg=DarkCyan " seems better than line above, as could match filetype  
 "	au FileType *	hi Comment	ctermbg=Grey ctermfg=DarkCyan guibg=LightGrey guifg=DarkCyan " seems better than line above, as could match filetype  
 "
+" Deprecated - cmd g*/g# already did this
+" the vim's * add word boundary, usually I prefer not
+"nnoremap * :call SearchCurrentWordWithoutBoundary()<CR>n
+"function! SearchCurrentWordWithoutBoundary()
+"	let @/ = '\V'.escape(expand('<cword>'), '\')
+"endfunction
+
 "Deprecated my OuCopyToClipboard
 "inoremap <A-S-Y> <Esc>l"+y$
 "nnoremap <A-S-Y> <Esc>"+y$
@@ -759,6 +713,39 @@ endif
 "autocmd Filetype python map <buffer> <F11> :RInPython<Enter>
 "autocmd Filetype dosbatch map <buffer> <F11> :RInCmd<Enter>
 
+" Deprecated - move to vim-oumg
+"function! NoteOutline()
+"	call setloclist(0, [])
+"	let save_cursor = getpos(".")
+"
+"	call cursor(1, 1)
+"	let flags = 'cW'
+"	let file = expand('%')
+"	"while search("^\t*[^ \t]\+$", flags) > 0					" NOT works, why?
+"	"while search("^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$", flags) > 0		" NOT works, since vim not fully support POSIX regex syntax
+"	"while search("^\t*[^ \t][^ \t]*$", flags) > 0					" works, but all Chinese becomes outline
+"	while search("^\t*[-_a-z0-9\/\.][-_a-z0-9\/\.]*[\t ]*$", flags) > 0		" works, but a bit strict
+"		let flags = 'W'
+"		let title = substitute(getline('.'), '[ \t]*$', '', '')			" remove trailing blanks
+"		let titleToShow = substitute(title, '\t', '........', 'g')		" quickfix window removes any preceding blanks
+"		if titleToShow !~ "^\\." 
+"			let blank = printf('%s:%d:%s', file, line('.'), "  ")
+"			laddexpr blank
+"		endif
+"		let msg = printf('%s:%d:%s', file, line('.'), titleToShow)
+"		laddexpr msg
+"	endwhile
+"
+"	call setpos('.', save_cursor)
+"	vertical lopen
+"	vertical resize 40
+"
+"	" hide filename and line number in quickfix window, not sure how it works yet.
+"	set conceallevel=2 concealcursor=nc
+"	syntax match qfFileName /^.*| / transparent conceal
+"	"syntax match qfFileName /^[^|]*/ transparent conceal
+"endfunction
+"nnoremap <silent> mo :<C-U>call NoteOutline()<CR>
 
 " Since 7.3, not work anymore
 """ Some settings on diff, not really understand

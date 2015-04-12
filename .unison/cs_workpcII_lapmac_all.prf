@@ -54,6 +54,7 @@ ignore = Regex FCS/[^/]*/[^/]*-git
 ignore = Regex FCS/[^/]*/[^/]*-svn
 ignore = Regex FCS/[^/]*/[^/]*-local
 ignore = Regex DCB/Record/Note/A_NOTE_Copy.txt
+ignore = Regex DCD/mail/ouyangzhu@yy.com.sbd/Archive_Auto.sbd/
 ignore = Regex os_spec_.*/m2_repo/repository/.cache
 ignore = Regex os_spec_lu/program/vim
 ignore = Regex os_spec_win/program/A_System_Cygwin_1.7.17/tmp

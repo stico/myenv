@@ -36,9 +36,9 @@ $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
 
 # rime on osx
+$HOME/Library/Rime/weasel.custom.yaml
 $HOME/Library/Rime/default.custom.yaml
 $HOME/Library/Rime/squirrel.custom.yaml
-$HOME/Library/Rime/weasel.custom.yaml
 $HOME/Library/Rime/wubi_pinyin.custom.yaml
 
 # eval: /ext structure
