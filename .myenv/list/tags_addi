@@ -1,4 +1,4 @@
-# MY_TMP
+# TMP
 amp=$MY_TMP
 tmp=$MY_TMP
 dl=$MY_TMP/download
@@ -40,7 +40,8 @@ fcz=$MY_FCZ
 # myenv
 me=$MY_ENV
 env=$MY_ENV
-noteall=$MY_ENV/zgen/collection_note/collection_content.txt
+all=$MY_ENV/zgen/collection/all_content.txt
+noteall=$MY_ENV/zgen/collection/all_content.txt
 
 # Function
 tt=`dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $dir;echo $dir`

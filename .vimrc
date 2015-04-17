@@ -416,12 +416,7 @@ inoremap <C-A-Up> <Esc>yyPi
 
 command! -nargs=1 SMultiLines		:s/<args>/&\r/g
 command! -nargs=1 SMultiLinesAll	:%s/<args>/&\r/g
-command! -nargs=? XClipboardOriginal	:.,.+<args>-1 d + | :let @+=substitute(@+,'\_.\%$','','')
-command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 d + | :let @+=substitute(@+,'\_.\%$','','') | :silent! /never-epect-to-exist-string
-command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
-command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
-
-command! -nargs=0 OuCaa		:tabnew ~/.myenv/zgen/collection/all_content.txt
+command! -nargs=0 OuCaa			:tabnew ~/.myenv/zgen/collection/all_content.txt
 
 "TODO: restore mapping: 
 "	redir => oldcrmap
@@ -700,6 +695,12 @@ endif
 "Deprecated my OuCopyToClipboard
 "inoremap <A-S-Y> <Esc>l"+y$
 "nnoremap <A-S-Y> <Esc>"+y$
+"
+"Deprecated my OuCopyToClipboard
+"command! -nargs=? XClipboardOriginal	:.,.+<args>-1 d + | :let @+=substitute(@+,'\_.\%$','','')
+"command! -nargs=? XClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 d + | :let @+=substitute(@+,'\_.\%$','','') | :silent! /never-epect-to-exist-string
+"command! -nargs=? YClipboardOriginal	:.,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','')
+"command! -nargs=? YClipboard		:silent .,.+<args>-1 s/^\s*// | :silent execute 'normal <C-O>'| :silent .,.+<args>-1 y + | :let @+=substitute(@+,'\_.\%$','','') | :silent undo | :silent! /never-epect-to-exist-string
 "
 "Deprecated as moved the logic into bash function
 "command! -nargs=* RInCmd		:wa | :silent	! cmd.exe		<args> "%:p" & pause

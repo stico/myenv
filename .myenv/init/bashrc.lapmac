@@ -5,6 +5,9 @@
 
 bash_prompt_color=green
 
+# cmd `ls` need this to correctly show Chinese filename
+export LC_ALL="en_US.UTF-8"
+
 # Init zbox
 zbox_func=${HOME}/.zbox/zbox_func.sh
 if [ -e "${zbox_func}" ]  ; then
