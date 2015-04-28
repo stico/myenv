@@ -161,6 +161,21 @@ let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
 
+"""""""""""""""""""""""""""""" H1 - Topic - autocmd on qf
+" MNT: defaut behavior of <cr>:
+"	1) for location list, goto location and close the window 
+"	2) for quickfix list, goto location and KEEP the window
+" MNT: mapping update here for purpose/effection
+" 	1) <esc> to quict location & quickfix list
+" 	2) <cr>/<enter> for location list, goto location and close the window 
+" 	3) <cr>/<enter> for quickfix list, goto location and KEEP the window and cursor back to qf window
+augroup quickfix
+	autocmd!
+	autocmd FileType qf setlocal wrap
+	autocmd FileType qf nmap <buffer> <esc> :close<cr>
+	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>
+augroup END
+
 """""""""""""""""""""""""""""" H1 - Topic - auto save
 au FocusLost * silent! wa
 set autowriteall
@@ -423,16 +438,6 @@ command! -nargs=0 OuCaa			:tabnew ~/.myenv/zgen/collection/all_content.txt
 "	map <CR>
 "	redir END
 "	exec "nnoremap " . substitute(oldcrmap, '[\n\*]\|n ', '', 'g')
-"TODO: just for try, delete later
-"autocmd BufWinEnter quickfix silent! unmap <CR>
-"autocmd BufWinEnter quickfix silent! nnoremap <ESC> :q<CR>
-"autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
-"autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | exec "unmap <ESC>" | exec "nnoremap <CR> o<Esc>" | endif
-"
-"autocmd BufWinLeave quickfix silent! nnoremap <CR> o<Esc>
-"autocmd BufWinLeave quickfix silent! unmap <ESC>
-"autocmd FileType qf silent! unmap <CR>
-"autocmd FileType qf silent! nnoremap <ESC> :q<CR>
 
 """""""""""""""""""""""""""""" H1 - Script
 
