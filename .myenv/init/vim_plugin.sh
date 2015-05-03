@@ -5,7 +5,8 @@
 # Plugin List
 declare -A plugin_addr
 plugin_addr["vim-colors-solarized"]="git://github.com/altercation/vim-colors-solarized.git"
-#plugin_addr["YouCompleteMe"]="https://github.com/Valloric/YouCompleteMe.git"		# might need re-compile for big updates, see ~YouCompleteMe@vim
+#plugin_addr["quickfix-reflector.vim"]="git://github.com/stefandtw/quickfix-reflector.vim"	# oumg is enough, since only need qf lust update, NOT location list
+#plugin_addr["YouCompleteMe"]="https://github.com/Valloric/YouCompleteMe.git"			# might need re-compile for big updates, see ~YouCompleteMe@vim
 plugin_addr["nerdcommenter"]="https://github.com/scrooloose/nerdcommenter.git"
 plugin_addr["vim-autoformat"]="https://github.com/Chiel92/vim-autoformat.git" 
 plugin_addr["delimitMate"]="https://github.com/Raimondi/delimitMate.git"

@@ -166,18 +166,21 @@ let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --
 "	1) for location list, goto location and close the window 
 "	2) for quickfix list, goto location and KEEP the window
 " MNT: mapping update here for purpose/effection
-" 	1) <esc> to quict location & quickfix list
+" 	1) <esc> to quit location / quickfix list
 " 	2) <cr>/<enter> for location list, goto location and close the window 
 " 	3) <cr>/<enter> for quickfix list, goto location and KEEP the window and cursor back to qf window
 augroup quickfix
 	autocmd!
-	autocmd FileType qf setlocal wrap
-	autocmd FileType qf nmap <buffer> <esc> :close<cr>
+	"autocmd FileType qf setlocal wrap			" makes location window also wraps and messup
+	autocmd FileType qf nmap <buffer> <esc> :wq<cr>
 	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>
 augroup END
 
+"""""""""""""""""""""""""""""" H1 - Topic - autocmd on help
+autocmd FileType help nmap <buffer> <esc> :close<cr>
+
 """""""""""""""""""""""""""""" H1 - Topic - auto save
-au FocusLost * silent! wa
+autocmd FocusLost * silent! wa
 set autowriteall
 
 """""""""""""""""""""""""""""" H1 - Settings - Misc
