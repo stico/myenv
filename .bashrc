@@ -35,7 +35,7 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || e
 # Init myenv, including common functions
 bash_init=$HOME/.myenv/init/bash.sh
 bash_local=$HOME/.myenv/init/bashrc.$(hostname)
-bash_local_2=$HOME/.myenv/init/bashrc.$(cat /var/lib/dbus/machine-id)
+bash_local_2=$HOME/.myenv/init/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)
 [ -e $bash_init ] && source $bash_init
 [ -e $bash_local ] && source $bash_local
 [ -e $bash_local_2 ] && source $bash_local_2

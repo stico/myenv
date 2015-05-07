@@ -14,10 +14,12 @@ plugin_addr["syntastic"]="https://github.com/scrooloose/syntastic.git"
 plugin_addr["vim-surround"]="git://github.com/tpope/vim-surround.git"
 plugin_addr["vim-pathogen"]="git://github.com/tpope/vim-pathogen.git"
 plugin_addr["nerdtree"]="https://github.com/scrooloose/nerdtree.git"
+plugin_addr["vim-easytags"]="https://github.com/xolox/vim-easytags"
 plugin_addr["vim-repeat"]="git://github.com/tpope/vim-repeat.git"
 plugin_addr["vim-oumg"]="https://github.com/stico/vim-oumg.git"
 plugin_addr["tabular"]="git://github.com/godlygeek/tabular.git"
 plugin_addr["ctrlp.vim"]="git://github.com/kien/ctrlp.vim.git"
+plugin_addr["vim-misc"]="https://github.com/xolox/vim-misc"					# vim-easytags need this
 
 # Plugin List String
 plugin_candidates=""

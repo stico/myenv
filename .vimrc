@@ -102,18 +102,18 @@ else
 endif
 
 """""""""""""""""""""""""""""" H1 - Plugins
-"""""""" Pathogen
+"""""""" pathogen@vim
 call pathogen#infect()
 
-"""""""" Solarized
+"""""""" solarized@vim
 let g:solarized_italic = 0				" 0 to set comment font NOT use italic
 colorscheme solarized
 
-"""""""" NERDCommenter
+"""""""" NERDCommenter@vim
 let NERDSpaceDelims = 1					" add space for comment
 let NERDTreeWinSize = 45				" tree window width, default is 31
 
-"""""""" Ctrlp
+"""""""" Ctrlp@vim
 "let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
 "let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
@@ -125,26 +125,40 @@ let g:ctrlp_custom_ignore = {
 	\ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
 	\ }
 
+"""""""" EasyTags@vim
+" "tags" is a Vim buildin setting to locate tags file(s), relative to working dir or buffer (using a leading ./)
+" 1) ./.vimtags	means find file with name ".vimtags" in dir of current file
+" 2) .vimtags	means find file with name ".vimtags" in working directory
+" 3) /		means keep looking up and up until reach /
+set tags=./.vimtags,.vimtags;/
+let g:easytags_dynamic_files = 2 			" seems tag files are big, separate them by project
+
+"let g:easytags_autorecurse = 1				" never set this, which cause frozen (e.g. save .vimrc will gen tag for whole $HOME)
+let g:easytags_auto_highlight = 0
+let g:easytags_include_members = 1
+let g:easytags_events = ['BufWritePost']
+let g:easytags_cmd = '/opt/local/bin/ctags'
+
 """""""" netrw
 " Option 1, disable file creation of .netrwhist
 let g:netrw_dirhistmax=0
 " Option 2, disable file creation of .netrwhist
 " au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
 
-"""""""" syntastic
+"""""""" syntastic@vim
 "let g:syntastic_aggregate_errors = 1				" display together the errors found by all checkers
 "let g:syntastic_always_populate_loc_list = 1			" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
 ""let g:syntastic_quiet_messages = { "type": "style" }		" filter out some messages types
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']	" checker chain, run one by one (only run laters if current success)
 let g:syntastic_auto_jump = 2					" jump to 1st error (NOT warning)
 
-"""""""" AutoFormat/auto-format, @astyle
+"""""""" auto-format@vim, @astyle
 let g:formatprg_c = "astyle"
 let g:formatprg_args_c = "--mode=c --style=ansi"
 let g:formatprg_java = "astyle"
 let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --unpad-paren --add-brackets"
 
-"""""""" YCM/YouCompleteMe
+"""""""" YouCompleteMe@vim
 "highlight Pmenu ctermfg=2 ctermbg=3 guifg=#005f87 guibg=#EEE8D5		" 菜单补全菜单配色
 "highlight PmenuSel ctermfg=2 ctermbg=3 guifg=#AFD700 guibg=#106900	" 选中项补全菜单配色
 "let g:ycm_complete_in_comments=1					" 补全功能在注释中同样有效
@@ -156,6 +170,7 @@ let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --
 "let g:ycm_min_num_of_chars_for_completion=1				" 从第一个键入字符就开始罗列匹配项
 "let g:ycm_cache_omnifunc=0						" 禁止缓存匹配项，每次都重新生成匹配项
 "let g:ycm_seed_identifiers_with_syntax=1				" 语法关键字补全         
+let g:ycm_server_keep_logfiles = 1					" server keeps log, so could use :YcmDebugInfo to check crash info
 
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
@@ -172,7 +187,7 @@ let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --
 augroup quickfix
 	autocmd!
 	"autocmd FileType qf setlocal wrap			" makes location window also wraps and messup
-	autocmd FileType qf nmap <buffer> <esc> :wq<cr>
+	autocmd FileType qf nmap <buffer> <esc> :x<cr>
 	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>
 augroup END
 
