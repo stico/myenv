@@ -47,6 +47,7 @@
 !/.vrapperrc
 !/.tmux.conf
 !/.gitignore
+!/.gitignore_global
 !/.dir_colors
 !/.bashrc.me.*
 !/.xbindkeysrc
