@@ -176,6 +176,9 @@ let g:ycm_server_keep_logfiles = 1					" server keeps log, so could use :YcmDebu
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
 
+"""""""""""""""""""""""""""""" H1 - Topic - autocmd on nomodifable
+au BufReadPost * if(&modifiable==0) | nnoremap <Space> <C-f> | else | nnoremap <Space> i<Space><Esc> | endif
+
 """""""""""""""""""""""""""""" H1 - Topic - autocmd on qf
 " MNT: defaut behavior of <cr>:
 "	1) for location list, goto location and close the window 
@@ -382,7 +385,6 @@ nnoremap <C-CR> i<CR><Esc>
 " note <C-I> equals <Tab>, so <C-I> is also mapped here!
 nnoremap <Tab> i<Tab><Esc>
 nnoremap <S-Tab> $F<Tab>i<Tab><Esc>
-nnoremap <Space> i<Space><Esc>
 " delete by words
 inoremap <C-Del> <Esc>ldwi
 inoremap <C-Backspace> <Esc>ldbi
@@ -444,7 +446,7 @@ inoremap <C-A-Up> <Esc>yyPi
 " the window remains, not need to 'press ...'
 " %:p is filename (%) with modifier of full path (:p), use " incase have blanks
 " -nargs=* means it accepts any number of parameter
-"  <args> is parameter placeholder, <p-args> makes all things as in one
+"  <args> is parameter placeholder, <q-args> makes all things as in one
 "  for the path, could use "C:\Windows\system32\cmd.exe" or "\%Ruby_HOME\%\bin\ruby" 
 
 command! -nargs=1 SMultiLines		:s/<args>/&\r/g

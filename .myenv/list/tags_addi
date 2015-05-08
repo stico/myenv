@@ -4,6 +4,9 @@ tmp=$MY_TMP
 dl=$MY_TMP/download
 ws=$MY_TMP/workspace
 
+# Misc
+vimrc=$HOME/.vimrc
+
 # DW
 dw=$MY_FCZ/code_dw
 report=$MY_DCD/report

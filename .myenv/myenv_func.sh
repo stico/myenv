@@ -396,6 +396,8 @@ func_vi() {
 
 	# Version 2, use locate 
 	[ -d "$base" ] && shift || base="./"
+	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" /)" ] && func_cry 'ERROR: base should NOT be root (/)'
+	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" ${HOME})" ] && func_cry 'ERROR: base should NOT be $HOME'
 	func_vi_conditional "$(func_locate "FILE" "${base}" "$@")"
 
 	# Version 1, old .fl_me.txt
