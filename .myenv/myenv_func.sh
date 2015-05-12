@@ -822,6 +822,18 @@ func_git_commit_push() {
 	git status
 }
 
+func_git_commit_check() { 
+	for base in "$HOME" "$HOME/.zbox" "$HOME/Documents/FCS/oumisc/oumisc-git" ; do 
+
+		[ -z "$base" ] && echo 'ERROR: get an empty $base, pls check!' && continue 
+
+		\cd "$base" &> /dev/null 
+		git status | grep -q "nothing to commit, working directory clean"	\
+		&& echo "NOT need update: $base"					\
+		|| echo "NEED update: $base" 
+		\cd - &> /dev/null 
+	done
+}
 
 func_ssh_agent_init() {
 	# do nothing if already set

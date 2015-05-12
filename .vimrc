@@ -134,9 +134,11 @@ set tags=./.vimtags,.vimtags;/
 let g:easytags_dynamic_files = 2 			" seems tag files are big, separate them by project
 
 "let g:easytags_autorecurse = 1				" never set this, which cause frozen (e.g. save .vimrc will gen tag for whole $HOME)
+"let g:easytags_events = ['BufWritePost']
+let g:easytags_events = []				" do NOT gen tag, unless I invoke :UpdateTags
+let g:easytags_always_enabled = 0			" do NOT gen tag, unless I invoke :UpdateTags
 let g:easytags_auto_highlight = 0
 let g:easytags_include_members = 1
-let g:easytags_events = ['BufWritePost']
 let g:easytags_cmd = '/opt/local/bin/ctags'
 
 """""""" netrw
@@ -177,7 +179,7 @@ let g:ycm_server_keep_logfiles = 1					" server keeps log, so could use :YcmDebu
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
 
 """""""""""""""""""""""""""""" H1 - Topic - autocmd on nomodifable
-au BufReadPost * if(&modifiable==0) | nnoremap <Space> <C-f> | else | nnoremap <Space> i<Space><Esc> | endif
+au WinEnter * if(&modifiable==0) | nnoremap <Space> <C-f> | else | nnoremap <Space> i<Space><Esc> | endif
 
 """""""""""""""""""""""""""""" H1 - Topic - autocmd on qf
 " MNT: defaut behavior of <cr>:
@@ -217,11 +219,12 @@ set nowrap						" wrap/nowrap the line
 set linebreak						" won't break words as wrapping a line, need wrap set
 set cursorline						" highlight current line
 set gdefault						" make substitute g flag default on
-set shell=bash						" use bash as shell for :!
+"set shell=bash						" use bash as shell for :!
+set shell=bash\ --rcfile\ ~/.bashvimrc			" so could use diff config for bash in vim
 set relativenumber					" show number of lines related to current line
 
 "MNT: buildin grep is using quickfix@vim. 
-set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
+set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target\ --exclude=.vimtags
 "MNT: NOT need to change current dir in OuCodeReading mode, since it already changes. Why want to do this at the first place?!!!
 "set grepprg=\\cd\ $PWD;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
 "MNT: in OuCodeReading mode, %:p:h not the "root", should use $PWD instead

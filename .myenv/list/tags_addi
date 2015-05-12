@@ -5,6 +5,7 @@ dl=$MY_TMP/download
 ws=$MY_TMP/workspace
 
 # Misc
+oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 vimrc=$HOME/.vimrc
 
 # DW

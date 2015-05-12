@@ -1,0 +1,9 @@
+# NOTE: this file is for shell in vim
+
+# TODO: how to show prompt as in terminal, there are lots messup
+#export PS1="[33[01;33m]vim[33[01;34m] w $[33[00m] "
+#export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
+#export PS1="\[\e[31m\]\u@$(hostname -I | sed "s/ .*//"):\w\n\$\[\e[0m\]"	# Red line with $ in next line, prompt as scp address
+#export PS1="\[\e[34m\]\u@$(hostname -I | sed "s/ .*//"):\w\$\[\e[0m\]"		# Blue line with $ in same line, prompt as scp address
+#export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"
+export PS1="vim$"
