@@ -224,6 +224,7 @@ set shell=bash\ --rcfile\ ~/.bashvimrc			" so could use diff config for bash in 
 set relativenumber					" show number of lines related to current line
 
 "MNT: buildin grep is using quickfix@vim. 
+"MNT: set grepformat to customize the grep output
 set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target\ --exclude=.vimtags
 "MNT: NOT need to change current dir in OuCodeReading mode, since it already changes. Why want to do this at the first place?!!!
 "set grepprg=\\cd\ $PWD;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
@@ -275,6 +276,17 @@ nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
 """""""""""""""""""""""""""""" H1 - Mapping - move in insert mode
+" like in command line (@emacs)
+inoremap <C-K> <Right><ESC>C
+inoremap <C-U> <Right><ESC>c^
+inoremap <C-F> <Right>
+inoremap <C-B> <Left>
+inoremap <C-D> <Del>
+inoremap <C-A> <ESC>I
+inoremap <C-E> <ESC>A
+" since C-E is useful, we remap it to C-U
+inoremap <C-U> <C-E>
+" like in normal mode but with Ctrl key
 inoremap <C-H> <Left>
 inoremap <C-J> <Down>
 inoremap <C-K> <Up>

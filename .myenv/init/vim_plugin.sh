@@ -9,6 +9,7 @@ plugin_addr["vim-colors-solarized"]="git://github.com/altercation/vim-colors-sol
 #plugin_addr["YouCompleteMe"]="https://github.com/Valloric/YouCompleteMe.git"			# might need re-compile for big updates, see ~YouCompleteMe@vim
 plugin_addr["nerdcommenter"]="https://github.com/scrooloose/nerdcommenter.git"
 plugin_addr["vim-autoformat"]="https://github.com/Chiel92/vim-autoformat.git" 
+plugin_addr["vim-characterize"]="https://github.com/tpope/vim-characterize"
 plugin_addr["delimitMate"]="https://github.com/Raimondi/delimitMate.git"
 plugin_addr["syntastic"]="https://github.com/scrooloose/syntastic.git"
 plugin_addr["vim-surround"]="git://github.com/tpope/vim-surround.git"
@@ -18,6 +19,7 @@ plugin_addr["vim-easytags"]="https://github.com/xolox/vim-easytags"
 plugin_addr["vim-repeat"]="git://github.com/tpope/vim-repeat.git"
 plugin_addr["vim-oumg"]="https://github.com/stico/vim-oumg.git"
 plugin_addr["tabular"]="git://github.com/godlygeek/tabular.git"
+plugin_addr["vim-sleuth"]="https://github.com/tpope/vim-sleuth"
 plugin_addr["ctrlp.vim"]="git://github.com/kien/ctrlp.vim.git"
 plugin_addr["vim-misc"]="https://github.com/xolox/vim-misc"					# vim-easytags need this
 
