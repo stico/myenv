@@ -277,15 +277,15 @@ vnoremap <F1> <ESC>
 
 """""""""""""""""""""""""""""" H1 - Mapping - move in insert mode
 " like in command line (@emacs)
-inoremap <C-K> <Right><ESC>C
-inoremap <C-U> <Right><ESC>c^
+"inoremap <C-K> <Right><ESC>C	" conflict with <C-K> to go line below
+"inoremap <C-U> <Right><ESC>c^
 inoremap <C-F> <Right>
 inoremap <C-B> <Left>
 inoremap <C-D> <Del>
-inoremap <C-A> <ESC>I
-inoremap <C-E> <ESC>A
-" since C-E is useful, we remap it to C-U
-inoremap <C-U> <C-E>
+inoremap <C-A> <C-O>I
+inoremap <C-E> <C-O>A
+" since C-E is useful, remap it 
+inoremap <C-I> <C-U>
 " like in normal mode but with Ctrl key
 inoremap <C-H> <Left>
 inoremap <C-J> <Down>
@@ -403,8 +403,11 @@ nnoremap <S-Tab> $F<Tab>i<Tab><Esc>
 " delete by words
 inoremap <C-Del> <Esc>ldwi
 inoremap <C-Backspace> <Esc>ldbi
+" jump by word
 noremap <C-Left> b
-noremap <C-Right> w
+noremap <C-Right> e
+" default C-Right goes to next line when hit line end
+inoremap <C-Right> <Esc>ea
 " visual selection
 nnoremap <S-Right> vl
 "nnoremap <C-S-Right> ve
