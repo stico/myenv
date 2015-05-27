@@ -120,7 +120,7 @@ let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
 let g:ctrlp_custom_ignore = {
-	\ 'dir':  '\v[\/]\.(git|hg|svn|metadata)$|\/target$',
+	\ 'dir':  '\v[\/]\.(git|hg|svn|idea|metadata)$|\/target$',
 	\ 'file': '\v\.(exe|so|dll|class|jar|svn-base)$',
 	\ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
 	\ }
@@ -275,22 +275,28 @@ inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
-"""""""""""""""""""""""""""""" H1 - Mapping - move in insert mode
-" like in command line (@emacs)
-"inoremap <C-K> <Right><ESC>C	" conflict with <C-K> to go line below
-"inoremap <C-U> <Right><ESC>c^
-inoremap <C-F> <Right>
-inoremap <C-B> <Left>
-inoremap <C-D> <Del>
+"""""""""""""""""""""""""""""" H1 - Mapping - Jump
+" <C-I> equals <Tab>, since <Tab> is mapped in normal mode, need another key for function "jump next",  C-N in normal mode is useless, so use it
+nnoremap <C-N> <C-I>
+
+"""""""""""""""""""""""""""""" H1 - Mapping - edit/move in insert mode
+" like in command line (@emacs). 
+" NOTE 1, C-N NOT effects the C-N in completion mode, so no problem :-)
+" NOTE 2, C-W (delete back word) in insert mode already works
+"inoremap <C-K> <Right><ESC>C	" NOT useful as always cause mis-operation, and NOT easy to undo
+"inoremap <C-U> <Right><ESC>c^	" NOT useful as always cause mis-operation, and NOT easy to undo
 inoremap <C-A> <C-O>I
 inoremap <C-E> <C-O>A
+inoremap <C-D> <Del>
+inoremap <C-B> <Left>
+inoremap <C-F> <Right>
 " since C-E is useful, remap it 
-inoremap <C-I> <C-U>
-" like in normal mode but with Ctrl key
-inoremap <C-H> <Left>
-inoremap <C-J> <Down>
+inoremap <C-T> <C-E>
+" utilize h/l for word jumping
 inoremap <C-K> <Up>
-inoremap <C-L> <Right>
+inoremap <C-J> <Down>
+inoremap <C-H> <C-O>b
+inoremap <C-L> <ESC>ea
 
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 " NOTE: iskeyword MUST after the "set nocompatible"
@@ -305,8 +311,13 @@ set completeopt=menuone
 " Enter key will simply select the highlighted menu item, just as <C-Y> does
 "inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<lt>CR>"
-" the IDE way of completion, 2nd line is for terminal mapping
-imap <C-Space> <C-x><C-o>
+
+" IDE way of completion
+" use onmicomplete
+"inoremap <C-Space> <C-x><C-o>	
+" use YouCompleteMe@vim
+inoremap <C-Space> <C-N>
+" for terminal mapping
 imap <C-@> <C-Space>
 
 " keeps a menu item always highlighted. This way you can keep typing characters to narrow the matches, and the nearest match will be selected so that you can hit Enter at any time to insert it.
@@ -325,7 +336,7 @@ let g:rubycomplete_classes_in_global = 1
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 noremap <F11> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
 noremap <F12> :!source $MY_ENV/myenv_func.sh; func_run_file_format_output %:p:gs?\\?/?<Enter>
-noremap <C-T> :tabnew<CR>
+nnoremap <C-T> :tabnew<CR>
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 
 " failed to update to use <C-S-T>, seems will override the <C-T>
@@ -440,11 +451,6 @@ nnoremap <C-S-Left> <C-w><
 nnoremap <C-S-Right> <C-w>>
 nnoremap <C-S-Up> <C-w>-
 nnoremap <C-S-Down> <C-w>+
-
-"""""""""""""""""""""""""""""" H1 - Mapping - Jump
-" <C-I> equals <Tab>, since <Tab> is mapped in normal mode, need another key for function "jump next",  C-N in normal mode is useless, so use it
-nnoremap <C-N> <C-I>
-
 
 """""""""""""""""""""""""""""" H1 - Mapping - Eclipse Simulation
 " use Alt to move a line up/down as in eclipse

@@ -18,6 +18,9 @@ $LOC_CONF_SAMBA
 $MY_ENV/secu
 $MY_ENV/zgen
 
+# notes in git
+$HOME/Documents/FCS/oumisc/oumisc-git/note
+
 # user config
 $HOME/.ssh/
 $HOME/.hgrc
