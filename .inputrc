@@ -1,5 +1,29 @@
-set completion-ignore-case on
+# Config file for readline@tool, which bash based on.
+#
 
+################## Configuration ##################
 set bell-style none			# never ring the bell
 set bell-style visible			# use visual bell, if available
 set show-all-if-ambiguous on		# list all completions instead of ringing the bell
+set completion-ignore-case on
+
+################## Key Mapping ##################
+# NOTE 1: can NOT comment in line
+# NOTE 2: support multiple way to define keys
+# NOTE 3: since Alt/Meta inconvenient on osx, perfer or change to use ctrl
+# NOTE 2: press C-v or C-q, them press any key/combination, will show the escape sequence
+
+# word jump: c-l/h and c-<left>/<right> 
+Control-l: forward-word
+Control-h: backward-word
+"\e[1;5D": backward-word
+"\e[1;5C": forward-word
+
+# search: c-] is search foward, map c-[ as backward search
+Control-[: character-search-backward
+
+# misc
+Control-z: undo
+
+# Candidates
+#TAB: menu-complete			directly loop among completion instead of showing candidates.
