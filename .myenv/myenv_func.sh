@@ -823,7 +823,7 @@ func_git_commit_push() {
 }
 
 func_git_commit_check() { 
-	for base in "$HOME" "$HOME/.zbox" "$HOME/Documents/FCS/oumisc/oumisc-git" ; do 
+	for base in "$HOME" "$HOME/.zbox" "$HOME/Documents/FCS/oumisc/oumisc-git" "$HOME/.vim/bundle/vim-oumg" ; do 
 
 		[ -z "$base" ] && echo 'ERROR: get an empty $base, pls check!' && continue 
 
