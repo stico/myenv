@@ -43,6 +43,7 @@ dev_http_header() {
 
 dev_http_code() {
 	dev_curl "-s -o /dev/null -w %{http_code}" "$@"
+	echo ""	# create a newline
 }
 
 dev_effective_url() {

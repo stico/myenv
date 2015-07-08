@@ -9,6 +9,7 @@
 cdf3			"cd $HOME/Documents/FCZ/code_dw/finance.yyembed.yy.com_branch_for_v3.0"
 
 # Alias - Misc
+c			"cd ; clear"
 terminator		"func_terminator"
 idea			"tmp_cmd=idea      ; command -v idea.sh    &> /dev/null || echo Can NOT find command idea.sh    && idea.sh    &> /dev/null &"
 intellij		"tmp_cmd=intellij  ; command -v intellij   &> /dev/null || echo Can NOT find command intellij   && intellij   &> /dev/null &"

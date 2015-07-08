@@ -1,0 +1,63 @@
+# For rime in osx
+
+patch:
+
+  # 定制每页候选数
+  menu:
+    page_size: 9
+
+  # 打开用户词典和字频调整
+  translator:
+    enable_user_dict: true
+
+    # 載入朙月拼音擴充詞庫，对应文件luna_pinyin.extended.dict.yaml
+    #dictionary: luna_pinyin.extended
+
+  # 中西文切换
+  ascii_composer:
+
+    # Caps_Lock行为设置
+    # 设置为true: Caps Lock 切换到西文模式，默认输出大写字母
+    # 设置为false: Caps Lock 切换到西文模式，默认输出小写字母
+    good_old_caps_lock: true
+
+    # 切换Key的设置，可用键: Caps_Lock, Shift_L, Shift_R, Control_L, control_R
+    switch_key:
+
+      # Caps_Lock行为设置
+      # 设为noop表示只改变字母的大小写而不做中西文切换
+      Caps_Lock: noop
+
+      # Mac的鼠须管不能区分左、右，因此只有对Shift_L, Control_L的设定起作用
+      # inline_ascii 在输入法的临时西文编辑区内输入字母、数字、符号、空格等，回车上屏后自动复位到中文
+      # commit_text 已输入的候选文字上屏并切换至西文输入模式
+      # commit_code 已输入的编码字符上屏并切换至西文输入模式
+      # noop ：屏蔽该切换键。
+      Shift_L: inline_ascii
+      Shift_R: inline_ascii
+      Control_L: noop
+      Control_R: noop
+
+  # 针对应用程序的特殊设定
+  app_options:
+    # to get app bundle id      check Info.plist of the app/soft
+    # "ascii_mode: false"       use CN as defult in macvim
+    # "no_inline: true"         show input char inline (false, default) or in dialog box (true), macvim need this to see the input chars 
+      
+    org.vim.MacVim:
+      ascii_mode: false
+      no_inline: true
+
+    com.google.Chrome:
+      ascii_mode: false
+
+    com.googlecode.iterm2:
+      ascii_mode: false
+
+  # 定义标定的输出
+  #punctuator/full_shape:
+  #  "/": "、"                          # 全角下直接输出"、"
+  #punctuator/half_shape:
+  #  "/": "、"                          # 半角下直接输出"、"
+  #punctuator/half_shape:
+  #  "/": ["、", "/", "／", "÷"]        # 半角下的候选列表

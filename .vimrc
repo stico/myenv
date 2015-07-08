@@ -270,6 +270,9 @@ set whichwrap+=h,l					" make the h/l also
 set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /next line
 
 
+"""""""""""""""""""""""""""""" H1 - Mapping - Misc
+inoremap jj <ESC>
+
 """""""""""""""""""""""""""""" H1 - Mapping - Disable Useless keys
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
@@ -336,7 +339,12 @@ let g:rubycomplete_classes_in_global = 1
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 noremap <F11> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
 noremap <F12> :!source $MY_ENV/myenv_func.sh; func_run_file_format_output %:p:gs?\\?/?<Enter>
-nnoremap <C-T> :tabnew<CR>
+
+" open new tab with random tempfile, to avoid losing anything
+" D is <Command> key on osx, buts seems <D-T> is used by macvim self and not really work
+nnoremap <C-T> :exe ":tabnew " . tempname() . "-tmp"<CR>
+nnoremap <D-T> :exe ":tabnew " . tempname() . "-tmp"<CR>
+
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 
 " failed to update to use <C-S-T>, seems will override the <C-T>
