@@ -136,6 +136,7 @@ let g:easytags_dynamic_files = 2 			" seems tag files are big, separate them by 
 "let g:easytags_autorecurse = 1				" never set this, which cause frozen (e.g. save .vimrc will gen tag for whole $HOME)
 "let g:easytags_events = ['BufWritePost']
 let g:easytags_events = []				" do NOT gen tag, unless I invoke :UpdateTags
+let g:easytags_autorecurse = 1				" make -R as default
 let g:easytags_always_enabled = 0			" do NOT gen tag, unless I invoke :UpdateTags
 let g:easytags_auto_highlight = 0
 let g:easytags_include_members = 1
@@ -551,6 +552,9 @@ function! OucrCheck()
         if(filereadable("pom.xml"))
 		exec "SyntasticToggleMode"	
 	endif
+
+	" invoke again since 't:OucrRoot' might not exist before
+	set guitablabel=%{OuFilenameAsTabLabel()}
 
 	" open NERDTree if not opened
 	for bufnr in tabpagebuflist()

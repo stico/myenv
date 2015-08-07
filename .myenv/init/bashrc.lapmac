@@ -16,7 +16,7 @@ if [ -e "${zbox_func}" ]  ; then
        func_zbox use macvim		git
        func_zbox use maven		3.1.1
        func_zbox use mysql		5.6.23
-       func_zbox use nodejs		0.12.0
+       func_zbox use nodejs		0.12.7
        func_zbox use gradle		2.3
        func_zbox use androidsdk	        24.0.2
        func_zbox use python		2.7.10		# YouCompleteMe@vim need python 2.x

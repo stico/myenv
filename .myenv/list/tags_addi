@@ -29,10 +29,10 @@ oublog=$ZBOX/src/oublog/oublog-git
 outest=$ZBOX/src/outest/outest-local
 
 # MY_DOC
+dcd=$MY_DCD/dcd.txt
 doc=$MY_DOC
 dcb=$MY_DCB
 dcc=$MY_DCC
-dcd=$MY_DCD
 cdh=$MY_DCH
 dcm=$MY_DCM
 dco=$MY_DCO
