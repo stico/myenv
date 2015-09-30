@@ -34,3 +34,9 @@ lession	lession
 	[[["Curriculum","课程","","Kèchéng",0]],[["noun",["course","curriculum","branch of science","discipline","subject"],[["course",["课程","过程","进程","历程","程序","轨"],,0.10376516],["curriculum",["课程","课表"],,0.057304565],["branch of science",["课程"]],["discipline",["纪律","学科","纪","风纪","规律","课程"],[23402]],["subject",["主题","科目","主体","学科","标题","课程"],[23402]]],"课程",1]],"zh-CN",,[["Curriculum",[1],true,false,881,0,1,0]],[["课程",1,[["Curriculum",881,true,false],["Course",118,true,false],["Courses",0,true,false],["Program",0,true,false],["Programs",0,true,false]],[[0,2]],"课程"]],,,[],2]
 教训	Lesson
 	[[["Lesson","教训","","Jiàoxùn",0]],[["noun",["lesson","exhortation"],[["lesson",["课","教训","课时","学级"],,0.10376516],["exhortation",["讲道","劝告","号召","呼声","教训","训话"]]],"教训",1],["verb",["teach a lesson"],[["teach a lesson",["教训"]]],"教训",2]],"zh-CN",,[["Lesson",[1],true,false,1000,0,1,0]],[["教训",1,[["Lesson",1000,true,false],["Lessons",0,true,false],["Learned",0,true,false],["Lessons learned",0,true,false],["Lessons of",0,true,false]],[[0,2]],"教训"]],,,[],2]
+safety	安全
+	[[["安全","safety","Ānquán","",0]],[["noun",["安全","安全性","安危","保险"],[["安全",["security","safety"],,0.67663383],["安全性",["safety","security"]],["安危",["safety"]],["保险",["insurance","assurance","safe","safety"]]],"safety",1]],"en",,[["安全",[1],false,false,891,0,1,0]],[["safety",1,[["安全",891,false,false],["安全性",108,false,false],["的安全",0,false,false],["安全的",0,false,false]],[[0,6]],"safety"]],,,[],3]
+safty	的Safty
+	[[["的Safty","safty","De Safty","",0]],,"en",,[["的Safty",[1],false,false,1000,0,2,0]],[["safty",1,[["的Safty",1000,false,false]],[[0,5]],"safty"]],,["<b><i>safety</i></b>","safety",[1]],[["hmn"]],3]
+radix	基数
+	[[["基数","radix","Jīshù","",0]],,"en",,[["基数",[1],false,false,859,0,1,0]],[["radix",1,[["基数",859,false,false],["基",140,false,false],["基数的",0,false,false],["小数点",0,false,false],["基数中",0,false,false]],[[0,5]],"radix"]],,,[["en"]],2]

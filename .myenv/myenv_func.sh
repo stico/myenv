@@ -510,6 +510,8 @@ func_collect_statistics() {
 func_collect_all() {
 	# Tips: find encoding error files: grep "^@/" code_content.txt | sed -e 's/^@/file -e soft "/;s/$/"/' | bash | tee /tmp/1 | grep -v "\(ASCII text\|UTF-8 Unicode\)"
 
+	# TODO: too much file in FCS, 7w lines in 2015-09
+
 	# vars
 	local f d line
 	local base=$MY_ENV_ZGEN/collection
