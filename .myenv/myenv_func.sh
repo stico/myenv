@@ -271,6 +271,7 @@ func_vi_conditional() {
 		# pre condition: '+clientserver', 
 		# -g mean use GUI version
 		# directly use "vim -g" behaves wired (mess up terminal)
+		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 	else	
 		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
@@ -823,6 +824,7 @@ func_git_commit_push() {
 	git commit -a -m "$comment" 		&&
 	git push origin				&&
 	git status
+	func_git_commit_check | sort
 }
 
 func_git_commit_check() { 
@@ -861,7 +863,9 @@ func_ssh_agent_init() {
 func_ssh_with_jump() {
 	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
 
-	ip_addr=`getent hosts $1 | sed "s/\s\+.*$//"`
+	uname | grep -q Darwin									&& \
+	local ip_addr="$(dscacheutil -q host -a name $1 | sed '/ip_address/!d;s/^[^0-9]*//')"	|| \
+	local ip_addr="$(getent hosts $1 | sed "s/\s\+.*$//")"
 	[[ -z $ip_addr ]] && ip_addr=$1
 
 	port=32200
@@ -1070,13 +1074,20 @@ func_translate() {
 	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
-	func_translate_google "$@" || func_translate_microsoft "$@"
+	func_translate_google "$@" || func_translate_microsoft "$@" || func_translate_youdao "$@"
 }
 
 func_translate_IPA_google() { 
 	echo "WARN: not implemented yet!"
 	# IPA: International Phonetic Alphabet (IPA), tells pronunciation of words
 	# TODO: google api, IPA extraction: http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q=example&sl=en&tl=en
+}
+
+func_translate_youdao() { 
+	echo "WARN: not implemented yet!"
+	# address	http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=
+	# example 1	http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=test
+	# example 2	http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=测试
 }
 
 func_translate_google() { 

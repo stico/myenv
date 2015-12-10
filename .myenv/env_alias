@@ -75,7 +75,7 @@ mvnrun			"func_mvn_run"
 			# Head: g - git
 gitpull			"func_git_pull"
 gitstatus		"func_git_status"
-gitcommitpush		"func_git_commit_push ; func_git_commit_check | sort"
+gitcommitpush		"func_git_commit_push"
 gitcommitcheck		"func_git_commit_check | sort"
 
 			# Head: d - dated

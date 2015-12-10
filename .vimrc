@@ -11,6 +11,8 @@ set nocompatible		" This might reset some settings (e.g. "iskeyword"), so should
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
 	set guifont=XHei\ Mono\ 12
+
+	"TODO: osx has no settings yet
 endif
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
 nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
@@ -141,6 +143,20 @@ let g:easytags_always_enabled = 0			" do NOT gen tag, unless I invoke :UpdateTag
 let g:easytags_auto_highlight = 0
 let g:easytags_include_members = 1
 let g:easytags_cmd = '/opt/local/bin/ctags'
+
+"""""""" Tabular@vim
+" auto alignment when input "|". Copied from tabular doc, but NOT work, why?
+"inoremap <silent> <Bar> <Bar><Esc>:call <SID>align()<CR>a
+"function! s:align()
+"  let p = '^\s*|\s.*\s|\s*$'
+"  if exists(':Tabularize') && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
+"    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
+"    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
+"    Tabularize/|/l1
+"    normal! 0
+"    call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
+"  endif
+"endfunction
 
 """""""" netrw
 " Option 1, disable file creation of .netrwhist
