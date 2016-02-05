@@ -16,7 +16,6 @@ project=$MY_DCD/project
 
 # ZBOX
 zb=$ZBOX
-zbox=$ZBOX
 cnf=$ZBOX/cnf
 ins=$ZBOX/ins
 src=$ZBOX/src
