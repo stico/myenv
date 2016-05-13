@@ -1,18 +1,16 @@
+"""""""""""""""""""""""""""""" H1 - Topic - Basic
 if exists('loaded_settings_of_stico')
     finish
 endif
 let loaded_settings_of_stico = 1
 
-
-"""""""""""""""""""""""""""""" H1 - 
-set nocompatible		" This might reset some settings (e.g. "iskeyword"), so should happen in the beginning. 
+" This might reset some settings (e.g. "iskeyword"), so should happen in the beginning. 
+set nocompatible		
 
 """""""""""""""""""""""""""""" H1 - Topic - Font
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
 	set guifont=XHei\ Mono\ 12
-
-	"TODO: osx has no settings yet
 endif
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
 nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
@@ -20,27 +18,62 @@ nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(s
 
 """""""""""""""""""""""""""""" H1 - Input Method
 
-" osx + ~rime@tool
-if has("unix")
-	let s:uname = system("uname -s")
-	if s:uname == "Darwin"
-		" For macvim to work with input method (otherwise will NOT work properly):
-		" 1) need set "noimdisable"
-		" 2) need set iminsert
-		" 3) need set defaults "defaults write org.vim.MacVim MMUseInlineIm 0" on osx command line
-		" 4) need disable a setting: (in macvim) press M+, > Advanced > (disable) "Draw marked text inline"
-		set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
+" Squirrel_v3 (@rime), improve Squirrel_v2 
+" req: 1) cmd defaults/osascrpit. 2) disable shift for squirrel to switch between en/cn mode. 3) enable accessiblity for osascript (in /System/Library/CoreServices/RemoteManagement/ARDAgent.app)
+if executable('defaults') && executable('osascript') && has('unix')
 
-		" NOT work, will input CN in search mode. seems it changes frequently, so static set will, default value on macvim/vim is 2/0
-		"set iminsert=0		
-		
-		" NOT work, can NOT reserve CN mode when to back to insert mode
-		"autocmd! InsertLeave * set imdisable|set iminsert=0	
-		"autocmd! InsertEnter * set noimdisable|set iminsert=0
-	endif
+  set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
+  set ttimeoutlen=150		" for what? google shows it will speedup some operation
+
+  " 0 for EN, 2 for CN (Squirrel)
+  let g:osx_detect_input_cmd = "defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | awk '/Squirrel/{print 2;exit;};/U\.S\./{print 0;exit;}'"
+  let g:input_toggle = 0
+
+  function! Change2cn()
+     let s:input_status = system(g:osx_detect_input_cmd)
+     if s:input_status != 2 && g:input_toggle == 1
+	let l:a = system("osascript $HOME/.vim/applescript/use_squirrel.applescript")
+	let g:input_toggle = 0
+     endif
+  endfunction
+  autocmd InsertEnter * call Change2cn()
+
+  " seems squirrel will trigger into en mode, so InsertLeave just need to record status
+  function! RecordImStatus()
+     let s:input_status = system(g:osx_detect_input_cmd)
+     if s:input_status == 2
+        let g:input_toggle = 1
+	"let l:a = system("osascript $HOME/.vim/applescript/use_english.applescript")
+     endif
+  endfunction
+  autocmd InsertLeave * call RecordImStatus() 
 endif
 
-" Option 1: FCITX, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
+" Squirrel_v2 (@rime), slow and annoy version. Like FCITX_v1. Detect current input method and change via command. Since the input change need applescript which is heavy, too much InsertEnter/Leave event makes too much "noise"
+" req: 1) cmd defaults/osascrpit. 2) disable shift for squirrel to switch between en/cn mode. 3) enable accessiblity for osascript (in /System/Library/CoreServices/RemoteManagement/ARDAgent.app)
+"if executable('defaults') && executable('osascript') && has('unix')
+"  let g:input_toggle = 0
+"  function! Change2en()
+"     let s:input_status = system("defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | awk '/Squirrel/{print 2;exit;};/U\.S\./{print 0;exit;}'")
+"     if s:input_status == 2
+"	let g:input_toggle = 1
+"	let l:a = system("osascript $HOME/.vim/applescript/use_english.applescript")
+"     endif
+"  endfunction
+"  function! Change2cn()
+"     let s:input_status = system("defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | awk '/Squirrel/{print 2;exit;};/U\.S\./{print 0;exit;}'")
+"     if s:input_status != 2 && g:input_toggle == 1
+"	let l:a = system("osascript $HOME/.vim/applescript/use_squirrel.applescript")
+"	let g:input_toggle = 0
+"     endif
+"  endfunction
+"  set ttimeoutlen=150
+"  call Change2en()
+"  autocmd InsertLeave * call Change2en()
+"  autocmd InsertEnter * call Change2cn()
+"endif
+
+" FCITX_v1, slow version, use fcitx.vim if need faster: http://www.vim.org/scripts/script.php?script_id=3764
 if executable('fcitx-remote') && has('unix')
 	" TODO: search CN and then press "n", will not goto next, how to improve? Seems the WinCmdEnter/Leave works not smoothly
 	let g:input_toggle = 0
@@ -64,7 +97,27 @@ if executable('fcitx-remote') && has('unix')
 	autocmd InsertEnter * call Fcitx2cn()
 endif
 
-" Option 2: ibus, Need vim-ibus interface to use
+" Squirrel_v1 (@rime), NOT good enough: when back in insert mode, input is still english
+"if has("unix")
+"	let s:uname = system("uname -s")
+"	if s:uname == "Darwin"
+"		" For macvim to work with input method (otherwise will NOT work properly):
+"		" 1) need set "noimdisable"
+"		" 2) need set iminsert
+"		" 3) need set defaults "defaults write org.vim.MacVim MMUseInlineIm 0" on osx command line
+"		" 4) need disable a setting: (in macvim) press M+, > Advanced > (disable) "Draw marked text inline"
+"		set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
+"
+"		" NOT work, will input CN in search mode. seems it changes frequently, so static set will, default value on macvim/vim is 2/0
+"		"set iminsert=0
+"		
+"		" NOT work, can NOT reserve CN mode when to back to insert mode
+"		"autocmd! InsertLeave * set imdisable|set iminsert=0	
+"		"autocmd! InsertEnter * set noimdisable|set iminsert=0
+"	endif
+"endif
+
+" ibus_v1, Need vim-ibus interface to use
 " https://github.com/bouzuya/vim-ibus
 " https://github.com/eagle0701/vim-ibus
 " https://github.com/tuvistavie/dot-files/tree/master/.vim/bundle/vim-ibus
@@ -303,20 +356,20 @@ nnoremap <C-N> <C-I>
 " like in command line (@emacs). 
 " NOTE 1, C-N NOT effects the C-N in completion mode, so no problem :-)
 " NOTE 2, C-W (delete back word) in insert mode already works
+" NOTE 3, use insert mode command, to avoid InsertEnter/Leave event
 "inoremap <C-K> <Right><ESC>C	" NOT useful as always cause mis-operation, and NOT easy to undo
 "inoremap <C-U> <Right><ESC>c^	" NOT useful as always cause mis-operation, and NOT easy to undo
-inoremap <C-A> <C-O>I
-inoremap <C-E> <C-O>A
+inoremap <C-K> <Up>
 inoremap <C-D> <Del>
+inoremap <C-E> <End>
+inoremap <C-J> <Down>
+inoremap <C-A> <Home>
 inoremap <C-B> <Left>
 inoremap <C-F> <Right>
-" since C-E is useful, remap it 
+inoremap <C-H> <C-Left>
+inoremap <C-L> <C-Right>
+" since original C-E (repeat char below) is useful, remap it to <C-T>
 inoremap <C-T> <C-E>
-" utilize h/l for word jumping
-inoremap <C-K> <Up>
-inoremap <C-J> <Down>
-inoremap <C-H> <C-O>b
-inoremap <C-L> <ESC>ea
 
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 " NOTE: iskeyword MUST after the "set nocompatible"
@@ -424,7 +477,7 @@ if !has("unix")
   set guioptions-=a
 endif
 
-"""""""""""""""""""""""""""""" H1 - Mapping - Input
+"""""""""""""""""""""""""""""" H1 - Mapping - Input (mswin.vim)
 " mswin.vim mapped this to ^Y as undo cmd in windows, but this shield the useful auto complete cmd in vim (auto input the char above)
 inoremap <C-Y> <C-Y>
 noremap <C-Y> <C-Y>
@@ -439,9 +492,9 @@ nnoremap <S-Tab> $F<Tab>i<Tab><Esc>
 " delete by words
 inoremap <C-Del> <Esc>ldwi
 inoremap <C-Backspace> <Esc>ldbi
-" jump by word
-noremap <C-Left> b
-noremap <C-Right> e
+" jump by word, TODO_test_should_restore
+"noremap <C-Left> b
+"noremap <C-Right> e
 " default C-Right goes to next line when hit line end
 inoremap <C-Right> <Esc>ea
 " visual selection
