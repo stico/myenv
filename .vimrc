@@ -4,8 +4,10 @@ if exists('loaded_settings_of_stico')
 endif
 let loaded_settings_of_stico = 1
 
-" This might reset some settings (e.g. "iskeyword"), so should happen in the beginning. 
-set nocompatible		
+set nocompatible	" resets some settings (e.g. "iskeyword"), so should happen in the beginning. 
+set noerrorbells	" no bell when there is error msg, note: those bell without error msg (e.g. press twice ESC) is not controlled here
+set visualbell		" enable this togehter with set t_vb to empty, press twice ESC will no bell
+set t_vb=		" see 'set visualbell'
 
 """""""""""""""""""""""""""""" H1 - Topic - Font
 if has('gui_running') && has('unix')
@@ -218,11 +220,14 @@ let g:netrw_dirhistmax=0
 " au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
 
 """""""" syntastic@vim
-"let g:syntastic_aggregate_errors = 1				" display together the errors found by all checkers
-"let g:syntastic_always_populate_loc_list = 1			" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
-""let g:syntastic_quiet_messages = { "type": "style" }		" filter out some messages types
-"let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']	" checker chain, run one by one (only run laters if current success)
-let g:syntastic_auto_jump = 2					" jump to 1st error (NOT warning)
+"let g:syntastic_aggregate_errors = 1					" display together the errors found by all checkers
+"let g:syntastic_always_populate_loc_list = 1				" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
+""let g:syntastic_quiet_messages = { "type": "style" }			" filter out some messages types
+"let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']		" checker chain, run one by one (only run laters if current success)
+let g:syntastic_auto_jump = 2						" jump to 1st error (NOT warning)
+let g:syntastic_python_checkers=['pyflakes']				" from others: 使用pyflakes,速度比pylint快
+let g:syntastic_html_checkers=['tidy', 'jshint']
+let g:syntastic_javascript_checkers = ['jshint', 'jslint', 'eslint']	" syntastic@vim, sub section "javascript"
 
 """""""" auto-format@vim, @astyle
 let g:formatprg_c = "astyle"
@@ -293,6 +298,8 @@ set gdefault						" make substitute g flag default on
 set shell=bash\ --rcfile\ ~/.bashvimrc			" so could use diff config for bash in vim
 set relativenumber					" show number of lines related to current line
 
+"set macmeta						" option key as meta key on mac/macvim
+"
 "MNT: buildin grep is using quickfix@vim. 
 "MNT: set grepformat to customize the grep output
 set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target\ --exclude=.vimtags

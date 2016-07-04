@@ -1,1 +1,0 @@
-subprocess.Popen(['/usr/bin/gvim'])

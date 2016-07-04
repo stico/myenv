@@ -1,1 +1,0 @@
-system.exec_command('wmctrl -k on')

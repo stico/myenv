@@ -341,24 +341,25 @@ func_locate() {
 func_locate_via_find() {
 	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
 
-	# get and check parameters
-	local type="${1}"
+	# NEED maxdepth which dramatically improved response time
+	local maxdepth=$#			# collect here, so effectively = param_count + 2
+	local find_type_raw="${1}"
 	local base="$(readlink -f "${2}")"	# important: use the formal path
 	func_validate_path_exist "${base}"	# the base should be exist. NOTE, tag should be translated before use this funciton
 	shift; shift;
 
 	# parepare parameters for "find"
 	local find_type
-	case "${type}" in
+	case "${find_type_raw}" in
 		FILE)	find_type=f ;;
 		DIR)	find_type=d ;;
 		*)	echo "ERROR: func_locate_via_find need a TYPE parameter (either FILE or DIR)! 1>&2"
 	esac
 	local search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
 
-	targets=`find -P "$base" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d"`			# 1st, try not follow links
-	[ -z "$targets" ] && targets=`find -L "$base" -iregex "$search" -type ${find_type} | sed -e "/^$/d"`	# 2nd, try follow links 
-	[ -z "$targets" ] && return 1										# 3rd, just return error
+	targets=`find -P "$base" -maxdepth ${maxdepth} -iregex "$search" -xtype ${find_type} | sed -e "/^$/d"`				# 1st, try not follow links
+	[ -z "$targets" ] && targets=`find -L "$base" -maxdepth ${maxdepth} -iregex "$search" -type ${find_type} | sed -e "/^$/d"`	# 2nd, try follow links 
+	[ -z "$targets" ] && return 1													# 3rd, just return error
 
 	# use the shortest result
 	echo "$targets" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1
@@ -450,7 +451,7 @@ func_cd_smart() {
 	\ls -hF --color=auto
 
 	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
-	# the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
+	# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
 	#if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
 		[ -e ".hg" ] && (command -v hg &> /dev/null) && hg status
 		[ -e ".svn" ] && (command -v svn &> /dev/null) && svn status
