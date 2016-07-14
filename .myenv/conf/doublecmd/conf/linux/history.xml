@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doublecmd>
+  <History>
+    <CommandLine>
+      <Item>cd ..</Item>
+      <Item>ls</Item>
+    </CommandLine>
+    <FileMask/>
+    <SearchText/>
+    <ReplaceText/>
+    <SearchExcludeFiles/>
+    <SearchExcludeDirectories/>
+  </History>
+</doublecmd>

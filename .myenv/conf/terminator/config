@@ -1,0 +1,150 @@
+[global_config]
+  title_transmit_bg_color = "#91aff5"
+  dbus = True
+  inactive_color_offset = 0.66
+[keybindings]
+  cycle_prev = <Ctrl><Shift>p
+  close_window = ""
+  group_tab = ""
+  resize_left = <Ctrl><Shift>Left
+  reset_clear = ""
+  go_right = <Ctrl><Shift>l
+  new_tab = <Ctrl>T
+  resize_right = <Ctrl><Shift>Right
+  resize_down = <Ctrl><Shift>Down
+  toggle_zoom = <Ctrl>m
+  scaled_zoom = <Ctrl><Shift>m
+  zoom_in = <Ctrl>plus
+  group_all = ""
+  move_tab_right = ""
+  prev_tab = <Ctrl>Page_Up
+  split_vert = <Ctrl>bar
+  ungroup_all = ""
+  ungroup_tab = ""
+  paste = <Shift>Insert
+  cycle_next = <Ctrl><Shift>n
+  zoom_out = <Ctrl>minus
+  close_term = ""
+  new_terminator = ""
+  go_left = <Ctrl><Shift>h
+  copy = ""
+  hide_window = ""
+  reset = ""
+  go_up = <Ctrl><Shift>k
+  resize_up = <Ctrl><Shift>Up
+  next_tab = <Ctrl>Page_Down
+  split_horiz = <Ctrl>underscore
+  zoom_normal = <Ctrl>0
+  go_down = <Ctrl><Shift>j
+  new_window = ""
+  move_tab_left = ""
+  toggle_scrollbar = ""
+[profiles]
+  [[default]]
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    font = Consolas 12
+    background_image = None
+    background_darkness = 0.53
+    scrollback_lines = 5000
+    use_system_font = False
+    foreground_color = "#839496"
+    copy_on_selection = True
+    background_color = "#073642"
+  [[solarized-dark]]
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    background_color = "#002b36"
+    background_image = None
+    cursor_color = "#eee8d5"
+    foreground_color = "#eee8d5"
+  [[solarized-light]]
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    background_color = "#eee8d5"
+    background_image = None
+    cursor_color = "#002b36"
+    foreground_color = "#002b36"
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    #profile = solarized-dark
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = default
+  [[t2h]]
+    [[[child0]]]
+      type = Window
+      order = 0
+      parent = ""
+    [[[child1]]]
+      type = VPaned
+      order = 0
+      parent = child0
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child1
+      command = ping 8.8.8.8
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child1
+      command = ping 4.2.2.1
+  [[t4]]
+    [[[child0]]]
+      type = Window
+      order = 0
+      parent = ""
+    [[[child1]]]
+      type = VPaned
+      order = 0
+      parent = child0
+    [[[child2]]]
+      type = HPaned
+      order = 0
+      parent = child1
+    [[[child3]]]
+      type = HPaned
+      order = 1
+      parent = child1
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child2
+      command = ping 8.8.8.8
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child2
+      command = ping 4.2.2.1
+    [[[terminal3]]]
+      type = Terminal
+      order = 0
+      parent = child3
+      command = top
+    [[[terminal4]]]
+      type = Terminal
+      order = 1
+      parent = child3
+      command = ping localhost
+  [[t2v]]
+    [[[child0]]]
+      type = Window
+      order = 0
+      parent = ""
+    [[[child1]]]
+      type = HPaned
+      order = 0
+      parent = child0
+    [[[terminal1]]]
+      type = Terminal
+      order = 0
+      parent = child1
+      command = ping 8.8.8.8
+    [[[terminal2]]]
+      type = Terminal
+      order = 1
+      parent = child1
+      command = ping 4.2.2.1
+[plugins]
