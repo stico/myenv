@@ -549,6 +549,7 @@ func_collect_all() {
 			grep "^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$" "${fullpath}" >> "${stdnote_outline}"
 		done
 	done
+	echo "INFO: >> $(wc -l ${stdnote_outline}) lines"
 
 	echo "INFO: collecting miscnote"
 	local miscnote_content=${base}/miscnote_content.txt
@@ -560,6 +561,7 @@ func_collect_all() {
 		echo -e "\n\n@${line}\n"  >> "${miscnote_content}"
 		sed -e "s///" "${line}" >> "${miscnote_content}"
 	done
+	echo "INFO: >> $(wc -l ${miscnote_content}) lines"
 
 	echo "INFO: collecting myenv"
 	local myenv_content=${base}/myenv_content.txt
@@ -568,7 +570,8 @@ func_collect_all() {
 	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+" | sed -e '/list\/words_us/d')"
 	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_LIST/myenv_addi | xargs -I{}  echo echo {} )")"
 	for f in $myenv_git $myenv_addi ; do
-		[ ! -e "$f" ] && echo "WARN: ${f} not exist" && continue
+		[ ! -e "$f" ] && continue
+		#[ ! -e "$f" ] && echo "WARN: file inexist: ${f}" && continue
 
 		echo "${f}" >> "${myenv_filelist}"
 
@@ -577,6 +580,7 @@ func_collect_all() {
 		echo -e "\n\n@${f}\n"  >> "${myenv_content}"
 		sed -e "s///" "${f}" >> "${myenv_content}"
 	done
+	echo "INFO: >> $(wc -l ${myenv_content}) lines"
 
 	echo "INFO: collecting code"
 	local code_content=${base}/code_content.txt
@@ -586,35 +590,81 @@ func_collect_all() {
 		git ls-files | sed -e "s+^+${d}/+" >> "${code_filelist}"
 		\cd - &> /dev/null
 	done
-	sed -e "/Test_Record.txt/d;/SIG_Messaging.xml/d"	\
-	-e "/dump1.out/d;/sockjs.js/d;/struts-tags.tld/d"	\
-	-e "/\/note\/dc[cdo]/d" `# already in stdnote`		\
-	-e "/\/zbase\/sql\//d"					\
-	-e "/\/thrift\/gen\//d"					\
-	-e "/\/sysop_fed_lib\//d"				\
-	-e "/\/html\/ref_html.*.htm/d"				\
-	-e "/\/cs-base\/.*.\(html\|css\|js\)/d"			\
-	-e "/\/service-center\/.*.\(html\|css\|js\)/d"		\
-	-e "/\/css\/\(style\|bootstrap\|reveal\).*.css/d"	\
-	-e "/\/js\/\(Markdown\|reveal\|bootstrap\).*.js/d"	\
-	-e "/\/yyembed-server-data\/pindaoblacklist.thrift/d"	\
+	echo "INFO: >> $(wc -l ${code_filelist}) files"
+
+	# NOTE: no blank line allowed (sed will complain)
+	sed								\
+	`# file types`							\
+	-e "/\.jmx$/d"				`# jmeter file`		\
+	-e "/\.xsd$/d"							\
+	-e "/\.wsdl$/d"							\
+	`# filename with version info`					\
+	-e "/\(bootstrap\|echars\)[-_\\.[:alnum:]]*\.\(css\|js\)/d"	\
+	-e "/\(highcharts\|jquery\)[-_\\.[:alnum:]]*\.\(css\|js\)/d"	\
+	-e "/\(leap\|[Mm]arkdown\)[-_\\.[:alnum:]]*\.\(css\|js\)/d"	\
+	-e "/\(reveal\|style\)[-_\\.[:alnum:]]*\.\(css\|js\)/d"		\
+	-e "/\(stomp\|sockjs\)[-_\\.[:alnum:]]*\.\(css\|js\)/d"		\
+	-e "/\(zoom\)[-_\\.[:alnum:]]*\.\(css\|js\)/d"			\
+	`# project resource files`					\
+	-e "/\/cs-base\/.*.\(html\|css\|js\)/d"				\
+	-e "/\/service-center\/.*.\(html\|css\|js\)/d"			\
+	`# speicific paths`						\
+	-e "/\/zbase\/sql\//d"						\
+	-e "/\/thrift\/gen\//d"						\
+	-e "/\/note\/dc[cdo]/d"			`# already in stdnote`	\
+	-e "/\/sysop_fed_lib\//d"		`# libs, useless`	\
+	-e "/\/css\/\(print\|theme\)\//d"				\
+	-e "/\/js\/prettify\//d"					\
+	-e "/\/main\/js\/node_modules\//d"				\
+	-e "/\/main\/resources\/static\//d"				\
+	-e "/\/main\/webapp\/plugins\//d"				\
+	-e "/\/main\/webapp\/css\/skins\//d"				\
+	-e "/\/src\/org\/csapi\/www\/\(wsdl\|schema\)\//d"		\
+	`# speicific files`						\
+	-e "/\/yyembed-server-data\/pindaoblacklist.thrift/d"		\
+	-e "/Test_Record.txt/d;/SIG_Messaging.xml/d"			\
+	-e "/sinfo\/src\/main\/webapp\/js\/app.js/d"			\
+	-e "/jserverlib\/tmp_jdd\/converter.jade/d"			\
+	-e "/java_std_ppt\/java_std_ppt.html/d"				\
+	-e "/note\/zmp\/schedule_history.txt/d"				\
+	-e "/resources\/sql\/test-data.sql/d"				\
+	-e "/dump1.out/d;/struts-tags.tld/d"				\
+	-e "/webapp\/css\/AdminLTE.css/d"				\
+	`# misc`							\
+	-e "/Stub.java/d"						\
+	-e "/\/ant\/.*\/reports\//d"					\
+	-e "/\/html\/ref_html.*.htm/d"					\
+	-e "/\/template_war_spring\/.*\/blueprint\//d"			\
 	"${code_filelist}" | while read line ; do
 		func_validate_file_type_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
 		sed -e "s///" "${line}" >> "${code_content}"
 	done
+	echo "INFO: >> $(wc -l ${code_content}) lines"
 
 	echo "INFO: collecting mydoc filelist"
 	local mydoc_filelist=${base}/mydoc_filelist.txt
-	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCB  FCS  FCZ ; do	# v1, deprecated
-	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  FCB  ECS ; do		# v2, deprecated, put ECS in the end
-	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCB FCS ; do				# v3, compacted docs
+	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCS  FCZ ; do	# v1, deprecated
+	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  ECS ; do		# v2, deprecated, put ECS in the end
+	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCS ; do				# v3, compacted docs
 		(uname | grep -q Darwin					\
 			&& find "${MY_DOC}/${d}" -type f		\
 			|| locate $(readlink -f "${MY_DOC}/${d}")	)|\
-		sed -e "/\/\.\(git\|svn\|hg\)\//d"		\
-		-e "/\/target\//d" `# for maven project`	\
-		-e "/open.yy.com_trunk\//d" `# match prefix`	\
+		sed							\
+		-e "/\/DCD\/mail\//d"					\
+		-e "/\/sysop_fed_lib\//d"				\
+		-e "/\/js\/prettify\//d"				\
+		-e "/\/Contact\/osx_contacts\//d"			\
+		-e "/\/css\/\(print\|theme\)\//d"			\
+		-e "/\/main\/js\/node_modules\//d"			\
+		-e "/\/main\/resources\/static\//d"			\
+		-e "/\/main\/webapp\/plugins\//d"			\
+		-e "/\/main\/webapp\/css\/skins\//d"			\
+		-e "/\/\.\(git\|svn\|hg\|idea\)\//d"			\
+		-e "/\/DCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
+		-e "/\/FCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
+		-e "/\/target\//d" `# maven project target`		\
+		-e "/open.yy.com_trunk\//d" `# match prefix`		\
 		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`	>> ${mydoc_filelist}
 
 		#-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
@@ -634,6 +684,7 @@ func_collect_all() {
 		#-e "/\/appstore.yy.com_trunk\/framework\//d"		\
 		#| sed -e "/\/\(\.git\|\.svn\|\.hg\|target\)\//d;" | wc -l
 	done
+	echo "INFO: >> $(wc -l ${mydoc_filelist}) lines"
 
 	echo "INFO: collecting all"
 	local all_content=${base}/all_content.txt
@@ -1152,7 +1203,7 @@ func_translate_microsoft() {
 func_delete_dated() { 
 	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
 
-	local targetDir=$MY_TMP/$(func_date)
+	local targetDir=$MY_TMP/delete/$(func_date)
 	[[ ! -e $targetDir ]] && mkdir ${targetDir}
 
 	for t in "$@" ; do

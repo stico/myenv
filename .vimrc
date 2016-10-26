@@ -225,9 +225,9 @@ let g:netrw_dirhistmax=0
 ""let g:syntastic_quiet_messages = { "type": "style" }			" filter out some messages types
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']		" checker chain, run one by one (only run laters if current success)
 let g:syntastic_auto_jump = 2						" jump to 1st error (NOT warning)
-let g:syntastic_python_checkers=['pyflakes']				" from others: 使用pyflakes,速度比pylint快
+let g:syntastic_python_checkers=['pyflakes']				" syntastic@vim, sub section 'python'
 let g:syntastic_html_checkers=['tidy', 'jshint']
-let g:syntastic_javascript_checkers = ['jshint', 'jslint', 'eslint']	" syntastic@vim, sub section "javascript"
+let g:syntastic_javascript_checkers = ['jshint']			" syntastic@vim, sub section 'javascript'
 
 """""""" auto-format@vim, @astyle
 let g:formatprg_c = "astyle"
@@ -442,35 +442,28 @@ nnoremap g# #
 " quick way for no highlight, originally want to set noh after substitution, but seems no better way
 " nnoremap <Esc> :silent noh<Bar>echo<CR>
 
-"""""""""""""""""""""""""""""" H1 - Mapping - Win Behave (mostly copied from mswin.vim)
-behave mswin
-" CTRL-X and SHIFT-Del are Cut
-vnoremap <C-X> "+x
-" CTRL-C and CTRL-Insert are Copy
-vnoremap <C-C> "+y
-vnoremap <C-Insert> "+y
 " CTRL-V (insert mode) and SHIFT-Insert (all mode) are Paste
+" NOTE: <D-V> NOT work, need <D-v> (lowercase)
 map <C-V>		"+gP
+map <D-v>		"+gP
 map <S-Insert>		"+gP
 cmap <C-V>		<C-R>+
+cmap <D-v>		<C-R>+
 cmap <S-Insert>		<C-R>+
-" Pasting blockwise/linewise selections is not possible in Insert/Visual mode without +virtualedit feature. They are pasted as if they were characterwise instead. Uses the paste.vim autoload script.
-exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
-exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
-imap <S-Insert>		<C-V>
-vmap <S-Insert>		<C-V>
-exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
-exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
-imap <S-Insert>		<C-V>
-vmap <S-Insert>		<C-V>
-exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
-exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
-imap <S-Insert>		<C-V>
-vmap <S-Insert>		<C-V>
-exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
-exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
-imap <S-Insert>		<C-V>
-vmap <S-Insert>		<C-V>>
+imap <C-V>		<C-R>+
+imap <D-v>		<C-R>+
+imap <S-Insert>		<C-R>+
+
+"""""""""""""""""""""""""""""" H1 - Mapping - Win Behave (mostly copied from mswin.vim)
+behave mswin
+vnoremap <C-X> "+x
+vnoremap <C-C> "+y
+vnoremap <C-Insert> "+y
+
+" For CTRL-V to work autoselect must be off. On Unix we have two selections, autoselect can be used.
+if !has("unix")
+  set guioptions-=a
+endif
 
 " Use CTRL-Q to do what CTRL-V used to do, since CTRL-V has been used or paste
 " Use CTRL-S for saving, also in Insert mode
@@ -479,10 +472,26 @@ noremap <C-Q>		<C-V>
 noremap <C-S>		:update<CR>
 vnoremap <C-S>		<C-C>:update<CR>
 inoremap <C-S>		<C-O>:update<CR>
-" For CTRL-V to work autoselect must be off. On Unix we have two selections, autoselect can be used.
-if !has("unix")
-  set guioptions-=a
-endif
+
+" NOT REALLY UNDERSTAND 
+" Pasting blockwise/linewise selections is not possible in Insert/Visual mode without +virtualedit feature. 
+" They are pasted as if they were characterwise instead. Uses the paste.vim autoload script.
+"exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
+"exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
+"imap <S-Insert>		<C-V>
+"vmap <S-Insert>		<C-V>
+"exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
+"exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
+"imap <S-Insert>		<C-V>
+"vmap <S-Insert>		<C-V>
+"exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
+"exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
+"imap <S-Insert>		<C-V>
+"vmap <S-Insert>		<C-V>
+"exe 'inoremap <script> <C-V>' paste#paste_cmd['i']
+"exe 'vnoremap <script> <C-V>' paste#paste_cmd['v']
+"imap <S-Insert>		<C-V>
+"vmap <S-Insert>		<C-V>>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Input (mswin.vim)
 " mswin.vim mapped this to ^Y as undo cmd in windows, but this shield the useful auto complete cmd in vim (auto input the char above)
