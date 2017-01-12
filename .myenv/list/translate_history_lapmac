@@ -56,3 +56,10 @@ Bolt cutters	initial-scale=1
   <a href=//www.google.com/><span id=logo aria-label=Google></span></a>
   <p><b>403.</b> <ins>That’s an error.</ins>
   <p>Your client does not have permission to get URL <code>/translate_a/t</code> from this server.  <ins>That’s all we know.</ins>
+kpi	content-type
+	<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
+<TITLE>302 Moved</TITLE></HEAD><BODY>
+<H1>302 Moved</H1>
+The document has moved
+<A HREF="http://ipv4.google.com/sorry/index?continue=http://translate.google.cn/translate_a/t&amp;q=CGMSBDr44CYYwdPbwAUiGQDxp4NLzxek3n3f1anfnt_X4NYSZ5KGelg">here</A>.
+</BODY></HTML>

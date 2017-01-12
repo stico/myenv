@@ -892,6 +892,19 @@ func_git_commit_check() {
 	done
 }
 
+func_unison_fs_lapmac_all() {
+	local disk_path="/dev/disk3s1"
+	local mount_path="/Volumes/Untitled"
+
+	(command -v unison &> /dev/null) || func_cry "ERROR: unison NOT in path, pls check"
+	(command -v ntfs-3g &> /dev/null) || func_cry "ERROR: ntfs-3g NOT in path, pls check"
+	[ -e "${disk_path}" ] || func_cry "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
+	[ -e "${mount_path}" ] || mkdir "${mount_path}"
+
+	sudo ntfs-3g "${disk_path}" "${mount_path}"
+	unison fs_lapmac_all
+}
+
 func_ssh_agent_init() {
 	# do nothing if already set
 	# The unison remote style can not accept .bashrc have output

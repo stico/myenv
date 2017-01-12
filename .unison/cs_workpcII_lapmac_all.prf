@@ -10,8 +10,10 @@ root=/Users/ouyangzhu/Documents
 rootalias = //lapmac//Users/ouyangzhu/Documents -> //PRIMARY_I//Documents
 
 # External
-root=ssh://172.19.108.137/Documents
-rootalias = //workpcII//ssh://172.19.108.137/Documents -> //SECOND_I//Documents
+#root=ssh://172.19.108.137/Documents
+#rootalias = //workpcII//ssh://172.19.108.137/Documents -> //SECOND_I//Documents
+root=ssh://172.27.209.16/Documents
+rootalias = //workpcII//ssh://172.27.209.16/Documents -> //SECOND_I//Documents
 
 ################################################################################
 # PATH: the -path cmd option not support glob
@@ -55,6 +57,7 @@ ignore = Regex FCS/[^/]*/[^/]*-svn
 ignore = Regex FCS/[^/]*/[^/]*-local
 ignore = Regex DCB/Record/Note/A_NOTE_Copy.txt
 ignore = Regex DCD/mail/mail_archive/ouyangzhu@yy.com.sbd/Archive_Auto.*
+ignore = Regex DCD/mail/mail_archive/ouyangzhu@yy.com.sbd/Archive_Auto_Sentry.*
 ignore = Regex os_spec_.*/m2_repo/repository/.cache
 ignore = Regex os_spec_lu/program/vim
 ignore = Regex os_spec_win/program/A_System_Cygwin_1.7.17/tmp
