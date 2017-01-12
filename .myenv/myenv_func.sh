@@ -893,16 +893,48 @@ func_git_commit_check() {
 }
 
 func_unison_fs_lapmac_all() {
-	local disk_path="/dev/disk3s1"
 	local mount_path="/Volumes/Untitled"
 
-	(command -v unison &> /dev/null) || func_cry "ERROR: unison NOT in path, pls check"
-	(command -v ntfs-3g &> /dev/null) || func_cry "ERROR: ntfs-3g NOT in path, pls check"
-	[ -e "${disk_path}" ] || func_cry "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
-	[ -e "${mount_path}" ] || mkdir "${mount_path}"
+	# only works: 1) on osx, 2) in interactive mode
+	uname | grep -q Darwin || func_cry "ERROR: this function only works on OSX"
+	echo $- | grep -q "i" || func_cry "ERROR: this function only works in interactive mode"
 
-	sudo ntfs-3g "${disk_path}" "${mount_path}"
+	# TODO: use 'diskutil list' to correctly find disk
+	# try to find disk automatically (use the 1st unmounted diskXs1, X > 0)
+	local disk_path
+	local disk_status="$(\df -h)"
+	local disk_candidates="$(\ls /dev/disk*s1 | sed -e "/disk0s1/d")"
+	for disk_path in ${disk_candidates} ; do
+		if echo "${disk_status}" | grep -q "${disk_path}" ; then
+			echo "INFO: ${disk_path} alread mounted, try next"
+			disk_path=""
+		else
+			echo "INFO: found! ${disk_path} is available"
+			break
+		fi
+	done
+	[ -z "${disk_path}" ] && func_cry "ERROR: can NOT find diskXs1 for mounting"
+
+	# if path exist AND not writable, need eject first (TODO: make the eject automatically?)
+	[ -e "${mount_path}" -a ! -w "${mount_path}" ] && func_cry "ERROR: disk already mount in RO mode, pls eject first!"
+
+	# if target inexist, try to mount the disk
+	if [ ! -e "${mount_path}/backup/DCB" ] ; then
+		(command -v unison &> /dev/null) || func_cry "ERROR: unison NOT in path, pls check"
+		(command -v ntfs-3g &> /dev/null) || func_cry "ERROR: ntfs-3g NOT in path, pls check"
+		[ -e "${disk_path}" ] || func_cry "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
+		[ -e "${mount_path}" ] || mkdir "${mount_path}"
+
+		echo "INFO: try to mount ${disk_path} to ${mount_path}"
+		sudo ntfs-3g "${disk_path}" "${mount_path}"
+	fi
+
 	unison fs_lapmac_all
+
+	local answer
+	echo "Do you want to umount disk? [Y/n]"
+	read -e answer
+	echo "${answer}" | grep -q "[nN]" || sudo umount "${mount_path}"
 }
 
 func_ssh_agent_init() {
