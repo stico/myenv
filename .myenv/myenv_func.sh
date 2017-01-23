@@ -1258,8 +1258,28 @@ func_delete_dated() {
 	#mv "$@" ${targetDir} &> /dev/null
 }
 
+func_backup_myenv() { 
+	local tmpDir="$(mktemp -d)"
+	local packFile="${tmpDir}/myenv_backup.zip"
+	local fileList=~/.myenv/zgen/collection/myenv_filelist.txt
+
+	echo "INFO: create zip file based on filelist: ${fileList}"
+	cat "${fileList}" | zip -rq "${packFile}" -@ || func_die "ERROR: failed to zip files into ${packFile}"
+
+	echo "INFO: bakcup command output too"
+	mkdir -p "${tmpDir}"
+	df -h				> "${tmpDir}/cmd_output_df_h.txt"
+	\ls -la ~ | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_home.txt"
+	\ls -la / | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_root.txt"
+	\ls -la ~/.zbox/ | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_zbox.txt" 
+	zip -rjq "${packFile}" "${tmpDir}"/*.txt
+
+	func_backup_dated "${packFile}"
+}
+
 func_backup_dated() { 
-	func_param_check 1 "Usage: $FUNCNAME <path>\n\tLast argument 'FL' will treat as FileList." "$@" 
+	func_param_check 1 "Usage: $FUNCNAME <path>\n\tCurrently only support backup up single target (file/dir)." "$@" 
+	# TODO: backup list of file & dir
 
 	local srcPath="$(readlink -f "$1")"
 	local fileName="$(basename "$srcPath")"
@@ -1267,17 +1287,13 @@ func_backup_dated() {
 	local packFile="$(mktemp -d)/${targetFile}.zip"
 	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
 
-	echo "INFO: check if source exist, srcPath: ${srcPath}"
+	#echo "INFO: check if source exist, srcPath: ${srcPath}"
 	func_validate_path_exist "${srcPath}" 
 
-	# For filelist, use as file list. Magic here: use as filelist if last argument is 'FL'
-	if [[ "${@: -1}" == "FL" && -f "${srcPath}" ]] ; then
-		echo -e "INFO: Creating zip file from filelist, target: $packFile"
-		cat "${srcPath}" | zip -rq "${packFile}" -@ || func_die "ERROR: failed to zip file: $srcPath"
 	# For dir, zip it before backup
-	elif [ -d "$srcPath" ]; then		
-		echo -e "INFO: Creating zip file for backup, target: $packFile"
-		zip -rq "$packFile" "$srcPath" || func_die "ERROR: failed to zip file: $srcPath"
+	if [ -d "${srcPath}" ]; then		
+		echo -e "INFO: Creating zip file for backup, target: ${packFile}"
+		zip -rq "${packFile}" "${srcPath}" || func_die "ERROR: failed to zip file: ${srcPath}"
 	fi
 
 	# Backup to target places
