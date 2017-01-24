@@ -118,7 +118,7 @@ function func_init_apt_distupgrade() {
 
 	local last_stamp=$(( `date +%s` - `stat -c %Y ${apt_upgrade_stamp}` ))
 	if [ -e $apt_upgrade_stamp ] && (( $last_stamp > 86400 )) ; then
-		echo "INFO: execute 'supdo apt-get -y dist-upgrade'"
+		echo "INFO: execute 'sudo apt-get -y dist-upgrade', log goes to: $tmp_init_log"
 		sudo apt-get -y dist-upgrade &>> $tmp_init_log && touch $apt_upgrade_stamp
 	else
 		echo "INFO: last update was ${last_stamp} seconds ago, skip..."

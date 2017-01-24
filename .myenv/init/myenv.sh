@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # One line cmd
-# V1: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh | bash
-# V2: rm /tmp/myenv.sh ; wget -O /tmp/myenv.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh && bash /tmp/myenv.sh 
+# V1: rm /tmp/myenv.sh ; wget -O /tmp/myenv.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh && bash /tmp/myenv.sh 
+# V1 (2017-01): works
+# V2: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh | bash
+# V2 (2017-01): NOT work any more, gets nothing 
 
 # Variable
 git_myenv_name=myenv
@@ -14,21 +16,35 @@ init_myenv_tmp=/tmp/init_myenv/`date "+%Y%m%d_%H%M%S"`
 # Source & Prepare
 umask 077
 mkdir -p ${init_myenv_tmp}
+cd ${init_myenv_tmp}
 
-# TODO: should not rely on these script, search "func_"
-source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
+# TODO: not really need this
+#if [ -f ${HOME}/.myenv/myenv_func.sh ] ; then
+#	source ${HOME}/.myenv/myenv_func.sh 
+#else
+#	wget -q -O ./myenv_lib.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh"
+#	wget -q -O ./myenv_func.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh"
+#	source ./myenv_lib.sh
+#	source ./myenv_func.sh
+#fi
 
 # Functions
 function func_init_git() {
 	# Check if already exist
 	(command -v git &> /dev/null) && echo "INFO: git already exist, skip init git" && return 0 
-	[ -e ${HOME}/dev/git ] && echo "INFO: git already exist, skip init git" && return 0
+
+	# TODO: check zbox?
 
 	# Try install by system
+	# Note 0: check if user have sudo priviledge
 	# Note 1: the git install command should be separate, seems its fail will make other package not continue
 	(sudo -n ls &> /dev/null) && sudo apt-get update 
 	(sudo -n ls &> /dev/null) && sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev openssl libssl-dev build-essential tree zip unzip subversion 
 	(sudo -n ls &> /dev/null) && sudo apt-get install -y git && return 0
+
+	# TODO: the compile version need update
+	echo "WARN: the compile version of git is old, will NOT continue, pls solve it manually!"
+	exit
 
 	# Try compile
 	local git_tar="git-1.8.5.tar.gz"
@@ -125,7 +141,7 @@ function func_init_myenv_secure {
 	[ ! -e ${datedbackup} ] && echo "INFO: ${datedbackup} not exist, skip init myenv secure" && return 0
 
 	# Find the backup
-	local myenv_full_bak=`find ${datedbackup} -name "*myenv*full*.zip" | tail -1`
+	local myenv_full_bak=`find ${datedbackup} -name "*_myenv_*.zip" | tail -1`
 	[ ! -e "$myenv_full_bak" ] && echo "ERROR: $myenv_full_bak not exist, pls check!" && exit 1
 
 	# Extract .ssh, secu, secure
@@ -134,7 +150,10 @@ function func_init_myenv_secure {
 	rm -rf $init_myenv_tmp/$myenv_full_bak_name 
 
 	#TODO: use unzip instead!!!
-	func_uncompress $myenv_full_bak $init_myenv_tmp/$myenv_full_bak_name 
+	(command -v unzip &> /dev/null) && echo "INFO: install unzip to uncompress backup file" && sudo apt-get install unzip
+	\cd $init_myenv_tmp/$myenv_full_bak_name 
+	unzip $myenv_full_bak 
+	\cd -
 
 	# Find and copy
 	local ssh_bak=`find $init_myenv_tmp -name ".ssh" -type d | tail -1`
