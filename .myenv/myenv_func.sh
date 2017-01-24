@@ -1248,6 +1248,8 @@ func_translate_microsoft() {
 func_delete_dated() { 
 	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
 
+	# TODO: rename .xxx file to dot_xxx, for better finding and viewing
+
 	local targetDir=$MY_TMP/delete/$(func_date)
 	[[ ! -e $targetDir ]] && mkdir ${targetDir}
 
