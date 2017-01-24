@@ -1,39 +1,38 @@
 #!/bin/bash
 
 # One line cmd
-# V1: rm /tmp/myenv.sh ; wget -O /tmp/myenv.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh && bash /tmp/myenv.sh 
 # V1 (2017-01): works
-# V2: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh | bash
+# V1: rm /tmp/myenv.sh ; wget -O /tmp/myenv.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh && bash /tmp/myenv.sh 
 # V2 (2017-01): NOT work any more, gets nothing 
+# V2: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh | bash
 
-# Variable
-git_myenv_name=myenv
-git_myenv_addr=git://github.com/stico/myenv.git
-init_myenv_tmp=/tmp/init_myenv/`date "+%Y%m%d_%H%M%S"`
-#git_myenv_addr=https://github.com/stico/myenv.git	# not work when libcurl not support https
-#git_myenv_addr=git@github.com:stico/myenv.git		# need priviledge
+# Variable, TODO: shorten the names
+tmp_init_dir=/tmp/init_myenv/`date "+%Y%m%d_%H%M%S"`
+tmp_init_log=${tmp_init_dir}/init.log
 
 # Source & Prepare
 umask 077
-mkdir -p ${init_myenv_tmp}
-cd ${init_myenv_tmp}
+mkdir -p ${tmp_init_dir}
+cd ${tmp_init_dir}
 
-# TODO: not really need this
-#if [ -f ${HOME}/.myenv/myenv_func.sh ] ; then
-#	source ${HOME}/.myenv/myenv_func.sh 
-#else
-#	wget -q -O ./myenv_lib.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh"
-#	wget -q -O ./myenv_func.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh"
-#	source ./myenv_lib.sh
-#	source ./myenv_func.sh
-#fi
+func_source_lib(){
+	local func=myenv_func.sh 
 
-# Functions
-function func_init_git() {
+	echo "INFO: source ${func} (which also source lib functions)"
+	if [ -f ./${func} ] ; then
+		source ./${func}
+	elif [ -f ${HOME}/.myenv/${func} ] ; then
+		source ${HOME}/.myenv/${func}
+	else
+		wget -q -O ./myenv_lib.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh"
+		wget -q -O ./myenv_func.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh"
+		source ./myenv_func.sh
+	fi
+}
+
+func_init_git() {
 	# Check if already exist
-	(command -v git &> /dev/null) && echo "INFO: git already exist, skip init git" && return 0 
-
-	# TODO: check zbox?
+	func_is_cmd_exist git && echo "INFO: cmd git already exist, skip init git" && return 0 
 
 	# Try install by system
 	# Note 0: check if user have sudo priviledge
@@ -43,6 +42,7 @@ function func_init_git() {
 	(sudo -n ls &> /dev/null) && sudo apt-get install -y git && return 0
 
 	# TODO: the compile version need update
+	# TODO: extract to another function?
 	echo "WARN: the compile version of git is old, will NOT continue, pls solve it manually!"
 	exit
 
@@ -116,16 +116,21 @@ function func_init_git() {
 }
 
 function func_init_myenv {
+	local git_myenv_name=myenv
+	local git_myenv_addr=git://github.com/stico/myenv.git
+	#local git_myenv_addr=https://github.com/stico/myenv.git	# not work when libcurl not support https
+	#local git_myenv_addr=git@github.com:stico/myenv.git		# need priviledge
+
 	[ -e ${HOME}/.git ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && return 0
 
-	cd ${init_myenv_tmp}
+	cd ${tmp_init_dir}
 	( command -v git &> /dev/null ) && local git="git" || local git="${HOME}/dev/git/bin/git"
 
 	$git clone $git_myenv_addr
-	[ ! -e ${init_myenv_tmp}/$git_myenv_name/.git ] && echo "ERROR: failed to init myenv, pls check!" && exit 1
+	[ ! -e ${tmp_init_dir}/$git_myenv_name/.git ] && echo "ERROR: failed to init myenv, pls check!" && exit 1
 
-	mv ${init_myenv_tmp}/$git_myenv_name/* ${HOME}
-	mv ${init_myenv_tmp}/$git_myenv_name/.* ${HOME}
+	mv ${tmp_init_dir}/$git_myenv_name/* ${HOME}
+	mv ${tmp_init_dir}/$git_myenv_name/.* ${HOME}
 
 	cd ${HOME}
 	$git config --global user.email "stico@163.com"
@@ -147,18 +152,18 @@ function func_init_myenv_secure {
 	# Extract .ssh, secu, secure
 	local tmp1=${myenv_full_bak%.zip}
 	local myenv_full_bak_name=${tmp1##*/}
-	rm -rf $init_myenv_tmp/$myenv_full_bak_name 
+	rm -rf $tmp_init_dir/$myenv_full_bak_name 
 
 	#TODO: use unzip instead!!!
 	(command -v unzip &> /dev/null) && echo "INFO: install unzip to uncompress backup file" && sudo apt-get install unzip
-	\cd $init_myenv_tmp/$myenv_full_bak_name 
+	\cd $tmp_init_dir/$myenv_full_bak_name 
 	unzip $myenv_full_bak 
 	\cd -
 
 	# Find and copy
-	local ssh_bak=`find $init_myenv_tmp -name ".ssh" -type d | tail -1`
-	local secu_bak=`find $init_myenv_tmp -name "secu" -type d | tail -1`
-	local smbcr_bak=`find $init_myenv_tmp -name ".smbcredentials" -type d | tail -1`
+	local ssh_bak=`find $tmp_init_dir -name ".ssh" -type d | tail -1`
+	local secu_bak=`find $tmp_init_dir -name "secu" -type d | tail -1`
+	local smbcr_bak=`find $tmp_init_dir -name ".smbcredentials" -type d | tail -1`
 	mkdir -p ~/.ssh ~/.myenv/secu
 	[ -e "$ssh_bak" ] && cp -rf $ssh_bak/* ~/.ssh/ 
 	[ -e "$secu_bak" ] && cp -rf $secu_bak/* ~/.myenv/secu/ 
@@ -177,7 +182,25 @@ function func_init_myenv_secure {
 	git push --set-upstream origin master
 }
 
-# Action
+func_pre_check() {
+	echo "INFO: pre condition check (username, platform, doc path, etc)"
+
+	# Check username
+	[ "$(whoami)" != "ouyangzhu" ] && func_stop "ERROR: username must be 'ouyangzhu'!" 
+
+	# Check platform
+	uname -s | grep -q "MINGW\|CYGWIN " && func_stop "ERROR: can NOT run init on CYGWIN or MINGW platform!"
+
+	# Check important existence
+	func_validate_path_exist /ext /ext/Documents
+
+	# Check owner of /ext
+	func_validate_path_owner /ext "ouyangzhu:ouyangzhu"
+}
+
+# Init. NOTE: the sequence is important!
+func_pre_check		| func_pipe_filter "${tmp_init_log}"
+func_source_lib		| func_pipe_filter "${tmp_init_log}"
 func_init_git
 func_init_myenv
 func_init_myenv_secure

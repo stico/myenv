@@ -8,29 +8,6 @@ func_dati() { date "+%Y-%m-%d_%H-%M-%S";		}
 func_nanosec()  { date +%s%N;				}
 func_millisec() { echo $(($(date +%s%N)/1000000));	}
 
-# TODO: create func_complain: auto use func_die for non-interactive mode, use func_cry for interactive mode
-#       command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
-#       command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
-#       explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
-
-func_die() {
-	local usage="Usage: $FUNCNAME <error_info>" 
-	local desc="Desc: echo error info to stderr and exit" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
-	
-	echo -e "$@" 1>&2
-	exit 1
-}
-
-func_cry() {
-	local usage="Usage: $FUNCNAME <error_info>" 
-	local desc="Desc: echo error info to stderr and kill current job (exit the function stack without exiting shell)" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
-	
-	echo -e "$@" 1>&2
-	kill -INT $$
-}
-
 func_check_exit_code() {
 	# NOTE: should NOT do anything before check, since need check exit status of last command
 	[ "$?" = "0" ]  && echo  "INFO: ${1}" || func_die "ERROR: ${2:-${1}}"
@@ -217,24 +194,48 @@ func_vcs_update() {
 	fi
 }
 
+################################################################################
+# Utility: validation and check
+# TODO: rename: validate to assert
+################################################################################
+
 func_validate_path_exist() {
 	local usage="Usage: $FUNCNAME <path> ..."
 	local desc="Desc: the path must be exist, otherwise will exit" 
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 	
 	for p in "$@" ; do
-		[ ! -e "${p}" ] && echo "ERROR: ${p} NOT exist!" && exit 1
+		[ ! -e "${p}" ] && func_stop "ERROR: ${p} NOT exist!"
 	done
 }
 
+func_validate_path_not_exist() { func_validate_path_inexist "$@" ;}
 func_validate_path_inexist() {
 	local usage="Usage: $FUNCNAME <path> ..."
 	local desc="Desc: the path must be NOT exist, otherwise will exit" 
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 	
 	for p in "$@" ; do
-		[ -e "${p}" ] && echo "ERROR: ${p} already exist!" && exit 1
+		[ -e "${p}" ] && func_stop "ERROR: ${p} already exist!"
 	done
+}
+
+func_validate_path_owner() {
+	local usage="Usage: $FUNCNAME <path> <owner>"
+	local desc="Desc: the path must be owned by owner(xxx:xxx format), otherwise will exit" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	local expect="${2}"
+	local real=$(ls -ld "${1}" | awk '{print $3":"$4}')
+	[ "${real}" != "${expect}" ] && func_stop "ERROR: owner NOT match, expect: ${expect}, real: ${real}"
+}
+
+func_is_cmd_exist() {
+	local usage="Usage: $FUNCNAME <cmd>"
+	local desc="Desc: check if cmd exist, return 0 if exist, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	command -v "${1}" &> /dev/null && return 0 || return 1
 }
 
 func_validate_cmd_exist() {
@@ -242,7 +243,9 @@ func_validate_cmd_exist() {
 	local desc="Desc: the cmd must be exist, otherwise will exit" 
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 
-	( ! command -v "${1}" &> /dev/null) && echo "ERROR: cmd (${1}) NOT exist!" && exit 1
+	for p in "$@" ; do
+		func_is_cmd_exist "${p}" || func_stop "ERROR: cmd (${p}) NOT exist!"
+	done
 }
 
 func_validate_dir_not_empty() {
@@ -252,7 +255,7 @@ func_validate_dir_not_empty() {
 	
 	for p in "$@" ; do
 		# only redirect stderr, otherwise the test will always false
-		[ ! "$(ls -A "${p}" 2> /dev/null)" ] && echo "ERROR: ${p} is empty!" && exit 1
+		[ ! "$(ls -A "${p}" 2> /dev/null)" ] && func_stop "ERROR: ${p} is empty!"
 	done
 }
 
@@ -263,8 +266,60 @@ func_validate_dir_empty() {
 	
 	for p in "$@" ; do
 		# only redirect stderr, otherwise the test will always false
-		[ "$(ls -A "${p}" 2> /dev/null)" ] && echo "ERROR: ${p} not empty!" && exit 1
+		[ "$(ls -A "${p}" 2> /dev/null)" ] && func_stop "ERROR: ${p} not empty!"
 	done
+}
+
+################################################################################
+# Utility: pipe
+################################################################################
+
+func_pipe_filter() {
+	if [ -z "${1}" ] ; then
+		sed -n -e "/^\(Desc\|INFO\|WARN\|ERROR\):/p"
+	else
+		tee -a "${1}" | sed -n -e "/^\(Desc\|INFO\|WARN\|ERROR\):/p"
+	fi
+}
+
+################################################################################
+# Utility: process
+################################################################################
+
+func_stop() {
+	local usage="Usage: $FUNCNAME <error_info>" 
+	local desc="Desc: echo error info to stderr and exit" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	
+	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
+	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
+	# explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
+	echo -e "$@" 1>&2
+	[ -z "$PS1" ] && exit 1 || kill -INT $$
+}
+
+func_die() {
+	# old, use func_stop() instead
+	# TODO: redirect to func_stop after verified
+
+	local usage="Usage: $FUNCNAME <error_info>" 
+	local desc="Desc: echo error info to stderr and exit" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	
+	echo -e "$@" 1>&2
+	exit 1
+}
+
+func_cry() {
+	# old, use func_stop() instead
+	# TODO: redirect to func_stop after verified
+
+	local usage="Usage: $FUNCNAME <error_info>" 
+	local desc="Desc: echo error info to stderr and kill current job (exit the function stack without exiting shell)" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	
+	echo -e "$@" 1>&2
+	kill -INT $$
 }
 
 ################################################################################
@@ -289,4 +344,3 @@ func_num_to_human() {
 	done
 	echo "${number}${fraction}${UNIT[$unit_index]}"
 }
-
