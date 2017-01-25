@@ -24,6 +24,7 @@ $HOME/Documents/FCS/oumisc/oumisc-git/note
 # user config
 $HOME/.ssh/
 $HOME/.hgrc
+$HOME/.unison/
 $HOME/.gitconfig
 $HOME/.subversion/
 $HOME/.VirtualBox/
@@ -50,6 +51,10 @@ $HOME/Library/Rime/wubi_pinyin.custom.yaml
 `cat $LOC_HOSTS > $MY_ENV/zgen/hosts && echo $MY_ENV/zgen/hosts`
 
 # Deprecared
+#$HOME/.unison/ar*	# NOT work?
+#$HOME/.unison/fp*	# NOT work?
+#`echo $(\ls $HOME/.unison/ar*)`	# NOT work?
+#`echo $(\ls $HOME/.unison/fp*)`	# NOT work?
 #$HOME/.zbox/src/feihu/feihu-git/
 #$HOME/.zbox/src/oublog/oublog-git/
 #$HOME/.zbox/src/oumisc/oumisc-git/

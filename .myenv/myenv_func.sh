@@ -520,9 +520,13 @@ func_collect_all() {
 	local f d line
 	local base=$MY_ENV_ZGEN/collection
 
+	# IMPORTANT: do NOT remove the ${base} dir, otherwise might confusing in debug: 
+	#	- cd into ${base} and then run func_collect_all(), 
+	#	- then ${base} has been deleted, you are now actually in ~/amp/delete/xxxx-xx-xx
+	#	- you always check the old file!
+	#	- EVER WORSE: the pwd command seem NOT showing the correct current path ! (this happens as least on osx)
 	echo "INFO: clean old collection"
-	func_delete_dated "${base}"
-	mkdir -p "${base}"
+	func_delete_dated ${base}/*
 
 	echo "INFO: update locate db (osx will just skip)"
 	func_locate_dbupdate

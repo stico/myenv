@@ -350,3 +350,6 @@ func_init_myenv_unison		| func_pipe_filter "${tmp_init_log}"
 func_init_git_writable		| func_pipe_filter "${tmp_init_log}"
 func_init_apt_distupgrade	| func_pipe_filter "${tmp_init_log}"	
 func_init_apt_install_basic	| func_pipe_filter "${tmp_init_log}"
+
+# TODO: init zbox
+# TODO: run func_collect_all
