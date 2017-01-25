@@ -258,9 +258,9 @@ func_vi_conditional() {
 		return 0
 	fi
 
-	# non GUI version: use vim (text)
-	if [ -z "$DISPLAY" ] && (command -v vim &> /dev/null) ; then
-		\vim "$@"
+	# Terminal mode: use vim if available, otherwise vi
+	if [ -z "$DISPLAY" ] ; then
+		command -v vim &> /dev/null && \vim "$@" || \vi "$@"
 		return 0
 	fi
 
@@ -455,9 +455,9 @@ func_cd_smart() {
 	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
 	# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
 	#if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
-		[ -e ".hg" ] && (command -v hg &> /dev/null) && hg status
-		[ -e ".svn" ] && (command -v svn &> /dev/null) && svn status
-		[ -e ".git" ] && (command -v git &> /dev/null) && git status
+		[ -e ".hg" ] && command -v hg &> /dev/null && hg status
+		[ -e ".svn" ] && command -v svn &> /dev/null && svn status
+		[ -e ".git" ] && command -v git &> /dev/null && git status
 	#fi
 
 	# status code always success, otherwise func_cd_tag NOT work
@@ -922,8 +922,8 @@ func_unison_fs_lapmac_all() {
 
 	# if target inexist, try to mount the disk
 	if [ ! -e "${mount_path}/backup/DCB" ] ; then
-		(command -v unison &> /dev/null) || func_cry "ERROR: unison NOT in path, pls check"
-		(command -v ntfs-3g &> /dev/null) || func_cry "ERROR: ntfs-3g NOT in path, pls check"
+		command -v unison &> /dev/null || func_cry "ERROR: unison NOT in path, pls check"
+		command -v ntfs-3g &> /dev/null || func_cry "ERROR: ntfs-3g NOT in path, pls check"
 		[ -e "${disk_path}" ] || func_cry "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
 		[ -e "${mount_path}" ] || mkdir "${mount_path}"
 
@@ -1095,7 +1095,7 @@ func_sys_net() {
 }
 
 func_sys_info_os_len() {
-	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+	command -v uname &> /dev/null && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
 
 	# Note, cygwin is usually 32bit
 	if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then		echo "64bit"
@@ -1112,7 +1112,7 @@ func_sys_info_os_ver() {
 }
 
 func_sys_info_os_type() {
-	if [ "$os_name" = "ubuntu" ] && (command -v dpkg &> /dev/null) ; then 
+	if [ "$os_name" = "ubuntu" ] && command -v dpkg &> /dev/null ; then 
 		if (dpkg -l ubuntu-desktop &> /dev/null) ; then			echo "desktop"
 		else								echo "server"
 		fi
@@ -1123,7 +1123,7 @@ func_sys_info_os_type() {
 }
 
 func_sys_info_os_name() {
-	(command -v uname &> /dev/null) && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
+	command -v uname &> /dev/null && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
 
 	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release
 	elif [ $(echo $uname_info | grep -ic "cygwin") -eq 1 ] ; then		echo "cygwin"
@@ -1250,16 +1250,21 @@ func_translate_microsoft() {
 func_delete_dated() { 
 	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
 
-	# TODO: rename .xxx file to dot_xxx, for better finding and viewing
-
 	local targetDir=$MY_TMP/delete/$(func_date)
-	[[ ! -e $targetDir ]] && mkdir ${targetDir}
+	[ -e ${targetDir} ] || mkdir -p ${targetDir}
 
+	local t_name=""
 	for t in "$@" ; do
 		[ ! -e "${t}" ] && echo "WARN: ${t} inexist, will NOT perform dated delete!" && continue
-		mv "${t}" "${targetDir}/$(basename "${t}")_$(func_time)"
+
+		t_name=$(basename "${t}")
+		if [[ ${t_name} == .* ]] ; then 
+			# make the dot start file visualable
+			mv "${t}" "${targetDir}/dot_${t_name}_$(func_time)"
+		else
+			mv "${t}" "${targetDir}/${t_name}_$(func_time)"
+		fi
 	done
-	#mv "$@" ${targetDir} &> /dev/null
 }
 
 func_backup_myenv() { 

@@ -128,15 +128,18 @@ func_uncompress() {
 		*.tar.bz2)	tar -jxvf "$source_file" &> /dev/null	;;	# NOTE, should before "*.bz2)"
 		*.bz2)		bunzip2 "$source_file" &> /dev/null	;;
 		*.gz)		gunzip "$source_file" &> /dev/null	;;
-		
 		*.7z)		7z e "$source_file" &> /dev/null	;;	# use "-e" will fail, "e" is extract, "x" is extract with full path
-		*.zip)		unzip "$source_file" &> /dev/null	;;
+		*.zip)		func_complain_cmd_not_exist unzip \
+				&& sudo apt-get install unzip ;			# try intall
+				unzip "$source_file" &> /dev/null	;;
 		*.tar)		tar -xvf "$source_file" &> /dev/null	;;
 		*.xz)		tar -Jxvf "$source_file" &> /dev/null	;;
 		*.tgz)		tar -zxvf "$source_file" &> /dev/null	;;
 		*.tbz2)		tar -jxvf "$source_file" &> /dev/null	;;
 		*.Z)		uncompress "$source_file"		;;
-		*.rar)		unrar e "$source_file" &> /dev/null	;;	# candidate 1
+		*.rar)		func_complain_cmd_not_exist unrar \
+				&& sudo apt-get install unrar ;			# try intall
+				unrar e "$source_file" &> /dev/null	;;	# candidate 1
 		#*.rar)		7z e "$source_file" &> /dev/null	;;	# candidate 2
 		*)		echo "ERROR: unknow format of file: ${source_file}"	;;
 	esac
@@ -150,20 +153,6 @@ func_uncompress() {
 	fi
 
 	\cd - &> /dev/null
-}
-
-func_bak_file() {
-	local usage="Usage: $FUNCNAME <file> ..."
-	local desc="Desc: backup file, with suffixed date" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-	
-	for p in "$@" ; do
-		func_validate_path_exist "${p}"
-		[ -d "${p}" ] && func_die "WARN: skipping backup directory ${p}" 
-
-		[ -w "${p}" ] && cp "${p}"{,.bak.$(func_dati)} || sudo cp "${p}"{,.bak.$(func_dati)}
-		[ "$?" != "0" ] && func_die "ERROR: backup file ${p} failed!"
-	done
 }
 
 func_vcs_update() {
@@ -198,6 +187,22 @@ func_vcs_update() {
 # Utility: validation and check
 # TODO: rename: validate to assert
 ################################################################################
+func_complain_privilege_not_sudoer() { 
+	local usage="Usage: $FUNCNAME <msg>"
+	local desc="Desc: complains if current user not have sudo privilege, return 0 if not have, otherwise 1" 
+	
+	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege!}" && result=0
+	return 1
+}
+
+func_complain_path_not_exist() {
+	local usage="Usage: $FUNCNAME <path> <msg>"
+	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist!}" && return 0
+	return 1
+}
 
 func_validate_path_exist() {
 	local usage="Usage: $FUNCNAME <path> ..."
@@ -238,6 +243,16 @@ func_is_cmd_exist() {
 	command -v "${1}" &> /dev/null && return 0 || return 1
 }
 
+func_complain_cmd_not_exist() {
+	local usage="Usage: $FUNCNAME <cmd> <msg>"
+	local desc="Desc: complains if command not exist, return 0 if not exist, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	func_is_cmd_exist "${1}" && return 1
+	echo "${2:-WARN: cmd ${1} NOT exist!}" 
+	return 0
+}
+
 func_validate_cmd_exist() {
 	local usage="Usage: $FUNCNAME <cmd> ..."
 	local desc="Desc: the cmd must be exist, otherwise will exit" 
@@ -271,8 +286,59 @@ func_validate_dir_empty() {
 }
 
 ################################################################################
-# Utility: pipe
+# Utility: FileSystem
 ################################################################################
+
+func_link_init() {
+	local usage="Usage: ${FUNCNAME} <target> <source>"
+	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+
+	local target="$1"
+	local source="$2"
+	echo "INFO: creating link ${target} --> ${source}"
+
+	# check, skip if target already link, remove if target empty 
+	func_complain_path_not_exist ${source} && return 0
+	[ -h "${target}" ] && echo "INFO: >> ${target} already a link (--> $(readlink -f ${target}) ), skip" && return 0
+	[ -d "${target}" ] && [ ! "$(ls -A ${target})" ] && rmdir "${target}"
+
+	\ln -s "${source}" "${target}"
+}
+
+func_duplicate_dated() {
+	local usage="Usage: $FUNCNAME <file> ..."
+	local desc="Desc: backup file, with suffixed date" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	local dati="$(func_dati)"
+	for p in "$@" ; do
+		func_complain_path_not_exist "${p}" && continue
+
+		# if target is dir, check size first (>100M will warn and skip)
+		if [ -d "${p}" ] ; then
+			p_size=$(stat -c%s "${p}")
+			p_size_h=$(func_num_to_human zip_size)
+			(( p_size > 104857600 )) && echo "WARN: ${p} size (${p_size_h}) too big (>100M), skip" && continue 
+		fi
+
+		target="${p}.bak.${dati}"
+		echo "INFO: backup file, ${p} --> ${target}"
+		[ -w "${p}" ] && cp -r "${p}" "${target}" || sudo cp -r "${p}" "${target}"
+		[ "$?" != "0" ] && echo "WARN: backup ${p} failed, pls check!"
+	done
+}
+
+################################################################################
+# Utility: shell
+################################################################################
+
+func_is_non_interactive() {
+	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
+	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
+	# explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
+	return [ -z "$PS1" ] 
+}
 
 func_pipe_filter() {
 	if [ -z "${1}" ] ; then
@@ -291,11 +357,8 @@ func_stop() {
 	local desc="Desc: echo error info to stderr and exit" 
 	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 	
-	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
-	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
-	# explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
 	echo -e "$@" 1>&2
-	[ -z "$PS1" ] && exit 1 || kill -INT $$
+	func_is_non_interactive && exit 1 || kill -INT $$
 }
 
 func_die() {

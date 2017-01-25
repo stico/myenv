@@ -30,7 +30,7 @@ done
 [ "$1" = "update" ] && echo -e "Updating host list file.\n\tSource: ${target_list}\n\target: $target_sys" || exit 0
 [ ! -e "$target_list" -o ! -e "$target_sys" ] && echo "Error: $target_list or $target_sys not exists!" && exit 1
 source ${HOME}/.myenv/myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
-func_bak_file $target_sys || func_die "ERROR: backup file failed!"
+func_duplicate_dated $target_sys || func_die "ERROR: backup file failed!"
 
 sudo sh -c "sed -i -e \"/$line_begin/,/$line_end/d\" $target_sys"
 sudo sh -c "echo \"\n\n\n\n${line_begin}\" >> $target_sys"

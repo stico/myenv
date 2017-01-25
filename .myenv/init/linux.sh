@@ -1,11 +1,12 @@
 #!/bin/bash
 
+# !!! NOTE !!!: most part of this script in ~/.myenv/init/myenv.sh now, use that instead 
+#		migrate status: above func_init_os_common() is done, below (include) is NOT yet
+
 # One line cmd
 # V1: curl https://raw.github.com/stico/myenv/master/.myenv/init/linux.sh | bash
 # V2: rm /tmp/linux.sh ; wget -O /tmp/linux.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/linux.sh && bash /tmp/linux.sh 
 # V3: ( bash linux.sh & ) ; sleep 1 ; tail -f /tmp/init_linux/$(ls /tmp/init_linux | tail -1)/init.log
-
-# TODO: standarize func_init_soft_xxx to $MY_ENV/tool
 
 # Variable
 tmp_init_dir=/tmp/init_linux/`date "+%Y%m%d_%H%M%S"`
@@ -86,7 +87,7 @@ function func_init_sudoer() {
 	echo "INFO: update /etc/sudoers"
 	sudo grep "sudo.*NOPASSWD:" /etc/sudoers &> /dev/null && echo "INFO: /etc/sudoers already updated, skip" && return 0
 
-	func_bak_file /etc/sudoers
+	func_duplicate_dated /etc/sudoers
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' /etc/sudoers
 }
 
@@ -101,7 +102,7 @@ function func_init_apt_config() {
 		grep "${mirror_addr}" "${src_file}" &> /dev/null && echo "INFO: ${src_file} already updated, skip" && continue
 		( ! sudo grep "^[^#]*ubuntu.com" "${src_file}" ) &> /dev/null && echo "INFO: ${src_file} NOT need updated, skip" && continue
 
-		func_bak_file "${src_file}" 
+		func_duplicate_dated "${src_file}" 
 		echo "INFO: update ${src_file} with mirror: ${mirror_addr}"
 		#sudo sed -i -e "/ubuntu.com/p;s/[^\/]*\.ubuntu\.com/${mirror_addr}/" ${src_file}	# reserve original source
 		sudo sed -i -e "s/[^\/]*\.ubuntu\.com/${mirror_addr}/" ${src_file}			# replace original source
@@ -163,7 +164,7 @@ function func_init_soft_ibus() {
 	# Chinese Input Method - Ibus. Still need: manual part: 1) add to autostart, use the /usr/bin/ibus-daemon. 2) set hotkey and in ibus preference 3) select input method in ibus preference
 	ibus_table=/usr/share/ibus-table/engine/table.py
 	sudo apt-get install -y ibus-table-wubi
-	func_bak_file $ibus_table && sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' $ibus_table
+	func_duplicate_dated $ibus_table && sudo sed -i -e '/self._chinese_mode.*=.*get_value.*/,/))/{s/self._chinese_mode.*=.*/self._chinese_mode = 2/;/self._chinese_mode.*=.*/!d;}' $ibus_table
 }
 
 function func_init_soft_terminator() { 
@@ -290,19 +291,19 @@ function func_init_de_xfce() {
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE applications config"
 	source_path=~/.myenv/conf/xfce/applications/
 	target_path=~/.local/share/applications/
-	func_bak_file ${target_path}/defaults.list || return 0
+	func_duplicate_dated ${target_path}/defaults.list || return 0
 	mv -f ${target_path}/defaults.list /tmp/
 	cp $source_path/* $target_path/* >> $tmp_init_log
 
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE config"
 	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
-	func_bak_file ${target_path} || return 0
+	func_duplicate_dated ${target_path} || return 0
 	sed -i -e '/workspace_count/s/value="."/value="1"/' $target_path
 
 	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
 	source_path=~/.myenv/conf/xfce/xfce4-keyboard-shortcuts.xml
 	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-	func_bak_file ${target_path} || return 0
+	func_duplicate_dated ${target_path} || return 0
 	mv -f $target_path /tmp/
 	cp $source_path $target_path >> $tmp_init_log
 	# without this, the Tab key not work in xrdp connection
@@ -312,7 +313,7 @@ function func_init_de_xfce() {
 	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
 	dt_type=XFCE
 	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
-	func_bak_file ${gnome_keying_desktop} || return 0
+	func_duplicate_dated ${gnome_keying_desktop} || return 0
 	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
 		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
 	else 
@@ -356,8 +357,12 @@ function func_init_manual_needed() {
 	#TODO: test it on ubuntu 13.10
 	#func_init_manual_infinality
 
+	# TODO: make sure this in unattended way, otherwise dist-upgrade will ask for agreement. Test the solution
+	# NOT work on 16.04 yet: http://askubuntu.com/questions/766491/failure-to-download-extra-data-files-with-ttf-mscorefonts-installer-on-ubuntu
 	# Need comfirm the dialog, seems deprecated the package "msttcorefonts"
-	#sudo apt-get install -y --force-yes ttf-mscorefonts-installer
+	echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+	echo ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note | sudo debconf-set-selections
+	sudo apt-get install -y --force-yes ttf-mscorefonts-installer
 }
 
 # Action
@@ -371,6 +376,10 @@ func_init_myenv
 #func_init_apt_config	# seems changed too much stuff (in ubuntu 13.10)
 func_init_apt_distupgrade
 func_init_apt_install_basic
+
+################################################################################
+# migration status line: to ~/.myenv/init/myenv.sh 
+################################################################################
 
 # Action - OS spect
 func_init_os_common
