@@ -1275,7 +1275,7 @@ func_backup_myenv() {
 	echo "INFO: create zip file based on filelist: ${fileList}"
 	cat "${fileList}" | zip -rq "${packFile}" -@ || func_die "ERROR: failed to zip files into ${packFile}"
 
-	echo "INFO: bakcup command output too"
+	echo "INFO: bakcup command output, add to the backup zip"
 	mkdir -p "${tmpDir}"
 	df -h				> "${tmpDir}/cmd_output_df_h.txt"
 	\ls -la ~ | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_home.txt"
