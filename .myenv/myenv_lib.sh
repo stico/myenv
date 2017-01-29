@@ -337,7 +337,7 @@ func_is_non_interactive() {
 	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
 	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
 	# explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
-	return [ -z "$PS1" ] 
+	[ -z "$PS1" ] && return 0 || return 1
 }
 
 func_pipe_filter() {
