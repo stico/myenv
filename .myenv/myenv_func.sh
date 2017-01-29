@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# single line self source
-# source ${HOME}/.myenv/myenv_func.sh || source ./myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
+# source lib. To simplify, just try myenv_lib.sh in myenv
+MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
+[ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
 
-# source lib
-source $HOME/.myenv/myenv_lib.sh || source ./myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
+# Deprecated: single line self source
+#source ${HOME}/.myenv/myenv_func.sh || source ./myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
+#source $HOME/.myenv/myenv_lib.sh || source ./myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
 [ -z "$ZBOX" ]			&& ZBOX=$HOME/.zbox
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
