@@ -33,12 +33,14 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || e
 #uname | grep -q Darwin || export DISPLAY=
 
 # Init myenv, including common functions
-bash_init=$HOME/.myenv/init/bash.sh
-bash_local=$HOME/.myenv/init/bashrc.$(hostname)
-bash_local_2=$HOME/.myenv/init/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)
-[ -e $bash_init ] && source $bash_init
-[ -e $bash_local ] && source $bash_local
-[ -e $bash_local_2 ] && source $bash_local_2
+zbox_init=${HOME}/.zbox/zbox_func.sh
+bash_init=${HOME}/.myenv/init/bash.sh
+bash_local=${HOME}/.myenv/init/bashrc.$(hostname)
+bash_local_2=${HOME}/.myenv/init/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)
+[ -e "${zbox_init}" ] && source "${zbox_init}"
+[ -e "${bash_init}" ] && source "${bash_init}"
+[ -e "${bash_local}" ] && source "${bash_local}"
+[ -e "${bash_local_2}" ] && source "${bash_local_2}"
 
 # Init ssh agent
 func_ssh_agent_init

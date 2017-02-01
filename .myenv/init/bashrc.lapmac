@@ -8,35 +8,30 @@ bash_prompt_color=green
 # cmd `ls` need this to correctly show Chinese filename
 export LC_ALL="en_US.UTF-8"
 
-# Init zbox
-zbox_func=${HOME}/.zbox/zbox_func.sh
-if [ -e "${zbox_func}" ]  ; then
-	source "${zbox_func}"
+# zbox
+func_zbox_use_silent macvim		git
+func_zbox_use_silent maven		3.1.1
+func_zbox_use_silent mysql		5.6.23
+func_zbox_use_silent ruby		2.2.0
+func_zbox_use_silent nodejs		6.3.1
+func_zbox_use_silent gradle		2.3
+func_zbox_use_silent androidsdk	        24.0.2
+func_zbox_use_silent chromedriver	2.19
+func_zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x?
+func_zbox_use_silent ntfs-3g		2016.2.22
 
-       func_zbox_use_silent macvim		git
-       func_zbox_use_silent maven		3.1.1
-       func_zbox_use_silent mysql		5.6.23
-       func_zbox_use_silent ruby		2.2.0
-       func_zbox_use_silent nodejs		6.3.1
-       func_zbox_use_silent gradle		2.3
-       func_zbox_use_silent androidsdk	        24.0.2
-       func_zbox_use_silent chromedriver	2.19
-       func_zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x?
-       func_zbox_use_silent ntfs-3g		2016.2.22
+#func_zbox use python		3.4.3		# YouCompleteMe@vim still need python 2.x?
 
-       #func_zbox use python		3.4.3		# YouCompleteMe@vim still need python 2.x?
+#func_zbox use fpp		git
+#func_zbox use python            3.4.3		# works, but disable by default, since YouCompleteMe@vim need python 2.x
+#func_zbox use ant               1.9.4
+#func_zbox use php               5.5.10
+#func_zbox use springloaded      1.2.0.RELEASE
+#func_zbox use androidstudio     135.1339820
+#func_zbox use idea              14.0.1
+#func_zbox use eclipse           4.3.2           jee_x64
+#func_zbox use adtbundle         20140702        x64
 
-       #func_zbox use fpp		git
-       #func_zbox use python            3.4.3		# works, but disable by default, since YouCompleteMe@vim need python 2.x
-       #func_zbox use ant               1.9.4
-       #func_zbox use php               5.5.10
-       #func_zbox use springloaded      1.2.0.RELEASE
-       #func_zbox use androidstudio     135.1339820
-       #func_zbox use idea              14.0.1
-       #func_zbox use eclipse           4.3.2           jee_x64
-       #func_zbox use adtbundle         20140702        x64
-       
-       # Use Alternatives
-       #func_zbox use vim               # use macvim
-       #func_zbox use oraclejdk         # use version installed via dmg
-fi
+# Use Alternatives
+#func_zbox use vim               # use macvim
+#func_zbox use oraclejdk         # use version installed via dmg
