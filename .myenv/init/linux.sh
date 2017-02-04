@@ -377,14 +377,14 @@ func_init_myenv
 func_init_apt_distupgrade
 func_init_apt_install_basic
 
-################################################################################
-# migration status line: to ~/.myenv/init/myenv.sh 
-################################################################################
-
 # Action - OS spect
 func_init_os_common
 func_init_os_ubuntu1310
 func_init_os_linuxmint15
+
+################################################################################
+# migration status line: to ~/.myenv/init/myenv.sh 
+################################################################################
 
 # Action - DE spect
 func_init_de_xfce

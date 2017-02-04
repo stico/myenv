@@ -1,0 +1,12 @@
+# ubuntuvm
+# 	HW	mac book pro MGX92CH/A
+# 	OS	Yosemite (2015-02)
+# 	FOR	work
+
+bash_prompt_color=green
+
+# cmd `ls` need this to correctly show Chinese filename
+export LC_ALL="en_US.UTF-8"
+
+# zbox
+func_zbox_use_silent ruby		2.4.0

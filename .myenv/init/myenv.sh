@@ -7,39 +7,93 @@
 #       V2: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh | bash
 
 # Design
-#       Repeatable: status check
-#       Compatible: personal env, test env, public env
+#	# Guideline
+#		Repeatable: status check
+#       	Compatible: test, production, personal, 
+#       	Platform: linux, osx
+#	# Detail
+#		every function: 1) do its own status check, 2) will not stop other functions
+#		
+
+# TODO
+#	run func_collect_all
+#	how to?: production env of dw, usually should not install via apt-get?
+#	into myenv: 
+#		func_pipe_filter rename to func_filter_keymsg
+#		complain_non_interactive 
+#			NOT works as expect: $bash xxx.sh could accept input
+#		remove ">>" in echo (link creation)
+#	IS_DESKTOP=false as default value
+#	use or into zbox?: init_git_via_make
+#	func_init_manual_needed need update
+
+# Deprecated
+#	func_pre_check
 
 # Config
+IS_DESKTOP=true
+REUSE_DOWNLOADED_SOURCE=true
 DATED_BACKUP_PATH=${HOME}/Documents/DCB/DatedBackup
 
-# Variable & Prepare, TODO: shorten the names
-tmp_tag="_me_init_"
-tmp_init_dir=/tmp/${tmp_tag}/`date "+%m%d_%H%M%S"`
-tmp_init_log=${tmp_init_dir}/init.log
+# Variable
+tmp_base="/tmp/_me_init_"
+init_dir=${tmp_base}/`date "+%m%d_%H%M%S"`
+init_log=${init_dir}/init.log
+
+# Prepare
 umask 077
-mkdir -p ${tmp_init_dir}
-cd ${tmp_init_dir}
+mkdir -p ${init_dir}
+cd ${init_dir}
 
 # Steps
 func_source_lib() {
+	local lib=myenv_lib.sh 
 	local func=myenv_func.sh 
-	echo "INFO: --STEP-- source ${func} (which also source lib functions)"
+	local me_home=${HOME}/.myenv
+	echo "INFO: --STEP-- source ${lib} and ${func}"
 
-	if [ -f ./${func} ] ; then
-		echo "INFO: use ${func} in current dir: $PWD"
+	if [[ -f ./${lib} && -f ./${func} ]] ; then
+		echo "INFO: use files in current dir: $PWD"
+		source ./${lib}
 		source ./${func}
-	elif [ -f ${HOME}/.myenv/${func} ] ; then
-		echo "INFO: use ${func} in myenv dir: ${HOME}/.myenv"
-		source ${HOME}/.myenv/${func}
-	else
-		echo "INFO: download ${func} from github to tmp dir: ${tmp_init_dir}"
-		wget -q -O ${tmp_init_dir}/myenv_lib.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh"
-		wget -q -O ${tmp_init_dir}/myenv_func.sh "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh"
-		\cd ${tmp_init_dir}
-		source ${func}
-		\cd -
+		return 0
 	fi
+
+	if [[ -f ${me_home}/${lib} && -f ${me_home}/${func} ]] ; then
+		echo "INFO: use files in myenv dir: ${me_home}"
+		source ${me_home}/${lib}
+		source ${me_home}/${func}
+		return 0
+	fi
+
+	if [[ "${REUSE_DOWNLOADED_SOURCE}" = true ]] ; then
+
+
+
+
+		local lib_latest=$(find "${tmp_base}/" -name "${lib}" | tail -1)
+		local func_latest=$(find "${tmp_base}/" -name "${func}" | tail -1)
+		if [[ -n "${lib_latest}" && -n "${func_latest}" ]] ; then 
+			echo "INFO: use latest downloaded files: ${lib_latest}, ${func_latest}"
+			source "${lib_latest}"
+			source "${func_latest}"
+			return 0
+		fi
+	fi
+
+	local lib_dl=${init_dir}/${lib}
+	local func_dl=${init_dir}/${func}
+	echo "INFO: try to downloaded from github"
+	wget -q -O ${lib_dl} "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh"
+	wget -q -O ${func_dl} "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh"
+	if [[ -f "${lib_dl}" && -f "${func_dl}" ]] ; then
+		echo "INFO: use files downloaded from github (in ${init_dir})"
+		source ${lib_dl}
+		source ${func_dl}
+		return 0
+	fi
+
+	echo "SUMMARY: failed to import source ${lib} and ${func}, lots step will fail!!!"
 }
 
 func_init_dirs() {
@@ -50,22 +104,9 @@ func_init_dirs() {
 	func_link_init ${HOME}/Documents /ext/Documents
 	func_link_init ${HOME}/.m2 /ext/Documents/FCS/maven/m2_repo
 
-	[ -e ~/Downloads ] && func_link_init ~/amp/download ~/Downloads
-}
-
-func_init_git_via_apt() {
-	echo "INFO: --STEP-- init git command"
-
-	# check
-	func_is_cmd_exist git && echo "INFO: cmd git already exist, skip init git" && return 0 
-	func_complain_privilege_not_sudoer "WARN: NO sudo privilege, will skip install git via apt-get" && return 1
-
-	# Note 0: check if user have sudo privilege
-	# Note 1: the git install command should be separate, seems its fail will make other package not continue
-	echo "INFO: install git via apt-get"
-	sudo apt-get update 
-	sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev openssl libssl-dev build-essential tree zip unzip subversion 
-	sudo apt-get install -y git && func_is_cmd_exist git || echo "ERROR: failed to install git via apt-get" && return 1 
+	[ -e ~/amp/downloads ] || func_link_init ~/amp/download ~/Downloads
+	
+	[ -e "${HOME}/Documents/DCC" ] || echo "SUMMARY: seems no personal ~/Documents linked"
 }
 
 func_init_git_via_make() {
@@ -143,7 +184,7 @@ func_init_git_via_make() {
 }
 
 func_init_myenv() {
-	echo "WARN: --STEP-- NOT implemented yet!!!"
+	echo "WARN: --STEP-- NOT implemented yet!!!" && return 1
 
 	[ -e ${HOME}/.git ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && return 0
 	func_init_myenv_via_git || func_init_myenv_via_http
@@ -152,26 +193,39 @@ func_init_myenv() {
 func_init_myenv_via_http() {
 	echo "WARN: --STEP-- NOT implemented yet!!!"
 	echo "INFO: --STEP-- init myenv from github via http (ReadOnly)"
+	return 1
+}
+
+func_init_zbox_via_apt() {		
+	echo "INFO: --STEP-- init zbox from github via git"
+
+	[ -d ~/.zbox/.git ] && echo "INFO: ~/.zbox/.git already exist, skip" && return 0
+
+	local repo_name=zbox
+	local repo_addr=git://github.com/ouyzhu/zbox.git
+	func_vcs_update git "${repo_addr}" ~/.zbox
 }
 
 func_init_myenv_via_git() {
 	echo "INFO: --STEP-- init myenv from github via git"
 
-	local git_myenv_name=myenv
-	local git_myenv_addr=git://github.com/stico/myenv.git
-	#local git_myenv_addr=https://github.com/stico/myenv.git	# not work when libcurl not support https
-	#local git_myenv_addr=git@github.com:stico/myenv.git		# need privilege
+	local repo_name=myenv
+	local repo_addr=git://github.com/stico/myenv.git
+	#local repo_addr=https://github.com/stico/myenv.git	# not work when libcurl not support https
+	#local repo_addr=git@github.com:stico/myenv.git		# need privilege
 
 	[ -e ${HOME}/.git ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && return 0
 
 	func_complain_cmd_not_exist git "ERROR: cmd git NOT exist, skip init myenv via git" && return 1
 
-	\cd ${tmp_init_dir}
-	\git clone $git_myenv_addr
-	func_complain_path_not_exist ${tmp_init_dir}/${git_myenv_name}/.git "ERROR: fail to git clone from github" && return 1
+	\cd ${init_dir}
+	\git clone $repo_addr
+	func_complain_path_not_exist ${init_dir}/${repo_name}/.git "ERROR: fail to git clone from github" && return 1
 
-	mv ${tmp_init_dir}/$git_myenv_name/* ${HOME}
-	mv ${tmp_init_dir}/$git_myenv_name/.* ${HOME}
+	# to avoid move the "*/./..", another way (not test): mv /kkk/.[!.]* /xxx/
+	shopt -s dotglob
+	mv ${init_dir}/$repo_name/* ${HOME}
+	mv ${init_dir}/$repo_name/.* ${HOME}
 
 	\cd ${HOME}
 	\git config --global user.email "stico@163.com"
@@ -191,12 +245,13 @@ func_init_myenv_unison() {
 	\ls ${target}/ar* &> /dev/null && echo "INFO: unison sync info already exist, skip" && return 0
 
 	# Find the backup. IMPORTANT: the host name must match, which is diff in func_init_myenv_secure()
-	local zip_path=`find ${DATED_BACKUP_PATH} -name "*_$(hostname)*_myenv_*.zip" | sort | tail -1`
-	func_complain_path_not_exist "${zip_path}" && return 1
+	local zip_pattern="*_$(hostname)*_myenv_*.zip"
+	local zip_path=`find ${DATED_BACKUP_PATH} -name "${zip_pattern}" | sort | tail -1`
+	func_complain_path_not_exist "${zip_path:-${zip_pattern}}" && return 1
 
 	# Extract the backup
 	local zip_filename=${zip_path##*/}
-	local extract_path=${tmp_init_dir}/${zip_filename%.zip}
+	local extract_path=${init_dir}/${zip_filename%.zip}
 	[ -e "${extract_path}" ] && echo "INFO: extraction exist, reuse it" || func_uncompress ${zip_path} ${extract_path}
 
 	# Find and copy
@@ -204,6 +259,16 @@ func_init_myenv_unison() {
 	\ls $unison_bak/fp* &> /dev/null && \ls $unison_bak/ar* &> /dev/null \
 	&& echo "INFO: no unison sync info in backup" && return 0
 	[ -e "$unison_bak" ] && cp -rf $unison_bak/{ar,fp}* ${target}
+}
+
+func_init_myenv_local() {
+	echo "INFO: --STEP-- init myenv files for local usage"
+
+	local local_bashrc="${HOME}/.myenv/init/bashrc.$(hostname)"
+	if [ ! -e "${local_bashrc}" ] ; then
+		touch "${local_bashrc}"
+		echo "INFO: pls add local stuff (e.g. func_zbox_use) in: ${local_bashrc}"
+	fi
 }
 
 func_init_myenv_secure() {
@@ -224,7 +289,7 @@ func_init_myenv_secure() {
 
 	# Extract the backup
 	local zip_filename=${zip_path##*/}
-	local extract_path=${tmp_init_dir}/${zip_filename%.zip}
+	local extract_path=${init_dir}/${zip_filename%.zip}
 	[ -e "${extract_path}" ] && echo "INFO: extraction exist, reuse it" || func_uncompress ${zip_path} ${extract_path}
 
 	# Find and copy
@@ -237,27 +302,54 @@ func_init_myenv_secure() {
 	[ -e "$smbcr_bak" ] && cp -rf $smbcr_bak/* ~/.smbcredentials/
 }
 
-func_init_git_writable() {
-	echo "INFO: --STEP-- try to update myenv git to writable mode"
+func_init_zbox_writable(){
+	echo "INFO: --STEP-- try to update zbox git to writable mode"
 
-	# check, git cmd already checked in func_init_myenv()
-	local gname=stico_github
-	func_complain_path_not_exist ~/.git "WARN: ~/.git not exist, myenv git still in readonly mode!" && return 1
-	func_complain_path_not_exist ~/.ssh/${gname} "WARN: ~/.ssh/stico_github not exist, myenv git still in readonly mode!" && return 1
-
-	\cd ${HOME}
-	if (! \git remote -v | \grep -q ${gname}) ; then
-		\git remote rm origin
-		\git remote add origin "${gname}:stico/myenv.git"
-		\git config --global user.name stico
-		\git config --global user.email ouyzhu@gmail.com
-		\git push --set-upstream origin master
-	else
-		echo "INFO: myenv already in writable mode"
-	fi
-	\cd -
+	func_init_git_repo_writable ~/.zbox ouyzhu@gmail.com "ouyzhu_github:ouyzhu/zbox.git"
 }
 
+func_init_myenv_collection(){	
+	echo "INFO: --STEP-- try collect notes (func_std_standarize)"
+	
+	[ -e "${HOME}/.myenv/zgen/collection/all_content.txt" ] && echo "INFO: collection already exist, skip" && return 0
+
+	func_std_standarize
+}
+
+func_init_myenv_writable(){
+	echo "INFO: --STEP-- try to update myenv git to writable mode"
+
+	func_init_git_repo_writable ${HOME} ouyzhu@gmail.com "stico_github:stico/myenv.git"
+}
+
+func_init_git_repo_writable() {
+	local usage="Usage: ${FUNCNAME} <repo_path> <repo_mail> <repo_writable_addr>"
+	local desc="Desc: update git to use certification, so repo becomes writable" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+
+	local repo_dir="${1}"
+	local repo_mail="${2}"
+	local repo_addr="${3}"
+
+	# check, git cmd already checked in func_init_myenv()
+	func_complain_path_not_exist ${repo_dir}/.git "WARN: ${repo_dir}/.git NOT exist, check if repo path correct" && return 1
+	func_complain_path_not_exist ~/.ssh/${repo_addr%%:*} "WARN: ~/.ssh/${repo_addr%%:*} NOT exist, repo still in readonly mode!" && return 1
+
+	\cd ${repo_dir} &> /dev/null
+	if (! \git remote -v | \grep -q "${repo_addr}") ; then
+		echo "INFO: update git config info (origin, mail, set-upstream, etc)"
+		\git remote rm origin
+		\git remote add origin "${repo_addr}"
+		\git push --set-upstream origin master
+		\git config --global user.email "${repo_mail}"
+		\git config --global user.name "${repo_mail%%@*}"
+	else
+		echo "INFO: repo already in writable mode"
+	fi
+	\cd - &> /dev/null
+}
+
+# Deprecated
 func_pre_check() {
 	echo "INFO: --STEP-- pre condition check (username, platform, doc path, etc)"
 
@@ -268,20 +360,35 @@ func_pre_check() {
 	func_complain_path_not_exist /ext/Documents "WARN: /ext/Documents not exist, some private info can NOT be init"
 
 	# check user privilege
-	func_complain_privilege_not_sudoer "WARN: current user NOT have sudo privilege, some cmd might fail"
+	func_complain_sudo_unusable "some cmd might fail" && return 1
 
 	# Check platform
 	uname -s | grep -q "MINGW\|CYGWIN " && func_stop "ERROR: can NOT run init on CYGWIN or MINGW platform!"
 }
 
+func_is_sudo_need_password() {
+	# TODO: merge with func_complain_privilege_not_sudoer ???
+
+	# check if user need input password for sudo, return 0 if need input password, otherwise return 1
+	# true is a cmd, -n for check in safe way (will not prompt for password)
+	sudo -n true 2>/dev/null && return 1 || return 0
+}
+
+func_complain_sudo_unusable() {
+	local msg="skip ${1}, since sudo need password in non-interactive mode"
+
+	if func_is_sudo_need_password && func_is_non_interactive ; then 
+		echo "WARN: ${msg}"
+		echo "SUMMARY: ${msg}"
+		return 0
+	fi
+	return 1
+}
+
 func_init_sudoer() {
 	echo "INFO: --STEP-- update /etc/sudoers, use NOPASSWD way"
 
-	# check current situation, -n will prevents sudo from prompting the user for a password, so check in "safe way"
-	if ! sudo -n true 2>/dev/null && func_is_non_interactive ; then 
-		echo "ERROR: CAN NOT continue in non-interactive mode without sudo granted (password input at least once)."
-		exit 1
-	fi
+	func_complain_sudo_unusable "can NOT check/update /etc/sudoers file" && return 1
 
 	# check if already performed
 	if sudo grep "sudo.*NOPASSWD:" /etc/sudoers &> /dev/null ; then
@@ -293,12 +400,22 @@ func_init_sudoer() {
 	sudo sed -i '/%sudo/s/(ALL:ALL)/NOPASSWD:/' /etc/sudoers
 }
 
+func_init_apt_update() {	
+	echo "INFO: --STEP-- apt-get update"
+
+	func_complain_sudo_unusable && return 1
+
+	sudo apt-get update
+}
+
 func_init_apt_distupgrade() {
 	# TODO: seems the time check is unnecessary, the cmd is very fast in ubuntu 16.04
-	echo "INFO: --STEP-- apt dist-upgrade"
+	echo "INFO: --STEP-- apt-get dist-upgrade"
 
-	# Check if long enough to run again. NOTE: this file should NOT in ${tmp_init_dir}, as need across diff init
-	local apt_upgrade_stamp=/tmp/${tmp_tag}/apt-dist-upgrade-success-stamp
+	func_complain_sudo_unusable && return 1
+
+	# Check if long enough to run again. NOTE: this file should NOT in ${init_dir}, as need across diff init
+	local apt_upgrade_stamp=${tmp_base}/apt-dist-upgrade-success-stamp
 	[ ! -e $apt_upgrade_stamp ] && touch -t 197101020304 $apt_upgrade_stamp
 	local last_stamp=$(( $(date +%s) - $(stat -c %Y ${apt_upgrade_stamp}) ))
 	(( ${last_stamp:=12345678} < 259200 ))							\
@@ -320,36 +437,249 @@ func_init_apt_distupgrade() {
 	&& touch $apt_upgrade_stamp
 }
 
+func_init_apt_install_lib() {
+	echo "INFO: --STEP-- install library for other software intall/compile via apt-get"
+
+	func_complain_sudo_unusable && return 1
+
+	# usually for soft compile/install
+	sudo apt-get install -y linux-headers-`uname -r`	
+	sudo apt-get install -y build-essential build-essential 
+	sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev openssl libssl-dev
+}
+
 func_init_apt_install_basic() {
-	echo "INFO: --STEP-- install basic softwares"
+	echo "INFO: --STEP-- install basic softwares via apt-get"
 
-	sudo apt-get install -y dkms				# Dynamic Kernel Module Support
-	sudo apt-get install -y aptitude			
-	sudo apt-get install -y autossh w3m			# dev tools
-	sudo apt-get install -y expect unison 			
-	sudo apt-get install -y linux-headers-`uname -r`	# some soft compile need this
-	sudo apt-get install -y git subversion mercurial	# dev tools
-	sudo apt-get install -y openssh-server samba curl	
-	sudo apt-get install -y build-essential make gcc cmake	# build tools
-	sudo apt-get install -y zip unzip unrar p7zip p7zip-rar	
+	func_complain_sudo_unusable && return 1
 
+	func_init_apt_install_single git git 
+	func_init_apt_install_single gcc gcc 
+	func_init_apt_install_single zip zip 
+	func_init_apt_install_single make make 
+	func_init_apt_install_single dkms dkms			# Dynamic Kernel Module Support
+	func_init_apt_install_single tree tree
+	func_init_apt_install_single curl curl	
+	func_init_apt_install_single samba samba 
+	func_init_apt_install_single cmake cmake
+	func_init_apt_install_single unzip unzip 
+	func_init_apt_install_single unrar unrar 
+	func_init_apt_install_single hg mercurial
+	func_init_apt_install_single expect expect
+	func_init_apt_install_single unison unison
+	func_init_apt_install_single svn subversion 
+	func_init_apt_install_single aptitude aptitude
+	func_init_apt_install_single ssh openssh-server 
+	func_init_apt_install_single p7zip "7zip p7zip-rar"
+
+	# deprecated
+	#func_init_apt_install_single w3m w3m
+	#func_init_apt_install_single autossh autossh
 	#sudo apt-get install -y tmux autossh w3m		# dev tools
 	#sudo apt-get install -y debconf-utils			# help auto select when install software (like mysql, wine, etc)
 }
 
-# Init. NOTE: the sequence is important!
-echo "INFO: init start, log in tmp dir: ${tmp_init_log}"
-func_source_lib			# func_pipe_filter NOT work here
-func_init_sudoer		| func_pipe_filter "${tmp_init_log}"	# seq front since need fail fast
-func_pre_check			| func_pipe_filter "${tmp_init_log}"
-flocal last_stamp=unc_init_dirs			| func_pipe_filter "${tmp_init_log}"
-func_init_git_via_apt		| func_pipe_filter "${tmp_init_log}"
-func_init_myenv_via_git		| func_pipe_filter "${tmp_init_log}"
-func_init_myenv_secure		| func_pipe_filter "${tmp_init_log}"
-func_init_myenv_unison		| func_pipe_filter "${tmp_init_log}"
-func_init_git_writable		| func_pipe_filter "${tmp_init_log}"
-func_init_apt_distupgrade	| func_pipe_filter "${tmp_init_log}"	
-func_init_apt_install_basic	| func_pipe_filter "${tmp_init_log}"
+func_init_apt_install_single() {
+	if func_is_cmd_exist "${1}" ; then
+		echo "INFO: ${2} already installed"
+		return 0
+	else
+		sudo apt-get install -y "${2}"		\
+		&& echo "INFO: install ${2} success"	\
+		|| echo "WARN: install ${2} failed!"	
+	fi
+}
 
-# TODO: init zbox
-# TODO: run func_collect_all
+func_init_desktop_soft() {
+	echo "INFO: --STEP-- install software for desktop"
+
+	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
+
+	func_init_apt_install_single vlc vlc
+	func_init_apt_install_single xrdp xrdp
+	func_init_apt_install_single xclip xclip
+	func_init_apt_install_single arandr arandr
+	func_init_apt_install_single wmctrl wmctrl 
+	func_init_apt_install_single xdotool xdotool
+	func_init_apt_install_single rdesktop rdesktop
+	func_init_apt_install_single xbindkeys xbindkeys 
+	func_init_apt_install_single virtualbox "virtualbox virtualbox-guest-additions-iso virtualbox-ext-pack"
+
+	# code formatters, see ~auto-format@vim
+	func_init_apt_install_single tidy tidy 
+	func_init_apt_install_single astyle astyle 
+	func_init_apt_install_single python-autopep8 python-autopep8	
+
+	sudo apt-get install -y indicator-multiload
+
+	func_init_desktop_font		
+	func_init_desktop_clipit
+	func_init_desktop_chrome	
+	func_init_desktop_terminator
+
+	# deprecated
+	#sudo apt-get install -y fcitx-table-wbpy
+}
+
+func_init_desktop_terminator() { 
+	echo "INFO: --STEP-- try to install soft terminator"
+
+	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
+	command -v terminator &> /dev/null && echo "INFO: alredy installed, skip" && return 0
+	func_complain_sudo_unusable "can NOT install basic softwares via apt-get" && return 1
+
+	sudo apt-get install -y terminator
+	local conf=~/.config/terminator
+	[ -e "${conf}" ] && func_duplicate_dated "${conf}"
+	ln -s ${HOME}/.myenv/conf/terminator "${conf}"
+}
+
+# Deprecated
+func_init_desktop_virtualbox() { 
+	echo "INFO: --STEP-- try to install soft virtualbox"
+
+	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
+	[ -e /usr/bin/virtualbox ] && echo "INFO: alredy installed, skip" && return 0
+
+	if ( grep "DISTRIB_ID=Ubuntu" /etc/lsb-release ) ; then
+		# (2014-03: can NOT use usb in ver 4.3, even after install extension pack. V4.2 works and not need extension pack)
+		wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+		sudo sh -c 'echo "deb http://download.virtualbox.org/virtualbox/debian saucy contrib" >> /etc/apt/sources.list.d/virtualbox.list'
+		sudo apt-get install virtualbox
+	elif ( grep -i "DISTRIB_ID=LinuxMint" /etc/lsb-release ) ; then
+		sudo apt-get install -y virtualbox-nonfree
+		sudo apt-get install -y virtualbox-guest-additions-iso
+		# for functions like USB to work correctly
+		sudo usermod -a -G vboxusers $(whoami)
+	else
+		echo "WARN: failed to install virtualbox"
+	fi
+}
+
+func_init_desktop_chrome() {
+	echo "INFO: --STEP-- try to install soft chrome (apt-get way)"
+
+	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
+	command -v google-chrome           &> /dev/null && echo "INFO: alredy installed, skip" && return 0
+	dpkg -l | grep -i "google.*chrome" &> /dev/null && echo "INFO: alredy installed, skip" && return 0
+
+	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+	sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+	sudo apt-get install -y google-chrome-stable
+}
+
+func_init_desktop_clipit() { 
+	echo "INFO: --STEP-- try to install soft clipit"
+
+	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
+	command -v clipit &> /dev/null && echo "INFO: alredy installed, skip" && return 0
+
+	sudo apt-get install -y clipit
+
+	local conf=~/.config/clipit
+	[ -e "${conf}" ] && mv func_duplicate_dated "${conf}"
+	ln -s ${HOME}/.myenv/conf/clipit "${conf}"
+}
+
+func_init_desktop_font() {
+	echo "INFO: --STEP-- try to init font"
+	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
+
+	local font_sys=/usr/share/fonts/fontfiles
+	local font_xhei=${font_sys}/XHei.TTC
+	local font_msyhmono=${font_sys}/MSYHMONO.ttf
+	local font_home=/ext/Documents/DCC/font/repo/
+
+	func_complain_sudo_unusable && return 1
+	func_complain_path_not_exist ${font_home} && return 1
+
+	[ -e "${font_xhei}" -a -e "${font_msyhmono}" ] && echo "INFO: font already exist, skip" && return 0
+
+	sudo mkdir -p ${font_sys}
+	sudo cp ${font_home}/XHei.TTC ${font_home}/MSYHMONO.ttf ${font_sys}		# xhei for vim 
+	sudo chmod -R 755 ${font_sys}
+	fc-cache -fv >> ${tmp_init_log}							# update fonts 
+}
+ 
+func_init_desktop_xfce() {
+	echo "INFO: DE specific init for XFCE"
+	( ! dpkg -l | grep -i "xfce" &> /dev/null ) && echo "INFO: skip since not XFCE desktop" && return 0
+
+	# TODO: how to check?
+
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE applications config"
+	source_path=~/.myenv/conf/xfce/applications/
+	target_path=~/.local/share/applications/
+	func_duplicate_dated ${target_path}/defaults.list || return 0
+	mv -f ${target_path}/defaults.list /tmp/
+	cp $source_path/* $target_path/* >> $tmp_init_log
+
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE config"
+	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+	func_duplicate_dated ${target_path} || return 0
+	sed -i -e '/workspace_count/s/value="."/value="1"/' $target_path
+
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE key config"
+	source_path=~/.myenv/conf/xfce/xfce4-keyboard-shortcuts.xml
+	target_path=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+	func_duplicate_dated ${target_path} || return 0
+	mv -f $target_path /tmp/
+	cp $source_path $target_path >> $tmp_init_log
+	# without this, the Tab key not work in xrdp connection
+	#sed -i -e 's/Tab.*switch_window_key/Tab" type="empty/' $config_keys 
+
+	echo ">>> INIT `date "+%H:%M:%S"`: update XFCE keying config"
+	# without this, will get error like "WARNING: gnome-keyring:: couldn't connect to: /tmp/keyring-WtN6AD/pkcs11: No such file or directory"
+	dt_type=XFCE
+	gnome_keying_desktop=/etc/xdg/autostart/gnome-keyring-pkcs11.desktop
+	func_duplicate_dated ${gnome_keying_desktop} || return 0
+	if [ $(grep -c "OnlyShowIn=.*${dt_type}" $gnome_keying_desktop) -lt 1 ] ; then 
+		sudo sed -i -e "s/^\(OnlyShowIn=\)\(.*\)/\1${dt_type};\2/" $gnome_keying_desktop 
+	else 
+		echo "INFO: $gnome_keying_desktop already contains $dt_type, ignore"
+	fi
+}
+
+func_init_manual_needed() {
+	return 0
+
+	echo "INFO: Following steps need manual op (like set password, accept agreement), continue (N) [Y/N]?"
+	read -e continue                                                                                           
+	[ "$continue" != "Y" -a "$continue" != "y" ] && echo "Give up, pls install those soft manually later!" && return 1
+
+	echo "INFO: add a backup user, remember to change its password which already have record!"
+	( ! grep "^ouyangzhu2:" /etc/passwd &> /dev/null ) && sudo useradd -m -s /bin/bash -g sudo ouyangzhu2 && sudo passwd ouyangzhu2
+
+	#TODO: test it on ubuntu 13.10
+	#func_init_manual_infinality
+
+	# TODO: make sure this in unattended way, otherwise dist-upgrade will ask for agreement. Test the solution
+	# NOT work on 16.04 yet: http://askubuntu.com/questions/766491/failure-to-download-extra-data-files-with-ttf-mscorefonts-installer-on-ubuntu
+	# Need comfirm the dialog, seems deprecated the package "msttcorefonts"
+	echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+	echo ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note | sudo debconf-set-selections
+	sudo apt-get install -y --force-yes ttf-mscorefonts-installer
+}
+
+# Init. NOTE: the sequence is important!
+echo "INFO: init start, log in tmp dir: ${init_log}"
+func_source_lib			# func_pipe_filter NOT work here
+func_init_sudoer		| func_pipe_filter "${init_log}"	# seq front since need fail fast
+func_init_dirs			| func_pipe_filter "${init_log}"
+func_init_apt_update		| func_pipe_filter "${init_log}"	
+func_init_apt_distupgrade	| func_pipe_filter "${init_log}"	
+func_init_apt_install_lib	| func_pipe_filter "${init_log}"
+func_init_apt_install_basic	| func_pipe_filter "${init_log}"
+func_init_zbox_via_apt		| func_pipe_filter "${init_log}"
+func_init_myenv_via_git		| func_pipe_filter "${init_log}"
+func_init_myenv_local		| func_pipe_filter "${init_log}"
+func_init_myenv_secure		| func_pipe_filter "${init_log}"
+func_init_myenv_unison		| func_pipe_filter "${init_log}"
+func_init_myenv_writable	| func_pipe_filter "${init_log}"
+func_init_myenv_collection	| func_pipe_filter "${init_log}"
+func_init_zbox_writable		| func_pipe_filter "${init_log}"
+func_init_desktop_soft		| func_pipe_filter "${init_log}"
+func_init_desktop_xfce		| func_pipe_filter "${init_log}"
+
+echo "INFO: ---------------- SUMMARY ----------------"
+sed -n -e "s/^SUMMARY://p" "${init_log}" | cat -n
