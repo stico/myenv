@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TODO: seems cygwin init is very slow
+# NOTE: seems cygwin init is very slow (in 2014)
 # NOTE: unison remote style can not accept .bashrc have output
 
 # set flags
@@ -8,8 +8,13 @@
 [ $(uname -s | grep -c MINGW) -eq 1 ]  && os_mingw="true"  || os_mingw="false"
 [ $(uname -s | grep -c Darwin) -eq 1 ] && os_osx="true"    || os_osx="false"
 
-# os specific
+# set mask
 [ "$os_cygwin" = "true" -o "$os_mingw" = "true" ] && umask 000 || umask 077
+
+# If not running interactively, just return
+[ -z "$PS1" ] && return
+
+# os specific
 [ "$os_cygwin" = "false" -a -f /etc/bash_completion ] && source /etc/bash_completion 	# very slow in cygwin, run it first, init/bash.sh need turn off some completion on cygwin
 if [ "$os_osx" = "true" ] ; then
 	# NOTE: since myenv depends on GNU utilities, so NEED set PATH at beginning, even the PATH will be overwrite by later script
@@ -22,9 +27,6 @@ if [ "$os_osx" = "true" ] ; then
 	#test -r /sw/bin/init.sh && . /sw/bin/init.sh	# will add "/sw/bin:/sw/sbin:"
 	#[ -e $fink_cu_path ] && export PATH=$PATH:$fink_cu_path || echo "WARN: missing basic commands, try 'sudo apt-get install coreutils' (via fink)"
 fi
-
-# If not running interactively, don't do anything
-[ -z "$PS1" ] && return
 
 # init basic env
 SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`

@@ -1104,10 +1104,29 @@ func_sys_info_os_len() {
 	command -v uname &> /dev/null && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
 
 	# Note, cygwin is usually 32bit
-	if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then		echo "64bit"
-	elif [ $(echo $uname_info | grep -ic "i[3-6]86") -eq 1 ] ; then		echo "32bit"
-	else									echo "unknown"
-	fi
+	#if [ $(echo $uname_info | grep -ic "x86_64") -eq 1 ] ; then		echo "64bit"
+	#elif [ $(echo $uname_info | grep -ic "i[3-6]86") -eq 1 ] ; then		echo "32bit"
+	#else									echo "unknown"
+	#fi
+
+	# TODO 1: also use the os part to replace func_sys_info_os_name()?
+	# TODO 2: arm part still need improve
+	archi=$(uname -sm)
+	case "$archi" in
+		Darwin\ *64)   echo "64bit";;
+		Darwin\ *86)   echo "32bit";;
+		Linux\ *64)    echo "64bit";;
+		Linux\ *86)    echo "32bit";;
+		Linux\ armv5*) echo "armv5";;
+		Linux\ armv6*) echo "armv6";;
+		Linux\ armv7*) echo "armv7";;
+		Linux\ armv8*) echo "armv8";;
+		FreeBSD\ *64)  echo "64bit";;
+		FreeBSD\ *86)  echo "32bit";;
+		OpenBSD\ *64)  echo "64bit";;
+		OpenBSD\ *86)  echo "32bit";;
+		*)             echo "unknown";;
+	esac
 }
 
 func_sys_info_os_ver() {

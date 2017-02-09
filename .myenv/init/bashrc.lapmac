@@ -19,6 +19,8 @@ func_zbox_use_silent androidsdk	        24.0.2
 func_zbox_use_silent chromedriver	2.19
 func_zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x?
 func_zbox_use_silent ntfs-3g		2016.2.22
+func_zbox_use_silent mkvalidator	0.4.0
+func_zbox_use_silent fzf		git
 
 #func_zbox use python		3.4.3		# YouCompleteMe@vim still need python 2.x?
 
