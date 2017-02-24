@@ -470,24 +470,23 @@ func_init_apt_install_basic() {
 	func_init_apt_install_single svn subversion 
 	func_init_apt_install_single aptitude aptitude
 	func_init_apt_install_single ssh openssh-server 
-	func_init_apt_install_single p7zip "7zip p7zip-rar"
+	func_init_apt_install_single p7zip 7zip p7zip-rar
+	func_init_apt_install_single debconf debconf-utils		# help auto select when install software (like mysql, wine, etc)
 
 	# deprecated
 	#func_init_apt_install_single w3m w3m
 	#func_init_apt_install_single autossh autossh
 	#sudo apt-get install -y tmux autossh w3m		# dev tools
-	#sudo apt-get install -y debconf-utils			# help auto select when install software (like mysql, wine, etc)
 }
 
 func_init_apt_install_single() {
 	if func_is_cmd_exist "${1}" ; then
 		echo "INFO: ${2} already installed"
 		return 0
-	else
-		sudo apt-get install -y "${2}"		\
-		&& echo "INFO: install ${2} success"	\
-		|| echo "WARN: install ${2} failed!"	
 	fi
+
+	shift
+	sudo apt-get install -y "$@" && echo "INFO: install ${2} success" || echo "WARN: install ${2} failed!"	
 }
 
 func_init_desktop_soft() {
@@ -495,6 +494,13 @@ func_init_desktop_soft() {
 
 	[[ "${IS_DESKTOP}" = false ]] && echo "INFO: skip this step, as config IS_DESKTOP is false" && return 0 
 
+	# in other functions
+	func_init_desktop_font		
+	func_init_desktop_clipit
+	func_init_desktop_chrome	
+	func_init_desktop_terminator
+
+	# install one by one
 	func_init_apt_install_single vlc vlc
 	func_init_apt_install_single xrdp xrdp
 	func_init_apt_install_single xclip xclip
@@ -503,19 +509,19 @@ func_init_desktop_soft() {
 	func_init_apt_install_single xdotool xdotool
 	func_init_apt_install_single rdesktop rdesktop
 	func_init_apt_install_single xbindkeys xbindkeys 
-	func_init_apt_install_single virtualbox "virtualbox virtualbox-guest-additions-iso virtualbox-ext-pack"
+
+	sudo apt-get install -y indicator-multiload
+
+	# virtualbox need more step
+	apt-key list | grep -q virtualbox || wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+	echo virtualbox-ext-pack virtualbox-ext-pack/license select true | sudo debconf-set-selections
+	func_init_apt_install_single virtualbox virtualbox virtualbox-guest-additions-iso virtualbox-ext-pack
+	sudo usermod -a -G vboxusers $(whoami)
 
 	# code formatters, see ~auto-format@vim
 	func_init_apt_install_single tidy tidy 
 	func_init_apt_install_single astyle astyle 
 	func_init_apt_install_single python-autopep8 python-autopep8	
-
-	sudo apt-get install -y indicator-multiload
-
-	func_init_desktop_font		
-	func_init_desktop_clipit
-	func_init_desktop_chrome	
-	func_init_desktop_terminator
 
 	# deprecated
 	#sudo apt-get install -y fcitx-table-wbpy
@@ -564,8 +570,15 @@ func_init_desktop_chrome() {
 	dpkg -l | grep -i "google.*chrome" &> /dev/null && echo "INFO: alredy installed, skip" && return 0
 
 	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-	sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-	sudo apt-get install -y google-chrome-stable
+	if [ ! -e /etc/apt/sources.list.d/google-chrome.list ] ; then
+		sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+		sudo chmod 664 /etc/apt/sources.list.d/google-chrome.list
+	fi
+	sudo apt-get install -y --allow-unauthenticated google-chrome-stable
+
+	# from web, seems works for ubuntu 16.04
+	#wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+	#sudo dpkg -i --force-depends google-chrome-stable_current_amd64.deb
 }
 
 func_init_desktop_clipit() { 
