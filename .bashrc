@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# NOTE: seems cygwin init is very slow (in 2014)
+# NOTE: seems cygwin init is very slow (2014)
 # NOTE: unison remote style can not accept .bashrc have output
+
+# Source files
+SRC_ZBOX_FUNC=${HOME}/.zbox/zbox_func.sh
+SRC_BASH_COMMON=${HOME}/.myenv/conf/bash/bashrc.common
+SRC_BASH_HOSTNAME=${HOME}/.myenv/conf/bash/bashrc.$(hostname)
+SRC_BASH_MACHINEID=${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)
 
 # set flags
 [ $(uname -s | grep -c CYGWIN) -eq 1 ] && os_cygwin="true" || os_cygwin="false"
@@ -35,14 +41,10 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || e
 #uname | grep -q Darwin || export DISPLAY=
 
 # Init myenv, including common functions
-zbox_init=${HOME}/.zbox/zbox_func.sh
-bash_init=${HOME}/.myenv/init/bash.sh
-bash_local=${HOME}/.myenv/init/bashrc.$(hostname)
-bash_local_2=${HOME}/.myenv/init/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)
-[ -e "${zbox_init}" ] && source "${zbox_init}"
-[ -e "${bash_init}" ] && source "${bash_init}"
-[ -e "${bash_local}" ] && source "${bash_local}"
-[ -e "${bash_local_2}" ] && source "${bash_local_2}"
+[ -e "${SRC_ZBOX_FUNC}" ] && source "${SRC_ZBOX_FUNC}"
+[ -e "${SRC_BASH_COMMON}" ] && source "${SRC_BASH_COMMON}"
+[ -e "${SRC_BASH_HOSTNAME}" ] && source "${SRC_BASH_HOSTNAME}"
+[ -e "${SRC_BASH_MACHINEID}" ] && source "${SRC_BASH_MACHINEID}"
 
 # Init ssh agent
 func_ssh_agent_init
@@ -72,15 +74,20 @@ if [ "$os_cygwin" = "false" ] ; then
 	#complete -r vi vim gvim unzip					# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
 
 	# set diff prompt for internal machine and external machine 
-	internetIpCount=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|127.0.0.1\|fc00::\|fe80::\|::1\)')
-	if `grep -q "^bash_prompt_color=green" $HOME/.myenv/init/bashrc.$(hostname) &> /dev/null` ; then
-		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
-	elif [ "$internetIpCount" -ge 1 ] ; then 
-		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				# Red line with $ in next line
-		export PS1="\[\e[31m\]\u@$(hostname -I | sed "s/ .*//"):\w\n\$\[\e[0m\]"	# Red line with $ in next line, prompt as scp address
+	public_ip_count=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|fc00::\|fe80::\)')
+	if `cat ${SRC_BASH_HOSTNAME} ${SRC_BASH_MACHINEID} 2>/dev/null | grep -q "^bash_prompt_color=green" &> /dev/null` ; then
+		# Green line with $ in same line
+		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				
+	elif [ "${public_ip_count}" -ge 1 ] ; then 
+		# Red line with $ in next line
+		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				
+		# Red line with $ in next line, prompt as scp address
+		export PS1="\[\e[31m\]\u@$(hostname -I | sed "s/ .*//"):\w\n\$\[\e[0m\]"	
 	else 
-		#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				# Blue line with $ in same line
-		export PS1="\[\e[34m\]\u@$(hostname -I | sed "s/ .*//"):\w\$\[\e[0m\]"		# Blue line with $ in same line, prompt as scp address
+		# Blue line with $ in same line
+		#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				
+		# Blue line with $ in same line, prompt as scp address
+		export PS1="\[\e[34m\]\u@$(hostname -I | sed "s/ .*//"):\w\$\[\e[0m\]"		
 	fi
 else
 	# Green line with $ in same line

@@ -747,15 +747,36 @@ func_head() {
 }
 
 func_ip() {
-	if [ $(func_sys_info | grep -c "^cygwin") = 0 ] ; then
+	# NOTE: "tr -s ' '" compact space to single for better field identify
+	if [ $(func_sys_info | grep -c "cygwin") = 1 ] ; then
 		# non-cygwin env: ifconfig
 		/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
 		/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
-	else
+	elif [ $(func_sys_info | grep -c "osx") = 1 ] ; then
+		/sbin/ifconfig -a | tr -s ' '		\
+		| awk -F'[% ]' '			\
+			/^[a-z]/{print "";printf $1}	\
+			/^\s*inet /{printf " " $2}	\
+			# Un-comment to show IPv6 addr	\
+			# /^\s*inet6 /{printf " " $2}	\
+			END{print ""}'			\
+		| sed -e "/127.0.0.1/d;/^\s*$/d;/\s/!d;"\
+		| column -t -s " "
+	elif [ $(func_sys_info | grep -c "win") = 1 ] ; then
 		# seem directly pipe the output of ipconfig is very slow
 		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
 		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
 		#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
+	else
+		/sbin/ifconfig -a | tr -s ' '		\
+		| awk '					\
+			/^[a-z]/{printf $1 }		\
+			/inet addr:/{printf " " $2}	\
+			# Un-comment to show IPv6 addr	\
+			#/inet6 addr:/{printf " " $3}	\
+			/^$/{print}'			\
+		| sed -e "/127.0.0.1/d;s/addr://" 	\
+		| column -t -s " "
 	fi
 }
 
@@ -1131,6 +1152,7 @@ func_sys_info_os_len() {
 
 func_sys_info_os_ver() {
 	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release
+	elif uname | grep -q Darwin ; then					echo "osx"
 	elif [ "$os_name" = "cygwin" ] ; then					uname -r | sed -e "s/(.*//"
 	else									echo "unknown"
 	fi
@@ -1223,7 +1245,7 @@ func_translate_google() {
 	else	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=en&sl=zh-CN"	# cn > en	# why become cn > cn !!??
 	fi
 
-	res_raw=`curl -e "http://translate.google.cn/?"							\
+	res_raw=`curl -e "http://translate.google.cn/?"								\
 		-H 'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:11.0) Gecko/20100101 Firefox/11.0'	\
 		-H 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'			\
 		-s "http://translate.google.cn/translate_a/t"							\

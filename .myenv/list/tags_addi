@@ -22,7 +22,13 @@ ins=$ZBOX/ins
 src=$ZBOX/src
 stg=$ZBOX/stg
 
+# MYENV
+init=$MY_ENV_INIT
+conf=$MY_ENV_CONF
+zgen=$MY_ENV_ZGEN
+
 # OUMISC
+data=/data
 misc=$ZBOX/src/oumisc/oumisc-git
 oumisc=$ZBOX/src/oumisc/oumisc-git
 ourepo=$ZBOX/src/ourepo/ourepo-git
