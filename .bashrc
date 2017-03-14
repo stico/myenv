@@ -74,20 +74,19 @@ if [ "$os_cygwin" = "false" ] ; then
 	#complete -r vi vim gvim unzip					# vi complete seems very annoying (shows help of gawk!) on cygwin # seems fix in cygwin 1.17
 
 	# set diff prompt for internal machine and external machine 
-	public_ip_count=$(func_ip | grep -v -c '^\(172\.\|192\.\|10\.\|fc00::\|fe80::\)')
 	if `cat ${SRC_BASH_HOSTNAME} ${SRC_BASH_MACHINEID} 2>/dev/null | grep -q "^bash_prompt_color=green" &> /dev/null` ; then
 		# Green line with $ in same line
 		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				
-	elif [ "${public_ip_count}" -ge 1 ] ; then 
-		# Red line with $ in next line
-		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				
-		# Red line with $ in next line, prompt as scp address
-		export PS1="\[\e[31m\]\u@$(hostname -I | sed "s/ .*//"):\w\n\$\[\e[0m\]"	
-	else 
+	elif func_ip | grep -q '[^0-9\.]\(172\.\|192\.\|10\.\|fc00::\|fe80::\)' ; then 
 		# Blue line with $ in same line
 		#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				
 		# Blue line with $ in same line, prompt as scp address
 		export PS1="\[\e[34m\]\u@$(hostname -I | sed "s/ .*//"):\w\$\[\e[0m\]"		
+	else 
+		# Red line with $ in next line
+		#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				
+		# Red line with $ in next line, prompt as scp address
+		export PS1="\[\e[31m\]\u@$(hostname -I | sed "s/ .*//"):\w\n\$\[\e[0m\]"	
 	fi
 else
 	# Green line with $ in same line
