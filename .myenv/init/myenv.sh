@@ -20,10 +20,8 @@ func_via_git() {
 	[ -e "${TMP_PATH}/.git" ] && \cd "${TMP_PATH}" && \git pull || \git clone "${REPO_ADDR}"
 	[ -e "${TMP_PATH}/.git" ] || func_die "ERROR: ${TMP_PATH}/.git NOT exist, git clone failed"
 
-	# to avoid move the "*/./..", another way (not test): mv /kkk/.[!.]* /xxx/
-	shopt -s dotglob
 	mv ${TMP_PATH}/* ${HOME}
-	mv ${TMP_PATH}/.* ${HOME}
+	mv ${TMP_PATH}/.[!.]* ${HOME}
 	\cd ${HOME}
 	\git config --global user.email "stico@163.com"
 	\git config --global user.name "stico"
