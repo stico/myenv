@@ -274,6 +274,14 @@ func_validate_cmd_exist() {
 	done
 }
 
+func_is_dir_empty() {
+	local usage="Usage: $FUNCNAME <dir>"
+	local desc="Desc: check if directory is empty or inexist, return 0 if empty, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 1 || return 0
+}
+
 func_validate_dir_not_empty() {
 	local usage="Usage: $FUNCNAME <dir> ..."
 	local desc="Desc: the directory must exist and NOT empty, otherwise will exit" 
@@ -281,7 +289,7 @@ func_validate_dir_not_empty() {
 	
 	for p in "$@" ; do
 		# only redirect stderr, otherwise the test will always false
-		[ ! "$(ls -A "${p}" 2> /dev/null)" ] && func_stop "ERROR: ${p} is empty!"
+		func_is_dir_empty "${p}" && func_stop "ERROR: ${p} is empty!"
 	done
 }
 
@@ -292,7 +300,7 @@ func_validate_dir_empty() {
 	
 	for p in "$@" ; do
 		# only redirect stderr, otherwise the test will always false
-		[ "$(ls -A "${p}" 2> /dev/null)" ] && func_stop "ERROR: ${p} not empty!"
+		func_is_dir_empty "${p}" || func_stop "ERROR: ${p} not empty!"
 	done
 }
 
@@ -312,7 +320,7 @@ func_link_init() {
 	# check, skip if target already link, remove if target empty 
 	func_complain_path_not_exist ${source} && return 0
 	[ -h "${target}" ] && echo "INFO: ${target} already a link (--> $(readlink -f ${target}) ), skip" && return 0
-	[ -d "${target}" ] && [ ! "$(ls -A ${target})" ] && rmdir "${target}"
+	[ -d "${target}" ] && func_is_dir_empty "${target}" && rmdir "${target}"
 
 	\ln -s "${source}" "${target}"
 }

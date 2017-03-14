@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# check bash version
-echo $BASH_VERSION | grep -q "^[123]\." && echo "ERROR: bash version must 4+" && return 1
+# check bash version, quite few production env use ubuntu 9.04, bash version is 3.2
+#echo $BASH_VERSION | grep -q "^[123]\." && echo "ERROR: bash version must 4+" && return 1
 
 # make it simple, we works under the .myenv dir
 \pushd $HOME/.myenv &> /dev/null
@@ -35,7 +35,7 @@ envFuncSrc=(myenv_func.sh myenv_dev.sh secu/myenv_func_secu.sh)
 if [ ! -e $genShPath ] ; then
 	mkdir -p $genShPath
 fi
-rm $genShPath/*
+func_is_dir_empty $genShPath || rm $genShPath/*
 
 # gen env var
 for envFile in "${envVarSrc[@]}"

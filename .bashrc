@@ -77,7 +77,7 @@ if [ "$os_cygwin" = "false" ] ; then
 	if `cat ${SRC_BASH_HOSTNAME} ${SRC_BASH_MACHINEID} 2>/dev/null | grep -q "^bash_prompt_color=green" &> /dev/null` ; then
 		# Green line with $ in same line
 		export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				
-	elif func_ip | grep -q '[^0-9\.]\(172\.\|192\.\|10\.\|fc00::\|fe80::\)' ; then 
+	elif func_ip | grep -q '[^0-9\.]\(172\.\|192\.\|fc00::\|fe80::\)' ; then 
 		# Blue line with $ in same line
 		#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				
 		# Blue line with $ in same line, prompt as scp address
