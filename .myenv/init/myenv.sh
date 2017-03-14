@@ -1,3 +1,6 @@
+# init myenv
+# one line cmd: curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/init/myenv.sh' | bash
+
 TMP_DIR=/tmp/__init_myenv__
 TMP_PATH="${TMP_DIR}/myenv"
 REPO_ADDR=git://github.com/stico/myenv.git
@@ -14,8 +17,8 @@ func_via_git() {
 	\cd "${TMP_DIR}" || func_die "ERROR: failed to mkdir/cd tmp dir: ${TMP_DIR}"
 
 	echo "INFO: init myenv from github via git"
-	\git clone "${REPO_ADDR}"
-	[ -e "${TMP_PATH}/.git" ] && echo "INFO: ${TMP_PATH}/.git NOT exist, git clone failed" && exit 0
+	[ -e "${TMP_PATH}/.git" ] && \cd "${TMP_PATH}" && \git pull || \git clone "${REPO_ADDR}"
+	[ -e "${TMP_PATH}/.git" ] || func_die "ERROR: ${TMP_PATH}/.git NOT exist, git clone failed"
 
 	# to avoid move the "*/./..", another way (not test): mv /kkk/.[!.]* /xxx/
 	shopt -s dotglob

@@ -16,6 +16,7 @@
 #		
 
 # TODO
+#	split into small pieces like myenv.sh?
 #	run func_collect_all
 #	how to?: production env of dw, usually should not install via apt-get?
 #	into myenv: 
@@ -33,7 +34,8 @@
 # Config
 IS_DESKTOP=true
 REUSE_DOWNLOADED_SOURCE=true
-DATED_BACKUP_PATH=${HOME}/Documents/DCB/DatedBackup
+MY_ENV_INIT="${HOME}/.myenv/init"
+DATED_BACKUP_PATH="${HOME}/Documents/DCB/DatedBackup"
 
 # Variable
 tmp_base="/tmp/_me_init_"
@@ -225,7 +227,7 @@ func_init_myenv_local() {
 	local local_bashrc="${HOME}/.myenv/init/bashrc.$(hostname)"
 	if [ ! -e "${local_bashrc}" ] ; then
 		touch "${local_bashrc}"
-		echo "INFO: pls add local stuff (e.g. func_zbox_use) in: ${local_bashrc}"
+		echo "INFO: pls add local stuff (e.g. zbox) in: ${local_bashrc}"
 	fi
 }
 
@@ -642,7 +644,7 @@ func_init_apt_distupgrade	| func_pipe_filter "${init_log}"
 func_init_apt_install_lib	| func_pipe_filter "${init_log}"
 func_init_apt_install_basic	| func_pipe_filter "${init_log}"
 func_init_zbox_via_apt		| func_pipe_filter "${init_log}"
-func_init_myenv_via_git		| func_pipe_filter "${init_log}"
+bash "${MY_ENV_INIT}/myenv.sh"	| func_pipe_filter "${init_log}"
 func_init_myenv_local		| func_pipe_filter "${init_log}"
 func_init_myenv_secure		| func_pipe_filter "${init_log}"
 func_init_myenv_unison		| func_pipe_filter "${init_log}"
