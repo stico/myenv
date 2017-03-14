@@ -9,4 +9,4 @@ bash_prompt_color=green
 export LC_ALL="en_US.UTF-8"
 
 # zbox
-func_zbox_use_silent ruby		2.4.0
+zbox_use_silent ruby		2.4.0

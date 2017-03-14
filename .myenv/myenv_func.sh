@@ -181,6 +181,7 @@ func_std_gen_tags() {
 			echo "${dd##*/}=${dd}" >> "${MY_TAGS_CODE}"
 		done
 	done
+	echo "INFO: standarize of tags generation, done"
 }
 
 func_std_gen_links() {
@@ -198,6 +199,7 @@ func_std_gen_links() {
 			fi
 		done
 	done
+	echo "INFO: standarize of links generation, done"
 }
 
 func_std_standarize() {

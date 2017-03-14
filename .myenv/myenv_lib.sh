@@ -55,7 +55,7 @@ func_mkdir() {
 }
 
 func_mkdir_cd() { 
-	local usage="Usage: $FUNCNAME <path> ..." 
+	local usage="Usage: $FUNCNAME <path>" 
 	local desc="Desc: (fail fast) create dir and cd into it. Create dirs if NOT exist, exit if fail, which is different with /bin/mkdir" 
 	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
 
@@ -74,6 +74,7 @@ func_download() {
 	[ -z "${1}" ] && func_die "ERROR: url is null or empty, download failed"
 	[ -f "${2}" ] && echo "INFO: file (${2}) already exist, skip download" && return 0
 
+	# TODO: curl has a feature --metalink <addr> (if target site support), which could make use of mirrors (e.g. for failover)
 	case "${1}" in
 		*)		func_download_wget "$@"	;;
 		#http://*)	func_download_wget "$@" ;;
@@ -235,6 +236,16 @@ func_validate_path_owner() {
 	[ "${real}" != "${expect}" ] && func_stop "ERROR: owner NOT match, expect: ${expect}, real: ${real}"
 }
 
+func_is_positive_int() {
+	local usage="Usage: $FUNCNAME <param>"
+	local desc="Desc: return 0 if the param is positive integer, otherwise will 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	# NOTE: no quote on the pattern part!
+	local num="${1}"
+	[[ "${num}" =~ ^[\-]*[0-9]+$ ]] && (( num > 0 )) && return 0 || return 1
+}
+
 func_is_cmd_exist() {
 	local usage="Usage: $FUNCNAME <cmd>"
 	local desc="Desc: check if cmd exist, return 0 if exist, otherwise 1" 
@@ -300,7 +311,7 @@ func_link_init() {
 
 	# check, skip if target already link, remove if target empty 
 	func_complain_path_not_exist ${source} && return 0
-	[ -h "${target}" ] && echo "INFO: >> ${target} already a link (--> $(readlink -f ${target}) ), skip" && return 0
+	[ -h "${target}" ] && echo "INFO: ${target} already a link (--> $(readlink -f ${target}) ), skip" && return 0
 	[ -d "${target}" ] && [ ! "$(ls -A ${target})" ] && rmdir "${target}"
 
 	\ln -s "${source}" "${target}"
@@ -346,6 +357,34 @@ func_pipe_filter() {
 	else
 		tee -a "${1}" | sed -n -e "/^\(Desc\|INFO\|WARN\|ERROR\):/p"
 	fi
+}
+
+func_gen_local_vars() {
+	local usage="Usage: $FUNCNAME <file1> <file2> ..." 
+	local desc="Desc: gen local var definition based on file sequence" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	# check file existence
+	local exist_files=()
+	local inexist_files=()
+	for f in "$@" ; do
+		if ! [ -r "${f}" ] ; then
+			inexist_files+=("${f}")
+			continue
+		fi
+		exist_files+=("${f}")
+	done
+
+	# report to stderr
+	(( ${#inexist_files[*]} > 0 )) && echo "DEBUG: skip those inexist files: ${inexist_files[*]}" 1>&2
+	(( ${#exist_files[*]} == 0 )) && echo "WARN: NO files really readable to gen local var: $@" 1>&2 && return 1
+
+	# TODO: embrace value with " or ', since bash eval get error if value have special chars like &/, etc. path field almost always have such chars.
+	# works but not efficient: s/^\([^=[:blank:]]*\)[[:blank:]]*=[[:blank:]]*/\1=/;
+	cat "${exist_files[@]}"			\
+	| sed -e "/^[[:blank:]]*\($\|#\)/d;
+		s/[[:blank:]]*=[[:blank:]]*/=/;
+		s/^/local /"
 }
 
 ################################################################################
