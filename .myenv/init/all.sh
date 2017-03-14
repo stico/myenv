@@ -183,12 +183,6 @@ func_init_git_via_make() {
 	ln -s "$git_target_path" "$git_target_link"
 }
 
-func_init_myenv_via_http() {
-	echo "WARN: --STEP-- NOT implemented yet!!!"
-	echo "INFO: --STEP-- init myenv from github via http (ReadOnly)"
-	return 1
-}
-
 func_init_zbox_via_apt() {		
 	echo "INFO: --STEP-- init zbox from github via git"
 
@@ -197,43 +191,6 @@ func_init_zbox_via_apt() {
 	local repo_name=zbox
 	local repo_addr=git://github.com/ouyzhu/zbox.git
 	func_vcs_update git "${repo_addr}" ~/.zbox
-}
-
-func_init_myenv() {
-	echo "WARN: --STEP-- NOT implemented yet!!!" && return 1
-
-	[ -e ${HOME}/.git ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && return 0
-	func_init_myenv_via_git || func_init_myenv_via_http
-}
-
-# TODO: actually not useful here, reuse ~/.myenv/myenv_init.sh instead?
-func_init_myenv_via_git() {
-	echo "INFO: --STEP-- init myenv from github via git"
-
-	local repo_name=myenv
-	local repo_addr=git://github.com/stico/myenv.git
-	#local repo_addr=https://github.com/stico/myenv.git	# not work when libcurl not support https
-	#local repo_addr=git@github.com:stico/myenv.git		# need privilege
-
-	[ -e ${HOME}/.git ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && return 0
-
-	func_complain_cmd_not_exist git "ERROR: cmd git NOT exist, skip init myenv via git" && return 1
-
-	\cd ${init_dir}
-	\git clone $repo_addr
-	func_complain_path_not_exist ${init_dir}/${repo_name}/.git "ERROR: fail to git clone from github" && return 1
-
-	# to avoid move the "*/./..", another way (not test): mv /kkk/.[!.]* /xxx/
-	shopt -s dotglob
-	mv ${init_dir}/$repo_name/* ${HOME}
-	mv ${init_dir}/$repo_name/.* ${HOME}
-
-	\cd ${HOME}
-	\git config --global user.email "stico@163.com"
-	\git config --global user.name "stico"
-	\git config --global push.default simple
-	echo "INFO: myenv init success (git way)!"
-	\cd -
 }
 
 func_init_myenv_unison() {
