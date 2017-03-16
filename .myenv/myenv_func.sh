@@ -996,97 +996,73 @@ func_ssh_with_jump() {
 	local ip_addr="$(getent hosts $1 | sed "s/\s\+.*$//")"
 	[[ -z $ip_addr ]] && ip_addr=$1
 
-	port=32200
-	jump_machine=dw
+	local port=32200
+	local jump_host=dw
 	shift
-	ssh -t $jump_machine "ssh -p $port $ip_addr $@"			# V1, simple version
+	ssh -t "${jump_host}" "ssh -p ${port} ${ip_addr} $@"			# V1, simple version
 
 	# TODO: check the $1, if it is a ip, should not parse as unique_name
 	# TODO: add function for run cmd on multiple host
 	# Demo: func_ssh_with_jump 222.88.95.197 
 }
 
-func_translate_ip() {
-	func_param_check 1 "Usage: $FUNCNAME [domain/host name]" "$@"
-
-	ping -c 1 "${1}" | head -1 | sed -e "s/[^(]*(//;s/).*//"
-}
-
 func_scp_with_jump_translate_remote() {
 	func_param_check 1 "Usage: $FUNCNAME [addr]" "$@"
 
-	echo ${1} | grep -q -v ":" && echo "${1}" && return 0
-	echo "$(func_translate_ip ${1%:*}):${1#*:}"
+	func_str_not_contains "${1}" ":" && echo "${1}" && return 0
+
+	local ip="$(ping -c 1 "${1%:*}" | head -1 | sed -e "s/[^(]*(//;s/).*//")"
+	echo "${ip}:${1#*:}"
 }
 
 func_scp_with_jump() {
-	func_param_check 2 "Usage: $FUNCNAME [source] [target]" "$@"
+	local usage="Usage: $FUNCNAME <source> <target>"
+	local desc="Desc: scp via jump machine, from <source> to <target> dir" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
 
-	PORT=32200
-	JUMP_MACHINE=dw
-
-	source=$1
-	sourceName=$(basename $source)
-	tmpTransferName=tmp_transfer_`func_dati`_${sourceName}
-	target=$2
-	targetDir=$(dirname ${target##*:})
-	targetCmd="mkdir -p $targetDir"
-	targetAddr=${target%%:*}
-
-	source=$(func_scp_with_jump_translate_remote "${source}")
-	target=$(func_scp_with_jump_translate_remote "${target}")
-
-	if [[ $(echo $1 | grep -c ":") == 1 ]] 
-	then
-		echo "Downloading ..."
-
-		# download content to jump machine
-		ssh $JUMP_MACHINE "scp -r -P $PORT $source ~/$tmpTransferName"
-
-		# create dir and download content to local machine 
-		$targetCmd
-		[[ -d $target ]] && targetFullName=$target/$sourceName
-		scp -r -P $PORT ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName $targetFullName
-	else
-		echo "Uploading ..."
-
-		# upload content to jump machine
-		scp -r -P $PORT $source ouyangzhu@$JUMP_MACHINE:~/$tmpTransferName
-
-		# create dir and upload content to target machine in jump machine
-		ssh $JUMP_MACHINE "ssh -p $PORT $targetAddr $targetCmd"
-		# TODO: support rename in target (see above)
-		ssh $JUMP_MACHINE "scp -r -P $PORT ~/$tmpTransferName $target"
-	fi
-
-	# delete tmp file in jump machine
-	ssh $JUMP_MACHINE "rm -rf ~/$tmpTransferName"
-
+	# TODO: possible to support scp between 2 production machine?
 	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
 
-	# Improve: the file name was changed to tmp_xxx
-	# Improve: support unique_name (need translate, since the jump machine didn't set the hosts)
-	# Improve: support file name with wildcard
-	# Improve: cache the file based on MD5?
-	# Improve: support all senario 
-	#	L > R	I	cmd on L(src=L-Path		target=J-Host-Tmp)		II: cmd on J(src=J-Tmp	target=R-Host-Path)
-	#	R > L	II	cmd on J(src=R-Host-Path	target=J-Tmp)			II: cmd on L(src=L-Path	target=J-Host-Tmp)
-	#	R1 > R2	III	cmd on J(src=R1-Host-Path	target=J-Tmp)			II: cmd on J(src=J-Tmp	target=R2-Host-Tmp)
-	#
-	#	rule for scp exe location		J if $1 contains :, otherwise L
-	#	rule for scp exe stage 1 src		directly use
-	#	rule for scp exe stage 1 target		J-Tmp if $1 contains :, otherwise J-Host-Tmp
-	#	rule for scp exe stage 2 src		J-Tmp if $2 contains :, otherwise directly use
-	#	rule for scp exe stage 2 target		directly use if $2 contains :, otherwuse J-Host-Tmp
-	#
-	#	and mkdir?
+	local port=32200
+	local jump_host=dw
+	local jump_tmpdir="~/amp/__transfer__/$(func_dati)"
+
+	local source=$(func_scp_with_jump_translate_remote "${1}")
+	local sourceName=$(basename $source)
+	local target=$(func_scp_with_jump_translate_remote "${2}")
+	local targetName="${target##*:}"
+	local targetAddr=${target%%:*}
+
+	# Perform transfer
+	if func_str_contains "${source}" ":" ; then
+		[ -d "${target}" ] || func_cry "ERROR: target MUST be a directory!"
+		[ -e "${target}/${sourceName}" ] && func_cry "ERROR: ${target}/${sourceName} already exist, NOT support override!"
+
+		echo "Downloading ..."
+		ssh "${jump_host}" "mkdir -p ${jump_tmpdir}"
+		ssh "${jump_host}" "scp -r -P ${port} ${source} ${jump_tmpdir}"
+		scp -r -P "${port}" "ouyangzhu@${jump_host}:${jump_tmpdir}/*" "${target}"
+	else
+		func_is_str_blank "${targetName}" && func_cry "ERROR: var targetName is blank!"
+		[ -e "${source}" ] || func_cry "ERROR: ${source} NOT exist!"
+		local target_exist="$(ssh "${jump_host}" "ssh -p ${port} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
+		[ "${target_exist}" = "true" ] && func_cry "ERROR: ${targetName}/${sourceName} on target meachine already exist!"
+		
+		echo "Uploading ..."
+		ssh "${jump_host}" "mkdir -p ${jump_tmpdir}"
+		scp -r -P "${port}" "${source}" "ouyangzhu@${jump_host}:${jump_tmpdir}"
+		ssh "${jump_host}" "scp -r -P ${port} ${jump_tmpdir}/* ${target}"
+	fi
+
+	# cleanup, in case too much garbage
+	ssh "${jump_host}" "bash ${jump_tmpdir}/../cleanup.sh"
 
 	# Demo: 
-		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test
-		#func_scp_with_jump ~/amp/test/t1 ouyangzhu@222.134.66.106:~/test1
-		#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test2/test
-		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test/t1 ~/amp/2012-11-01/test1
-		#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
+	#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test
+	#func_scp_with_jump ~/amp/test/t1 ouyangzhu@222.134.66.106:~/test1
+	#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test2/test
+	#func_scp_with_jump ouyangzhu@222.134.66.106:~/test/t1 ~/amp/2012-11-01/test1
+	#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
 }
 
 func_terminator() { 

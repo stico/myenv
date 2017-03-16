@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 # source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
@@ -453,4 +453,41 @@ func_num_to_human() {
 		let unit_index++
 	done
 	echo "${number}${fraction}${UNIT[$unit_index]}"
+}
+
+################################################################################
+# Data Type: string
+################################################################################
+
+func_is_str_empty() {
+	local usage="Usage: $FUNCNAME <string>"
+	local desc="Desc: check if string is empty (or not defined), return 0 if empty, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	[ -z "${1}" ] && return 0 || return 1
+}
+
+func_is_str_blank() {
+	local usage="Usage: $FUNCNAME <string>"
+	local desc="Desc: check if string is blank (or not defined), return 0 if empty, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	# remove all space and use -z to check
+	[ -z "${1//[[:blank:]]}" ] && return 0 || return 1
+}
+
+func_str_not_contains() {
+	! func_str_contains "$@"
+}
+
+func_str_contains() {
+	local usage="Usage: $FUNCNAME <string> <substr>"
+	local desc="Desc: check if string contains substr, return 0 if contains, otherwise 1" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+	
+	func_is_str_empty "${1}" && return 1
+
+	# use != for not contains
+	# use =~ for regex match: [[ $string =~ .*My.* ]], note if regex contains space, need escape with "\"
+	[[ "${1}" == *"${2}"* ]] && return 0 || return 1
 }
