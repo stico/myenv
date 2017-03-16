@@ -20,8 +20,8 @@ stty -ixoff
 shopt -s histappend
 shopt -s histreedit
 shopt -s checkwinsize
-SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`
 uname -s | grep -iq darwin && [ -d "${MACPORTS}" ] && export PATH="${MACPORTS}:${MACPORTS}/bin:${MACPORTS}/libexec/gnubin/:${PATH}:"	# OSX: macports path must be in the front 
+SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`			# must after PATH setting to compitable with OSX (/opt/local/libexec/gnubin//dircolors)
 
 # Completion
 [ -f "${COMPLETION}" ] && source "${COMPLETION}"

@@ -230,6 +230,7 @@ let g:netrw_dirhistmax=0
 ""let g:syntastic_quiet_messages = { "type": "style" }			" filter out some messages types
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']		" checker chain, run one by one (only run laters if current success)
 let g:syntastic_auto_jump = 2						" jump to 1st error (NOT warning)
+let g:syntastic_bash_checkers=['shellcheck']				" syntastic@vim, sub section 'python'
 let g:syntastic_python_checkers=['pyflakes']				" syntastic@vim, sub section 'python'
 let g:syntastic_html_checkers=['tidy', 'jshint']
 let g:syntastic_javascript_checkers = ['jshint']			" syntastic@vim, sub section 'javascript'
@@ -241,11 +242,11 @@ let g:formatprg_java = "astyle"
 let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --unpad-paren --add-brackets"
 
 """""""" YouCompleteMe@vim
-"highlight Pmenu ctermfg=2 ctermbg=3 guifg=#005f87 guibg=#EEE8D5		" 菜单补全菜单配色
+"highlight Pmenu ctermfg=2 ctermbg=3 guifg=#005f87 guibg=#EEE8D5	" 菜单补全菜单配色
 "highlight PmenuSel ctermfg=2 ctermbg=3 guifg=#AFD700 guibg=#106900	" 选中项补全菜单配色
 "let g:ycm_complete_in_comments=1					" 补全功能在注释中同样有效
 "let g:ycm_confirm_extra_conf=0						" 允许 vim 加载 .ycm_extra_conf.py 文件，不再提示
-"let g:ycm_collect_identifiers_from_tags_files=1				" 开启 YCM 标签补全引擎
+"let g:ycm_collect_identifiers_from_tags_files=1			" 开启 YCM 标签补全引擎
 "set tags+=/data/misc/software/misc./vim/stdcpp.tags			" 引入 C++ 标准库tags
 "inoremap <leader>; <C-x><C-o>						" YCM 集成 OmniCppComplete 补全引擎，设置其快捷键
 "set completeopt-=preview						" 补全内容不以分割子窗口形式出现，只显示补全列表
