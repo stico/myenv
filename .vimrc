@@ -289,7 +289,7 @@ filetype plugin indent on				" type detection, language-dependent indenting
 set autoread						" auto read if file updated (e.g. by other soft)
 set autochdir						" automatically change current dir
 set autoindent						" auto indent the new line to the previous one
-set dictionary+=$MY_ENV/list/words_us
+set dictionary+=$MY_DCO/english/dictionary/words_us
 set nobackup						" won't leave additional file(s) after close VIM
 set nowritebackup					" default is :set writebackup, will keep a backup file while file is being worked. Once VIM is closed; the backup will vanish.
 set noswapfile						" (1) Keep in mind that this option will keep everything in memory. (2) Don't use this for big files, will be memeory consuming and Recovery will be impossible! (3) In essence; if security is a concern, use this option

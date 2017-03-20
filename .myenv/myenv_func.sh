@@ -12,13 +12,12 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
 [ -z "$MY_ENV" ]		&& MY_ENV=$HOME/.myenv
+[ -z "$MY_ENV_CONF" ]		&& MY_ENV_CONF=$MY_ENV/conf
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
-[ -z "$MY_ENV_LIST" ]		&& MY_ENV_LIST=$MY_ENV/list
-[ -z "$MY_ENV_LOG" ]		&& MY_ENV_LOG=$MY_ENV/zgen/log
-[ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/list/tags_addi
 [ -z "$MY_TAGS_NOTE" ]		&& MY_TAGS_NOTE=$MY_ENV/zgen/tags_note
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
-[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD_PROJ)
+[ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/env/tags_addi
+[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD)
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
@@ -576,9 +575,8 @@ func_collect_all() {
 	echo "INFO: collecting myenv"
 	local myenv_content=${base}/myenv_content.txt
 	local myenv_filelist=${base}/myenv_filelist.txt
-	#for f in $(locate "$MY_ENV" | sed -e "/\/zgen\/collection/d;/\.fl_me.txt/d;/list\/words_us/d") ; do
-	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+" | sed -e '/list\/words_us/d')"
-	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_LIST/myenv_addi | xargs -I{}  echo echo {} )")"
+	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
+	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_CONF/env/myenv_addi | xargs -I{}  echo echo {} )")"
 	for f in $myenv_git $myenv_addi ; do
 		[ ! -e "$f" ] && continue
 		#[ ! -e "$f" ] && echo "WARN: file inexist: ${f}" && continue
@@ -1038,7 +1036,7 @@ func_scp_with_jump() {
 		[ -d "${target}" ] || func_cry "ERROR: target MUST be a directory!"
 		[ -e "${target}/${sourceName}" ] && func_cry "ERROR: ${target}/${sourceName} already exist, NOT support override!"
 
-		echo "Downloading ..."
+		echo "INFO: start to download ..."
 		ssh "${jump_host}" "mkdir -p ${jump_tmpdir}"
 		ssh "${jump_host}" "scp -r -P ${port} ${source} ${jump_tmpdir}"
 		scp -r -P "${port}" "ouyangzhu@${jump_host}:${jump_tmpdir}/*" "${target}"
@@ -1048,7 +1046,7 @@ func_scp_with_jump() {
 		local target_exist="$(ssh "${jump_host}" "ssh -p ${port} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
 		[ "${target_exist}" = "true" ] && func_cry "ERROR: ${targetName}/${sourceName} on target meachine already exist!"
 		
-		echo "Uploading ..."
+		echo "INFO: start to upload ..."
 		ssh "${jump_host}" "mkdir -p ${jump_tmpdir}"
 		scp -r -P "${port}" "${source}" "ouyangzhu@${jump_host}:${jump_tmpdir}"
 		ssh "${jump_host}" "scp -r -P ${port} ${jump_tmpdir}/* ${target}"
@@ -1195,7 +1193,7 @@ func_sys_info() {
 
 func_translate() { 
 	# check history
-	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename $MY_ENV/list/translate_history_*)
+	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename ${MY_DCO}/english/translate/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	func_translate_google "$@" || func_translate_microsoft "$@" || func_translate_youdao "$@"
@@ -1233,7 +1231,7 @@ func_translate_google() {
 	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
 	echo $res_simple
 	echo $res_raw
-	echo -e "$*\t$res_simple\n\t$res_raw" >> $MY_ENV/list/translate_history_$(hostname)
+	echo -e "$*\t$res_simple\n\t$res_raw" >> ${MY_DCO}/english/translate/translate_history_$(hostname)
 }
 
 func_translate_microsoft() { 
@@ -1269,7 +1267,7 @@ func_translate_microsoft() {
 	[ -z "$res_raw" ] && return 1
 
 	echo $res_raw
-	echo -e "$*\n\t$res_raw" >> $MY_ENV/list/translate_history_$(hostname)
+	echo -e "$*\n\t$res_raw" >> ${MY_DCO}/english/translate/translate_history_$(hostname)
 }
 
 func_delete_dated() { 

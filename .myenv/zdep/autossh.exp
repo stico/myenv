@@ -1,8 +1,0 @@
-#!/usr/bin/expect
-
-#TODO: the send passwd not work, since there will be a GUI dialog
-set timeout 120
-spawn autossh -M 1986 -N -D 1984 ******@******
-expect "*@foolssh.info's password:"
-send "******\r"
-#interact

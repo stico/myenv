@@ -9,7 +9,8 @@
 MACPORTS="/opt/local"
 COMPLETION="/etc/bash_completion"
 SRC_ZBOX_FUNC=${HOME}/.zbox/zbox_func.sh
-SRC_BASH_COMMON=${HOME}/.myenv/conf/bash/bashrc.common
+SRC_BASH_ENV=${HOME}/.myenv/conf/env/env.sh
+SRC_BASH_FUNC=${HOME}/.myenv/myenv_func.sh
 SRC_BASH_HOSTNAME=${HOME}/.myenv/conf/bash/bashrc.$(hostname)
 SRC_BASH_MACHINEID=${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)
 
@@ -21,7 +22,9 @@ shopt -s histappend
 shopt -s histreedit
 shopt -s checkwinsize
 uname -s | grep -iq darwin && [ -d "${MACPORTS}" ] && export PATH="${MACPORTS}:${MACPORTS}/bin:${MACPORTS}/libexec/gnubin/:${PATH}:"	# OSX: macports path must be in the front 
-SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || eval `dircolors -b /etc/DIR_COLORS`			# must after PATH setting to compitable with OSX (/opt/local/libexec/gnubin//dircolors)
+
+# shellcheck disable=2015
+SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval "$(dircolors -b ~/.dir_colors)" || eval "$(dircolors -b /etc/DIR_COLORS)"		# must after PATH setting to compitable with OSX (/opt/local/libexec/gnubin//dircolors)
 
 # Completion
 [ -f "${COMPLETION}" ] && source "${COMPLETION}"
@@ -29,8 +32,9 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval `dircolors -b ~/.dir_colors` || e
 complete -F _known_hosts scpx sshx ssht
 
 # Source files
+[ -e "${SRC_BASH_ENV}" ] && source "${SRC_BASH_ENV}"
 [ -e "${SRC_ZBOX_FUNC}" ] && source "${SRC_ZBOX_FUNC}"
-[ -e "${SRC_BASH_COMMON}" ] && source "${SRC_BASH_COMMON}"
+[ -e "${SRC_BASH_FUNC}" ] && source "${SRC_BASH_FUNC}"
 [ -e "${SRC_BASH_HOSTNAME}" ] && source "${SRC_BASH_HOSTNAME}"
 [ -e "${SRC_BASH_MACHINEID}" ] && source "${SRC_BASH_MACHINEID}"
 
@@ -39,7 +43,7 @@ complete -F _known_hosts scpx sshx ssht
 [ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh		# infinality font rendering config
 
 # Settings for diff machine type
-if `cat ${SRC_BASH_HOSTNAME} ${SRC_BASH_MACHINEID} 2>/dev/null | grep -q "^bash_prompt_color=green" &> /dev/null` ; then
+if grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" ; then
 	func_ssh_agent_init							# Init ssh agent
 	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"			# Green line with $ in same line
 elif func_ip | grep -q '[^0-9\.]\(172\.\|192\.\|fc00::\|fe80::\)' ; then 

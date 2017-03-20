@@ -370,7 +370,7 @@ func_pipe_filter() {
 func_gen_local_vars() {
 	local usage="Usage: $FUNCNAME <file1> <file2> ..." 
 	local desc="Desc: gen local var definition based on file sequence" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 
 	# check file existence
 	local exist_files=()
