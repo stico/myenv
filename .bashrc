@@ -43,7 +43,7 @@ complete -F _known_hosts scpx sshx ssht
 [ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh		# infinality font rendering config
 
 # Settings for diff machine type
-if grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" ; then
+if grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null ; then
 	func_ssh_agent_init							# Init ssh agent
 	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"			# Green line with $ in same line
 elif func_ip | grep -q '[^0-9\.]\(172\.\|192\.\|fc00::\|fe80::\)' ; then 
