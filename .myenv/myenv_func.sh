@@ -330,7 +330,7 @@ func_load_rvm() {
 
 func_locate_dbupdate() {
 	# skip for OSX
-	uname | grep -q Darwin && return
+	uname | grep -q Darwin && return 1
 
 	sudo updatedb
 }
@@ -338,9 +338,9 @@ func_locate_dbupdate() {
 func_locate() {
 	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
 
-	uname | grep -q Darwin		\
-	&& func_locate_via_find "$@"	\
-	|| func_locate_via_locate "$@"
+	# seems tuned find is always a good choice (even much better than mlocate on osx), see performance@locate
+	# func_locate_via_locate "$@"
+	func_locate_via_find "$@"
 }
 
 func_locate_via_find() {
@@ -1310,7 +1310,7 @@ func_backup_myenv() {
 }
 
 func_backup_dated() { 
-	func_param_check 1 "Usage: $FUNCNAME <path>\n\tCurrently only support backup up single target (file/dir)." "$@" 
+	func_param_check 1 "Usage: $FUNCNAME <path> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." "$@" 
 	# TODO: backup list of file & dir
 
 	local srcPath="$(readlink -f "$1")"
@@ -1318,6 +1318,8 @@ func_backup_dated() {
 	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
 	local packFile="$(mktemp -d)/${targetFile}.zip"
 	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
+
+	[ -n "${2}" ] && bakPaths+=("${2}")
 
 	#echo "INFO: check if source exist, srcPath: ${srcPath}"
 	func_validate_path_exist "${srcPath}" 
