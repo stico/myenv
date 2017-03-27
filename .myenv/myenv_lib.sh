@@ -185,15 +185,44 @@ func_vcs_update() {
 }
 
 ################################################################################
-# Utility: validation and check
-# TODO: rename: validate to assert
+# Utility: FileSystem
 ################################################################################
-func_complain_privilege_not_sudoer() { 
-	local usage="Usage: $FUNCNAME <msg>"
-	local desc="Desc: complains if current user not have sudo privilege, return 0 if not have, otherwise 1" 
+func_is_filetype_text() {
+	local usage="Usage: $FUNCNAME <path>"
+	local desc="Desc: check if filetype is text, return 0 if yes, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	file "${1}" | grep -q text
+}
+
+func_is_dir_empty() {
+	local usage="Usage: $FUNCNAME <dir>"
+	local desc="Desc: check if directory is empty or inexist, return 0 if empty, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 1 || return 0
+}
+
+func_validate_dir_not_empty() {
+	local usage="Usage: $FUNCNAME <dir> ..."
+	local desc="Desc: the directory must exist and NOT empty, otherwise will exit" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 	
-	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege!}" && result=0
-	return 1
+	for p in "$@" ; do
+		# only redirect stderr, otherwise the test will always false
+		func_is_dir_empty "${p}" && func_stop "ERROR: ${p} is empty!"
+	done
+}
+
+func_validate_dir_empty() {
+	local usage="Usage: $FUNCNAME <dir> ..."
+	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	for p in "$@" ; do
+		# only redirect stderr, otherwise the test will always false
+		func_is_dir_empty "${p}" || func_stop "ERROR: ${p} not empty!"
+	done
 }
 
 func_complain_path_not_exist() {
@@ -236,78 +265,6 @@ func_validate_path_owner() {
 	[ "${real}" != "${expect}" ] && func_stop "ERROR: owner NOT match, expect: ${expect}, real: ${real}"
 }
 
-func_is_positive_int() {
-	local usage="Usage: $FUNCNAME <param>"
-	local desc="Desc: return 0 if the param is positive integer, otherwise will 1" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-	
-	# NOTE: no quote on the pattern part!
-	local num="${1}"
-	[[ "${num}" =~ ^[\-]*[0-9]+$ ]] && (( num > 0 )) && return 0 || return 1
-}
-
-func_is_cmd_exist() {
-	local usage="Usage: $FUNCNAME <cmd>"
-	local desc="Desc: check if cmd exist, return 0 if exist, otherwise 1" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-
-	command -v "${1}" &> /dev/null && return 0 || return 1
-}
-
-func_complain_cmd_not_exist() {
-	local usage="Usage: $FUNCNAME <cmd> <msg>"
-	local desc="Desc: complains if command not exist, return 0 if not exist, otherwise 1" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-
-	func_is_cmd_exist "${1}" && return 1
-	echo "${2:-WARN: cmd ${1} NOT exist!}" 
-	return 0
-}
-
-func_validate_cmd_exist() {
-	local usage="Usage: $FUNCNAME <cmd> ..."
-	local desc="Desc: the cmd must be exist, otherwise will exit" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-
-	for p in "$@" ; do
-		func_is_cmd_exist "${p}" || func_stop "ERROR: cmd (${p}) NOT exist!"
-	done
-}
-
-func_is_dir_empty() {
-	local usage="Usage: $FUNCNAME <dir>"
-	local desc="Desc: check if directory is empty or inexist, return 0 if empty, otherwise 1" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-
-	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 1 || return 0
-}
-
-func_validate_dir_not_empty() {
-	local usage="Usage: $FUNCNAME <dir> ..."
-	local desc="Desc: the directory must exist and NOT empty, otherwise will exit" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-	
-	for p in "$@" ; do
-		# only redirect stderr, otherwise the test will always false
-		func_is_dir_empty "${p}" && func_stop "ERROR: ${p} is empty!"
-	done
-}
-
-func_validate_dir_empty() {
-	local usage="Usage: $FUNCNAME <dir> ..."
-	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-	
-	for p in "$@" ; do
-		# only redirect stderr, otherwise the test will always false
-		func_is_dir_empty "${p}" || func_stop "ERROR: ${p} not empty!"
-	done
-}
-
-################################################################################
-# Utility: FileSystem
-################################################################################
-
 func_link_init() {
 	local usage="Usage: ${FUNCNAME} <target> <source>"
 	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
@@ -349,14 +306,49 @@ func_duplicate_dated() {
 }
 
 ################################################################################
-# Utility: shell
+# Utility: shell/os/system
 ################################################################################
+func_is_cmd_exist() {
+	local usage="Usage: $FUNCNAME <cmd>"
+	local desc="Desc: check if cmd exist, return 0 if exist, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	command -v "${1}" &> /dev/null && return 0 || return 1
+}
 
 func_is_non_interactive() {
 	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
 	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
 	# explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
 	[ -z "$PS1" ] && return 0 || return 1
+}
+
+func_complain_cmd_not_exist() {
+	local usage="Usage: $FUNCNAME <cmd> <msg>"
+	local desc="Desc: complains if command not exist, return 0 if not exist, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	func_is_cmd_exist "${1}" && return 1
+	echo "${2:-WARN: cmd ${1} NOT exist!}" 
+	return 0
+}
+
+func_validate_cmd_exist() {
+	local usage="Usage: $FUNCNAME <cmd> ..."
+	local desc="Desc: the cmd must be exist, otherwise will exit" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	for p in "$@" ; do
+		func_is_cmd_exist "${p}" || func_stop "ERROR: cmd (${p}) NOT exist!"
+	done
+}
+
+func_complain_privilege_not_sudoer() { 
+	local usage="Usage: $FUNCNAME <msg>"
+	local desc="Desc: complains if current user not have sudo privilege, return 0 if not have, otherwise 1" 
+	
+	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege!}" && result=0
+	return 1
 }
 
 func_pipe_filter() {
@@ -385,7 +377,7 @@ func_gen_local_vars() {
 
 	# report to stderr
 	(( ${#inexist_files[*]} > 0 )) && echo "DEBUG: skip those inexist files: ${inexist_files[*]}" 1>&2
-	(( ${#exist_files[*]} == 0 )) && echo "WARN: NO files really readable to gen local var: $@" 1>&2 && return 1
+	(( ${#exist_files[*]} == 0 )) && echo "WARN: NO files really readable to gen local var: $*" 1>&2 && return 1
 
 	# TODO: embrace value with " or ', since bash eval get error if value have special chars like &/, etc. path field almost always have such chars.
 	# works but not efficient: s/^\([^=[:blank:]]*\)[[:blank:]]*=[[:blank:]]*/\1=/;
@@ -393,6 +385,114 @@ func_gen_local_vars() {
 	| sed -e "/^[[:blank:]]*\($\|#\)/d;
 		s/[[:blank:]]*=[[:blank:]]*/=/;
 		s/^/local /"
+}
+
+################################################################################
+# Utility: network
+################################################################################
+func_is_valid_ip() {
+	local usage="Usage: $FUNCNAME <address>" 
+	local desc="Desc: check if address is valid ipv4/ipv6 address, return 0 if yes otherwise no"
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	func_is_valid_ipv4 "${1}" && return 0
+	func_is_valid_ipv6 "${1}" && return 0
+	return 1
+}
+
+func_is_valid_ipv4() {
+	local usage="Usage: $FUNCNAME <address>" 
+	local desc="Desc: check if address is valid ipv4 address, return 0 if yes otherwise no"
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	# candiate: use python: socket.inet_pton(socket.AF_INET, sys.argv[1])
+	# candiate: seems tool ipcalc/sipcalc could do this, but need install
+
+	# Test
+	#func_is_valid_ip4 4.2.2.2 && echo yes || echo no
+	#func_is_valid_ip4 192.168.1.1 && echo yes || echo no
+	#func_is_valid_ip4 0.0.0.0 && echo yes || echo no
+	#func_is_valid_ip4 255.255.255.255 && echo yes || echo no
+	#func_is_valid_ip4 192.168.0.1 && echo yes || echo no
+	#func_is_valid_ip4 " 169.252.12.253       " && eyn
+	#echo "^^^^^^^^^^^ is yes -------- vvvvvvvv below is no"
+	#func_is_valid_ip4 255.255.255.256 && echo yes || echo no
+	#func_is_valid_ip4 a.b.c.d && echo yes || echo no
+	#func_is_valid_ip4 192.168.0 && echo yes || echo no
+	#func_is_valid_ip4 1234.123.123.123 && echo yes || echo no
+
+	# seems accurate enough
+	local part="25[0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[1-9][0-9]\|[0-9]"
+
+	# shellcheck disable=2086
+	# do NOT use " around ${1}, as blank will cause ^ or $ fail in grep
+	echo ${1} | grep -q "^\(${part}\)\(\.\(${part}\)\)\{3\}$"
+}
+
+func_is_valid_ipv6() {
+	local usage="Usage: $FUNCNAME <address>" 
+	local desc="Desc: check if address is valid ipv6 address, return 0 if yes otherwise no"
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	# candiate: https://twobit.us/2011/07/validating-ip-addresses/
+	# candiate: use python: socket.inet_pton(socket.AF_INET6, sys.argv[1])
+
+	# Test
+	#func_is_valid_ip6 1:2:3:4:5:6:7:8 && eyn
+	#func_is_valid_ip6 1:2:3:4:5:6:7:9999 && eyn
+	#echo "^^^^^^^^^^^ is yes -------- vvvvvvvv below is no"
+	#func_is_valid_ip6 1:2:3:4:5:6:7: && eyn
+	#func_is_valid_ip6 1:2:3:4:5:6:7:9999999 && eyn
+
+	# Source: http://stackoverflow.com/questions/53497/regular-expression-that-matches-valid-ipv6-addresses
+	# Comment: use POSIX regex, seems have some flaw, improve it if really need to 
+	local RE_IPV6
+	local RE_IPV4="((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])"
+	RE_IPV6="([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|"                    # TEST: 1:2:3:4:5:6:7:8
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,7}:|"                         # TEST: 1::                              1:2:3:4:5:6:7::
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|"         # TEST: 1::8             1:2:3:4:5:6::8  1:2:3:4:5:6::8
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|"  # TEST: 1::7:8           1:2:3:4:5::7:8  1:2:3:4:5::8
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|"  # TEST: 1::6:7:8         1:2:3:4::6:7:8  1:2:3:4::8
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|"  # TEST: 1::5:6:7:8       1:2:3::5:6:7:8  1:2:3::8
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|"  # TEST: 1::4:5:6:7:8     1:2::4:5:6:7:8  1:2::8
+	RE_IPV6="${RE_IPV6}[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|"       # TEST: 1::3:4:5:6:7:8   1::3:4:5:6:7:8  1::8
+	RE_IPV6="${RE_IPV6}:((:[0-9a-fA-F]{1,4}){1,7}|:)|"                     # TEST: ::2:3:4:5:6:7:8  ::2:3:4:5:6:7:8 ::8       ::     
+	RE_IPV6="${RE_IPV6}fe08:(:[0-9a-fA-F]{1,4}){2,2}%[0-9a-zA-Z]{1,}|"     # TEST: fe08::7:8%eth0      fe08::7:8%1                                      (link-local IPv6 addresses with zone index)
+	RE_IPV6="${RE_IPV6}::(ffff(:0{1,4}){0,1}:){0,1}${RE_IPV4}|"            # TEST: ::255.255.255.255   ::ffff:255.255.255.255  ::ffff:0:255.255.255.255 (IPv4-mapped IPv6 addresses and IPv4-translated addresses)
+	RE_IPV6="${RE_IPV6}([0-9a-fA-F]{1,4}:){1,4}:${RE_IPV4}"                # TEST: 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33                        (IPv4-Embedded IPv6 Address)
+
+	# shellcheck disable=2086
+	# do NOT use " around ${1}, as blank will cause ^ or $ fail in grep
+	echo ${1} | egrep -q "^(${RE_IPV6})$"
+}
+
+func_ip_of_host() {
+	local usage="Usage: $FUNCNAME <host>" 
+	local desc="Desc: echo one ip of the host, otherwise echo empty, return original if already an ip"
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	# 1st Check: return original, trim spaces, as valid address not have space
+	func_is_valid_ip "${1}" && echo "${1//[[:blank:]]/}" && return 0
+
+	# 2nd Check: Use /etc/hosts, faster
+	if [ -r /etc/hosts ] ; then
+		# shellcheck disable=2155
+		local etc_val="$(grep "^[^#]*${1}[[:blank:]].*$" /etc/hosts)" 
+		[ -n "${etc_val}" ] && echo "${etc_val%%[[:blank:]]*}" && return 0
+	fi
+	
+	# 3rd Check: Use os cmd, (2017-03) simple test shows, time is NOT stable on ubuntu16.04, reason is the OS or the network?
+	if uname | grep -q Darwin ; then
+		local result
+		# dscacheutil -q host -a name "${1}" | sed '/ip_address/!d;s/^[^0-9]*//'
+		result="$(dscacheutil -q host -a name "${1}")"
+		echo "${result##*: }"
+	else
+		getent hosts "${1}" | sed "s/\s\+.*$//"
+	fi
+
+	# more ways to get ip: ping, ns-lookup, etc
+	#ping -c 1 "${1%:*}" | head -1 | sed -e "s/[^(]*(//;s/).*//"	# note when host inexist
 }
 
 ################################################################################
@@ -435,6 +535,15 @@ func_cry() {
 ################################################################################
 # Data Type: number
 ################################################################################
+func_is_positive_int() {
+	local usage="Usage: $FUNCNAME <param>"
+	local desc="Desc: return 0 if the param is positive integer, otherwise will 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	# NOTE: no quote on the pattern part!
+	local num="${1}"
+	[[ "${num}" =~ ^[-]*[0-9]+$ ]] && (( num > 0 )) && return 0 || return 1
+}
 
 func_num_to_human() {
 	local usage="Usage: $FUNCNAME <number>"
@@ -458,7 +567,6 @@ func_num_to_human() {
 ################################################################################
 # Data Type: string
 ################################################################################
-
 func_is_str_empty() {
 	local usage="Usage: $FUNCNAME <string>"
 	local desc="Desc: check if string is empty (or not defined), return 0 if empty, otherwise 1" 

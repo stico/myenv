@@ -8,6 +8,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 #source ${HOME}/.myenv/myenv_func.sh || source ./myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 #source $HOME/.myenv/myenv_lib.sh || source ./myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
+# Const of Path
 [ -z "$ZBOX" ]			&& ZBOX=$HOME/.zbox
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
@@ -20,6 +21,11 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD)
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
+
+# Const of misc
+[ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
+[ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
+[ -z "$MY_JUMP_TRANSFER" ]	&& MY_JUMP_TRANSFER="~/amp/__transfer__"	# do NOT use $MY_ENV here
 
 func_validate_exist() {
 	# TODO: deprecate this wrapper
@@ -61,15 +67,6 @@ func_validate_cmd_exist() {
 	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
 }
 
-func_validate_file_type_text() {
-	func_param_check 1 "USAGE: $FUNCNAME <file>" "$@"
-
-	# TODO: effeciency need improve!
-
-	real_file=$(eval echo "$*")
-	file "$real_file" | grep -q text
-}
-
 func_filter_comments() {
 	func_param_check 1 "USAGE: $FUNCNAME <file> ..." "$@"
 
@@ -100,12 +97,15 @@ func_eval() {
 func_grep_myenv() {
 	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
 
-	cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
-	xargs --delimiter="\n" grep -d skip -I -i "$@" 2>&1	| \
-	# use relative path which is shorter
-	sed -e "s+^${base}+.+"					| \
-	# re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
-	grep --color "$@"
+	func_collect_myenv "no_content"
+	xargs -d'\n' -a "${MY_ENV_ZGEN}/collection/myenv_filelist.txt" grep --color -d skip -I -i "$@" 2>&1
+
+	#cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
+	#xargs -d'\n' grep -d skip -I -i "$@" 2>&1		| \
+	## use relative path which is shorter
+	# sed -e "s+^${base}+.+"				| \
+	## re-color result. More: grep -oE ".{0,20}$search.{0,20}", to shorter the result
+	#grep --color "$@"
 }
 
 func_eval_path() {
@@ -339,6 +339,7 @@ func_locate() {
 	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
 
 	# seems tuned find is always a good choice (even much better than mlocate on osx), see performance@locate
+	# BUT also note the limit of the func_locate_via_find, which usually enough
 	# func_locate_via_locate "$@"
 	func_locate_via_find "$@"
 }
@@ -509,8 +510,34 @@ func_collect_statistics() {
 
 		# use function in pipe
 		#export -f func_param_check
-		#export -f func_validate_file_type_text
-		#cat myenv_filelist.txt | xargs -n 1 -I{} bash -c 'func_validate_file_type_text {} && wc -l {}' | sort -n | tee /tmp/2
+		#export -f func_is_filetype_text
+		#cat myenv_filelist.txt | xargs -n 1 -I{} bash -c 'func_is_filetype_text {} && wc -l {}' | sort -n | tee /tmp/2
+	done
+}
+
+func_collect_myenv() {
+	# extract alone as "func_grep_myenv" need update file list frequently
+	# NOTE: myenv_content/myenv_filelist might duplicate with caller
+
+	local need_content="${1:-true}"
+	local myenv_content=${MY_ENV_ZGEN}/collection/myenv_content.txt
+	local myenv_filelist=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
+	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
+	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_CONF/env/myenv_addi | xargs -I{}  echo echo {} )")"
+
+	[ -e "${myenv_filelist}" ] && func_delete_dated ${myenv_filelist}
+	[ -e "${myenv_content}" ] && [ "${1}" = "true" ] && func_delete_dated ${myenv_content}
+
+	for f in ${myenv_git} ${myenv_addi} ; do
+		#[ ! -e "$f" ] && echo "WARN: file inexist: ${f}" && continue
+
+		[ ! -e "$f" ] && continue
+		echo "${f}" >> "${myenv_filelist}"
+
+		[ "${1}" = "with_content" ] || continue
+		func_is_filetype_text "${f}" || continue
+		echo -e "\n\n@${f}\n"  >> "${myenv_content}"
+		sed -e "s///" "${f}" >> "${myenv_content}"
 	done
 }
 
@@ -575,19 +602,7 @@ func_collect_all() {
 	echo "INFO: collecting myenv"
 	local myenv_content=${base}/myenv_content.txt
 	local myenv_filelist=${base}/myenv_filelist.txt
-	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
-	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_CONF/env/myenv_addi | xargs -I{}  echo echo {} )")"
-	for f in $myenv_git $myenv_addi ; do
-		[ ! -e "$f" ] && continue
-		#[ ! -e "$f" ] && echo "WARN: file inexist: ${f}" && continue
-
-		echo "${f}" >> "${myenv_filelist}"
-
-		func_validate_file_type_text "${f}" || continue
-
-		echo -e "\n\n@${f}\n"  >> "${myenv_content}"
-		sed -e "s///" "${f}" >> "${myenv_content}"
-	done
+	func_collect_myenv "with_content"
 	echo "INFO: >> $(wc -l ${myenv_content}) lines"
 
 	echo "INFO: collecting code"
@@ -644,7 +659,7 @@ func_collect_all() {
 	-e "/\/html\/ref_html.*.htm/d"					\
 	-e "/\/template_war_spring\/.*\/blueprint\//d"			\
 	"${code_filelist}" | while read line ; do
-		func_validate_file_type_text "${line}" || continue
+		func_is_filetype_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
 		sed -e "s///" "${line}" >> "${code_content}"
 	done
@@ -986,48 +1001,154 @@ func_ssh_agent_init() {
 	ssh-add ~/.ssh/ouyangzhu_duowan
 }
 
-func_ssh_with_jump() {
-	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
-
-	uname | grep -q Darwin									&& \
-	local ip_addr="$(dscacheutil -q host -a name $1 | sed '/ip_address/!d;s/^[^0-9]*//')"	|| \
-	local ip_addr="$(getent hosts $1 | sed "s/\s\+.*$//")"
-	[[ -z $ip_addr ]] && ip_addr=$1
-
-	local port=32200
-	local jump_host=dw
-	shift
-	ssh -t "${jump_host}" "ssh -p ${port} ${ip_addr} $@"			# V1, simple version
-
-	# TODO: check the $1, if it is a ip, should not parse as unique_name
-	# TODO: add function for run cmd on multiple host
-	# Demo: func_ssh_with_jump 222.88.95.197 
-}
-
-func_scp_with_jump_translate_remote() {
+func_scp_host_to_ip() {
 	func_param_check 1 "Usage: $FUNCNAME [addr]" "$@"
 
 	func_str_not_contains "${1}" ":" && echo "${1}" && return 0
 
-	local ip="$(ping -c 1 "${1%:*}" | head -1 | sed -e "s/[^(]*(//;s/).*//")"
-	echo "${ip}:${1#*:}"
+	echo "$(func_ip_of_host "${1%:*}"):${1#*:}"
 }
 
-func_scp_with_jump() {
-	local usage="Usage: $FUNCNAME <source> <target>"
-	local desc="Desc: scp via jump machine, from <source> to <target> dir" 
+func_ssh_via_jump() {
+	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
+
+	local ip_addr="$(func_ip_of_host "${1}")"
+	[ -z "${ip_addr}" ] && ip_addr="${1}"
+	shift
+
+	ssh -t "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $@"			# V1, simple version
+
+	# TODO: check the $1, if it is a ip, should not parse as unique_name
+	# TODO: add function for run cmd on multiple host
+	# Demo: func_ssh_via_jump 222.88.95.197 
+}
+
+func_dist_via_jump() {
+	local usage="Usage: $FUNCNAME <tag> <source> <target_prefix> "
+	local desc="Desc:\tstep 1) if <source> (default is local) provided, download <tag> from <source> then run step 2, otherwise directly run step 2.\n\tstep 2) distribute <tag> to all hosts defined in /etc/hosts, with <target_prefix> (default is as tag) prefix"
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+
+	# Design: 
+
+	# Const
+	local DIST_BASE="~/.myenv/dist"		# do NOT use ${MY_ENV} or ${HOME} here, HOME path is diff on diff machine, need expansion on target machine
+	local DIST_BAK="${DIST_BASE}/backup"
+
+	# Parameters
+	local tag="${1}"
+	local target_prefix="${3:-${tag}}"
+	local source_ip="$(func_ip_of_host ${2:-__NOT_EXIST#HOST__})"
+
+	# Variable
+	local dati="$(func_dati)"
+	local dist_path="${DIST_BASE}/${tag}"
+	local jump_tmpdir="${MY_JUMP_TRANSFER}/${dati}"
+	local tag_path_local="$(func_tag_value_raw "${tag}")"
+
+	# Check
+	[ -f "${tag_path_local}" ] && tag_path_local="${tag_path_local%/*}"
+	[ -d "${tag_path_local}" ] || func_stop "ERROR: local path (${tag_path_local}) for tag (${tag}) NOT exist!"
+	[ -n "${2}" ] && [ -z "${source_ip}" ] && func_stop "ERROR: failed to translate <source> (${2}) to ip address, abort!"
+
+	# Jump part
+	if [ -n "${source_ip}" ]; then
+		local source_full_addr="${source_ip}:${dist_path}"
+		func_is_valid_ip "${source_ip}" || func_stop "ERROR: source ip (${source_ip}) NOT valid, abort!"
+
+		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
+		func_scp_prod_to_jump "${jump_tmpdir}" "${source_full_addr}/*"
+	else
+		local dist_paths=()
+		[ -d "${tag_path_local}/config" ] && dist_paths+=("${tag_path_local}/config") || echo "INFO: ${tag_path_local}/config NOT exist, skip"
+		[ -d "${tag_path_local}/script" ] && dist_paths+=("${tag_path_local}/script") || echo "INFO: ${tag_path_local}/script NOT exist, skip"
+		[ ${#dist_paths[@]} -eq 0 ] && func_stop "ERROR: dist_paths for '${tag}' is empty, means nothing to distribute, abort!"
+
+		echo "INFO: '${tag}' from localhost (${dist_paths[*]}) to jump machine (${jump_tmpdir})"
+		func_scp_local_to_jump "${jump_tmpdir}" "${tag}" "${dist_paths[@]}" 
+	fi
+
+	# Verify JUMP
+	local jump_tmpdir_contents="$(ssh "${MY_JUMP_HOST}" "ls ${jump_tmpdir}")"
+	echo "INFO: verify jump tmpdir, gets content: "${jump_tmpdir_contents}
+	[ -z "${jump_tmpdir_contents}" ] && func_stop "ERROR: no content on jump tmpdir, abort!"
+
+	# Distribute to remote
+	local dist_hosts="$(grep "^[^#]*[[:blank:]]${target_prefix}" /etc/hosts | sed -e "/${source_ip:-__DIST-INEXIST#STR__}/d;s/\s.*//;" | sort -u)"
+	echo "INFO: distribute to hosts: "${dist_hosts}
+	func_jump_distribute ${dati} ${tag} ${dist_hosts} 
+
+	# Distribute to local
+	if [ -n "${source_ip}" ]; then
+		echo "INFO: also backup to local: (${tag_path_local})"
+
+		mkdir -p "${tag_path_local}/backup"
+		for content in ${jump_tmpdir_contents} ; do
+			mv "${tag_path_local}/${content}" "${tag_path_local}/backup/${content}_${dati}"
+		done
+		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" ${tag_path_local}/
+	fi
+
+	func_jump_cleanup
+}
+
+func_scp_jump_to_prod() {
+	local usage="Usage: $FUNCNAME <dir> <target1> <target2>"
+	local desc="Desc: scp <dir> in jump machine, to multiple <target> dirs" 
 	func_param_check 2 "${desc} \n ${usage} \n" "$@"
 
-	# TODO: possible to support scp between 2 production machine?
-	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
+	local jump_tmpdir="${1}"
+	shift
 
-	local port=32200
-	local jump_host=dw
-	local jump_tmpdir="~/amp/__transfer__/$(func_dati)"
+	local target
+	for target in "${@}" ; do
+		ssh "${MY_JUMP_HOST}" "scp -r -P ${MY_PROD_PORT} ${jump_tmpdir}/* ${target}"
+	done
+}
 
-	local source=$(func_scp_with_jump_translate_remote "${1}")
+func_scp_prod_to_jump() {
+	local usage="Usage: $FUNCNAME <jump_dir> <prod_source>"
+	local desc="Desc: scp stuffs from production machine to jump machine" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+
+	# NOTE: only support one <prod_source>, in case too complicated
+	local jump_tmpdir="${1}"
+	local prod_source="${2}"
+	ssh "${MY_JUMP_HOST}" "mkdir -p ${jump_tmpdir}"
+	ssh "${MY_JUMP_HOST}" "scp -r -P ${MY_PROD_PORT} ${prod_source} ${jump_tmpdir}"
+}
+
+func_scp_local_to_jump() {
+	local usage="Usage: $FUNCNAME <jump_dir> <path1> <path2> ..."
+	local desc="Desc: scp stuffs from local machine to jump machine" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+
+	local jump_tmpdir="${1}"
+	shift
+
+	func_complain_path_not_exist "${@}"
+	ssh "${MY_JUMP_HOST}" "mkdir -p ${jump_tmpdir}"
+	scp -r -P "${MY_PROD_PORT}" "${@}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/"
+}
+
+func_jump_distribute() {
+	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/distribite.sh ${@}"
+}
+
+func_jump_cleanup() {
+	# cleanup, in case too much garbage
+	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/cleanup.sh"
+}
+
+func_scp_via_jump() {
+	local usage="Usage: $FUNCNAME <source> <target> <jump_tmpdir>"
+	local desc="Desc: scp via jump machine, from <source> to <target> dir, use <jump_tmpdir> if provided" 
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+
+	local jump_tmpdir="${3:-${MY_JUMP_TRANSFER}/$(func_dati)}"
+
+	local source=$(func_scp_host_to_ip "${1}")
 	local sourceName=$(basename $source)
-	local target=$(func_scp_with_jump_translate_remote "${2}")
+	local target=$(func_scp_host_to_ip "${2}")
 	local targetName="${target##*:}"
 	local targetAddr=${target%%:*}
 
@@ -1037,23 +1158,21 @@ func_scp_with_jump() {
 		[ -e "${target}/${sourceName}" ] && func_cry "ERROR: ${target}/${sourceName} already exist, NOT support override!"
 
 		echo "INFO: start to download ..."
-		ssh "${jump_host}" "mkdir -p ${jump_tmpdir}"
-		ssh "${jump_host}" "scp -r -P ${port} ${source} ${jump_tmpdir}"
-		scp -r -P "${port}" "ouyangzhu@${jump_host}:${jump_tmpdir}/*" "${target}"
+		func_scp_prod_to_jump "${jump_tmpdir}" "${source}"
+		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" "${target}"
 	else
-		func_is_str_blank "${targetName}" && func_cry "ERROR: var targetName is blank!"
-		[ -e "${source}" ] || func_cry "ERROR: ${source} NOT exist!"
-		local target_exist="$(ssh "${jump_host}" "ssh -p ${port} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
-		[ "${target_exist}" = "true" ] && func_cry "ERROR: ${targetName}/${sourceName} on target meachine already exist!"
+		local target_exist="$(ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
+		[ "${target_exist}" = "true" ] && func_cry "ERROR: ${targetName}/${sourceName} on target meachine (${targetAddr}) already exist!"
 		
 		echo "INFO: start to upload ..."
-		ssh "${jump_host}" "mkdir -p ${jump_tmpdir}"
-		scp -r -P "${port}" "${source}" "ouyangzhu@${jump_host}:${jump_tmpdir}"
-		ssh "${jump_host}" "scp -r -P ${port} ${jump_tmpdir}/* ${target}"
+		func_scp_local_to_jump "${jump_tmpdir}" "${source}" 
+		func_scp_jump_to_prod "${jump_tmpdir}" "${target}"
 	fi
 
-	# cleanup, in case too much garbage
-	ssh "${jump_host}" "bash ${jump_tmpdir}/../cleanup.sh"
+	# Cleanup
+	func_jump_cleanup
+
+	# Note: seems using ProxyCommand is a better way (not totally work yet), see ~/.ssh/config for more detail
 
 	# Demo: 
 	#func_scp_with_jump ~/amp/test ouyangzhu@222.134.66.106:~/test
@@ -1293,7 +1412,7 @@ func_delete_dated() {
 func_backup_myenv() { 
 	local tmpDir="$(mktemp -d)"
 	local packFile="${tmpDir}/myenv_backup.zip"
-	local fileList=~/.myenv/zgen/collection/myenv_filelist.txt
+	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
 
 	echo "INFO: create zip file based on filelist: ${fileList}"
 	cat "${fileList}" | zip -rq "${packFile}" -@ || func_die "ERROR: failed to zip files into ${packFile}"
@@ -1917,7 +2036,7 @@ func_find_non_utf8_in_content() {
 #	while read line
 #	do
 #		source_path="$(func_eval "$line")"
-#		func_validate_file_type_text "$source_path" || continue					# won't collect non-text file
+#		func_is_filetype_text "$source_path" || continue					# won't collect non-text file
 #		[ -d "$source_path" ] && echo -e "INFO: skipping dir: $line" && continue
 #
 #		target_file=$(echo "$source_path" | sed -e 's+/\|:+@+g;s+\$\| \|\(\|\)\|（\|）\|&++g')	# avoid name confliction

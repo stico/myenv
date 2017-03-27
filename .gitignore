@@ -4,8 +4,9 @@
 # IGNORE, for secure reason
 /.ssh/
 /.hgrc
-/.subversion/
 /.myenv/secu/
+/.myenv/dist/
+/.subversion/
 /.smbcredentials
 
 # INCLUDE: config files

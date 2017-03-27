@@ -99,9 +99,9 @@ loadrvm			"func_load_rvm"
 loadvirtualenv		"func_load_virtualenvwrapper"
 
 			# Head: s - ssh
-sshx			"func_ssh_with_jump"
+sshx			"func_ssh_via_jump"
 ssht			"ssh -p 32200"
-scpx			"func_scp_with_jump"
+scpx			"func_scp_via_jump"
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list, NOT use "-F", which makes "ls ~/amp/download" shows a link entry instead of content in dir (need "ls ~/amp/download/" to show content) 
