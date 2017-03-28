@@ -14,19 +14,25 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
 [ -z "$MY_ENV" ]		&& MY_ENV=$HOME/.myenv
 [ -z "$MY_ENV_CONF" ]		&& MY_ENV_CONF=$MY_ENV/conf
+[ -z "$MY_ENV_DIST" ]		&& MY_ENV_DIST=$MY_ENV/dist
 [ -z "$MY_ENV_ZGEN" ]		&& MY_ENV_ZGEN=$MY_ENV/zgen
 [ -z "$MY_TAGS_NOTE" ]		&& MY_TAGS_NOTE=$MY_ENV/zgen/tags_note
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
-[ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/env/tags_addi
+[ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/addi/tags
 [ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD)
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
-# Const of misc
+# Const of DW
 [ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
 [ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
 [ -z "$MY_JUMP_TRANSFER" ]	&& MY_JUMP_TRANSFER="~/amp/__transfer__"	# do NOT use $MY_ENV here
 
+# Config
+LOCATE_USE_FIND='true'		# seems tuned find is always a good choice (faster than mlocate on both osx/ubuntu). Ref: performance@locate
+LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find, which usually enough
+
+# Functions
 func_validate_exist() {
 	# TODO: deprecate this wrapper
 	func_validate_path_exist "$@"
@@ -328,43 +334,52 @@ func_load_rvm() {
 	export PS1="(RVM) ${PS1}"
 }
 
-func_locate_dbupdate() {
-	# skip for OSX
-	uname | grep -q Darwin && return 1
+func_locate_updatedb() {
+	#uname | grep -q Darwin && return 1		# skip for OSX
 
+	[ "${LOCATE_USE_FIND}" = "true" ] && return 0
+	echo "INFO: update locate db"
 	sudo updatedb
 }
 
 func_locate() {
 	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
 
-	# seems tuned find is always a good choice (even much better than mlocate on osx), see performance@locate
-	# BUT also note the limit of the func_locate_via_find, which usually enough
-	# func_locate_via_locate "$@"
-	func_locate_via_find "$@"
+	if [ "${LOCATE_USE_FIND}" = "true" ] ; then
+		func_locate_via_find "$@"
+	elif [ "${LOCATE_USE_MLOCATE}" = "true" ] ; then
+		func_locate_via_locate "$@"
+	fi
 }
 
 func_locate_via_find() {
-	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
+	func_param_check 3 "Usage: $FUNCNAME <type> <base> <search_items...>" "$@"
 
-	# NEED maxdepth which dramatically improved response time
+	# IMPORTANT: maxdepth which dramatically improved response time
+
+	# variables
 	local maxdepth=$#			# collect here, so effectively = param_count + 2
 	local find_type_raw="${1}"
 	local base="$(readlink -f "${2}")"	# important: use the formal path
-	func_validate_path_exist "${base}"	# the base should be exist. NOTE, tag should be translated before use this funciton
 	shift; shift;
+	local search_raw="$*"
 
-	# parepare parameters for "find"
+	# check 
+	func_validate_path_exist "${base}"	# NOTE, tag should be translated before use this funciton
+	[ -z "${search_raw}" ] && func_stop "ERROR: <search_items> must NOT be empty, abort!"
+
+	# prepare
 	local find_type
 	case "${find_type_raw}" in
 		FILE)	find_type=f ;;
 		DIR)	find_type=d ;;
-		*)	echo "ERROR: func_locate_via_find need a TYPE parameter (either FILE or DIR)! 1>&2"
+		*)	func_stop "ERROR: parameter <type> must be either FILE or DIR" 1>&2
 	esac
-	local search=`echo "$*" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/\$/[^\/]*/'`
+	#local search=$(echo "${search_raw}" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/$/[^\/]*/')	# version 1: works
+	local search="${base}/.*${search_raw// /.*}.*"						# version 2: works. More precise: prefix with base. Less strict: no / between <search_items>
 
-	targets=`find -P "$base" -maxdepth ${maxdepth} -iregex "$search" -xtype ${find_type} | sed -e "/^$/d"`				# 1st, try not follow links
-	[ -z "$targets" ] && targets=`find -L "$base" -maxdepth ${maxdepth} -iregex "$search" -type ${find_type} | sed -e "/^$/d"`	# 2nd, try follow links 
+	targets="$(find -P "$base" -maxdepth ${maxdepth} -iregex "$search" -xtype ${find_type} | sed -e "/^$/d")"			# 1st, try not follow links
+	[ -z "$targets" ] && targets="$(find -L "$base" -maxdepth ${maxdepth} -iregex "$search" -type ${find_type} | sed -e "/^$/d")"	# 2nd, try follow links 
 	[ -z "$targets" ] && return 1													# 3rd, just return error
 
 	# use the shortest result
@@ -435,7 +450,7 @@ func_cd_tag() {
 		func_cd_smart "${base}" && return 0 
 	fi
 
-	# 3.3) find target. Version 2, use locate
+	# 3.3) find target. Version 2, use func_locate
 	[ -d "${base}" ] && shift || base="./"
 	func_cd_smart "$(func_locate "DIR" "${base}" "$@")"
 
@@ -523,7 +538,7 @@ func_collect_myenv() {
 	local myenv_content=${MY_ENV_ZGEN}/collection/myenv_content.txt
 	local myenv_filelist=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
 	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
-	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_CONF/env/myenv_addi | xargs -I{}  echo echo {} )")"
+	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_CONF/addi/myenv | xargs -I{}  echo echo {} )")"
 
 	[ -e "${myenv_filelist}" ] && func_delete_dated ${myenv_filelist}
 	[ -e "${myenv_content}" ] && [ "${1}" = "true" ] && func_delete_dated ${myenv_content}
@@ -555,11 +570,9 @@ func_collect_all() {
 	#	- then ${base} has been deleted, you are now actually in ~/amp/delete/xxxx-xx-xx
 	#	- you always check the old file!
 	#	- EVER WORSE: the pwd command seem NOT showing the correct current path ! (this happens as least on osx)
-	echo "INFO: clean old collection"
+	echo "INFO: clean old collection and updatedb (if need)"
 	func_delete_dated ${base}/*
-
-	echo "INFO: update locate db (osx will just skip)"
-	func_locate_dbupdate
+	func_locate_updatedb
 
 	echo "INFO: collecting stdnote and gen quicklist"
 	local count=0
@@ -895,7 +908,7 @@ func_svn_update() {
 		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
 		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ 
 	done
-	func_locate_dbupdate
+	func_locate_updatedb
 }
 
 func_svn_status() { 
@@ -904,7 +917,7 @@ func_svn_status() {
 
 func_git_pull() { 
 	git pull origin master && git status
-	func_locate_dbupdate
+	func_locate_updatedb
 }
 
 func_git_status() { 
@@ -1025,10 +1038,26 @@ func_ssh_via_jump() {
 
 func_dist_via_jump() {
 	local usage="Usage: $FUNCNAME <tag> <source> <target_prefix> "
-	local desc="Desc:\tstep 1) if <source> (default is local) provided, download <tag> from <source> then run step 2, otherwise directly run step 2.\n\tstep 2) distribute <tag> to all hosts defined in /etc/hosts, with <target_prefix> (default is as tag) prefix"
+	#local desc="Desc:\tstep 1) if <source> (default is local) provided, download <tag> from <source> then run step 2, otherwise directly run step 2.\n\tstep 2) distribute <tag> to all hosts defined in /etc/hosts, with <target_prefix> (default is as tag) prefix"
+	read -r -d '' desc <<-'EOF'
+		Functionality:
+		    1. help to synchronise config/script across production machines via jump.
+		    2. mean while help to backup in local machine
+		Concept:
+		    <tag>		the myenv tag system, help to easily locate the topic and config/script path
+		    <source>		default is local, the host where is the latest config/script
+		    <target_prefix>	default is <tag>, to identify those hosts to distribute (dist_hosts), 
+		    dist_hosts		hosts starts with <target_prefix> in /etc/hosts
+		Steps: 
+		    1) if <source> provided, download <tag> from <source> then run step 2, otherwise directly run step 2
+		    2) distribute <tag> to all dist_hosts, except <source> itself (if provided)
+		Examples:
+		    $FUNCNAME hp-proxy					# distribute $MY_DCD/hp-proxy/{config,script} to ~dist_hosts start with 'hp-proxy'
+		    $FUNCNAME hp-proxy hp-proxy.web.76			# latest version is on "hp-proxy.web.76", distribute to other dist_hosts, and backup to local
+		    $FUNCNAME hp-proxy hp-proxy.web.76	hp-proxy.web	# as above, but dist_hosts might smaller, since <target_prefix> is more strict
+		    $FUNCNAME hp-proxy localhost	hp-proxy.web	# when <source> is local, but need specify <target_prefix>, use 'localhost/127.0.0.1' as <source>
+		EOF
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-
-	# Design: 
 
 	# Const
 	local DIST_BASE="~/.myenv/dist"		# do NOT use ${MY_ENV} or ${HOME} here, HOME path is diff on diff machine, need expansion on target machine
@@ -1050,34 +1079,34 @@ func_dist_via_jump() {
 	[ -d "${tag_path_local}" ] || func_stop "ERROR: local path (${tag_path_local}) for tag (${tag}) NOT exist!"
 	[ -n "${2}" ] && [ -z "${source_ip}" ] && func_stop "ERROR: failed to translate <source> (${2}) to ip address, abort!"
 
-	# Jump part
-	if [ -n "${source_ip}" ]; then
-		local source_full_addr="${source_ip}:${dist_path}"
-		func_is_valid_ip "${source_ip}" || func_stop "ERROR: source ip (${source_ip}) NOT valid, abort!"
-
-		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
-		func_scp_prod_to_jump "${jump_tmpdir}" "${source_full_addr}/*"
-	else
+	# To Jump 
+	if [ -z "${source_ip}" -o "${source_ip}" = "127.0.0.1" ]; then
 		local dist_paths=()
 		[ -d "${tag_path_local}/config" ] && dist_paths+=("${tag_path_local}/config") || echo "INFO: ${tag_path_local}/config NOT exist, skip"
 		[ -d "${tag_path_local}/script" ] && dist_paths+=("${tag_path_local}/script") || echo "INFO: ${tag_path_local}/script NOT exist, skip"
 		[ ${#dist_paths[@]} -eq 0 ] && func_stop "ERROR: dist_paths for '${tag}' is empty, means nothing to distribute, abort!"
 
 		echo "INFO: '${tag}' from localhost (${dist_paths[*]}) to jump machine (${jump_tmpdir})"
-		func_scp_local_to_jump "${jump_tmpdir}" "${tag}" "${dist_paths[@]}" 
+		func_scp_local_to_jump "${jump_tmpdir}" "${dist_paths[@]}" 
+	else
+		local source_full_addr="${source_ip}:${dist_path}"
+		func_is_valid_ip "${source_ip}" || func_stop "ERROR: source ip (${source_ip}) NOT valid, abort!"
+
+		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
+		func_scp_prod_to_jump "${source_full_addr}/*" "${jump_tmpdir}"
 	fi
 
-	# Verify JUMP
+	# Verify Jump
 	local jump_tmpdir_contents="$(ssh "${MY_JUMP_HOST}" "ls ${jump_tmpdir}")"
 	echo "INFO: verify jump tmpdir, gets content: "${jump_tmpdir_contents}
 	[ -z "${jump_tmpdir_contents}" ] && func_stop "ERROR: no content on jump tmpdir, abort!"
 
-	# Distribute to remote
+	# Distribute
 	local dist_hosts="$(grep "^[^#]*[[:blank:]]${target_prefix}" /etc/hosts | sed -e "/${source_ip:-__DIST-INEXIST#STR__}/d;s/\s.*//;" | sort -u)"
 	echo "INFO: distribute to hosts: "${dist_hosts}
-	func_jump_distribute ${dati} ${tag} ${dist_hosts} 
+	func_jump_distribute "${dati}" "${tag}" "${dist_hosts}" 
 
-	# Distribute to local
+	# Backup to local
 	if [ -n "${source_ip}" ]; then
 		echo "INFO: also backup to local: (${tag_path_local})"
 
@@ -1110,9 +1139,9 @@ func_scp_prod_to_jump() {
 	local desc="Desc: scp stuffs from production machine to jump machine" 
 	func_param_check 2 "${desc} \n ${usage} \n" "$@"
 
-	# NOTE: only support one <prod_source>, in case too complicated
-	local jump_tmpdir="${1}"
-	local prod_source="${2}"
+	# NOTE: only support one <prod_source>, in case too complicated. Enhance if really need
+	local prod_source="${1}"
+	local jump_tmpdir="${2}"
 	ssh "${MY_JUMP_HOST}" "mkdir -p ${jump_tmpdir}"
 	ssh "${MY_JUMP_HOST}" "scp -r -P ${MY_PROD_PORT} ${prod_source} ${jump_tmpdir}"
 }
@@ -1131,7 +1160,7 @@ func_scp_local_to_jump() {
 }
 
 func_jump_distribute() {
-	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/distribite.sh ${@}"
+	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/distribute.sh ${@}"
 }
 
 func_jump_cleanup() {
@@ -1158,7 +1187,7 @@ func_scp_via_jump() {
 		[ -e "${target}/${sourceName}" ] && func_cry "ERROR: ${target}/${sourceName} already exist, NOT support override!"
 
 		echo "INFO: start to download ..."
-		func_scp_prod_to_jump "${jump_tmpdir}" "${source}"
+		func_scp_prod_to_jump "${source}" "${jump_tmpdir}"
 		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" "${target}"
 	else
 		local target_exist="$(ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"

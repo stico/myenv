@@ -24,8 +24,9 @@ stg=$ZBOX/stg
 
 # MYENV
 conf=$MY_ENV_CONF
-secu=$MY_ENV_SECU
+dist=$MY_ENV_DIST
 zgen=$MY_ENV_ZGEN
+tag=$MY_ENV_CONF/addi/tags
 
 # OUMISC
 data=/data

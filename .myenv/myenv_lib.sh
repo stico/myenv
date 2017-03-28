@@ -470,18 +470,21 @@ func_ip_of_host() {
 	local usage="Usage: $FUNCNAME <host>" 
 	local desc="Desc: echo one ip of the host, otherwise echo empty, return original if already an ip"
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
-	
+
 	# 1st Check: return original, trim spaces, as valid address not have space
 	func_is_valid_ip "${1}" && echo "${1//[[:blank:]]/}" && return 0
 
-	# 2nd Check: Use /etc/hosts, faster
+	# 2nd Check: hardcode for localhost
+	[ "${1}" = "localhost" ] && echo "127.0.0.1" && return 0
+
+	# 3rd Check: Use /etc/hosts, faster
 	if [ -r /etc/hosts ] ; then
 		# shellcheck disable=2155
 		local etc_val="$(grep "^[^#]*${1}[[:blank:]].*$" /etc/hosts)" 
 		[ -n "${etc_val}" ] && echo "${etc_val%%[[:blank:]]*}" && return 0
 	fi
 	
-	# 3rd Check: Use os cmd, (2017-03) simple test shows, time is NOT stable on ubuntu16.04, reason is the OS or the network?
+	# 4th Check: Use os cmd, (2017-03) simple test shows, time is NOT stable on ubuntu16.04, reason is the OS or the network?
 	if uname | grep -q Darwin ; then
 		local result
 		# dscacheutil -q host -a name "${1}" | sed '/ip_address/!d;s/^[^0-9]*//'
