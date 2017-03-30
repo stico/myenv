@@ -23,6 +23,10 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
+# Const
+[ -z "$MY_OS_VER" ]		&& MY_OS_VER="$(func_os_ver)"
+[ -z "$MY_OS_NAME" ]		&& MY_OS_NAME="$(func_os_name)"
+
 # Const of DW
 [ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
 [ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
@@ -776,11 +780,11 @@ func_head() {
 
 func_ip() {
 	# NOTE: "tr -s ' '" compact space to single for better field identify
-	if [ $(func_sys_info | grep -c "cygwin") = 1 ] ; then
+	if [ "${MY_OS_NAME}" = "${OS_CYGWIN}" ] ; then
 		# non-cygwin env: ifconfig
 		/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
 		/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
-	elif [ $(func_sys_info | grep -c "osx") = 1 ] ; then
+	elif [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 		/sbin/ifconfig -a | tr -s ' '		\
 		| awk -F'[% ]' '			\
 			/^[a-z]/{print "";printf $1}	\
@@ -790,7 +794,7 @@ func_ip() {
 			END{print ""}'			\
 		| sed -e "/127.0.0.1/d;/^\s*$/d;/\s/!d;"\
 		| column -t -s " "
-	elif [ $(func_sys_info | grep -c "win") = 1 ] ; then
+	elif [ "${MY_OS_NAME}" = "${OS_WIN}" ] ; then
 		# seem directly pipe the output of ipconfig is very slow
 		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
 		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
@@ -1254,7 +1258,7 @@ func_sys_info_os_len() {
 	#else									echo "unknown"
 	#fi
 
-	# TODO 1: also use the os part to replace func_sys_info_os_name()?
+	# TODO 1: also use the os part to replace func_os_name()?
 	# TODO 2: arm part still need improve
 	archi=$(uname -sm)
 	case "$archi" in
@@ -1274,14 +1278,6 @@ func_sys_info_os_len() {
 	esac
 }
 
-func_sys_info_os_ver() {
-	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release
-	elif uname | grep -q Darwin ; then					echo "osx"
-	elif [ "$os_name" = "cygwin" ] ; then					uname -r | sed -e "s/(.*//"
-	else									echo "unknown"
-	fi
-}
-
 func_sys_info_os_type() {
 	if [ "$os_name" = "ubuntu" ] && command -v dpkg &> /dev/null ; then 
 		if (dpkg -l ubuntu-desktop &> /dev/null) ; then			echo "desktop"
@@ -1293,27 +1289,17 @@ func_sys_info_os_type() {
 	fi
 }
 
-func_sys_info_os_name() {
-	command -v uname &> /dev/null && uname_info=`uname -a` || uname_info="cmd_uname_not_exist"
-
-	if [ -e /etc/lsb-release ] ; then					sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release
-	elif [ $(echo $uname_info | grep -ic "cygwin") -eq 1 ] ; then		echo "cygwin"
-	elif [ $(echo $uname_info | grep -ic "mingw") -eq 1 ] ; then		echo "mingw"
-	else									echo "unknown"
-	fi
-}
-
 func_sys_info() { 
 	# format: <os_name>          		_<os_ver>  _<os_len>     _<os_type>               _<hostname>	_<addInfo>
 	# exampe: ubuntu/linuxmint/cygwin/win	_12.04     _64bit/32bit  _desktop/server/win7/xp  _workvm	_precise
 
-	os_name=`func_sys_info_os_name`
+	os_name="$MY_OS_NAME"
 
 	# use cache if cached, need os_name to distiguish cygwin/mingw
 	[ -n "$MY_ENV_ZGEN" ] && [ -e "$MY_ENV_ZGEN" ] && cache_file=$MY_ENV_ZGEN/sys_info_${os_name} || cache_file=/tmp/sys_info_${os_name}
 	[ -e $cache_file ] && cat $cache_file && return
 
-	os_ver=`func_sys_info_os_ver`
+	os_ver="$MY_OS_VER"
 	os_len=`func_sys_info_os_len`
 	os_type=`func_sys_info_os_type`
 
@@ -1775,6 +1761,64 @@ func_find_non_utf8_in_content() {
 
 	echo "INFO: suspected files are:"
 	cat ${tmp_suspect}
+}
+
+func_samba_is_mounted() {
+	func_param_check 1 "USAGE: $FUNCNAME <path>" "$@"
+	df | grep -q "${1}" &> /dev/null
+}
+
+func_samba_umount() {
+	func_param_check 1 "USAGE: $FUNCNAME <config_file>" "$@"
+
+	# load config
+	func_validate_path_exist "${1}"
+	eval "$(func_gen_local_vars "${1}")"
+	func_contains_blank_str "${mount_path}" && func_stop "ERROR: critical config NOT set, pls check (mount_path)"
+
+	# umount
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+		umount "${mount_path}"
+	else
+		func_stop "ERROR: pls write code for current os: ${MY_OS_NAME}"
+	fi
+
+	# re-check
+	if func_samba_is_mounted "${mount_path}" ; then
+		echo "INFO: umount success"
+	else
+		func_stop "WARN: mount failed, pls check"
+	fi
+}
+
+func_samba_mount() {
+	func_param_check 1 "USAGE: $FUNCNAME <config_file>" "$@"
+
+	# load config
+	func_validate_path_exist "${1}"
+	eval "$(func_gen_local_vars "${1}")"
+	func_contains_blank_str "${mount_path}" "${samba_path}" && func_stop "ERROR: critical config NOT set, pls check (mount_path/samba_path)"
+
+	# check
+	mount_path="$(readlink -f "${mount_path}")"
+	func_samba_is_mounted "${mount_path}" && echo "INFO: already mounted, at: ${mount_path}"
+
+	# mount
+	[ -d "${mount_path}" ] || mkdir -p "${mount_path}"
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+		echo "INFO: cmd: mount_smbfs ${samba_path} ${mount_path}"
+		mount_smbfs "${samba_path}" "${mount_path}"
+	else
+		func_stop "ERROR: pls write code for current os: ${MY_OS_NAME}"
+	fi
+
+	# recheck
+	if func_samba_is_mounted "${mount_path}" ; then
+		echo "INFO: mount success at: ${mount_path}"
+		cd "${mount_path}"
+	else
+		echo "WARN: mount failed! pls check"
+	fi
 }
 ################################### Deprecated ###################################
 ## deprecated by func_locate

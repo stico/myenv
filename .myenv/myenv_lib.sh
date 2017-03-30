@@ -2,6 +2,7 @@
 
 # source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
+# Function
 func_date() { date "+%Y-%m-%d";			}
 func_time() { date "+%H-%M-%S";			}
 func_dati() { date "+%Y-%m-%d_%H-%M-%S";		}
@@ -306,7 +307,7 @@ func_duplicate_dated() {
 }
 
 ################################################################################
-# Utility: shell/os/system
+# Utility: shell
 ################################################################################
 func_is_cmd_exist() {
 	local usage="Usage: $FUNCNAME <cmd>"
@@ -385,6 +386,92 @@ func_gen_local_vars() {
 	| sed -e "/^[[:blank:]]*\($\|#\)/d;
 		s/[[:blank:]]*=[[:blank:]]*/=/;
 		s/^/local /"
+}
+
+################################################################################
+# Utility: platform
+################################################################################
+OS_OSX="osx"
+OS_WIN="win"
+OS_AIX="aix"
+OS_BSD="bsd"
+OS_SUSE="suse"
+OS_LINUX="linux"
+OS_MINGW="mingw"
+OS_REDHAT="redhat"
+OS_CYGWIN="cygwin"
+OS_SOLARIS="solaris"
+OS_FREEBSD="freebsd"
+OS_MANDRAKE="mandrake"
+
+func_os_name() {
+	# based on release file, some NOT verified
+	if [ -f /etc/lsb-release ] ; then					
+		# \L is to lowercase
+		sed -n -e "s/DISTRIB_ID=\(\S*\)/\L\1/p" /etc/lsb-release	
+		return
+	elif [ -f /etc/redhat-release ] ; then
+		echo ${OS_REDHAT}
+		return
+	elif [ -f /etc/SuSE-release ] ; then
+		echo ${OS_SUSE}
+		return
+	elif [ -f /etc/mandrake-release ] ; then
+		echo ${OS_MANDRAKE}
+		return
+	fi
+
+	local fullname
+	if [ -n "$OSTYPE" ] ; then
+		# bash buildin var
+		fullname="${OSTYPE,,}"
+	else
+		func_validate_cmd_exist uname
+		fullname="$(uname -o)"
+		fullname="${fullname,,}"
+	fi
+
+	# longer match first, TODO: what if $OSTYPE and $(uname -a) have diff string? list both of them?
+	case "${fullname}" in
+		solaris*)	echo "${OS_SOLARIS}"	;return ;;
+		sunos*)		echo "${OS_SOLARIS}"	;return ;;
+		freebsd*)	echo "${OS_FREEBSD}"	;return ;;
+		darwin*)	echo "${OS_OSX}"	;return ;; 
+		cygwin*)	echo "${OS_CYGWIN}"	;return ;; 
+		linux*)		echo "${OS_LINUX}"	;return ;;
+		msys*)		echo "${OS_MINGW}"	;return ;;	# Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+		bsd*)		echo "${OS_BSD}"	;return ;;
+		win*)		echo "${OS_WIN}"	;return ;;	# NOT sure, check on windows!
+		aix*)		echo "${OS_AIX}"	;return ;;	# NOT sure, check on windows!
+	esac
+
+	# final
+	echo "unknown: ${OSTYPE}, ${fullname}" ;
+}
+
+func_os_ver() {
+	# based on release file, some NOT verified
+	if [ -e /etc/lsb-release ] ; then					
+		sed -n -e "s/DISTRIB_RELEASE=\(\S*\)/\1/p" /etc/lsb-release
+		return
+	elif [ -f /etc/redhat-release ] ; then
+		sed s/\ release.*// /etc/redhat-release
+		#sed s/.*\(// /etc/redhat-release | sed s/\)// 
+		#sed s/.*release\ // /etc/redhat-release | sed s/\ .*// 
+		return
+	elif [ -f /etc/SuSE-release ] ; then
+		/etc/SuSE-release | sed s/VERSION.*//
+		#tr "\n" ' ' /etc/SuSE-release | sed s/.*=\ //
+		return
+	elif [ -f /etc/mandrake-release ] ; then
+		sed s/.*\(// | sed s/\)// /etc/mandrake-release
+		#sed s/.*release\ // /etc/mandrake-release | sed s/\ .*//
+		return
+	fi
+
+	# TODO: to improve, seems returns linux kernel version, not os version
+	func_validate_cmd_exist uname
+	uname -r
 }
 
 ################################################################################
@@ -571,7 +658,7 @@ func_num_to_human() {
 # Data Type: string
 ################################################################################
 func_is_str_empty() {
-	local usage="Usage: $FUNCNAME <string>"
+	local usage="Usage: $FUNCNAME <string...>"
 	local desc="Desc: check if string is empty (or not defined), return 0 if empty, otherwise 1" 
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 	
@@ -579,12 +666,24 @@ func_is_str_empty() {
 }
 
 func_is_str_blank() {
-	local usage="Usage: $FUNCNAME <string>"
+	local usage="Usage: $FUNCNAME <string...>"
 	local desc="Desc: check if string is blank (or not defined), return 0 if empty, otherwise 1" 
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 	
 	# remove all space and use -z to check
 	[ -z "${1//[[:blank:]]}" ] && return 0 || return 1
+}
+
+func_contains_blank_str() {
+	local usage="Usage: $FUNCNAME <string...>"
+	local desc="Desc: check if parameter contains blank (or not defined) str, return 0 if yes, otherwise 1" 
+	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	
+	local str
+	for str in "$@" ; do
+		func_is_str_blank "${str}" && return 0
+	done
+	return 1
 }
 
 func_str_not_contains() {
