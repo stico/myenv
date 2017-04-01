@@ -1090,7 +1090,7 @@ func_dist_source_env() {
 	func_is_str_blank "${tags}" && return
 
 	local tag tag_env
-	for tag in tags ; do
+	for tag in "${tags}" ; do
 		tag_env="${MY_ENV_DIST}/${tag}/script/env.sh" 
 		[ -f "${tag_env}" ] && source "${tag_env}"
 	done
