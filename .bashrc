@@ -39,22 +39,22 @@ complete -F _known_hosts scpx sshx ssht
 [ -e "${SRC_BASH_MACHINEID}" ] && source "${SRC_BASH_MACHINEID}"
 
 # Tool update
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"			# make less more friendly for non-text input files, see lesspipe(1)
-[ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh		# infinality font rendering config
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"				# make less more friendly for non-text input files, see lesspipe(1)
+[ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh			# infinality font rendering config
 
 # Settings for diff machine type
-if grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null ; then
-	func_ssh_agent_init							# Init ssh agent
-	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"			# Green line with $ in same line
-elif func_ip | grep -q '[^0-9\.]\(172\.\|192\.\|fc00::\|fe80::\)' ; then 
-	func_ssh_agent_init							# Init ssh agent
-	LOCAL_IP=$(func_ip | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
-	#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"			# Blue line with $ in same line
-	export PS1="\[\e[34m\]\u@${LOCAL_IP}:\w\$\[\e[0m\]"			# Blue line with $ in same line, prompt as scp address
+if func_is_personal_machine ; then
+	func_ssh_agent_init								# Init ssh agent
+	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
+elif func_is_internal_machine ; then 
+	func_ssh_agent_init								# Init ssh agent
+	LOCAL_IP=$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
+	#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				# Blue line with $ in same line
+	export PS1="\[\e[34m\]\u@${LOCAL_IP}:\w\$\[\e[0m\]"				# Blue line with $ in same line, prompt as scp address
 else 
-	LOCAL_IP=$(func_ip | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
-	#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"			# Red line with $ in next line
-	export PS1="\[\e[31m\]\u@${LOCAL_IP}:\w\n\$\[\e[0m\]"			# Red line with $ in next line, prompt as scp address
+	LOCAL_IP=$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
+	#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				# Red line with $ in next line
+	export PS1="\[\e[31m\]\u@${LOCAL_IP}:\w\n\$\[\e[0m\]"				# Red line with $ in next line, prompt as scp address
 fi
 
 ################################################################################

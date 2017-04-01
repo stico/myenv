@@ -13,7 +13,7 @@ genEnvAlias=$genShPath/envAliasAll
 pushd "${base}" &> /dev/null
 
 # Prepare
-mkdir "${genShPath}" &> /dev/null
+mkdir -p "${genShPath}" &> /dev/null
 rm "${genShPath}"/* &> /dev/null
 
 # Assemble

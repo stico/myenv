@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # DESC: init myenv. See conf/myenv/init_all.sh for setup everything 
-# one line cmd: curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/init/myenv.sh' | bash
+# one line cmd: curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/myenv_init.sh' | bash
 
 TMP_DIR=/tmp/__init_myenv__
 TMP_PATH="${TMP_DIR}/myenv"

@@ -21,6 +21,10 @@ $MY_ENV/zgen
 # notes in git
 $HOME/Documents/FCS/oumisc/oumisc-git/note
 
+# zbox script
+#$HOME/.zbox/zbox_lib.sh
+$HOME/.zbox/zbox_func.sh
+
 # user config
 $HOME/.ssh/
 $HOME/.hgrc

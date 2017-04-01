@@ -28,6 +28,8 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_OS_NAME" ]		&& MY_OS_NAME="$(func_os_name)"
 
 # Const of DW
+[ -z "$MY_DIST_BAK" ]		&& MY_DIST_BAK="~/.myenv/dist/backup"
+[ -z "$MY_DIST_BASE" ]		&& MY_DIST_BASE="~/.myenv/dist"			# diff with $MY_ENV_DIST, no expansion here
 [ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
 [ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
 [ -z "$MY_JUMP_TRANSFER" ]	&& MY_JUMP_TRANSFER="~/amp/__transfer__"	# do NOT use $MY_ENV here
@@ -84,7 +86,10 @@ func_filter_comments() {
 }
 
 func_tag_value_raw() {
-	sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}" | head -1
+	func_is_personal_machine								\
+	&& sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}"	\
+	|| sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}"						\
+	| head -1
 }
 
 func_tag_value() {
@@ -217,30 +222,55 @@ func_std_standarize() {
 }
 
 func_select_line() {
-	func_param_check 3 "Usage: $FUNCNAME <result_var_name> <shortest|userselect> <lines>" "$@"
+	func_param_check 1 "Usage: $FUNCNAME <content>" "$@"
 
-	# need use variable to "return" result
-	result_var_name=$1
-	eval $result_var_name=""
-	shift
-
-	# empty parameter, empty output
-	[ -z "$*" ] && return 1
+	local content="${1}"
 	
-	# direct return for shortest
-	local select_type=$1
-	shift
-	[ "shortest" = "${select_type}" ] && eval $result_var_name="$(echo "$*" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1)" && return 0
+	# content empty
+	if func_is_str_blank "${content}" ; then
+		echo "WARN: content for selection is blank!" 1>&2
+		return
+	fi
 
-	targets_lines=$(echo "$*" | wc -l)
-	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
-
-	func_head 20 "$*" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"
-	echo "MULTIPLE CANDIDATES, PLS SELECT ONE:"
-	read -e selection
-	user_selection=`echo "$*" | sed -n -e "${selection}p"`
-	eval $result_var_name=$user_selection
+	# single line
+	local lines="$(echo "${content}" | wc -l)"
+	(( lines == 1 )) && echo "${content}" && return
+	
+	# ask for selection
+	local selection="$(( lines + 1 ))"
+	while (( selection <= 0 )) || (( selection > lines )) ; do
+		func_head 20 "${content}" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"	1>&2
+		echo "MULTIPLE CANDIDATES, PLS SELECT ONE:"				1>&2
+		read -e selection
+	done
+	echo "${content}" | sed -n -e "${selection}p"
 }
+
+#func_select_line() {
+#	func_param_check 3 "Usage: $FUNCNAME <result_var_name> <shortest|userselect> <lines>" "$@"
+#
+#	# need use variable to "return" result
+#	result_var_name=$1
+#	eval $result_var_name=""
+#	shift
+#
+#	# empty parameter, empty output
+#	[ -z "$*" ] && return 1
+#	
+#	# direct return for shortest
+#	local select_type=$1
+#	shift
+#	[ "shortest" = "${select_type}" ] && eval $result_var_name="$(echo "$*" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1)" && return 0
+#
+#	targets_lines=$(echo "$*" | wc -l)
+#	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
+#
+#	func_head 20 "$*" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"
+#	echo "MULTIPLE CANDIDATES, PLS SELECT ONE:"
+#	read -e selection
+#	user_selection=`echo "$*" | sed -n -e "${selection}p"`
+#	eval $result_var_name=$user_selection
+#}
 
 func_log() {
 	func_param_check 4 "Usage: $FUNCNAME <level> <prefix> <log_path> <str>" "$@"
@@ -464,6 +494,14 @@ func_cd_tag() {
 	#func_cd_smart "${base}/${result_target}"
 }
 
+func_is_personal_machine() {
+	grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null 
+}
+
+func_is_internal_machine() {
+	func_ip_list | grep -q '[^0-9\.]\(172\.\|192\.\|fc00::\|fe80::\)' 
+}
+
 func_cd_smart() {
 	# Old rvm support
 	# (2013-06-12) seems not checking and using func_rvm_cd could also source rvm, why?
@@ -472,8 +510,8 @@ func_cd_smart() {
 
 	[ -z "$*" ] && \cd || \cd "$*"
 
-	# ls
-	\ls -hF --color=auto
+	# ls based on env
+	func_is_personal_machine && \ls -hF --color=auto || \ls -lhF --color=auto
 
 	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
 	# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
@@ -778,7 +816,12 @@ func_head() {
 	echo "$*" | sed -n -e "1,${show_lines}p;${show_lines}s/.*/( ...... WARN: more lines suppressed, $total_lines total ...... )/p"
 }
 
-func_ip() {
+func_ip_single() {
+	# some old version of 'sort' NOT support -V, which is better than plain 'sort'
+	func_ip | sed -e 's/^\S*\s*//;/^\s*$/d' | sort | tail -1
+}
+
+func_ip_list() {
 	# NOTE: "tr -s ' '" compact space to single for better field identify
 	if [ "${MY_OS_NAME}" = "${OS_CYGWIN}" ] ; then
 		# non-cygwin env: ifconfig
@@ -841,7 +884,7 @@ func_mvn_run() {
 	if [ "$(echo "${candidates}" | wc -l)" = "1" ] ; then
 		mvn_run_file="${candidates}"
 	else
-		func_select_line mvn_run_file userselect "${candidates}"
+		mvn_run_file="$(func_select_line "${candidates}")"
 	fi
 
 	# execute
@@ -1040,7 +1083,40 @@ func_ssh_via_jump() {
 	# Demo: func_ssh_via_jump 222.88.95.197 
 }
 
-func_dist_via_jump() {
+func_dist_backup() {
+	func_param_check 2 "Usage: $FUNCNAME <tag> <path>" "$@"
+
+	# Design: 
+	#	full history on local machine (dist/backup), and latest version in config (dist/<tag>/config), 
+	#	since config will "dated_backup" in func_dist_tag
+
+	# machine check
+	func_is_personal_machine && func_stop "ERROR: this function supposed to only work on dw prodcut machine!"
+	func_is_internal_machine && func_stop "ERROR: this function supposed to only work on dw prodcut machine!"
+
+	# path check
+	local tag_config_path="${MY_DIST_BASE}/${1}/config"
+	func_complain_path_not_exist "${tag_config_path}"
+
+	local src="$(readlink -f ${2})"
+	local src_dir="$(dirname ${src})"
+	local src_name="$(basename ${src})"
+	local bak_target="${tag_config_path}/${src_name}_${src_dir//\//#}_$(func_ip_single)"
+	local bak_target_dated="${MY_DIST_BAK}/${src_name}_${src_dir//\//#}_$(func_dati)"
+
+	# delete old version
+	[ -e "${bak_target}" ] && func_delete_dated "${bak_target}"
+
+	#echo "INFO: backup to: ${bak_target}"
+	\cp -r "${src}" "${bak_target}"
+	\cp -r "${src}" "${bak_target_dated}"
+	\ls -lh "${bak_target}"
+	\ls -lh "${bak_target_dated}"
+}
+
+func_dist_tag() {
+	# TODO: how to support internal machine as target? seem jump could connect to internal machine, but need sync pub key before connect
+
 	local usage="Usage: $FUNCNAME <tag> <source> <target_prefix> "
 	#local desc="Desc:\tstep 1) if <source> (default is local) provided, download <tag> from <source> then run step 2, otherwise directly run step 2.\n\tstep 2) distribute <tag> to all hosts defined in /etc/hosts, with <target_prefix> (default is as tag) prefix"
 	read -r -d '' desc <<-'EOF'
@@ -1063,10 +1139,6 @@ func_dist_via_jump() {
 		EOF
 	func_param_check 1 "${desc} \n ${usage} \n" "$@"
 
-	# Const
-	local DIST_BASE="~/.myenv/dist"		# do NOT use ${MY_ENV} or ${HOME} here, HOME path is diff on diff machine, need expansion on target machine
-	local DIST_BAK="${DIST_BASE}/backup"
-
 	# Parameters
 	local tag="${1}"
 	local target_prefix="${3:-${tag}}"
@@ -1074,7 +1146,7 @@ func_dist_via_jump() {
 
 	# Variable
 	local dati="$(func_dati)"
-	local dist_path="${DIST_BASE}/${tag}"
+	local dist_path="${MY_DIST_BASE}/${tag}"
 	local jump_tmpdir="${MY_JUMP_TRANSFER}/${dati}"
 	local tag_path_local="$(func_tag_value_raw "${tag}")"
 
@@ -1443,36 +1515,44 @@ func_backup_myenv() {
 	func_backup_dated "${packFile}"
 }
 
-func_backup_dated() { 
-	func_param_check 1 "Usage: $FUNCNAME <path> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." "$@" 
-	# TODO: backup list of file & dir
+func_backup_dated() {
+	func_param_check 1 "Usage: $FUNCNAME <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." "$@"
 
-	local srcPath="$(readlink -f "$1")"
-	local fileName="$(basename "$srcPath")"
-	local targetFile=$(func_dati)_$(uname -n)_"$fileName"
-	local packFile="$(mktemp -d)/${targetFile}.zip"
-	local bakPaths=("$MY_DOC/DCB/DatedBackup" "$HOME/amp/datedBackup")
-
-	[ -n "${2}" ] && bakPaths+=("${2}")
-
-	#echo "INFO: check if source exist, srcPath: ${srcPath}"
-	func_validate_path_exist "${srcPath}" 
-
-	# For dir, zip it before backup
-	if [ -d "${srcPath}" ]; then		
-		echo -e "INFO: Creating zip file for backup, target: ${packFile}"
-		zip -rq "${packFile}" "${srcPath}" || func_die "ERROR: failed to zip file: ${srcPath}"
+	local target target_path host_name
+	local source="$(readlink -f "$1")"
+	local source_name="$(basename "${source}")"
+	local dcb_dated_backup="$MY_DCB/DatedBackup"
+	
+	# backup path
+	if func_is_personal_machine && [ -d "${dcb_dated_backup}" ]; then
+		host_name="$(hostname)" 
+		target_path="${dcb_dated_backup}"
+	elif [ -d "${MY_ENV_DIST}" ] ; then
+		host_name="$(func_ip_single)"
+		tags="$(\ls "${MY_ENV_DIST}" | sed -e "/backup/d")"
+		target_path="$(func_select_line "${tags}")/config"
+	else
+		func_stop "ERROR: can NOT decide where to backup!"
 	fi
 
-	# Backup to target places
-	for bakPath in "${bakPaths[@]}" ; do
-		[ ! -e "${bakPath}" ] && echo "WARN: path NOT exist ($bakPath)" && continue
+	# check
+	func_validate_path_exist "${source}" "${target_path}"
 
-		echo "INFO: backup to path ${bakPath}"
-		[ -e "${packFile}" ] && cp "${packFile}" "${bakPath}/" || cp "${srcPath}" "${bakPath}/${targetFile}"
-		find "$bakPath" -name "${targetFile}*" | xargs ls -lh
-		#ls -lh "$bakPath" | grep "${targetFile}" || echo "WARN: failed to backup to path: ${bakPath}"
-	done
+	# backup
+	if [ -d "${source}" ] ; then
+		target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
+		zip -r "${target}" "${source}"
+	else
+		target="${target_path}/$(func_dati)_${host_name}_${source_name}"
+		cp -r "${source}" "${target}" 
+	fi
+
+	# addition backup
+	[ -n "${2}" ] && cp -r "${target}" "${2}"
+
+	# show
+	\ls -lh "${target}"
+	[ -n "${2}" ] && \ls -lh "${2}/$(basename "${target}")"
 }
 
 func_run_file_c() {
@@ -1836,7 +1916,7 @@ func_samba_mount() {
 #	targets=$(func_find_type_dotcache $find_type $*)
 #	[ $? -ne 0 ] && return 1
 #
-#	func_select_line $result_var_name shortest "$targets"
+#	#func_select_line $result_var_name shortest "$targets"
 #}
 #
 ## deprecated by func_locate
@@ -1851,7 +1931,7 @@ func_samba_mount() {
 #	eval $result_var_name=""
 #
 #	targets=`func_find_type $find_type $*`
-#	func_select_line $result_var_name shortest "$targets"
+#	#func_select_line $result_var_name shortest "$targets"
 #}
 #
 ## deprecated by func_locate
