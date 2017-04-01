@@ -1052,7 +1052,7 @@ func_dist_source_env() {
 	func_is_str_blank "${tags}" && return
 
 	local tag tag_env
-	for tag in "${tags}" ; do
+	for tag in ${tags} ; do
 		tag_env="${MY_ENV_DIST}/${tag}/script/env.sh" 
 		[ -f "${tag_env}" ] && source "${tag_env}"
 	done
@@ -1117,15 +1117,19 @@ func_dist_sync() {
 	else
 		# remote to jump. NOTE: backup is also send to jump machine
 		local tag_path="${MY_DIST_BASE}/${tag}"
-		local tag_path_synced="${MY_DIST_BASE}/${tag}_synced"
 		local source_full_addr="${source_ip}:${tag_path}"
 		func_is_valid_ip "${source_ip}" || func_stop "ERROR: source ip (${source_ip}) NOT valid, abort!"
 
 		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
 		func_scp_prod_to_jump "${source_full_addr}/*" "${jump_tmpdir}"
 
-		# move backup to another place, in case duplicate sync next time
-		func_ssh_via_jump "${source_ip}" "mkdir -p ${tag_path_synced} &> /dev/null ; mv ${tag_path}/backup/* ${tag_path_synced} &> /dev/null "
+		# move dist>tag>backup to dist>backup, in case duplicate sync next time, no need to mkdir dist>tag>backup as will already there after distribution for the 1st time
+		func_ssh_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${MY_DIST_BASE}/backup"
+
+		# WHY: if prefixed with "mkdir -p xxx;" the "*" in mv cmd WILL NOT expand!
+		#local tag_path_synced="${MY_DIST_BASE}/${tag}_synced"
+		#func_ssh_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${tag_path_synced} "					# works
+		#func_ssh_via_jump "${source_ip}" "mkdir -p ${tag_path_synced} ; mv ${tag_path}/backup/* ${tag_path_synced}"	# not work: mv: cannot stat `/home/ouyangzhu/.myenv/dist/hp-proxy/backup/*': No such file or directory
 	fi
 
 	# Verify Jump
@@ -1147,7 +1151,11 @@ func_dist_sync() {
 	if [ -n "${source_ip}" ]; then
 		echo "INFO: also backup to local: (${tag_path_local})"
 		mkdir -p "${tag_path_local}/backup"
+
 		for content in ${jump_tmpdir_contents} ; do
+			# there is only one backup in local machine, so, no move 
+			[ "${content}" = "backup" ] && continue 
+
 			mv "${tag_path_local}/${content}" "${tag_path_local}/backup/${content}_${dati}"
 		done
 		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" "${tag_path_local}/"
