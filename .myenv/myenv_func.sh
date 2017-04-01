@@ -511,7 +511,7 @@ func_cd_smart() {
 	[ -z "$*" ] && \cd || \cd "$*"
 
 	# ls based on env
-	func_is_personal_machine && \ls -hF --color=auto || \ls -lhF --color=auto
+	func_is_personal_machine && \ls -hF --color=auto || \ls -ltrhF --color=auto
 
 	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
 	# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
@@ -818,7 +818,7 @@ func_head() {
 
 func_ip_single() {
 	# some old version of 'sort' NOT support -V, which is better than plain 'sort'
-	func_ip | sed -e 's/^\S*\s*//;/^\s*$/d' | sort | tail -1
+	func_ip_list | sed -e 's/^\S*\s*//;/^\s*$/d' | sort | tail -1
 }
 
 func_ip_list() {
@@ -1517,7 +1517,7 @@ func_backup_dated() {
 	elif [ -d "${MY_ENV_DIST}" ] ; then
 		host_name="$(func_ip_single)"
 		tags="$(func_dist_tags)"
-		target_path="$(func_select_line "${tags}")/config"
+		target_path="${MY_ENV_DIST}/$(func_select_line "${tags}")/config"
 	else
 		func_stop "ERROR: can NOT decide where to backup!"
 	fi
