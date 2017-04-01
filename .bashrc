@@ -38,6 +38,9 @@ complete -F _known_hosts scpx sshx ssht
 [ -e "${SRC_BASH_HOSTNAME}" ] && source "${SRC_BASH_HOSTNAME}"
 [ -e "${SRC_BASH_MACHINEID}" ] && source "${SRC_BASH_MACHINEID}"
 
+# source dist tag env for internal and production machine 
+func_is_personal_machine || func_dist_source_env 
+
 # Tool update
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"				# make less more friendly for non-text input files, see lesspipe(1)
 [ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh			# infinality font rendering config

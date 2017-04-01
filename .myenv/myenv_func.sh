@@ -1083,38 +1083,25 @@ func_ssh_via_jump() {
 	# Demo: func_ssh_via_jump 222.88.95.197 
 }
 
-func_dist_backup() {
-	func_param_check 2 "Usage: $FUNCNAME <tag> <path>" "$@"
+func_dist_source_env() {
+	[ -d "${MY_ENV_DIST}" ] || return
 
-	# Design: 
-	#	full history on local machine (dist/backup), and latest version in config (dist/<tag>/config), 
-	#	since config will "dated_backup" in func_dist_tag
+	local tags="$(func_dist_tags)"
+	func_is_str_blank "${tags}" && return
 
-	# machine check
-	func_is_personal_machine && func_stop "ERROR: this function supposed to only work on dw prodcut machine!"
-	func_is_internal_machine && func_stop "ERROR: this function supposed to only work on dw prodcut machine!"
-
-	# path check
-	local tag_config_path="${MY_DIST_BASE}/${1}/config"
-	func_complain_path_not_exist "${tag_config_path}"
-
-	local src="$(readlink -f ${2})"
-	local src_dir="$(dirname ${src})"
-	local src_name="$(basename ${src})"
-	local bak_target="${tag_config_path}/${src_name}_${src_dir//\//#}_$(func_ip_single)"
-	local bak_target_dated="${MY_DIST_BAK}/${src_name}_${src_dir//\//#}_$(func_dati)"
-
-	# delete old version
-	[ -e "${bak_target}" ] && func_delete_dated "${bak_target}"
-
-	#echo "INFO: backup to: ${bak_target}"
-	\cp -r "${src}" "${bak_target}"
-	\cp -r "${src}" "${bak_target_dated}"
-	\ls -lh "${bak_target}"
-	\ls -lh "${bak_target_dated}"
+	local tag tag_env
+	for tag in tags ; do
+		tag_env="${MY_ENV_DIST}/${tag}/script/env.sh" 
+		[ -f "${tag_env}" ] && source "${tag_env}"
+	done
 }
 
-func_dist_tag() {
+func_dist_tags() {
+	[ -d "${MY_ENV_DIST}" ] || return
+	\ls "${MY_ENV_DIST}" | sed -e "/backup/d"
+}
+
+func_dist_sync() {
 	# TODO: how to support internal machine as target? seem jump could connect to internal machine, but need sync pub key before connect
 
 	local usage="Usage: $FUNCNAME <tag> <source> <target_prefix> "
@@ -1529,7 +1516,7 @@ func_backup_dated() {
 		target_path="${dcb_dated_backup}"
 	elif [ -d "${MY_ENV_DIST}" ] ; then
 		host_name="$(func_ip_single)"
-		tags="$(\ls "${MY_ENV_DIST}" | sed -e "/backup/d")"
+		tags="$(func_dist_tags)"
 		target_path="$(func_select_line "${tags}")/config"
 	else
 		func_stop "ERROR: can NOT decide where to backup!"
