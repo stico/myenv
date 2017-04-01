@@ -389,7 +389,7 @@ func_gen_local_vars() {
 }
 
 ################################################################################
-# Utility: platform
+# Utility: platform/os
 ################################################################################
 OS_OSX="osx"
 OS_WIN="win"
@@ -472,6 +472,32 @@ func_os_ver() {
 	# TODO: to improve, seems returns linux kernel version, not os version
 	func_validate_cmd_exist uname
 	uname -r
+}
+
+# shellcheck disable=2155
+func_os_len() {
+	func_validate_cmd_exist uname
+
+	# TODO 1: also use the os part to replace func_os_name()?
+	# TODO 2: arm part still need improve
+	# Note, cygwin is usually 32bit
+	local archi="$(uname -sm)"
+	case "$archi" in
+		*\ *64)    echo "64bit";;
+		*\ *86)    echo "32bit";;
+		*\ armv5*) echo "armv5";;
+		*\ armv6*) echo "armv6";;
+		*\ armv7*) echo "armv7";;
+		*\ armv8*) echo "armv8";;
+		*)         echo "unknown";;
+	esac
+}
+
+func_os_info() {
+	local os_ver=${MY_OS_VER:-$(func_os_ver)}
+	local os_len=${MY_OS_LEN:-$(func_os_len)}
+	local os_name=${MY_OS_NAME:-$(func_os_name)}
+	echo "${os_name}_${os_ver}_${os_len}"
 }
 
 ################################################################################
@@ -583,6 +609,46 @@ func_ip_of_host() {
 
 	# more ways to get ip: ping, ns-lookup, etc
 	#ping -c 1 "${1%:*}" | head -1 | sed -e "s/[^(]*(//;s/).*//"	# note when host inexist
+}
+
+func_ip_single() {
+	# some old version of 'sort' NOT support -V, which is better than plain 'sort'
+	func_ip_list | sed -e 's/^\S*\s*//;/^\s*$/d' | sort | tail -1
+}
+
+func_ip_list() {
+	# NOTE: "tr -s ' '" compact space to single for better field identify
+	local os_name=${MY_OS_NAME:-$(func_os_name)}
+	if [ "${os_name}" = "${OS_CYGWIN}" ] ; then
+		# non-cygwin env: ifconfig
+		/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
+		/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
+	elif [ "${os_name}" = "${OS_OSX}" ] ; then
+		/sbin/ifconfig -a | tr -s ' '		\
+		| awk -F'[% ]' '			
+			/^[a-z]/{print "";printf $1}	
+			/^\s*inet /{printf " " $2}	
+			# Un-comment to show IPv6 addr	
+			# /^\s*inet6 /{printf " " $2}	
+			END{print ""}'			\
+		| sed -e "/127.0.0.1/d;/^\s*$/d;/\s/!d;"\
+		| column -t -s " "
+	elif [ "${os_name}" = "${OS_WIN}" ] ; then
+		# seem directly pipe the output of ipconfig is very slow
+		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
+		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
+		#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
+	else
+		/sbin/ifconfig -a | tr -s ' '		\
+		| awk '					
+			/^[a-z]/{printf $1 }		
+			/inet addr:/{printf " " $2}	
+			# Un-comment to show IPv6 addr	
+			#/inet6 addr:/{printf " " $3}	
+			/^$/{print}'			\
+		| sed -e "/127.0.0.1/d;s/addr://" 	\
+		| column -t -s " "
+	fi
 }
 
 ################################################################################
