@@ -1034,18 +1034,15 @@ func_scp_host_to_ip() {
 	echo "$(func_ip_of_host "${1%:*}"):${1#*:}"
 }
 
+# shellcheck disable=2155,2029
 func_ssh_via_jump() {
 	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
 
 	local ip_addr="$(func_ip_of_host "${1}")"
-	[ -z "${ip_addr}" ] && ip_addr="${1}"
+	func_is_str_blank "${ip_addr}" && func_stop "ERROR: can NOT get ip address for: ${1}"
 	shift
 
-	ssh -t "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $@"			# V1, simple version
-
-	# TODO: check the $1, if it is a ip, should not parse as unique_name
-	# TODO: add function for run cmd on multiple host
-	# Demo: func_ssh_via_jump 222.88.95.197 
+	ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"			# V1, simple version
 }
 
 func_dist_source_env() {
@@ -1099,7 +1096,6 @@ func_dist_sync() {
 
 	# Variable
 	local dati="$(func_dati)"
-	local dist_path="${MY_DIST_BASE}/${tag}"
 	local jump_tmpdir="${MY_JUMP_TRANSFER}/${dati}"
 	local tag_path_local="$(func_tag_value_raw "${tag}")"
 
@@ -1110,19 +1106,26 @@ func_dist_sync() {
 
 	# To Jump 
 	if [ -z "${source_ip}" -o "${source_ip}" = "127.0.0.1" ]; then
-		local dist_paths=()
-		[ -d "${tag_path_local}/config" ] && dist_paths+=("${tag_path_local}/config") || echo "INFO: ${tag_path_local}/config NOT exist, skip"
-		[ -d "${tag_path_local}/script" ] && dist_paths+=("${tag_path_local}/script") || echo "INFO: ${tag_path_local}/script NOT exist, skip"
-		[ ${#dist_paths[@]} -eq 0 ] && func_stop "ERROR: dist_paths for '${tag}' is empty, means nothing to distribute, abort!"
+		# local to jump. NOTE: backup is NOT in sync list
+		local upload_paths=()
+		[ -d "${tag_path_local}/config" ] && upload_paths+=("${tag_path_local}/config") || echo "INFO: ${tag_path_local}/config NOT exist, skip"
+		[ -d "${tag_path_local}/script" ] && upload_paths+=("${tag_path_local}/script") || echo "INFO: ${tag_path_local}/script NOT exist, skip"
+		[ ${#upload_paths[@]} -eq 0 ] && func_stop "ERROR: upload_paths for '${tag}' is empty, means nothing to distribute, abort!"
 
-		echo "INFO: '${tag}' from localhost (${dist_paths[*]}) to jump machine (${jump_tmpdir})"
-		func_scp_local_to_jump "${jump_tmpdir}" "${dist_paths[@]}" 
+		echo "INFO: '${tag}' from localhost (${upload_paths[*]}) to jump machine (${jump_tmpdir})"
+		func_scp_local_to_jump "${jump_tmpdir}" "${upload_paths[@]}" 
 	else
-		local source_full_addr="${source_ip}:${dist_path}"
+		# remote to jump. NOTE: backup is also send to jump machine
+		local tag_path="${MY_DIST_BASE}/${tag}"
+		local tag_path_synced="${MY_DIST_BASE}/${tag}_synced"
+		local source_full_addr="${source_ip}:${tag_path}"
 		func_is_valid_ip "${source_ip}" || func_stop "ERROR: source ip (${source_ip}) NOT valid, abort!"
 
 		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
 		func_scp_prod_to_jump "${source_full_addr}/*" "${jump_tmpdir}"
+
+		# move backup to another place, in case duplicate sync next time
+		func_ssh_via_jump "${source_ip}" "mkdir -p ${tag_path_synced} &> /dev/null ; mv ${tag_path}/backup/* ${tag_path_synced} &> /dev/null "
 	fi
 
 	# Verify Jump
@@ -1136,6 +1139,7 @@ func_dist_sync() {
 	if func_is_str_blank "${dist_hosts}" ; then
 		echo "WARN: NO dist_hosts could be found, NO distribution!"
 	else
+		# NOTE: backup is NOT in the distribution list
 		func_jump_distribute "${dati}" "${tag}" ${dist_hosts}	# NO quote on ${dist_hosts}, otherwise will cross multiple line
 	fi
 
@@ -1152,6 +1156,7 @@ func_dist_sync() {
 	func_jump_cleanup
 }
 
+# shellcheck disable=2029
 func_scp_jump_to_prod() {
 	local usage="Usage: $FUNCNAME <dir> <target1> <target2>"
 	local desc="Desc: scp <dir> in jump machine, to multiple <target> dirs" 
@@ -1166,8 +1171,9 @@ func_scp_jump_to_prod() {
 	done
 }
 
+# shellcheck disable=2029
 func_scp_prod_to_jump() {
-	local usage="Usage: $FUNCNAME <jump_dir> <prod_source>"
+	local usage="Usage: $FUNCNAME <prod_source> <jump_dir>"
 	local desc="Desc: scp stuffs from production machine to jump machine" 
 	func_param_check 2 "${desc} \n ${usage} \n" "$@"
 
@@ -1200,6 +1206,7 @@ func_jump_cleanup() {
 	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/cleanup.sh"
 }
 
+# shellcheck disable=2155,2029
 func_scp_via_jump() {
 	local usage="Usage: $FUNCNAME <source> <target> <jump_tmpdir>"
 	local desc="Desc: scp via jump machine, from <source> to <target> dir, use <jump_tmpdir> if provided" 
@@ -1208,7 +1215,7 @@ func_scp_via_jump() {
 	local jump_tmpdir="${3:-${MY_JUMP_TRANSFER}/$(func_dati)}"
 
 	local source=$(func_scp_host_to_ip "${1}")
-	local sourceName=$(basename $source)
+	local sourceName=$(basename "${source}")
 	local target=$(func_scp_host_to_ip "${2}")
 	local targetName="${target##*:}"
 	local targetAddr=${target%%:*}
@@ -1222,7 +1229,9 @@ func_scp_via_jump() {
 		func_scp_prod_to_jump "${source}" "${jump_tmpdir}"
 		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" "${target}"
 	else
-		local target_exist="$(ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
+
+		local target_exist="$(func_ssh_via_jump "${targetAddr}" "[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false")"
+		#local target_exist="$(ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
 		[ "${target_exist}" = "true" ] && func_cry "ERROR: ${targetName}/${sourceName} on target meachine (${targetAddr}) already exist!"
 		
 		echo "INFO: start to upload ..."
@@ -1410,7 +1419,7 @@ func_backup_dated() {
 	elif [ -d "${MY_ENV_DIST}" ] ; then
 		host_name="$(func_ip_single)"
 		tags="$(func_dist_tags)"
-		target_path="${MY_ENV_DIST}/$(func_select_line "${tags}")/dbackup"
+		target_path="${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
 	else
 		func_stop "ERROR: can NOT decide where to backup!"
 	fi

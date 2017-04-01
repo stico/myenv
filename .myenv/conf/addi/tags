@@ -12,8 +12,7 @@ vimrc=$HOME/.vimrc
 
 # DW
 dw=$MY_FCZ/code_dw
-report=$MY_DCD/report
-project=$MY_DCD/project
+jump=$MY_DCD/ops/jump
 
 # ZBOX
 zb=$ZBOX
