@@ -404,14 +404,14 @@ func_locate_via_find() {
 
 	# check 
 	func_validate_path_exist "${base}"	# NOTE, tag should be translated before use this funciton
-	[ -z "${search_raw}" ] && func_stop "ERROR: <search_items> must NOT be empty, abort!"
+	[ -z "${search_raw}" ] && func_die "ERROR: <search_items> must NOT be empty, abort!"
 
 	# prepare
 	local find_type
 	case "${find_type_raw}" in
 		FILE)	find_type=f ;;
 		DIR)	find_type=d ;;
-		*)	func_stop "ERROR: parameter <type> must be either FILE or DIR" 1>&2
+		*)	func_die "ERROR: parameter <type> must be either FILE or DIR" 1>&2
 	esac
 	#local search=$(echo "${search_raw}" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/$/[^\/]*/')	# version 1: works
 	local search="${base}/.*${search_raw// /.*}.*"						# version 2: works. More precise: prefix with base. Less strict: no / between <search_items>
@@ -451,14 +451,14 @@ func_vi() {
 	# shortcut - only one tag, and exist
 	local base="$(func_tag_value $1)"
 	if [ $# -eq 1 ] ; then
-		[ ! -e "${base}" ] && func_cry "ERROR: ${base} not exist!"
+		[ ! -e "${base}" ] && func_die "ERROR: ${base} not exist!"
 		func_vi_conditional "${base}" && return 0 
 	fi
 
 	# Version 2, use locate 
 	[ -d "$base" ] && shift || base="./"
-	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" /)" ] && func_cry 'ERROR: base should NOT be root (/)'
-	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" ${HOME})" ] && func_cry 'ERROR: base should NOT be $HOME'
+	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" /)" ] && func_die 'ERROR: base should NOT be root (/)'
+	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" ${HOME})" ] && func_die 'ERROR: base should NOT be $HOME'
 	func_vi_conditional "$(func_locate "FILE" "${base}" "$@")"
 
 	# Version 1, old .fl_me.txt
@@ -484,7 +484,7 @@ func_cd_tag() {
 
 	# 3.2) direct cd for single tag
 	if [ $# -eq 1 ] ; then
-		[ ! -d "${base}" ] && func_cry "ERROR: ${base} not exist!"
+		[ ! -d "${base}" ] && func_die "ERROR: ${base} not exist!"
 		func_cd_smart "${base}" && return 0 
 	fi
 
@@ -860,8 +860,8 @@ func_mvn_run() {
 func_mvn_run_class() { 
 	func_param_check 1 "Usage: $FUNCNAME [class]" "$@"
 
-	[ -z "${1}" ] && func_cry "ERROR: not classname to run!"
-	[ ! -f pom.xml -o ! -d src/main/java ] && func_cry "ERROR: pom.xml or src/main/java NOT exist, seems not a maven project!"
+	[ -z "${1}" ] && func_die "ERROR: not classname to run!"
+	[ ! -f pom.xml -o ! -d src/main/java ] && func_die "ERROR: pom.xml or src/main/java NOT exist, seems not a maven project!"
 
 	echo "INFO: run command: mvn clean compile exec:java -Dexec.mainClass=${1}"
 	mvn clean compile exec:java -Dexec.mainClass="${1}"
@@ -965,8 +965,8 @@ func_unison_fs_lapmac_all() {
 	local mount_path="/Volumes/Untitled"
 
 	# only works: 1) on osx, 2) in interactive mode
-	uname | grep -q Darwin || func_cry "ERROR: this function only works on OSX"
-	echo $- | grep -q "i" || func_cry "ERROR: this function only works in interactive mode"
+	uname | grep -q Darwin || func_die "ERROR: this function only works on OSX"
+	echo $- | grep -q "i" || func_die "ERROR: this function only works in interactive mode"
 
 	# TODO: use 'diskutil list' to correctly find disk
 	# try to find disk automatically (use the 1st unmounted diskXs1, X > 0)
@@ -982,16 +982,16 @@ func_unison_fs_lapmac_all() {
 			break
 		fi
 	done
-	[ -z "${disk_path}" ] && func_cry "ERROR: can NOT find diskXs1 for mounting"
+	[ -z "${disk_path}" ] && func_die "ERROR: can NOT find diskXs1 for mounting"
 
 	# if path exist AND not writable, need eject first (TODO: make the eject automatically?)
-	[ -e "${mount_path}" -a ! -w "${mount_path}" ] && func_cry "ERROR: disk already mount in RO mode, pls eject first!"
+	[ -e "${mount_path}" -a ! -w "${mount_path}" ] && func_die "ERROR: disk already mount in RO mode, pls eject first!"
 
 	# if target inexist, try to mount the disk
 	if [ ! -e "${mount_path}/backup/DCB" ] ; then
-		command -v unison &> /dev/null || func_cry "ERROR: unison NOT in path, pls check"
-		command -v ntfs-3g &> /dev/null || func_cry "ERROR: ntfs-3g NOT in path, pls check"
-		[ -e "${disk_path}" ] || func_cry "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
+		command -v unison &> /dev/null || func_die "ERROR: unison NOT in path, pls check"
+		command -v ntfs-3g &> /dev/null || func_die "ERROR: ntfs-3g NOT in path, pls check"
+		[ -e "${disk_path}" ] || func_die "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
 		[ -e "${mount_path}" ] || mkdir "${mount_path}"
 
 		echo "INFO: try to mount ${disk_path} to ${mount_path}"
@@ -1039,7 +1039,7 @@ func_ssh_via_jump() {
 	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
 
 	local ip_addr="$(func_ip_of_host "${1}")"
-	func_is_str_blank "${ip_addr}" && func_stop "ERROR: can NOT get ip address for: ${1}"
+	func_is_str_blank "${ip_addr}" && func_die "ERROR: can NOT get ip address for: ${1}"
 	shift
 
 	ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"			# V1, simple version
@@ -1101,8 +1101,8 @@ func_dist_sync() {
 
 	# Check
 	[ -f "${tag_path_local}" ] && tag_path_local="${tag_path_local%/*}"
-	[ -d "${tag_path_local}" ] || func_stop "ERROR: local path (${tag_path_local}) for tag (${tag}) NOT exist!"
-	[ -n "${2}" ] && [ -z "${source_ip}" ] && func_stop "ERROR: failed to translate <source> (${2}) to ip address, abort!"
+	[ -d "${tag_path_local}" ] || func_die "ERROR: local path (${tag_path_local}) for tag (${tag}) NOT exist!"
+	[ -n "${2}" ] && [ -z "${source_ip}" ] && func_die "ERROR: failed to translate <source> (${2}) to ip address, abort!"
 
 	# To Jump 
 	if [ -z "${source_ip}" -o "${source_ip}" = "127.0.0.1" ]; then
@@ -1110,7 +1110,7 @@ func_dist_sync() {
 		local upload_paths=()
 		[ -d "${tag_path_local}/config" ] && upload_paths+=("${tag_path_local}/config") || echo "INFO: ${tag_path_local}/config NOT exist, skip"
 		[ -d "${tag_path_local}/script" ] && upload_paths+=("${tag_path_local}/script") || echo "INFO: ${tag_path_local}/script NOT exist, skip"
-		[ ${#upload_paths[@]} -eq 0 ] && func_stop "ERROR: upload_paths for '${tag}' is empty, means nothing to distribute, abort!"
+		[ ${#upload_paths[@]} -eq 0 ] && func_die "ERROR: upload_paths for '${tag}' is empty, means nothing to distribute, abort!"
 
 		echo "INFO: '${tag}' from localhost (${upload_paths[*]}) to jump machine (${jump_tmpdir})"
 		func_scp_local_to_jump "${jump_tmpdir}" "${upload_paths[@]}" 
@@ -1118,7 +1118,7 @@ func_dist_sync() {
 		# remote to jump. NOTE: backup is also send to jump machine
 		local tag_path="${MY_DIST_BASE}/${tag}"
 		local source_full_addr="${source_ip}:${tag_path}"
-		func_is_valid_ip "${source_ip}" || func_stop "ERROR: source ip (${source_ip}) NOT valid, abort!"
+		func_is_valid_ip "${source_ip}" || func_die "ERROR: source ip (${source_ip}) NOT valid, abort!"
 
 		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
 		func_scp_prod_to_jump "${source_full_addr}/*" "${jump_tmpdir}"
@@ -1135,7 +1135,7 @@ func_dist_sync() {
 	# Verify Jump
 	local jump_tmpdir_contents="$(ssh "${MY_JUMP_HOST}" "ls ${jump_tmpdir}")"
 	echo "INFO: verify jump tmpdir, gets content: "${jump_tmpdir_contents}
-	[ -z "${jump_tmpdir_contents}" ] && func_stop "ERROR: no content on jump tmpdir, abort!"
+	[ -z "${jump_tmpdir_contents}" ] && func_die "ERROR: no content on jump tmpdir, abort!"
 
 	# Distribute
 	local dist_hosts="$(grep "^[^#]*[[:blank:]]${target_prefix}" /etc/hosts | sed -e "/${source_ip:-__DIST-INEXIST#STR__}/d;s/\s.*//;" | sort -u)"
@@ -1230,8 +1230,8 @@ func_scp_via_jump() {
 
 	# Perform transfer
 	if func_str_contains "${source}" ":" ; then
-		[ -d "${target}" ] || func_cry "ERROR: target MUST be a directory!"
-		[ -e "${target}/${sourceName}" ] && func_cry "ERROR: ${target}/${sourceName} already exist, NOT support override!"
+		[ -d "${target}" ] || func_die "ERROR: target MUST be a directory!"
+		[ -e "${target}/${sourceName}" ] && func_die "ERROR: ${target}/${sourceName} already exist, NOT support override!"
 
 		echo "INFO: start to download ..."
 		func_scp_prod_to_jump "${source}" "${jump_tmpdir}"
@@ -1240,7 +1240,7 @@ func_scp_via_jump() {
 
 		local target_exist="$(func_ssh_via_jump "${targetAddr}" "[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false")"
 		#local target_exist="$(ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
-		[ "${target_exist}" = "true" ] && func_cry "ERROR: ${targetName}/${sourceName} on target meachine (${targetAddr}) already exist!"
+		[ "${target_exist}" = "true" ] && func_die "ERROR: ${targetName}/${sourceName} on target meachine (${targetAddr}) already exist!"
 		
 		echo "INFO: start to upload ..."
 		func_scp_local_to_jump "${jump_tmpdir}" "${source}" 
@@ -1429,7 +1429,7 @@ func_backup_dated() {
 		tags="$(func_dist_tags)"
 		target_path="${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
 	else
-		func_stop "ERROR: can NOT decide where to backup!"
+		func_die "ERROR: can NOT decide where to backup!"
 	fi
 
 	# prepare and check
@@ -1702,7 +1702,7 @@ func_op_compressed_file() {
 	local target_dir="$(mktemp -d)"
 	echo "${compressed_file}" 
 	echo "${target_dir}" 
-	func_uncompress "${compressed_file}" "${target_dir}" || func_cry "ERROR: can NOT uncompress file: ${compressed_file}"
+	func_uncompress "${compressed_file}" "${target_dir}" || func_die "ERROR: can NOT uncompress file: ${compressed_file}"
 	echo 111111111111111
 	cd "${target_dir}"
 	echo 111111111111111
@@ -1752,20 +1752,20 @@ func_samba_umount() {
 	# load config
 	func_validate_path_exist "${1}"
 	eval "$(func_gen_local_vars "${1}")"
-	func_contains_blank_str "${mount_path}" && func_stop "ERROR: critical config NOT set, pls check (mount_path)"
+	func_contains_blank_str "${mount_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path)"
 
 	# umount
 	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 		umount "${mount_path}"
 	else
-		func_stop "ERROR: pls write code for current os: ${MY_OS_NAME}"
+		func_die "ERROR: pls write code for current os: ${MY_OS_NAME}"
 	fi
 
 	# re-check
 	if func_samba_is_mounted "${mount_path}" ; then
 		echo "INFO: umount success"
 	else
-		func_stop "WARN: mount failed, pls check"
+		func_die "WARN: mount failed, pls check"
 	fi
 }
 
@@ -1775,7 +1775,7 @@ func_samba_mount() {
 	# load config
 	func_validate_path_exist "${1}"
 	eval "$(func_gen_local_vars "${1}")"
-	func_contains_blank_str "${mount_path}" "${samba_path}" && func_stop "ERROR: critical config NOT set, pls check (mount_path/samba_path)"
+	func_contains_blank_str "${mount_path}" "${samba_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path/samba_path)"
 
 	# check
 	mount_path="$(readlink -f "${mount_path}")"
@@ -1787,7 +1787,7 @@ func_samba_mount() {
 		echo "INFO: cmd: mount_smbfs ${samba_path} ${mount_path}"
 		mount_smbfs "${samba_path}" "${mount_path}"
 	else
-		func_stop "ERROR: pls write code for current os: ${MY_OS_NAME}"
+		func_die "ERROR: pls write code for current os: ${MY_OS_NAME}"
 	fi
 
 	# recheck

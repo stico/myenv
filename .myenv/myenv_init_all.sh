@@ -325,7 +325,7 @@ func_pre_check() {
 	func_complain_sudo_unusable "some cmd might fail" && return 1
 
 	# Check platform
-	uname -s | grep -q "MINGW\|CYGWIN " && func_stop "ERROR: can NOT run init on CYGWIN or MINGW platform!"
+	uname -s | grep -q "MINGW\|CYGWIN " && func_die "ERROR: can NOT run init on CYGWIN or MINGW platform!"
 }
 
 func_is_sudo_need_password() {

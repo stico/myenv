@@ -21,9 +21,9 @@ $MY_ENV/zgen
 # notes in git
 $HOME/Documents/FCS/oumisc/oumisc-git/note
 
-# zbox script
-#$HOME/.zbox/zbox_lib.sh
+# scripts depend on myenv_lib
 $HOME/.zbox/zbox_func.sh
+$MY_FCS/oumisc/oumisc-git/proj/tob/tob_func.sh
 
 # user config
 $HOME/.ssh/
