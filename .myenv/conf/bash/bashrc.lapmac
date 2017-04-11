@@ -21,6 +21,7 @@ zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x?
 zbox_use_silent ntfs-3g		2016.2.22
 zbox_use_silent mkvalidator	0.4.0
 zbox_use_silent fzf		git
+zbox_use_silent shellcheck	git
 
 #zbox use python		3.4.3		# YouCompleteMe@vim still need python 2.x?
 

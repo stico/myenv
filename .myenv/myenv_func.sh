@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=2155,1090
 
 # source lib. To simplify, just try myenv_lib.sh in myenv
 MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
@@ -19,8 +20,8 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_TAGS_NOTE" ]		&& MY_TAGS_NOTE=$MY_ENV/zgen/tags_note
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
 [ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/addi/tags
-[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=($MY_DCC $MY_DCO $MY_DCD)
-[ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=($MY_FCS/oumisc/oumisc-git $MY_FCS/ourepo/ourepo-git)
+[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=("$MY_DCC" "$MY_DCO" "$MY_DCD")
+[ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=("$MY_FCS/oumisc/oumisc-git" "$MY_FCS/ourepo/ourepo-git")
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
 # Const
@@ -29,50 +30,53 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_OS_NAME" ]		&& MY_OS_NAME="$(func_os_name)"
 
 # Const of DW
+# shellcheck disable=2088
+{
 [ -z "$MY_DIST_BAK" ]		&& MY_DIST_BAK="~/.myenv/dist/backup"
 [ -z "$MY_DIST_BASE" ]		&& MY_DIST_BASE="~/.myenv/dist"			# diff with $MY_ENV_DIST, no expansion here
 [ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
 [ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
 [ -z "$MY_JUMP_TRANSFER" ]	&& MY_JUMP_TRANSFER="~/amp/__transfer__"	# do NOT use $MY_ENV here
+}
 
 # Config
 LOCATE_USE_FIND='true'		# seems tuned find is always a good choice (faster than mlocate on both osx/ubuntu). Ref: performance@locate
 LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find, which usually enough
 
-# Functions
+# shellcheck disable=2009
 func_validate_user_proc() {
-	func_param_check 1 "USAGE: $FUNCNAME <proc_info>" "$@"
+	func_param_check 1 "$@"
 
 	ps -ef | grep "$1" | grep -v grep > /dev/null && return 0
 	return 1
 }
 
 func_validate_user_name() {
-	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
+	func_param_check 1 "$@"
 	
-	[ "`whoami`" != "$*" ] && echo "ERROR: username is not $* !" && exit 1
+	[ "$(whoami)" != "$*" ] && echo "ERROR: username is not $* !" && exit 1
 }
 
 func_validate_user_exist() {
-	func_param_check 1 "USAGE: $FUNCNAME <username>" "$@"
+	func_param_check 1 "$@"
 	
 	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
 }
 
 func_validate_available_port() {
-	func_param_check 1 "USAGE: $FUNCNAME <port>" "$@"
+	func_param_check 1 "$@"
 	
 	[ "$(netstat -an | grep -c "$1" 2>/dev/null)" = "1" ] && func_die "ERROR: port $1 has been used!"
 }
 
 func_validate_cmd_exist() {
-	func_param_check 1 "USAGE: $FUNCNAME <command>" "$@"
+	func_param_check 1 "$@"
 
 	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
 }
 
 func_filter_inexist_files() {
-	func_param_check 1 "USAGE: $FUNCNAME <file> ..." "$@"
+	func_param_check 1 "$@"
 	local file
 	local result=()
 	for file in "$@" ; do
@@ -83,37 +87,44 @@ func_filter_inexist_files() {
 }
 
 func_filter_comments() {
-	func_param_check 1 "USAGE: $FUNCNAME <file> ..." "$@"
+	func_param_check 1 "$@"
 
 	sed -e "/^\s*#/d;/^\s*$/d" "$@"
 }
 
 func_tag_value_raw() {
-	func_is_personal_machine								\
-	&& sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}"	\
-	|| sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}"						\
-	| head -1
+	if func_is_personal_machine ; then
+		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}" | head -1
+	else
+		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" | head -1
+	fi
 }
 
 func_tag_value() {
-	[ -z "$*" ] && return 1						# NO translation, empty parameter, empty output
-	[ "$*" = "." -o "$*" = ".." ] && echo $* && return 0		# NO translation, probably path, translate will also cause problem
-	[ $(echo "$*" | grep -c "/\| ") -ge 1 ] && echo $* && return 0	# NO translation, contain no-tag char
+	# NO translation
+	[ -z "$*" ] && return 1				# empty parameter, empty output
+	[ "$*" = "." ] && echo "$*" && return 0		# probably path, translate will also cause problem
+	[ "$*" = ".." ] && echo "$*" && return 0	# probably path, translate will also cause problem
+	[[ "$*" = */* ]] && echo "$*" && return 0	# contain no-tag char
 
-	tag_value_raw="$(func_tag_value_raw ${1})"
-	[ -z "$tag_value_raw" ] && echo $1 && return 0			# not a tag, return itself
-	func_eval $tag_value_raw					# eval
+	local raw="$(func_tag_value_raw "${1}")"
+	[ -z "$raw" ] && echo "$1" && return 0		# not a tag, return itself
+	func_eval "$raw"				# eval
 }
 
 func_eval() {
-	func_param_check 1 "USAGE: $FUNCNAME <tag>" "$@"
+	func_param_check 1 "$@"
 
 	# eval if contains var or cmd, otherwise return itself
-	echo "$*" | grep -q '`\|$' &> /dev/null && eval echo $* || echo $*
+	if echo "$*" | grep -q '`\|$' &> /dev/null ;then
+		eval echo "$*" 
+	else
+		echo "$*"
+	fi
 }
 
 func_grep_myenv() {
-	func_param_check 1 "Usage: $FUNCNAME [search]*" "$@"
+	func_param_check 1 "$@"
 
 	func_collect_myenv "no_content"
 	xargs -d'\n' -a "${MY_ENV_ZGEN}/collection/myenv_filelist.txt" grep --color -d skip -I -i "$@" 2>&1
@@ -126,49 +137,33 @@ func_grep_myenv() {
 	#grep --color "$@"
 }
 
-func_eval_path() {
-	func_param_check 2 "Usage: $FUNCNAME <result_var_name> <pathstr>" "$@"
-
-	# need use variable to "return" result
-	result_var_name=$1
-	eval $result_var_name=""
-	shift
-	pathstr="$*"
-
-	# eval path, check empty value
-	[ -n "$pathstr" ] && candidate=`func_tag_value $pathstr`
-	[ -z "$candidate" ] && echo -e "WARN: candiate is empty: $pathstr !" && return 1
-
-	# Try $HOME as base (myenv backup need this for git listed files)
-	[ -e "$HOME/$candidate" ] && eval $result_var_name="$HOME/$candidate" && return 0
-	[ -e "$candidate" ] && eval $result_var_name="$candidate" && return 0
-}
-
 func_fullpath() {
-	func_param_check 1 "Usage: $FUNCNAME <path>" "$@"
+	func_param_check 1 "$@"
 
 	local fullpath="$(readlink -f "${1}")"
-	if uname | grep -q Darwin ; then
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 		echo "${fullpath}" | tr -d '\n' | pbcopy
 		echo "${fullpath}"
 		return
 	else
-		# clipit put stuff in clipboard, use -p or xclip to put in primary
-		echo "${fullpath}" | tr -d '\n' | clipit -c | sed -e '$a\'
+		# clipit: use -p or xclip to put in primary
+		echo "${fullpath}" | tr -d '\n' | clipit -c &> /dev/null
+		echo "${fullpath}" 
 		return
 	fi
 }
 
 func_to_clipboard() {
 	# read from stdin
-	#func_param_check 1 "Usage: $FUNCNAME <data>" "$@"
+	#func_param_check 1 "$@"
 
 	# put data into clipboard, each line as an entry
-	while read line ; do echo $line
-		if uname | grep -q Darwin ; then
+	while read -r line ; do echo "$line"
+		if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 			echo "${line}" | tr -d '\n' | pbcopy
 		else
-			echo "${line}" | tr -d '\n' | clipit -c | sed -e '$a\'
+			echo "${line}" | tr -d '\n' | clipit -c &> /dev/null
+			echo "${line}"
 		fi
 		# osx need wait some time, 0.2 seems too short, why? 
 		sleep 0.5
@@ -179,7 +174,7 @@ func_to_clipboard() {
 func_std_gen_tags() {
 	local d dd note_file note_filename
 	rm "${MY_TAGS_NOTE}"
-	for d in ${MY_ROOTS_NOTE[@]} ; do
+	for d in "${MY_ROOTS_NOTE[@]}" ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
 		for note_file in ${d}/note/*.txt ; do
 			local note_filename="${note_file##*/}"
@@ -193,7 +188,7 @@ func_std_gen_tags() {
 	done
 
 	rm "${MY_TAGS_CODE}"
-	for d in ${MY_ROOTS_CODE[@]} ; do
+	for d in "${MY_ROOTS_CODE[@]}" ; do
 		for dd in ${d}/* ; do
 			echo "${dd##*/}=${dd}" >> "${MY_TAGS_CODE}"
 		done
@@ -204,15 +199,15 @@ func_std_gen_tags() {
 func_std_gen_links() {
 	# STD 1: if there is dir and note have same name, there should be a link
 	local d note_file
-	for d in ${MY_ROOTS_NOTE[@]} ; do
+	for d in "${MY_ROOTS_NOTE[@]}" ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
 		for note_file in ${d}/note/*.txt ; do
 			local note_filename="${note_file##*/}"
 			local topic_basepath="${d}/${note_filename%.txt}"
 			if [ -d "${topic_basepath}" ] && [ ! -f "${topic_basepath}/${note_filename}" ] ; then
-				\cd "${topic_basepath}" &> /dev/null
+				pushd "${topic_basepath}" &> /dev/null
 				ln -s "../note/${note_filename}" .
-				\cd - &> /dev/null
+				popd &> /dev/null
 			fi
 		done
 	done
@@ -226,7 +221,9 @@ func_std_standarize() {
 
 # shellcheck disable=2155
 func_select_line() {
-	func_param_check 1 "Usage: $FUNCNAME <content>" "$@"
+	# NOTE: bash script "select i in mon tue wed exit # $i will be the selected str", good for quick interactive
+	local usage="Usage: ${FUNCNAME[0]} <content>" 
+	func_param_check 1 "$@"
 
 	local content="${1}"
 	
@@ -245,52 +242,28 @@ func_select_line() {
 	while (( selection <= 0 )) || (( selection > lines )) ; do
 		func_head 20 "${content}" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"	1>&2
 		echo "MULTIPLE CANDIDATES, PLS SELECT ONE:"				1>&2
-		read -e selection
+		read -r -e selection
 	done
 	echo "${content}" | sed -n -e "${selection}p"
 }
 
-#func_select_line() {
-#	func_param_check 3 "Usage: $FUNCNAME <result_var_name> <shortest|userselect> <lines>" "$@"
-#
-#	# need use variable to "return" result
-#	result_var_name=$1
-#	eval $result_var_name=""
-#	shift
-#
-#	# empty parameter, empty output
-#	[ -z "$*" ] && return 1
-#	
-#	# direct return for shortest
-#	local select_type=$1
-#	shift
-#	[ "shortest" = "${select_type}" ] && eval $result_var_name="$(echo "$*" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2- | head -1)" && return 0
-#
-#	targets_lines=$(echo "$*" | wc -l)
-#	[ $targets_lines -eq 1 ] && eval $result_var_name="$*" && return 0
-#
-#	func_head 20 "$*" | cat -n | sed -e "s/\s\+\([0-9]\+\).*/& \1/"
-#	echo "MULTIPLE CANDIDATES, PLS SELECT ONE:"
-#	read -e selection
-#	user_selection=`echo "$*" | sed -n -e "${selection}p"`
-#	eval $result_var_name=$user_selection
-#}
-
 func_log() {
-	func_param_check 4 "Usage: $FUNCNAME <level> <prefix> <log_path> <str>" "$@"
+	local usage="Usage: ${FUNCNAME[0]} <level> <prefix> <log_path> <str>" 
+	func_param_check 4 "$@"
 
 	local level="$1"
 	local prefix="$2"
 	local log_path="$3"
 	shift; shift; shift
 
-	[ ! -e "$log_path" ] && mkdir -p $(dirname $log_path) && touch "$log_path"
+	[ ! -e "$log_path" ] && mkdir -p "$(dirname "$log_path")" && touch "$log_path"
 
-	echo "$(func_dati) $level [$prefix] $@" >> "$log_path"
+	echo "$(func_dati) $level [$prefix] $*" >> "$log_path"
 }
 
 func_log_info() {
-	func_param_check 3 "Usage: $FUNCNAME <prefix> <log_path> <str>" "$@"
+	local usage="Usage: ${FUNCNAME[0]} <prefix> <log_path> <str>" 
+	func_param_check 3 "$@"
 
 	func_log "INFO" "$@"
 }
@@ -298,16 +271,20 @@ func_log_info() {
 func_vi_conditional() {
 	# cygwin env: win style path + background job
 	if [ "${MY_OS_NAME}" = "${OS_CYGWIN}" ] ; then
-		parameters=${@:1:$(($#-1))}
-		target_origin=${@:$#}
-		[ -z "$target_origin" ] && target_cyg="" || target_cyg=`cygpath -w "$target_origin"`
-		( \\gvim $parameters $target_cyg & ) &> /dev/null
+		target_origin="${!#}"
+		parameters=( "${@:1:$(($#-1))}" )
+		[ -z "$target_origin" ] && target_cyg="" || target_cyg=$(cygpath -w "$target_origin")
+		( \\gvim "${parameters[@]}" "$target_cyg" & ) &> /dev/null
 		return 0
 	fi
 
-	# Terminal mode: use vim if available, otherwise vi
+	# Terminal mode: prefer vim if available, otherwise vi
 	if [ -z "$DISPLAY" ] ; then
-		command -v vim &> /dev/null && \vim "$@" || \vi "$@"
+		if func_is_cmd_exist vim ; then
+			"vim" "$@"
+		else
+			"vi" "$@"
+		fi
 		return 0
 	fi
 
@@ -316,7 +293,7 @@ func_vi_conditional() {
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
 	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
 	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	if uname | grep -q Darwin ; then
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 		# pre condition: '+clientserver', 
 		# -g mean use GUI version
 		# directly use "vim -g" behaves wired (mess up terminal)
@@ -329,9 +306,11 @@ func_vi_conditional() {
 			LD_LIBRARY_PATH="" gvim "$@"
 		fi
 
-		# why? if not sleep after init (1st time), will open 2 files, currently 1s is enough
-		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -l | grep -q 'SINGLE_VIM' || sleep 1
-		[ -e /usr/bin/wmctrl ] && /usr/bin/wmctrl -a 'SINGLE_VIM'
+		if [ -e /usr/bin/wmctrl ] ; then
+			# why? if not sleep after init (1st time), will open 2 files, currently 1s is enough
+			/usr/bin/wmctrl -l | grep -q 'SINGLE_VIM' || sleep 1
+			/usr/bin/wmctrl -a 'SINGLE_VIM'
+		fi
 	fi
 }
 
@@ -339,7 +318,7 @@ func_load_virtualenvwrapper() {
 	echo "INFO: loading virtual env (Virtualenvwrapper) for Python"
 
 	[ -z "${PYTHON_HOME}" ] && func_die "ERROR: env PYTHON_HOME not set"
-	mkdir -p ${HOME}/amp/workspace/virtualenv &> /dev/null
+	mkdir -p "${HOME}/amp/workspace/virtualenv" &> /dev/null
 
 	export VIRTUALENVWRAPPER_PYTHON=${PYTHON_HOME}/bin/python
 	export PS1="(VirtualEnv) ${PS1}"
@@ -349,7 +328,7 @@ func_load_virtualenvwrapper() {
 	export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
 	export PIP_VIRTUALENV_BASE=${WORKON_HOME}
 	export PIP_RESPECT_VIRTUALENV=true
-	source ${PYTHON_HOME}/bin/virtualenvwrapper.sh
+	source "${PYTHON_HOME}/bin/virtualenvwrapper.sh"
 }
 
 func_load_rvm() {
@@ -359,29 +338,31 @@ func_load_rvm() {
 
 	# step 1: rvm hacks command "cd", record it before myenv loads func_cd_tag
 	local init_src="$RVM_HOME/scripts/rvm"
-	[ -e "${init_src}" ] && source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
+	source "${init_src}" || func_die "ERROR: failed to source ${init_src} !"
 	[ "$(type -t cd)" = "function" ] && eval "function func_rvm_cd $(type cd | tail -n +3)"
 
 	# step 2: rvm need update path to use specific ruby version, this should invoke after myenv set PATH var
-	local ver="$($RVM_HOME/bin/rvm list | sed -n -e "s/^=.*ruby-\([^ ]*\)\s*\[.*/\1/p" | head -1)"
+	local ver="$("$RVM_HOME/bin/rvm" list | sed -n -e "s/^=.*ruby-\([^ ]*\)\s*\[.*/\1/p" | head -1)"
 	local ver_gemset="ruby-${ver}@global"
-	[ -n "${ver}" ] && echo "INFO: use version ${ver_gemset}" && rvm use "${ver_gemset}" --default || func_die "ERROR: can not find any usable version"
-	#$RVM_HOME/bin/rvm use "ruby-${ver}@global" --default	# why not work? just prefixed with $RVM_HOME/bin
+	if [ -n "${ver}" ] ; then
+		echo "INFO: use version ${ver_gemset}"
+		rvm use "${ver_gemset}" --default || func_die "ERROR: can not find any usable version"
+		#$RVM_HOME/bin/rvm use "ruby-${ver}@global" --default	# why not work? just prefixed with $RVM_HOME/bin
+	fi
 
 	# step 3: update PS1
 	export PS1="(RVM) ${PS1}"
 }
 
 func_locate_updatedb() {
-	#uname | grep -q Darwin && return 1		# skip for OSX
-
 	[ "${LOCATE_USE_FIND}" = "true" ] && return 0
 	echo "INFO: update locate db"
 	sudo updatedb
 }
 
 func_locate() {
-	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [type] [base] [items...]" 
+	func_param_check 3 "$@"
 
 	if [ "${LOCATE_USE_FIND}" = "true" ] ; then
 		func_locate_via_find "$@"
@@ -391,7 +372,8 @@ func_locate() {
 }
 
 func_locate_via_find() {
-	func_param_check 3 "Usage: $FUNCNAME <type> <base> <search_items...>" "$@"
+	local usage="Usage: ${FUNCNAME[0]} <type> <base> <search_items...>" 
+	func_param_check 3 "$@"
 
 	# IMPORTANT: maxdepth which dramatically improved response time
 
@@ -416,8 +398,8 @@ func_locate_via_find() {
 	#local search=$(echo "${search_raw}" | sed -e '/^$/q;s/ \|^/.*\/.*/g;s/$/[^\/]*/')	# version 1: works
 	local search="${base}/.*${search_raw// /.*}.*"						# version 2: works. More precise: prefix with base. Less strict: no / between <search_items>
 
-	targets="$(find -P "$base" -maxdepth ${maxdepth} -iregex "$search" -xtype ${find_type} | sed -e "/^$/d")"			# 1st, try not follow links
-	[ -z "$targets" ] && targets="$(find -L "$base" -maxdepth ${maxdepth} -iregex "$search" -type ${find_type} | sed -e "/^$/d")"	# 2nd, try follow links 
+	targets="$(find -P "$base" -maxdepth "${maxdepth}" -iregex "$search" -xtype ${find_type} | sed -e "/^$/d")"			# 1st, try not follow links
+	[ -z "$targets" ] && targets="$(find -L "$base" -maxdepth "${maxdepth}" -iregex "$search" -type ${find_type} | sed -e "/^$/d")"	# 2nd, try follow links 
 	[ -z "$targets" ] && return 1													# 3rd, just return error
 
 	# use the shortest result
@@ -425,13 +407,14 @@ func_locate_via_find() {
 }
 
 func_locate_via_locate() {
-	func_param_check 3 "Usage: $FUNCNAME [type] [base] [items...]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [type] [base] [items...]" 
+	func_param_check 3 "$@"
 
 	local type="${1}"
 	local base="$(readlink -f "${2}")"	# important: use the formal path
 	shift; shift
-	local pattern="$(echo "${base}/ $@ " | sed -e "s/\s/.*/g")"
-	locate -i --regex "${pattern}" | while read line; do
+	local pattern="$(echo "${base}/ $* " | sed -e "s/\s/.*/g")"
+	locate -i --regex "${pattern}" | while read -r line; do
 		case "${type}" in
 			FILE)	[ -f "${line}" ] && echo "${line}" && return 0 ;;
 			DIR)	[ -d "${line}" ] && echo "${line}" && return 0 ;;
@@ -449,7 +432,7 @@ func_vi() {
 	[ $# -eq 1 ] && [[ "${1}" == *.* ]] && func_vi_conditional "${1}" && return 0		# in form of x.y like abc.txt
 
 	# shortcut - only one tag, and exist
-	local base="$(func_tag_value $1)"
+	local base="$(func_tag_value "${1}")"
 	if [ $# -eq 1 ] ; then
 		[ ! -e "${base}" ] && func_die "ERROR: ${base} not exist!"
 		func_vi_conditional "${base}" && return 0 
@@ -457,8 +440,8 @@ func_vi() {
 
 	# Version 2, use locate 
 	[ -d "$base" ] && shift || base="./"
-	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" /)" ] && func_die 'ERROR: base should NOT be root (/)'
-	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" ${HOME})" ] && func_die 'ERROR: base should NOT be $HOME'
+	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" /)" ] && func_die "ERROR: base should NOT be root (/)"
+	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" "${HOME}")" ] && func_die "ERROR: base should NOT be \$HOME dir"
 	func_vi_conditional "$(func_locate "FILE" "${base}" "$@")"
 
 	# Version 1, old .fl_me.txt
@@ -472,27 +455,36 @@ func_cd_tag() {
 	# 1) shortcuts
 	[ -z "$*" ]     && func_cd_smart    && return 0			# home
 	[ "-"  = "$*" ] && func_cd_smart -  && return 0			# last dir
-	[ ".." = "$*" ] && func_cd_smart .. && return 0			# parent dir
 	[ "."  = "$*" ] && func_cd_smart .  && return 0			# current dir
+	[ ".." = "$*" ] && func_cd_smart .. && return 0			# parent dir, note even current dir is a link in parent dir, cmd 'cd' will handle correctly
 
-	# 2) inside current dir
-	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_smart "${1}" && return 0	# exist in current dir
+	# 2) single & relative path, including ./xxx format and ../xxx (if current dir in parent dir is NOT a link)
+	[ $# -eq 1 ] && [ -d "${1}" ] && func_cd_smart "${1}" && return 0
 
-	# 3.1) try tag eval, use its dir if it is a file
-	local base="$(func_tag_value ${1})"
-	[ -f "${base}" ] && base="$(dirname ${base})"
+	# 3) single & relative path of ../xxx, but current dir in parent dir IS a link, need to re-assemble the path
+	if [ $# -eq 1 ] && [[ ${1} = ../* ]] ; then
+		local relative_parent="$(dirname "${PWD}")/${1#..}"	# NOTE: "${PWD})/${1}" NOT works
+		if [ -d "${relative_parent}" ] ; then
+			func_cd_smart "${relative_parent}" 
+			return 0
+		fi
+	fi
+	
+	# 4) try tag eval, use its dir if it is a file
+	local base="$(func_tag_value "${1}")"
+	[ -f "${base}" ] && base="$(dirname "${base}")"
 
-	# 3.2) direct cd for single tag
+	# 4.1) direct cd for single tag
 	if [ $# -eq 1 ] ; then
-		[ ! -d "${base}" ] && func_die "ERROR: ${base} not exist!"
-		func_cd_smart "${base}" && return 0 
+		func_cd_smart "${base}" 
+		return 0 
 	fi
 
-	# 3.3) find target. Version 2, use func_locate
+	# 4.2) find target. Version 2, use func_locate
 	[ -d "${base}" ] && shift || base="./"
 	func_cd_smart "$(func_locate "DIR" "${base}" "$@")"
 
-	# 3.3) find target. Version 1, old .dl_me.txt: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
+	# x) find target. Version 1, old .dl_me.txt: 1) use current dir if base inexist 2) Find target, firstly cached version, otherwise no-cache version
 	#[ -d "${base}" ] && shift || base="./"
 	#func_find_dotcache result_target d $base $* || func_find result_target d $base $*
 	#func_cd_smart "${base}/${result_target}"
@@ -512,10 +504,19 @@ func_cd_smart() {
 	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd .
 	#[ "$(type -t func_rvm_cd)" = "function" -a -e "$*/.rvmrc" ] && func_rvm_cd "$*" && return 0
 
-	[ -z "$*" ] && \cd || \cd "$*"
+	# perform cd
+	if [ -z "$*" ] ; then
+		"cd" || return 1		# return if failed, following steps are unecessary then
+	else
+		"cd" "$*" || return 1		# return if failed, following steps are unecessary then
+	fi
 
 	# ls based on env
-	func_is_personal_machine && \ls -hF --color=auto || \ls -ltrhF --color=auto
+	local opts="-hF --color=auto" 
+	func_is_personal_machine || opts="-ltrhF --color=auto"
+
+	# shellcheck disable=2086
+	"ls" ${opts}
 
 	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
 	# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
@@ -530,17 +531,19 @@ func_cd_smart() {
 }
 
 func_head_cmd() {
-	func_param_check 2 "Usage: $FUNCNAME [show_lines] [cmd]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [show_lines] [cmd]" 
+	func_param_check 2 "$@"
 
 	show_lines=$1
 	shift
 
-	cmd_result=`eval "$*"`
-	func_head $show_lines "$cmd_result"
+	cmd_result=$(eval "$*")
+	func_head "$show_lines" "$cmd_result"
 }
 
 func_notify_mail() {
-	func_param_check 2 "Usage: $FUNCNAME [title] [content]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [title] [content]" 
+	func_param_check 2 "$@"
 
 	local title="${1}"
 	shift
@@ -549,11 +552,11 @@ func_notify_mail() {
 
 func_check_cronlog() {
 	local log=/home/ouyangzhu/.myenv/zgen/cron.log 
-	local result="$(grep -i "error" ${log})"
+	local errors="$(grep -i "error" "${log}")"
 
-	if [ -n "${result}" ] ; then
+	if [ -n "${errors}" ] ; then
 		echo "ERROR: Found error message in ${log}, sending notifications"
-		func_notify_mail "ERROR: [MYENV Notify] cronlog has ERROR ($(hostname))!" "$result"
+		func_notify_mail "ERROR: [MYENV Notify] cronlog has ERROR ($(hostname))!" "$errors"
 	else
 		echo "INFO: No err found in ${log}, not notificaton needed"
 	fi
@@ -566,7 +569,7 @@ func_collect_statistics() {
 	local base=$MY_ENV_ZGEN/collection
 
 	for f in ${base}/* ; do
-		echo ${f}
+		echo "${f}"
 		# TODO
 
 		# use function in pipe
@@ -580,14 +583,13 @@ func_collect_myenv() {
 	# extract alone as "func_grep_myenv" need update file list frequently
 	# NOTE: myenv_content/myenv_filelist might duplicate with caller
 
-	local need_content="${1:-true}"
 	local myenv_content=${MY_ENV_ZGEN}/collection/myenv_content.txt
 	local myenv_filelist=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
-	local myenv_git="$(\cd $HOME && git ls-files | sed -e "s+^+$HOME/+")"
-	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" $MY_ENV_CONF/addi/myenv | xargs -I{}  echo echo {} )")"
+	local myenv_git="$("cd" "$HOME" && git ls-files | sed -e "s+^+$HOME/+")"
+	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" "$MY_ENV_CONF/addi/myenv" | xargs -I{}  echo echo {} )")"
 
-	[ -e "${myenv_filelist}" ] && func_delete_dated ${myenv_filelist}
-	[ -e "${myenv_content}" ] && [ "${1}" = "true" ] && func_delete_dated ${myenv_content}
+	[ -e "${myenv_filelist}" ] && func_delete_dated "${myenv_filelist}"
+	[ -e "${myenv_content}" ] && [ "${1}" = "true" ] && func_delete_dated "${myenv_content}"
 
 	for f in ${myenv_git} ${myenv_addi} ; do
 		#[ ! -e "$f" ] && echo "WARN: file inexist: ${f}" && continue
@@ -602,6 +604,7 @@ func_collect_myenv() {
 	done
 }
 
+# shellcheck disable=2016,2129
 func_collect_all() {
 	# Tips: find encoding error files: grep "^@/" code_content.txt | sed -e 's/^@/file -e soft "/;s/$/"/' | bash | tee /tmp/1 | grep -v "\(ASCII text\|UTF-8 Unicode\)"
 
@@ -617,7 +620,7 @@ func_collect_all() {
 	#	- you always check the old file!
 	#	- EVER WORSE: the pwd command seem NOT showing the correct current path ! (this happens as least on osx)
 	echo "INFO: clean old collection and updatedb (if need)"
-	func_delete_dated ${base}/*
+	func_delete_dated "${base}"/*
 	func_locate_updatedb
 
 	echo "INFO: collecting stdnote and gen quicklist"
@@ -626,53 +629,55 @@ func_collect_all() {
 	local stdnote_outline=${base}/stdnote_outline.txt
 	local stdnote_filelist=${base}/stdnote_filelist.txt
 	local stdnote_quicklist=${base}/stdnote_quicklist.txt
-	for d in ${MY_ROOTS_NOTE[@]} ; do
+	for d in "${MY_ROOTS_NOTE[@]}" ; do
 		for f in $d/note/* ; do  
 			local filename=${f##*/} 
-			local dirname=$(echo ${d}/note)
-			local fullpath=${d}/note/${f#${dirname}}
+			local dirname="${d}/note"
+			local fullpath="${d}/note/${f#${dirname}}"
 
-			echo "${fullpath}" >> "${stdnote_filelist}"
+			echo "${fullpath}"							>> "${stdnote_filelist}"
 
-			echo -e "\n\n@${fullpath}\n" >> "${stdnote_content}"
-			sed -e "s///" "${f}"       >> "${stdnote_content}"
+			echo -e "\n\n@${fullpath}\n"						>> "${stdnote_content}"
+			sed -e "s///" "${f}"							>> "${stdnote_content}"
 			
-			printf "%-26s" ${filename%.txt}                       >> "${stdnote_quicklist}"
-			count=$(($count+1)) && (($count%4==0)) && printf "\n" >> "${stdnote_quicklist}"
+			printf "%-26s" "${filename%.txt}"					>> "${stdnote_quicklist}"
+			count=$(( count + 1 )) && (( count % 4 == 0 )) && printf "\n"		>> "${stdnote_quicklist}"
 
-			echo -e "\n\n@${fullpath}\n"                                     >> "${stdnote_outline}"
-			grep "^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$" "${fullpath}" >> "${stdnote_outline}"
+			echo -e "\n\n@${fullpath}\n"						>> "${stdnote_outline}"
+			grep "^[[:space:]]*[-_\.[:alnum:]]\+[[:space:]]*$" "${fullpath}"	>> "${stdnote_outline}"
 		done
 	done
-	echo "INFO: >> $(wc -l ${stdnote_outline}) lines"
+	echo "INFO: >> $(wc -l "${stdnote_outline}") lines"
 
 	echo "INFO: collecting miscnote"
 	local miscnote_content=${base}/miscnote_content.txt
 	local miscnote_filelist=${base}/miscnote_filelist.txt
-	uname | grep -q Darwin											\
-		&& mdfind -name NOTE | sed -e '/txt$/!d;/NOTE/!d;/\/amp\//d' >> "${miscnote_filelist}"		\
-		|| locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
-	cat "${miscnote_filelist}" | while read line ; do
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+		mdfind -name NOTE | sed -e '/txt$/!d;/NOTE/!d;/\/amp\//d' >> "${miscnote_filelist}"
+	else
+		locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
+	fi
+	while read -r line ; do
 		echo -e "\n\n@${line}\n"  >> "${miscnote_content}"
 		sed -e "s///" "${line}" >> "${miscnote_content}"
-	done
-	echo "INFO: >> $(wc -l ${miscnote_content}) lines"
+	done < "${miscnote_filelist}"
+	echo "INFO: >> $(wc -l "${miscnote_content}") lines"
 
 	echo "INFO: collecting myenv"
 	local myenv_content=${base}/myenv_content.txt
 	local myenv_filelist=${base}/myenv_filelist.txt
 	func_collect_myenv "with_content"
-	echo "INFO: >> $(wc -l ${myenv_content}) lines"
+	echo "INFO: >> $(wc -l "${myenv_content}") lines"
 
 	echo "INFO: collecting code"
 	local code_content=${base}/code_content.txt
 	local code_filelist=${base}/code_filelist.txt
-	for d in ${MY_ROOTS_CODE[@]} ; do
-		\cd "${d}" &> /dev/null
+	for d in "${MY_ROOTS_CODE[@]}" ; do
+		pushd "${d}" &> /dev/null
 		git ls-files | sed -e "s+^+${d}/+" >> "${code_filelist}"
-		\cd - &> /dev/null
+		popd &> /dev/null
 	done
-	echo "INFO: >> $(wc -l ${code_filelist}) files"
+	echo "INFO: >> $(wc -l "${code_filelist}") files"
 
 	# NOTE: no blank line allowed (sed will complain)
 	sed								\
@@ -717,22 +722,23 @@ func_collect_all() {
 	-e "/\/ant\/.*\/reports\//d"					\
 	-e "/\/html\/ref_html.*.htm/d"					\
 	-e "/\/template_war_spring\/.*\/blueprint\//d"			\
-	"${code_filelist}" | while read line ; do
+	"${code_filelist}" | while read -r line ; do
 		func_is_filetype_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
 		sed -e "s///" "${line}" >> "${code_content}"
 	done
-	echo "INFO: >> $(wc -l ${code_content}) lines"
+	echo "INFO: >> $(wc -l "${code_content}") lines"
 
 	echo "INFO: collecting mydoc filelist"
 	local mydoc_filelist=${base}/mydoc_filelist.txt
 	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCS  FCZ ; do	# v1, deprecated
-	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  ECS ; do		# v2, deprecated, put ECS in the end
+	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  ECS ; do			# v2, deprecated, put ECS in the end
 	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCS ; do				# v3, compacted docs
-		(uname | grep -q Darwin					\
-			&& find "${MY_DOC}/${d}" -type f		\
-			|| locate $(readlink -f "${MY_DOC}/${d}")	)|\
-		sed							\
+		# shellcheck disable=2015
+		( [ "${MY_OS_NAME}" = "${OS_OSX}" ]			\
+		&& find "${MY_DOC}/${d}" -type f			\
+		|| locate "$(readlink -f "${MY_DOC}/${d}")" )		\
+		| sed							\
 		-e "/\/DCD\/mail\//d"					\
 		-e "/\/sysop_fed_lib\//d"				\
 		-e "/\/js\/prettify\//d"				\
@@ -747,7 +753,7 @@ func_collect_all() {
 		-e "/\/FCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
 		-e "/\/target\//d" `# maven project target`		\
 		-e "/open.yy.com_trunk\//d" `# match prefix`		\
-		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`	>> ${mydoc_filelist}
+		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`		>> "${mydoc_filelist}"
 
 		#-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
 		#-e "/\/vendor\/ZF2\//d"				\
@@ -766,7 +772,7 @@ func_collect_all() {
 		#-e "/\/appstore.yy.com_trunk\/framework\//d"		\
 		#| sed -e "/\/\(\.git\|\.svn\|\.hg\|target\)\//d;" | wc -l
 	done
-	echo "INFO: >> $(wc -l ${mydoc_filelist}) lines"
+	echo "INFO: >> $(wc -l "${mydoc_filelist}") lines"
 
 	echo "INFO: collecting all"
 	local all_content=${base}/all_content.txt
@@ -786,7 +792,8 @@ func_collect_all() {
 }
 
 func_repeat() {
-	func_param_check 3 "Usage: $FUNCNAME <interval> <times> <cmd>" "$@"
+	local usage="Usage: ${FUNCNAME[0]} <interval> <times> <cmd>" 
+	func_param_check 3 "$@"
 
 	count=1
 	times="$2"
@@ -794,16 +801,17 @@ func_repeat() {
 	shift;shift
 
 	#for count in $(eval echo {1..$times}) ; do	# when times value big, will slow or not work
-	while (($count < $times)); do
+	while (( count <  times )); do
 		eval "$@" 
 		((count++))
-		sleep $interval
+		sleep "$interval"
 		echo -e "\n\n------------------------- Count: $count / $times -------------------------\n\n"
 	done
 }
 
 func_grep_cmd() {
-	func_param_check 2 "Usage: $FUNCNAME <search_str> <cmd>" "$@"
+	local usage="Usage: ${FUNCNAME[0]} <search_str> <cmd>" 
+	func_param_check 2 "$@"
 
 	search_str=$1
 	shift
@@ -811,7 +819,8 @@ func_grep_cmd() {
 }
 
 func_head() {
-	func_param_check 2 "Usage: $FUNCNAME [show_lines] [text]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [show_lines] [text]" 
+	func_param_check 2 "$@"
 
 	show_lines=$1
 	shift
@@ -825,16 +834,16 @@ func_mvn_clean() {
 
 	pushd . &> /dev/null
 	echo "INFO: start to do 'mvn clean', check log at: $log"
-	for p in $(find "$PWD" -name pom.xml) ; do
-		local d=$(dirname "$p")
+	find "$PWD" -name pom.xml | while read -r line ; do
+		local d=$(dirname "$line")
 		echo "INFO: cd $d && mvn clean"
-		\cd "$d" && mvn clean >> $log 2>&1
+		"cd" "$d" && mvn clean >> "$log" 2>&1
 	done
 	popd &> /dev/null
 }
 
 func_mvn_run() { 
-	func_param_check 0 "Usage: $FUNCNAME [class]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [class]" 
 
 	# search candidates
 	if [ -n "${1}" ] ; then
@@ -853,22 +862,24 @@ func_mvn_run() {
 	fi
 
 	# execute
-	mvn_run_class="$(echo ${mvn_run_file} | sed -e "s+src/main/java/++;s+/+.+g;s+.java$++")"
+	mvn_run_class="$(echo "${mvn_run_file}" | sed -e "s+src/main/java/++;s+/+.+g;s+.java$++")"
 	func_mvn_run_class "${mvn_run_class}" | sed -e "/^\[INFO\] /d;/^\[WARNING\] Warning: killAfter is now deprecated/d"
 }
 
 func_mvn_run_class() { 
-	func_param_check 1 "Usage: $FUNCNAME [class]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [class]" 
+	func_param_check 1 "$@"
 
 	[ -z "${1}" ] && func_die "ERROR: not classname to run!"
-	[ ! -f pom.xml -o ! -d src/main/java ] && func_die "ERROR: pom.xml or src/main/java NOT exist, seems not a maven project!"
+	[ ! -f pom.xml ] || [ ! -d src/main/java ] && func_die "ERROR: pom.xml or src/main/java NOT exist, seems not a maven project!"
 
 	echo "INFO: run command: mvn clean compile exec:java -Dexec.mainClass=${1}"
 	mvn clean compile exec:java -Dexec.mainClass="${1}"
 }
 
 func_mvn_gen() { 
-	func_param_check 2 "Usage: $FUNCNAME [pkg(war/jar/oujar/ouwar/csmm/cswar)] [name]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [pkg(war/jar/oujar/ouwar/csmm/cswar)] [name]" 
+	func_param_check 2 "$@"
 
 	local cmd=""
 	case "${1}" in
@@ -886,27 +897,27 @@ func_mvn_gen() {
 
 	echo "INFO: run mvn cmd: $cmd"
 	$cmd
-	mkdir -p ${2}/src/main/java 
+	mkdir -p "${2}/src/main/java" 
 }
 
 func_svn_backup() { 
 	[ -n "$1" ] && src_path="$1" || src_path="."
 
-	local src_name=$(basename $(readlink -f $src_path))
+	local src_name=$(basename "$(readlink -f "$src_path")")
 	local tmp_path=$MY_TMP/${src_name}_svn_export
 
 	# current dir is already project
-	[ -e ./.svn ] && svn export $src_path $tmp_path && return 0
+	[ -e ./.svn ] && svn export "$src_path" "$tmp_path" && return 0
 	
 	# projects are in subdir
-	mkdir -p $tmp_path
-	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
-		[ -n "$dir" ] && [ -e $dir/.svn ] && svn export $dir/  $tmp_path/$(basename $dir)
+	mkdir -p "$tmp_path"
+	find "$src_path" -maxdepth 1 -type d | while read -r dir ; do 
+		[ -n "$dir" ] && [ -e "$dir/.svn" ] && svn export "$dir/"  "$tmp_path/$(basename "$dir")"
 	done
 
 	# backup
-	func_backup_dated $tmp_path
-	[ -e "$tmp_path" ] && rm -rf $tmp_path
+	func_backup_dated "$tmp_path"
+	[ -e "$tmp_path" ] && rm -rf "$tmp_path"
 }
 
 func_svn_update() { 
@@ -916,9 +927,9 @@ func_svn_update() {
 	[ -e $src_path/.svn ] && svn update $src_path && return 0
 	
 	# projects are in subdir
-	for dir in $(find $src_path -maxdepth 1 -type d) ; do 
+	find $src_path -maxdepth 1 -type d | while read -r dir ; do 
 		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
-		[ -n "$dir" ] && [ -e $dir/.svn ] && svn update $dir/ 
+		[ -n "$dir" ] && [ -e "$dir/.svn" ] && svn update "$dir/" 
 	done
 	func_locate_updatedb
 }
@@ -950,14 +961,11 @@ func_git_commit_push() {
 
 func_git_commit_check() { 
 	for base in "$HOME" "$HOME/.zbox" "$HOME/Documents/FCS/oumisc/oumisc-git" "$HOME/.vim/bundle/vim-oumg" ; do 
-
-		[ -z "$base" ] && echo 'ERROR: get an empty $base, pls check!' && continue 
-
-		\cd "$base" &> /dev/null 
+		pushd "$base" &> /dev/null 
 		git status | grep -q "nothing to commit, working directory clean"	\
 		&& echo "NOT need update: $base"					\
 		|| echo "NEED update: $base" 
-		\cd - &> /dev/null 
+		popd &> /dev/null 
 	done
 }
 
@@ -965,14 +973,14 @@ func_unison_fs_lapmac_all() {
 	local mount_path="/Volumes/Untitled"
 
 	# only works: 1) on osx, 2) in interactive mode
-	uname | grep -q Darwin || func_die "ERROR: this function only works on OSX"
+	[ "${MY_OS_NAME}" = "${OS_OSX}" ] || func_die "ERROR: this function only works on OSX"
 	echo $- | grep -q "i" || func_die "ERROR: this function only works in interactive mode"
 
 	# TODO: use 'diskutil list' to correctly find disk
 	# try to find disk automatically (use the 1st unmounted diskXs1, X > 0)
 	local disk_path
-	local disk_status="$(\df -h)"
-	local disk_candidates="$(\ls /dev/disk*s1 | sed -e "/disk0s1/d")"
+	local disk_status="$(df -h)"
+	local disk_candidates="$("ls" /dev/disk*s1 --ignore "disk0s1")"
 	for disk_path in ${disk_candidates} ; do
 		if echo "${disk_status}" | grep -q "${disk_path}" ; then
 			echo "INFO: ${disk_path} alread mounted, try next"
@@ -985,7 +993,7 @@ func_unison_fs_lapmac_all() {
 	[ -z "${disk_path}" ] && func_die "ERROR: can NOT find diskXs1 for mounting"
 
 	# if path exist AND not writable, need eject first (TODO: make the eject automatically?)
-	[ -e "${mount_path}" -a ! -w "${mount_path}" ] && func_die "ERROR: disk already mount in RO mode, pls eject first!"
+	[ -e "${mount_path}" ] && [ ! -w "${mount_path}" ] && func_die "ERROR: disk already mount in RO mode, pls eject first!"
 
 	# if target inexist, try to mount the disk
 	if [ ! -e "${mount_path}/backup/DCB" ] ; then
@@ -1002,7 +1010,7 @@ func_unison_fs_lapmac_all() {
 
 	local answer
 	echo "Do you want to umount disk? [Y/n]"
-	read -e answer
+	read -r -e answer
 	echo "${answer}" | grep -q "[nN]" || sudo umount "${mount_path}"
 }
 
@@ -1027,22 +1035,35 @@ func_ssh_agent_init() {
 }
 
 func_scp_host_to_ip() {
-	func_param_check 1 "Usage: $FUNCNAME [addr]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} [addr]" 
+	func_param_check 1 "$@"
 
 	func_str_not_contains "${1}" ":" && echo "${1}" && return 0
 
 	echo "$(func_ip_of_host "${1%:*}"):${1#*:}"
 }
 
+func_ssh_cmd_via_jump() {
+	local ssh_via_jump_opts=""
+	func_ssh_via_jump "$@"
+}
+
+func_ssh_term_via_jump() {
+	local ssh_via_jump_opts="-t"
+	func_ssh_via_jump "$@"
+}
+
 # shellcheck disable=2155,2029
 func_ssh_via_jump() {
-	func_param_check 1 "Usage: $FUNCNAME [target]" "$@"
+	local usage="Usage: ${FUNCNAME[0]} <target>" 
+	func_param_check 1 "$@"
 
 	local ip_addr="$(func_ip_of_host "${1}")"
 	func_is_str_blank "${ip_addr}" && func_die "ERROR: can NOT get ip address for: ${1}"
 	shift
 
-	ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"			# V1, simple version
+	local ssh_via_jump_opts="${ssh_via_jump_opts:-"-t"}"
+	ssh ${ssh_via_jump_opts} "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"			# V1, simple version
 }
 
 func_dist_source_env() {
@@ -1060,14 +1081,16 @@ func_dist_source_env() {
 
 func_dist_tags() {
 	[ -d "${MY_ENV_DIST}" ] || return
-	\ls "${MY_ENV_DIST}" | sed -e "/backup/d"
+
+	# dirs are tags, except "backup"
+	"ls" "${MY_ENV_DIST}" --ignore "backup"
 }
 
 # shellcheck disable=2155,2086,2029
 func_dist_sync() {
 	# TODO: how to support internal machine as target? seem jump could connect to internal machine, but need sync pub key before connect
 
-	local usage="Usage: $FUNCNAME <tag> <source> <target_prefix> "
+	local usage="Usage: ${FUNCNAME[0]} <tag> <source> <target_prefix> "
 	#local desc="Desc:\tstep 1) if <source> (default is local) provided, download <tag> from <source> then run step 2, otherwise directly run step 2.\n\tstep 2) distribute <tag> to all hosts defined in /etc/hosts, with <target_prefix> (default is as tag) prefix"
 	read -r -d '' desc <<-'EOF'
 		Functionality:
@@ -1082,12 +1105,13 @@ func_dist_sync() {
 		    1) if <source> provided, download <tag> from <source> then run step 2, otherwise directly run step 2
 		    2) distribute <tag> to all dist_hosts, except <source> itself (if provided)
 		Examples:
-		    $FUNCNAME hp-proxy					# distribute $MY_DCD/hp-proxy/{config,script} to ~dist_hosts start with 'hp-proxy'
-		    $FUNCNAME hp-proxy hp-proxy.web.76			# latest version is on "hp-proxy.web.76", distribute to other dist_hosts, and backup to local
-		    $FUNCNAME hp-proxy hp-proxy.web.76	hp-proxy.web	# as above, but dist_hosts might smaller, since <target_prefix> is more strict
-		    $FUNCNAME hp-proxy localhost	hp-proxy.web	# when <source> is local, but need specify <target_prefix>, use 'localhost/127.0.0.1' as <source>
+		    ${FUNCNAME[0]} hp-proxy					# distribute $MY_DCD/hp-proxy/{config,script} to ~dist_hosts start with 'hp-proxy'
+		    ${FUNCNAME[0]} hp-proxy hp-proxy.web.76			# latest version is on "hp-proxy.web.76", distribute to other dist_hosts, and backup to local
+		    ${FUNCNAME[0]} hp-proxy hp-proxy.web.76	hp-proxy.web	# as above, but dist_hosts might smaller, since <target_prefix> is more strict
+		    ${FUNCNAME[0]} hp-proxy localhost	hp-proxy.web	# when <source> is local, but need specify <target_prefix>, use 'localhost/127.0.0.1' as <source>
 		EOF
-	func_param_check 1 "${desc} \n ${usage} \n" "$@"
+	local usage="${desc} \n ${usage} \n" 
+	func_param_check 1 "$@"
 
 	# Parameters
 	local tag="${1}"
@@ -1105,7 +1129,7 @@ func_dist_sync() {
 	[ -n "${2}" ] && [ -z "${source_ip}" ] && func_die "ERROR: failed to translate <source> (${2}) to ip address, abort!"
 
 	# To Jump 
-	if [ -z "${source_ip}" -o "${source_ip}" = "127.0.0.1" ]; then
+	if [ -z "${source_ip}" ] || [ "${source_ip}" = "127.0.0.1" ]; then
 		# local to jump. NOTE: backup is NOT in sync list
 		local upload_paths=()
 		[ -d "${tag_path_local}/config" ] && upload_paths+=("${tag_path_local}/config") || echo "INFO: ${tag_path_local}/config NOT exist, skip"
@@ -1124,12 +1148,12 @@ func_dist_sync() {
 		func_scp_prod_to_jump "${source_full_addr}/*" "${jump_tmpdir}"
 
 		# move dist>tag>backup to dist>backup, in case duplicate sync next time, no need to mkdir dist>tag>backup as will already there after distribution for the 1st time
-		func_ssh_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${MY_DIST_BASE}/backup"
+		func_ssh_cmd_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${MY_DIST_BASE}/backup"
 
 		# WHY: if prefixed with "mkdir -p xxx;" the "*" in mv cmd WILL NOT expand!
 		#local tag_path_synced="${MY_DIST_BASE}/${tag}_synced"
-		#func_ssh_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${tag_path_synced} "					# works
-		#func_ssh_via_jump "${source_ip}" "mkdir -p ${tag_path_synced} ; mv ${tag_path}/backup/* ${tag_path_synced}"	# not work: mv: cannot stat `/home/ouyangzhu/.myenv/dist/hp-proxy/backup/*': No such file or directory
+		#func_ssh_cmd_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${tag_path_synced} "					# works
+		#func_ssh_cmd_via_jump "${source_ip}" "mkdir -p ${tag_path_synced} ; mv ${tag_path}/backup/* ${tag_path_synced}"	# not work: mv: cannot stat `/home/ouyangzhu/.myenv/dist/hp-proxy/backup/*': No such file or directory
 	fi
 
 	# Verify Jump
@@ -1166,9 +1190,9 @@ func_dist_sync() {
 
 # shellcheck disable=2029
 func_scp_jump_to_prod() {
-	local usage="Usage: $FUNCNAME <dir> <target1> <target2>"
+	local usage="Usage: ${FUNCNAME[0]} <dir> <target1> <target2>"
 	local desc="Desc: scp <dir> in jump machine, to multiple <target> dirs" 
-	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+	func_param_check 2 "$@"
 
 	local jump_tmpdir="${1}"
 	shift
@@ -1181,9 +1205,9 @@ func_scp_jump_to_prod() {
 
 # shellcheck disable=2029
 func_scp_prod_to_jump() {
-	local usage="Usage: $FUNCNAME <prod_source> <jump_dir>"
+	local usage="Usage: ${FUNCNAME[0]} <prod_source> <jump_dir>"
 	local desc="Desc: scp stuffs from production machine to jump machine" 
-	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+	func_param_check 2 "$@"
 
 	# NOTE: only support one <prod_source>, in case too complicated. Enhance if really need
 	local prod_source="${1}"
@@ -1192,10 +1216,11 @@ func_scp_prod_to_jump() {
 	ssh "${MY_JUMP_HOST}" "scp -r -P ${MY_PROD_PORT} ${prod_source} ${jump_tmpdir}"
 }
 
+# shellcheck disable=2029
 func_scp_local_to_jump() {
-	local usage="Usage: $FUNCNAME <jump_dir> <path1> <path2> ..."
+	local usage="Usage: ${FUNCNAME[0]} <jump_dir> <path1> <path2> ..."
 	local desc="Desc: scp stuffs from local machine to jump machine" 
-	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+	func_param_check 2 "$@"
 
 	local jump_tmpdir="${1}"
 	shift
@@ -1205,10 +1230,12 @@ func_scp_local_to_jump() {
 	scp -r -P "${MY_PROD_PORT}" "${@}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/"
 }
 
+# shellcheck disable=2029
 func_jump_distribute() {
-	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/distribute.sh ${@}"
+	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/distribute.sh $*"
 }
 
+# shellcheck disable=2029
 func_jump_cleanup() {
 	# cleanup, in case too much garbage
 	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/cleanup.sh"
@@ -1216,9 +1243,9 @@ func_jump_cleanup() {
 
 # shellcheck disable=2155,2029
 func_scp_via_jump() {
-	local usage="Usage: $FUNCNAME <source> <target> <jump_tmpdir>"
+	local usage="Usage: ${FUNCNAME[0]} <source> <target> <jump_tmpdir>"
 	local desc="Desc: scp via jump machine, from <source> to <target> dir, use <jump_tmpdir> if provided" 
-	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+	func_param_check 2 "$@"
 
 	local jump_tmpdir="${3:-${MY_JUMP_TRANSFER}/$(func_dati)}"
 
@@ -1238,7 +1265,7 @@ func_scp_via_jump() {
 		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" "${target}"
 	else
 
-		local target_exist="$(func_ssh_via_jump "${targetAddr}" "[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false")"
+		local target_exist="$(func_ssh_cmd_via_jump "${targetAddr}" "[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false")"
 		#local target_exist="$(ssh "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${targetAddr} '[ -d ${targetName}/${sourceName} ] 2>/dev/null && echo true || echo false'" 2>/dev/null)"
 		[ "${target_exist}" = "true" ] && func_die "ERROR: ${targetName}/${sourceName} on target meachine (${targetAddr}) already exist!"
 		
@@ -1260,34 +1287,35 @@ func_scp_via_jump() {
 	#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
 }
 
+# shellcheck disable=2029
 func_terminator() { 
 	if [ "${MY_OS_NAME}" = "${OS_CYGWIN}" ] ; then
 		# non-cygwin env: original program
-		terminator --title SINGLE_TERMINATOR $*
+		terminator --title SINGLE_TERMINATOR "$@"
 	else
 		startxwin &> /dev/null	# just ensure X server started
-		raw_data=$(ipconfig)
-		local_ip=`echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p" | head -1`
+		local raw_data=$(ipconfig)
+		local local_ip=$(echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p" | head -1)
 		# both --maximise/--fullscreen are not really work
-		ssh workvm "DISPLAY=$local_ip:0.0 terminator --geometry=1910x1010+0+0 --title Gnome-Terminator&> /dev/null &" &> /dev/null
+		ssh workvm "DISPLAY=${local_ip}:0.0 terminator --geometry=1910x1010+0+0 --title Gnome-Terminator&> /dev/null &" &> /dev/null
 	fi
 }
 
 func_sys_net() {
-	usage="Usage: $FUNCNAME [interface] [interval], interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') 
-	func_param_check 1 $usage "$@"
+	usage="Usage: ${FUNCNAME[0]} [interface] [interval], interfaces: "$(ifconfig | sed '/^\s\+/d;/^\s*$/d;s/\s\+.*//;/lo/d;') 
+	func_param_check 1 "$@"
 
 	interface=$1
 	sleep_time=${2-2}
-	rx_before=$(ifconfig $interface | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
-	tx_before=$(ifconfig $interface | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
+	rx_before=$(ifconfig "$interface" | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
+	tx_before=$(ifconfig "$interface" | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
 	while : ; do
-		sleep $sleep_time
-		rx_after=$(ifconfig $interface | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
-		tx_after=$(ifconfig $interface | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
-		rx_result=$(( (rx_after-rx_before)*8/$sleep_time ))
-		tx_result=$(( (tx_after-tx_before)*8/$sleep_time ))
-		echo -e "$(date "+%Y-%m-%d %H:%M:%S") IN: ${rx_result}/$(( ${rx_result}/1000 )) bps/kbps,\tOUT: ${tx_result}/$(( ${tx_result}/1000 )) bps/kbps"
+		sleep "$sleep_time"
+		rx_after=$(ifconfig "$interface" | sed -n -e "s/^.*RX bytes:\([0-9]*\).*/\1/p")
+		tx_after=$(ifconfig "$interface" | sed -n -e "s/^.*TX bytes:\([0-9]*\).*/\1/p")
+		rx_result=$(( (rx_after-rx_before)*8/sleep_time ))
+		tx_result=$(( (tx_after-tx_before)*8/sleep_time ))
+		echo -e "$(date "+%Y-%m-%d %H:%M:%S") IN: ${rx_result}/$(( rx_result/1000 )) bps/kbps,\tOUT: ${tx_result}/$(( tx_result/1000 )) bps/kbps"
 
 		rx_before=$rx_after
 		tx_before=$tx_after
@@ -1296,7 +1324,7 @@ func_sys_net() {
 
 func_translate() { 
 	# check history
-	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename ${MY_DCO}/english/translate/translate_history_*)
+	history_txt=$(grep "^$*[[:blank:]]" -i -A 1 --no-filename "${MY_DCO}"/english/translate/translate_history_*)
 	[ -n "$history_txt" ] && echo "$history_txt" && return 0
 
 	func_translate_google "$@" || func_translate_microsoft "$@" || func_translate_youdao "$@"
@@ -1316,37 +1344,39 @@ func_translate_youdao() {
 }
 
 func_translate_google() { 
-	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} [words]" 
+	func_param_check 1 "$@" 
 
 	# might useful fields: ie=UTF-8&oe=UTF-8
-	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
+	if [ "$( echo "$*" | grep -c "[a-z]")" -ge 1 ] ; 
 	then	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=zh-CN&sl=en"	# en > cn
 	else	data="hl=en&tsel=0&ssel=0&client=t&sc=1&multires=1&otf=2&text=$*&tl=en&sl=zh-CN"	# cn > en	# why become cn > cn !!??
 	fi
 
-	res_raw=`curl -e "http://translate.google.cn/?"								\
+	res_raw="$(curl -e "http://translate.google.cn/?"								\
 		-H 'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:11.0) Gecko/20100101 Firefox/11.0'	\
 		-H 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'			\
 		-s "http://translate.google.cn/translate_a/t"							\
-		-d "$data"`
+		-d "$data")"
 	[ -z "$res_raw" ] && return 1
 
-	res_simple=`echo $res_raw | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}'`
-	echo $res_simple
-	echo $res_raw
-	echo -e "$*\t$res_simple\n\t$res_raw" >> ${MY_DCO}/english/translate/translate_history_$(hostname)
+	res_simple=$(echo "$res_raw" | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}')
+	echo "$res_simple"
+	echo "$res_raw"
+	echo -e "$*\t$res_simple\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname)"
 }
 
 func_translate_microsoft() { 
-	func_param_check 1 "Usage: $FUNCNAME [words]" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} [words]" 
+	func_param_check 1 "$@" 
 
 	access_token_tmp=/tmp/ms_translation_api_access_token
-	access_token_compare=/tmp/ms_translation_api_access_token_compare
+	#access_token_compare=/tmp/ms_translation_api_access_token_compare
 
 	access_token_uri="https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
 	# parameters below are applied from https://datamarket.azure.com
 	post_content="grant_type=client_credentials&client_id=ouyzhu&client_secret=0yAn46ClllxZk4CuY2tGkjo9Sl&scope=http://api.microsofttranslator.com"
-	translate_uri_cn2en="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=zh-CHS&to=en&text="
+	#translate_uri_cn2en="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=zh-CHS&to=en&text="
 	translate_uri_en2cn="http://api.microsofttranslator.com/v2/Http.svc/Translate?from=en&to=zh-CHS&text="
 
 	# Check if valid access token exist
@@ -1363,21 +1393,22 @@ func_translate_microsoft() {
 	access_token=$(head -1 "$access_token_tmp" | sed -e 's/.*"access_token":"\([^"]*\)".*/\1/')
 
 	# Translate, both '-H "ContentType: text/plain"' and '&contentType=text%2Fplain' NOT work (always get xml)
-	if [ $( echo $* | grep -c "[a-z]") -ge 1 ] ; 
+	if [ "$( echo "$*" | grep -c "[a-z]")" -ge 1 ] ; 
 	then res_raw=$(curl -s -H "ContentType: text/plain" -H "Authorization: Bearer $access_token" "${translate_uri_en2cn}$*")
 	else res_raw=$(curl -s -H "ContentType: text/plain" -H "Authorization: Bearer $access_token" "${translate_uri_en2cn}$*")
 	fi
 	[ -z "$res_raw" ] && return 1
 
-	echo $res_raw
-	echo -e "$*\n\t$res_raw" >> ${MY_DCO}/english/translate/translate_history_$(hostname)
+	echo "$res_raw"
+	echo -e "$*\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname)"
 }
 
 func_delete_dated() { 
-	func_param_check 1 "Usage: $FUNCNAME <path> <path> ..." "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <path> <path> ..." 
+	func_param_check 1 "$@" 
 
 	local targetDir=$MY_TMP/delete/$(func_date)
-	[ -e ${targetDir} ] || mkdir -p ${targetDir}
+	[ -e "${targetDir}" ] || mkdir -p "${targetDir}"
 
 	local t_name=""
 	for t in "$@" ; do
@@ -1399,21 +1430,22 @@ func_backup_myenv() {
 	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
 
 	echo "INFO: create zip file based on filelist: ${fileList}"
-	cat "${fileList}" | zip -rq "${packFile}" -@ || func_die "ERROR: failed to zip files into ${packFile}"
+	zip -rq "${packFile}" "${fileList}" || func_die "ERROR: failed to zip files into ${packFile}"
 
 	echo "INFO: bakcup command output, add to the backup zip"
 	mkdir -p "${tmpDir}"
-	df -h				> "${tmpDir}/cmd_output_df_h.txt"
-	\ls -la ~ | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_home.txt"
-	\ls -la / | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_root.txt"
-	\ls -la ~/.zbox/ | grep -- '->'	> "${tmpDir}/cmd_output_ls_l_zbox.txt" 
+	df -h					> "${tmpDir}/cmd_output_df_h.txt"
+	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
+	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
+	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
 	zip -rjq "${packFile}" "${tmpDir}"/*.txt
 
 	func_backup_dated "${packFile}"
 }
 
 func_backup_dated() {
-	func_param_check 1 "Usage: $FUNCNAME <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." "$@"
+	local usage="Usage: ${FUNCNAME[0]} <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." 
+	func_param_check 1 "$@"
 
 	local target target_path host_name
 	local source="$(readlink -f "$1")"
@@ -1449,16 +1481,17 @@ func_backup_dated() {
 	[ -n "${2}" ] && cp -r "${target}" "${2}"
 
 	# show
-	\ls -lh "${target}"
-	[ -n "${2}" ] && \ls -lh "${2}/$(basename "${target}")"
+	"ls" -lh "${target}"
+	[ -n "${2}" ] && "ls" -lh "${2}/$(basename "${target}")"
 }
 
 func_run_file_c() {
-	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <file>" 
+	func_param_check 1 "$@" 
 
-	local file="$(readlink -f ${1})"
-	local file_name="$(basename ${1})"
-	local target_dir="$(dirname ${file})/target"
+	local file="$(readlink -f "${1}")"
+	local file_name="$(basename "${1}")"
+	local target_dir="$(dirname "${file}")/target"
 	local executable="${target_dir}/${file_name%.c}"
 
 	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
@@ -1473,14 +1506,15 @@ func_run_file_c() {
 	if [ $? = $(( 128 + 11 )) ] ; then echo "Segmentation fault" 1>&2 ; fi		
 
 	rm "${target_dir}/${file_name}"
-	\cd - &> /dev/null
+	"cd" - &> /dev/null || echo "ERROR: failed to go back previous dir"
 }
 
 func_run_file_java() {
-	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <file>" 
+	func_param_check 1 "$@" 
 
 	local file_relative="${1}"
-	local file_absolute="$(readlink -f ${1})"
+	local file_absolute="$(readlink -f "${1}")"
 	local subpath_class="$(grep "^package " "${file_absolute}" | sed -e "s/package//;s/\s\|;//g;s/\./\//g;" )"
 
 	# simple java file without maven
@@ -1488,18 +1522,19 @@ func_run_file_java() {
 
 	# java file in maven project
 	local path_proj="${file_absolute%${subpath_class}*}/../../.."
-	[ ! -d "${path_proj}" ] && func_die "ERROR: "${path_proj}" NOT exist!"
-	\cd "${path_proj}" &> /dev/null
+	[ ! -d "${path_proj}" ] && func_die "ERROR: ${path_proj} NOT exist!"
+	pushd "${path_proj}" &> /dev/null
 	func_mvn_run "${file_relative}"
-	\cd - &> /dev/null
+	popd &> /dev/null
 }
 
 func_run_file_java_simple() {
-	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <file>" 
+	func_param_check 1 "$@" 
 
-	local file="$(readlink -f ${1})"
-	local dir_name="$(dirname ${file})"
-	local file_name="$(basename ${file})"
+	local file="$(readlink -f "${1}")"
+	local dir_name="$(dirname "${file}")"
+	local file_name="$(basename "${file}")"
 	local target_dir="${dir_name}/target"
 
 	local class_path="."
@@ -1507,46 +1542,49 @@ func_run_file_java_simple() {
 
 	func_mkdir_cd "${target_dir}" &> /dev/null	|| func_die "ERROR: failed to make or change dir: ${target_dir}"
 	cp -f "${file}" "${target_dir}"			|| func_die "ERROR: failed to copy file, FROM: ${file}, TO: ${target_dir}"
-	func_delete_dated ${file_name/%.java/.class} &> /dev/null
+	func_delete_dated "${file_name/%.java/.class}" &> /dev/null
 
-	javac -cp "${class_path}" ${file_name}
-	java  -cp "${class_path}" ${file_name%.java}
+	javac -cp "${class_path}" "${file_name}"
+	java  -cp "${class_path}" "${file_name%.java}"
 	rm "${target_dir}/${file_name}"
-	\cd - &> /dev/null
+	"cd" - &> /dev/null || echo "ERROR: failed to go back previous dir"
 }
 
 func_run_file() {
-	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <file>" 
+	func_param_check 1 "$@" 
 	
 	local file="${1}"
 	#filename="$(basename ${file})"
 	[ ! -e "${file}" ] && echo "ERROR: $file not exist!" && return 1
 
-	if [[ "$file" = *.c ]] ; then		(func_run_file_c $file)		# use subshell, could make sure "stay in current dir" even used ^C, but subshell stderr seems lost (can NOT get msg like "Segmentation fault", also NOTE, the "Segmentation fault" msg is print by shell, not by the crashed app)
+	if [[ "$file" = *.c ]] ; then		(func_run_file_c "$file")	# use subshell, could make sure "stay in current dir" even used ^C, but subshell stderr seems lost (can NOT get msg like "Segmentation fault", also NOTE, the "Segmentation fault" msg is print by shell, not by the crashed app)
 	#if [[ "$file" = *.c ]] ; then		func_run_file_c $file		# not using subshell, current dir might change to "target" when use ^C
-	elif [[ "$file" = *.java ]] ; then	func_run_file_java $file
-	elif [[ "$file" = *.js ]] ; then	node $file
-	elif [[ "$file" = *.rb ]] ; then	ruby $file
-	elif [[ "$file" = *.sh ]] ; then	bash $file
-	elif [[ "$file" = *.py ]] ; then	python $file
-	elif [[ "$file" = *.php ]] ; then	php $file
-	elif [[ "$file" = *.bat ]] ; then	cmd $file
-	elif [[ "$file" = *.exe ]] ; then	cmd $file
-	elif [[ "$file" = *.groovy ]] ; then	groovy $file
-	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File ${file//\\/\/}
+	elif [[ "$file" = *.java ]] ; then	func_run_file_java "$file"
+	elif [[ "$file" = *.js ]] ; then	node "$file"
+	elif [[ "$file" = *.rb ]] ; then	ruby "$file"
+	elif [[ "$file" = *.sh ]] ; then	bash "$file"
+	elif [[ "$file" = *.py ]] ; then	python "$file"
+	elif [[ "$file" = *.php ]] ; then	php "$file"
+	elif [[ "$file" = *.bat ]] ; then	cmd "$file"
+	elif [[ "$file" = *.exe ]] ; then	cmd "$file"
+	elif [[ "$file" = *.groovy ]] ; then	groovy "$file"
+	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File "${file//\\/\/}"
 	else
 		echo "ERROR: can not run file $file !"
 	fi
 }
 
 func_run_file_format_output() {
-	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <file>" 
+	func_param_check 1 "$@" 
 
 	func_run_file "${1}" | column -t -s "|"
 }
 
 func_ctrl_me() {
-	func_param_check 2 "Usage: $FUNCNAME <target> <action>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <target> <action>" 
+	func_param_check 2 "$@" 
 
 	name=$1
 	action=$2
@@ -1558,22 +1596,23 @@ func_ctrl_me() {
 }
 
 func_mount_iso() {
-	func_param_check 2 "Usage: $FUNCNAME <target_path> <iso_path>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <target_path> <iso_path>" 
+	func_param_check 2 "$@" 
 
 	#mount -t iso9660 -o ro,loop,noauto /your/texlive2012.iso /mnt
-	sudo mount -t iso9660 -o ro,loop,noauto $2 $1
+	sudo mount -t iso9660 -o ro,loop,noauto "$2" "$1"
 }
  
 func_mytask_all() {
 	local base=$MY_ENV_ZGEN/mytask
 	local log=$base/a.log
-	func_log_info $FUNCNAME $log "start"
+	func_log_info "${FUNCNAME[0]}" "$log" "start"
 
 	# find all files to execute
 	for f in $base/todo_* ; do
-		func_log_info $FUNCNAME $log "found $f"
+		func_log_info "${FUNCNAME[0]}" "$log" "found $f"
 		IFS="_" read -ra fa <<< "$f"
-		func_mytask_${fa[1]}_run "$f"
+		"func_mytask_${fa[1]}_run" "$f"
 	done
 
 	#Name, zgen/mytask, func_mytask_mail_add/run
@@ -1615,48 +1654,25 @@ func_mytask_all() {
 	#func_mytask_mail_add
 }
 
+# shellcheck disable=2154
 func_mytask_mail_run() {
-	func_param_check 1 "Usage: $FUNCNAME <file>" "$@" 
+	local usage="Usage: ${FUNCNAME[0]} <file>" 
+	func_param_check 1 "$@" 
 
 	local log=$base/a.log
-	func_log_info $FUNCNAME $log "execute file $f"
+	func_log_info "${FUNCNAME[0]}" "$log" "execute file $f"
 
 	source "$f"
-	echo ${mytask[mt_time_deadline]}
-	echo ${mytask[mt_time_win_start]}
-	echo ${mytask[mt_time_win_stop]}
-	echo ${mytask[mt_time_last_run]}
-	echo ${mytask[mt_history]}
-}
-
-func_tool_ins() {
-	func_param_check 1 "USAGE: $FUNCNAME <tool-name> <version>" "$@"
-
-	local ins_files="$MY_ENV/tool/${1}/init/ins"
-	[ -n "${2}" ] && ins_files="${ins_files} ${ins_files}-${2}"
-	eval $(func_tool_gen_vars ${ins_files})
-
-	case "${ins_tool}" in
-		apt)	func_tool_ins_apt "$@"					;;
-		*)	func_die "ERROR: can NOT handle ins_tool: ${ins_tool}"	;;
-	esac
-}
-
-func_tool_ins_apt() {
-	func_param_check 1 "USAGE: $FUNCNAME <tool-name> <version>" "$@"
-
-	local ins_files="$MY_ENV/tool/${1}/init/ins"
-	[ -n "${2}" ] && ins_files="${ins_files} ${ins_files}-${2}"
-	eval $(func_tool_gen_vars ${ins_files})
-	
-	[ -n "${ins_apt_repo}" ] && func_apt_add_repo "${ins_apt_repo}"
-	sudo apt-get update
-	[ -n "${ins_apt_install}" ] && sudo apt-get install -y "${ins_apt_install}"
+	echo "${mytask[mt_time_deadline]}"
+	echo "${mytask[mt_time_win_start]}"
+	echo "${mytask[mt_time_win_stop]}"
+	echo "${mytask[mt_time_last_run]}"
+	echo "${mytask[mt_history]}"
 }
 
 func_tool_gen_vars() {
 	local desc="Desc: 1) generate variable list for functions to source. 2) all variables are prefixed with 'local'"
-	func_param_check 1 "${desc}" "$@"
+	func_param_check 1 "$@"
 	
 	cat "$@" 2> /dev/null |\
 	sed -e 	"/^\s*#/d;
@@ -1666,12 +1682,13 @@ func_tool_gen_vars() {
 }
 
 func_apt_add_repo() {
-	func_param_check 1 "USAGE: $FUNCNAME <repo-name>" "$@"
+	local usage="USAGE: ${FUNCNAME[0]} <repo-name>" 
+	func_param_check 1 "$@"
 
 	apt_repo_name="${1}"
-	apt_source_name="$(echo ${apt_repo_name} | sed -e 's/.*://;s/\//-/')"
+	apt_source_name="$(echo "${apt_repo_name}" | sed -e 's/.*://;s/\//-/')"
 
-	if [ $(ls /etc/apt/sources.list.d/ | grep -c ${apt_source_name}) -ge 1 ] ; then
+	if ls /etc/apt/sources.list.d/*"${apt_source_name}"* &> /dev/null ; then
 		echo "INFO: ${apt_repo_name} (${apt_source_name}) already added, skip"
 		return 0
 	fi
@@ -1696,7 +1713,9 @@ func_find_space() {
 }
 
 func_op_compressed_file() {
-	func_param_check 1 "USAGE: $FUNCNAME <file-suffix> <compressed-file>" "$@"
+	local usage="USAGE: ${FUNCNAME[0]} <file-suffix> <compressed-file>" 
+	func_param_check 1 "$@"
+
 	local file_suffix="${1}"
 	local compressed_file="${2}"
 	local target_dir="$(mktemp -d)"
@@ -1704,11 +1723,11 @@ func_op_compressed_file() {
 	echo "${target_dir}" 
 	func_uncompress "${compressed_file}" "${target_dir}" || func_die "ERROR: can NOT uncompress file: ${compressed_file}"
 	echo 111111111111111
-	cd "${target_dir}"
+	cd "${target_dir}" || func_die "ERROR: failed to cd into ${target_dir}"
 	echo 111111111111111
-	local target_file="$(\ls | grep "${file_suffix}")"
+	local target_file="$(ls ./*"${file_suffix}")"
 	echo 22222
-	[ $(echo "${target_file}" | wc -l) -eq 1 ] && xdg-open "${target_file}" || echo "WARN: more than one file with suffix: ${file_suffix}, pls open manually!"
+	[ "$(echo "${target_file}" | wc -l)" -eq 1 ] && xdg-open "${target_file}" || echo "WARN: more than one file with suffix: ${file_suffix}, pls open manually!"
 	echo 33333
 }
 
@@ -1719,7 +1738,7 @@ func_mon_and_run() {
 
 	# NEED: sudo apt-get install inotify-tools
 	inotifywait -mr --timefmt '%Y-%m-%d %H:%M:%S' --format '%T %w %f' -e close_write "${watch_path}" | \
-	while read date time dir file; do
+	while read -r date time dir file; do
 	       updated_file=${dir}${file}
 	       ${watch_cmd}
 	       echo "Target updatd at ${date} ${time}, updated file: ${updated_file}"
@@ -1727,27 +1746,30 @@ func_mon_and_run() {
 }
 
 func_find_non_utf8_in_content() {
-	func_param_check 1 "USAGE: $FUNCNAME <filelist>" "$@"
+	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
+	func_param_check 1 "$@"
 
 	local tmp_filelist=$(mktemp)
 	echo "INFO: grep filelist into: ${tmp_filelist}"
-	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > ${tmp_filelist}
+	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > "${tmp_filelist}"
 
 	local tmp_suspect=$(mktemp)
 	echo "INFO: grep suspected files into: ${tmp_suspect}"
-	cat ${tmp_filelist} | xargs -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > ${tmp_suspect}
+	xargs -a "${tmp_filelist}" -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > "${tmp_suspect}"
 
 	echo "INFO: suspected files are:"
-	cat ${tmp_suspect}
+	cat "${tmp_suspect}"
 }
 
 func_samba_is_mounted() {
-	func_param_check 1 "USAGE: $FUNCNAME <path>" "$@"
+	local usage="USAGE: ${FUNCNAME[0]} <path>" 
+	func_param_check 1 "$@"
 	df | grep -q "${1}" &> /dev/null
 }
 
 func_samba_umount() {
-	func_param_check 1 "USAGE: $FUNCNAME <config_file>" "$@"
+	local usage="USAGE: ${FUNCNAME[0]} <config_file>" 
+	func_param_check 1 "$@"
 
 	# load config
 	func_validate_path_exist "${1}"
@@ -1769,8 +1791,10 @@ func_samba_umount() {
 	fi
 }
 
+# shellcheck disable=2154
 func_samba_mount() {
-	func_param_check 1 "USAGE: $FUNCNAME <config_file>" "$@"
+	local usage="USAGE: ${FUNCNAME[0]} <config_file>" 
+	func_param_check 1 "$@"
 
 	# load config
 	func_validate_path_exist "${1}"
@@ -1791,10 +1815,7 @@ func_samba_mount() {
 	fi
 
 	# recheck
-	if func_samba_is_mounted "${mount_path}" ; then
-		echo "INFO: mount success at: ${mount_path}"
-		cd "${mount_path}"
-	else
-		echo "WARN: mount failed! pls check"
-	fi
+	func_samba_is_mounted "${mount_path}" || func_die "ERROR: mount failed! pls check"
+	echo "INFO: mount success at: ${mount_path}"
+	cd "${mount_path}" || echo "ERROR: failed to cd ${mount_path}"
 }
