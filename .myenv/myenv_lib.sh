@@ -19,6 +19,14 @@ func_die() {
 	#func_is_non_interactive && exit 1 || kill -INT $$
 }
 
+func_techo() {
+	local usage="Usage: $FUNCNAME <level> <msg>" 
+	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
+	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+	
+	echo -e "${1^^}: $(date "+%Y-%m-%d %H:%M:%S"): ${2}"
+}
+
 func_param_check() {
 	# NOT use desc/usage var name, so invoker could call 'func_param_check 2 "$@"' instead of 'func_param_check 2 "${desc}\n${usage}\n" "$@"'
 	local s_usage="Usage: ${FUNCNAME[0]} <count> <string> ..."
@@ -81,6 +89,44 @@ func_download_wget() {
 	echo "" # next line should in new line
 	[ -f "${dl_fullpath}" ] || func_die "ERROR: ${dl_fullpath} not found, seems download faild!"
 	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
+}
+
+func_backup_rsync() {
+	local usage="Usage: $FUNCNAME <name> <base> <rsync_addr>" 
+	local desc="Desc: backup via rsync" 
+	func_param_check 3 "Usage: $FUNCNAME <path>" "$@"
+
+	# Parameters
+	local name="${1}"
+	local base="${2}"
+	local rsync_addr="${3}"
+
+	# Variables
+	local bak_path=${base}/${name}/
+	local log_file=${base}/${name}.log
+	local pid_file=${base}/${name}.pid
+	local rsync_pass=${base}/${name}.pass
+
+	# Validation and init
+	[ -f "${rsync_pass}" ] || func_die "ERROR: ${rsync_pass} NOT exist, pls check!"
+	func_is_running ${pid_file} && func_techo info "${name} backup already running, skip!" && exit 0
+	[ -d "${bak_path}" ] || mkdir -p "${bak_path}" || func_die "ERROR: ${bak_path} NOT dir, pls check!"
+
+	# Perform backup
+	local rsync_pid
+	func_techo info "start to backup ${name}" | tee -a ${log_file} 
+	nohup /usr/bin/rsync -avz --port=8730 --password-file=${rsync_pass} ${rsync_addr} ${bak_path} >> ${log_file} 2>&1 &
+	rsync_pid=$!
+
+	# Status followup
+	func_techo info "rsync process id is: ${rsync_pid}"
+	echo "${rsync_pid}" > "${pid_file}"
+	wait "${rsync_pid}"
+	if [ $? -eq 0 ] ; then
+		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a ${log_file} 
+	else
+		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a ${log_file} 
+	fi
 }
 
 # shellcheck disable=2155,2012
@@ -159,6 +205,18 @@ func_vcs_update() {
 		mkdir -p "$(dirname "${target_dir}")"
 		${cmd_init} "${src_addr}" "${target_dir}" || func_die "ERROR: ${cmd_init} failed"
 	fi
+}
+
+func_is_running() {
+	local usage="Usage: $FUNCNAME <pid_file>" 
+	local desc="Desc: check is pid in <pid_file> is running" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	
+	local pid_num="$(cat ${1} 2>/dev/null)"
+	pid_num=${pid_num:-INEXIST_PID_NUM}
+
+	# 0 is an inexist signal, but helps check if process exist
+	kill -0 "${pid_num}" 2>/dev/null 
 }
 
 ################################################################################

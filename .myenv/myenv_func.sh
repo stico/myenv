@@ -613,6 +613,7 @@ func_collect_all() {
 	# vars
 	local f d line
 	local base=$MY_ENV_ZGEN/collection
+	[ -d "${base}" ] || mkdir -p "${base}" 
 
 	# IMPORTANT: do NOT remove the ${base} dir, otherwise might confusing in debug: 
 	#	- cd into ${base} and then run func_collect_all(), 
