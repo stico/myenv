@@ -95,9 +95,9 @@ func_backup_rsync() {
 
 	# Variables
 	local bak_path=${base}/${name}/
-	local log_file=${base}_rsync/${name}.log
-	local pid_file=${base}_rsync/${name}.pid
-	local rsync_pass=${base}_rsync/${name}.pass
+	local log_file=${base}/${name}_rsync/${name}.log
+	local pid_file=${base}/${name}_rsync/${name}.pid
+	local rsync_pass=${base}/${name}_rsync/${name}.pass
 
 	# Validation and init
 	[ -f "${rsync_pass}" ] || func_die "ERROR: ${rsync_pass} NOT exist, pls check!"
