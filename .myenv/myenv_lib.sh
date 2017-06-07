@@ -113,8 +113,7 @@ func_backup_rsync() {
 
 	# Status followup
 	func_techo info "rsync process id is: ${rsync_pid}"
-	wait "${rsync_pid}"
-	if [ "${rsync_pid}" -eq 0 ] ; then
+	if wait "${rsync_pid}" ; then
 		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a "${log_file}" 
 	else
 		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a "${log_file}" 
