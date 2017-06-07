@@ -17,16 +17,14 @@ zbox_use_silent nodejs		6.3.1
 zbox_use_silent gradle		2.3
 zbox_use_silent androidsdk	        24.0.2
 zbox_use_silent chromedriver	2.19
-zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x?
+zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x (TODO: upgrade since YCM works with python 3 now)
+#zbox_use_silent python		3.6.1		# YouCompleteMe@vim still need python 2.x (TODO: upgrade since YCM works with python 3 now)
 zbox_use_silent ntfs-3g		2016.2.22
 zbox_use_silent mkvalidator	0.4.0
 zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
 
-#zbox use python		3.4.3		# YouCompleteMe@vim still need python 2.x?
-
 #zbox use fpp		git
-#zbox use python            3.4.3		# works, but disable by default, since YouCompleteMe@vim need python 2.x
 #zbox use ant               1.9.4
 #zbox use php               5.5.10
 #zbox use springloaded      1.2.0.RELEASE

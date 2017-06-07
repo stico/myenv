@@ -25,6 +25,8 @@ command! -nargs=0 FontDown :let &guifont = substitute(&guifont, '\zs\d\+', '\=ev
 
 """""""""""""""""""""""""""""" H1 - Input Method
 
+" TODO: Squirrel_v4 (@rime): try smartim plugin (currently only works on mac)
+
 " Squirrel_v3 (@rime), improve Squirrel_v2 
 " req: 1) cmd defaults/osascrpit. 2) disable shift for squirrel to switch between en/cn mode. 3) enable accessiblity for osascript (in /System/Library/CoreServices/RemoteManagement/ARDAgent.app)
 if executable('defaults') && executable('osascript') && has('unix')
@@ -224,16 +226,18 @@ let g:netrw_dirhistmax=0
 " Option 2, disable file creation of .netrwhist
 " au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
 
-"""""""" syntastic@vim
+"""""""" syntastic@vim, 
+" TODO: try async alternative on vim8: ale
 "let g:syntastic_aggregate_errors = 1					" display together the errors found by all checkers
 "let g:syntastic_always_populate_loc_list = 1				" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
 ""let g:syntastic_quiet_messages = { "type": "style" }			" filter out some messages types
 "let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']		" checker chain, run one by one (only run laters if current success)
 let g:syntastic_auto_jump = 2						" jump to 1st error (NOT warning)
-let g:syntastic_bash_checkers=['shellcheck']				" syntastic@vim, sub section 'python'
+let g:syntastic_sh_checkers=['shellcheck']				" syntastic@vim, sub section 'bash'
+let g:syntastic_sh_shellcheck_args=['-x']				" syntastic@vim, sub section 'bash'
 let g:syntastic_python_checkers=['pyflakes']				" syntastic@vim, sub section 'python'
 let g:syntastic_html_checkers=['tidy', 'jshint']
-let g:syntastic_javascript_checkers = ['jshint']			" syntastic@vim, sub section 'javascript'
+let g:syntastic_javascript_checkers = ['eslint']			" syntastic@vim, sub section 'javascript'
 
 """""""" auto-format@vim, @astyle
 let g:formatprg_c = "astyle"
@@ -308,7 +312,7 @@ set relativenumber					" show number of lines related to current line
 "
 "MNT: buildin grep is using quickfix@vim. 
 "MNT: set grepformat to customize the grep output
-set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target\ --exclude=.vimtags
+set grepprg=\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=node_modules\ --exclude-dir=target\ --exclude=.vimtags\ --exclude=\\*.min.js\ --exclude=jquery.js
 "MNT: NOT need to change current dir in OuCodeReading mode, since it already changes. Why want to do this at the first place?!!!
 "set grepprg=\\cd\ $PWD;\\grep\ -rIinH\ --color\ --exclude-dir=\\.{svn,git,bzr,hg,metadata}\ --exclude-dir=target
 "MNT: in OuCodeReading mode, %:p:h not the "root", should use $PWD instead

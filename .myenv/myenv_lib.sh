@@ -19,14 +19,6 @@ func_die() {
 	#func_is_non_interactive && exit 1 || kill -INT $$
 }
 
-func_techo() {
-	local usage="Usage: $FUNCNAME <level> <msg>" 
-	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
-	func_param_check 2 "${desc} \n ${usage} \n" "$@"
-	
-	echo -e "${1^^}: $(date "+%Y-%m-%d %H:%M:%S"): ${2}"
-}
-
 func_param_check() {
 	# NOT use desc/usage var name, so invoker could call 'func_param_check 2 "$@"' instead of 'func_param_check 2 "${desc}\n${usage}\n" "$@"'
 	local s_usage="Usage: ${FUNCNAME[0]} <count> <string> ..."
@@ -92,9 +84,9 @@ func_download_wget() {
 }
 
 func_backup_rsync() {
-	local usage="Usage: $FUNCNAME <name> <base> <rsync_addr>" 
+	local usage="Usage: ${FUNCNAME[0]} <name> <base> <rsync_addr>" 
 	local desc="Desc: backup via rsync" 
-	func_param_check 3 "Usage: $FUNCNAME <path>" "$@"
+	func_param_check 3 "$@"
 
 	# Parameters
 	local name="${1}"
@@ -109,23 +101,23 @@ func_backup_rsync() {
 
 	# Validation and init
 	[ -f "${rsync_pass}" ] || func_die "ERROR: ${rsync_pass} NOT exist, pls check!"
-	func_is_running ${pid_file} && func_techo info "${name} backup already running, skip!" && exit 0
+	func_is_running "${pid_file}" && func_techo info "${name} backup already running, skip!" && exit 0
 	[ -d "${bak_path}" ] || mkdir -p "${bak_path}" || func_die "ERROR: ${bak_path} NOT dir, pls check!"
 
 	# Perform backup
 	local rsync_pid
-	func_techo info "start to backup ${name}" | tee -a ${log_file} 
-	nohup /usr/bin/rsync -avz --port=8730 --password-file=${rsync_pass} ${rsync_addr} ${bak_path} >> ${log_file} 2>&1 &
+	func_techo info "start to backup ${name}" | tee -a "${log_file}" 
+	nohup /usr/bin/rsync -avz --port=8730 --password-file="${rsync_pass}" "${rsync_addr}" "${bak_path}" >> "${log_file}" 2>&1 &
 	rsync_pid=$!
+	echo "${rsync_pid}" > "${pid_file}"
 
 	# Status followup
 	func_techo info "rsync process id is: ${rsync_pid}"
-	echo "${rsync_pid}" > "${pid_file}"
 	wait "${rsync_pid}"
-	if [ $? -eq 0 ] ; then
-		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a ${log_file} 
+	if [ "${rsync_pid}" -eq 0 ] ; then
+		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a "${log_file}" 
 	else
-		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a ${log_file} 
+		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a "${log_file}" 
 	fi
 }
 
@@ -147,15 +139,16 @@ func_uncompress() {
 	echo "INFO: uncompress file, from: ${source_file} to: ${target_dir}"
 	func_mkdir_cd "${target_dir}"
 	case "$source_file" in
-		# group for 
+		*.jar | *.arr | *.zip)
+				func_complain_cmd_not_exist unzip \
+				&& sudo apt-get install unzip ;                 # try intall
+				unzip "$source_file" &> /dev/null       ;;
+
 		*.tar.gz)	tar -zxvf "$source_file" &> /dev/null	;;	# NOTE, should before "*.gz)"
 		*.tar.bz2)	tar -jxvf "$source_file" &> /dev/null	;;	# NOTE, should before "*.bz2)"
 		*.bz2)		bunzip2 "$source_file" &> /dev/null	;;
 		*.gz)		gunzip "$source_file" &> /dev/null	;;
 		*.7z)		7z e "$source_file" &> /dev/null	;;	# use "-e" will fail, "e" is extract, "x" is extract with full path
-		*.zip)		func_complain_cmd_not_exist unzip \
-				&& sudo apt-get install unzip ;			# try intall
-				unzip "$source_file" &> /dev/null	;;
 		*.tar)		tar -xvf "$source_file" &> /dev/null	;;
 		*.xz)		tar -Jxvf "$source_file" &> /dev/null	;;
 		*.tgz)		tar -zxvf "$source_file" &> /dev/null	;;
@@ -207,16 +200,37 @@ func_vcs_update() {
 	fi
 }
 
+# shellcheck disable=2155
 func_is_running() {
-	local usage="Usage: $FUNCNAME <pid_file>" 
+	local usage="Usage: ${FUNCNAME[0]} <pid_file>" 
 	local desc="Desc: check is pid in <pid_file> is running" 
 	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 	
-	local pid_num="$(cat ${1} 2>/dev/null)"
+	local pid_num="$(cat "${1}" 2>/dev/null)"
 	pid_num=${pid_num:-INEXIST_PID_NUM}
 
 	# 0 is an inexist signal, but helps check if process exist
 	kill -0 "${pid_num}" 2>/dev/null 
+}
+
+################################################################################
+# Utility: logging
+################################################################################
+func_techo() {
+	local usage="Usage: ${FUNCNAME[0]} <level> <msg>" 
+	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
+	func_param_check 2 "$@"
+	
+	echo -e "${1^^}: $(date "+%Y-%m-%d %H:%M:%S"): ${2}"
+}
+
+func_decho() {
+	local usage="Usage: ${FUNCNAME[0]} <msg>" 
+	local desc="Desc: echo msg as DEBUG level, based on env var ME_DEBUG=true to really show"
+	func_param_check 1 "$@"
+	
+	[ "${ME_DEBUG}" = 'true' ] || return 0
+	echo -e "DEBUG: ${1}"
 }
 
 ################################################################################
@@ -293,6 +307,15 @@ func_validate_dir_empty() {
 		# only redirect stderr, otherwise the test will always false
 		func_is_dir_empty "${p}" || func_die "ERROR: ${p} not empty!"
 	done
+}
+
+func_complain_path_exist() {
+	local usage="Usage: ${FUNCNAME[0]} <path> <msg>"
+	local desc="Desc: complains if path already exist, return 0 if exist, otherwise 1" 
+	func_param_check 1 "$@"
+	
+	[ -e "${1}" ] && echo "${2:-WARN: path ${1} alread exist!}" && return 0
+	return 1
 }
 
 func_complain_path_not_exist() {
@@ -382,14 +405,6 @@ func_duplicate_dated() {
 ################################################################################
 # Utility: shell
 ################################################################################
-func_is_cmd_exist() {
-	local usage="Usage: ${FUNCNAME[0]} <cmd>"
-	local desc="Desc: check if cmd exist, return 0 if exist, otherwise 1" 
-	func_param_check 1 "$@"
-
-	command -v "${1}" &> /dev/null && return 0 || return 1
-}
-
 func_is_non_interactive() {
 	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
 	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
@@ -399,6 +414,14 @@ func_is_non_interactive() {
 	else
 		return 1
 	fi
+}
+
+func_is_cmd_exist() {
+	local usage="Usage: ${FUNCNAME[0]} <cmd>"
+	local desc="Desc: check if cmd exist, return 0 if exist, otherwise 1" 
+	func_param_check 1 "$@"
+
+	command -v "${1}" &> /dev/null && return 0 || return 1
 }
 
 func_complain_cmd_not_exist() {
@@ -421,11 +444,38 @@ func_validate_cmd_exist() {
 	done
 }
 
+func_is_function_exist() {
+	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
+	local desc="Desc: check if <function-name> exist as a function, return 0 if exist and a function, otherwise 1" 
+	func_param_check 1 "$@"
+	
+	[ -n "$(type -t "${1}")" ] && [ "$(type -t "${1}")" = function ] && return 0 
+	return 1
+}
+
+func_complain_function_not_exist() {
+	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
+	local desc="Desc: complain if <function-name> NOT exist as a function, return 1 if not exist or not a function, otherwise 1" 
+	func_param_check 1 "$@"
+
+	func_is_function_exist "${1}" && return 1
+	echo "WARN: ${1} NOT exist or NOT a function!"
+}
+
+func_validate_function_exist() {
+	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
+	local desc="Desc: check if <function-name> exist as a function" 
+	func_param_check 1 "$@"
+	
+	func_is_function_exist "${1}" && return 0
+	func_die "ERROR: ${1} NOT exist or NOT a function!"
+}
+
 func_complain_privilege_not_sudoer() { 
 	local usage="Usage: ${FUNCNAME[0]} <msg>"
 	local desc="Desc: complains if current user not have sudo privilege, return 0 if not have, otherwise 1" 
 	
-	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege!}" && result=0
+	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege!}" && return 0
 	return 1
 }
 
@@ -729,6 +779,28 @@ func_ip_list() {
 		| sed -e "/127.0.0.1/d;s/addr://" 	\
 		| column -t -s " "
 	fi
+}
+
+################################################################################
+# Data Type: array
+################################################################################
+func_is_array_not_empty() {
+	local usage="USAGE: ${FUNCNAME[0]} <array-elements>" 
+	local desc="Desc: check if <array-elements> is NOT empty, return 0 if true, otherwise 1" 
+	
+	[[ "$#" -gt 0 ]] && return 0 || return 1
+}
+
+func_array_contans() {
+	local usage="USAGE: ${FUNCNAME[0]} <element> <array>" 
+	local desc="Desc: check if <array> contains <element>, return 0 if contains, otherwise 1" 
+	func_param_check 2 "$@"
+
+	local e
+	for e in "${@:2}"; do 
+		[[ "$e" == "$1" ]] && return 0
+	done
+	return 1
 }
 
 ################################################################################

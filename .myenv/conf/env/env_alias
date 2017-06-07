@@ -128,7 +128,7 @@ gport			"netstat -an | grep "
 gc			"func_grep_cmd"
 
 # --include must BEFORE --exclude, otherwise NOT work
-gf			"\grep -rIinH --color --exclude-dir=\.{svn,git,bzr,hg,metadata} --exclude-dir=target --exclude=\.vimtags --exclude=\*.min.js --exclude=jquery.js"
+gf			"\grep -rIinH --color --exclude-dir=\.{svn,git,bzr,hg,metadata} --exclude-dir=node_modules --exclude-dir=target --exclude=\.vimtags --exclude=\*.min.js --exclude=jquery.js"
 gfpy			"\grep -rIinH --color --include=\*.py"
 gfsh			"\grep -rIinH --color --include=\*.sh"
 gfjs			"\grep -rIinH --color --include=\*.js --exclude=\*.min.js --exclude=jquery.js"
