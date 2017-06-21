@@ -423,6 +423,19 @@ func_locate_via_locate() {
 	done
 }
 
+func_clean_less() {
+	func_clean_cat "$@" | less
+}
+
+func_clean_cat() {
+	local usage="Usage: ${FUNCNAME[0]} <file_path>" 
+	func_param_check 1 "$@"
+	
+	func_is_filetype_text "${1}" || func_die "ERROR: ${1} is NOT text file"
+	sed -e '/^\s*$/d;
+		/^\s*\(#\|"\|\/\/\)/d' "${1}"
+}
+
 func_vi() {
 	# shortcut - open a new one
 	[ -z "$*" ] && func_vi_conditional && return 0
@@ -1092,26 +1105,27 @@ func_dist_sync() {
 	# TODO: how to support internal machine as target? seem jump could connect to internal machine, but need sync pub key before connect
 
 	local usage="Usage: ${FUNCNAME[0]} <tag> <source> <target_prefix> "
-	#local desc="Desc:\tstep 1) if <source> (default is local) provided, download <tag> from <source> then run step 2, otherwise directly run step 2.\n\tstep 2) distribute <tag> to all hosts defined in /etc/hosts, with <target_prefix> (default is as tag) prefix"
 	read -r -d '' desc <<-'EOF'
 		Functionality:
 		    1. help to synchronise config/script across production machines via jump.
 		    2. mean while help to backup in local machine
+
 		Concept:
 		    <tag>		the myenv tag system, help to easily locate the topic and config/script path
 		    <source>		default is local, the host where is the latest config/script
 		    <target_prefix>	default is <tag>, to identify those hosts to distribute (dist_hosts), 
 		    dist_hosts		hosts starts with <target_prefix> in /etc/hosts
+
 		Steps: 
 		    1) if <source> provided, download <tag> from <source> then run step 2, otherwise directly run step 2
 		    2) distribute <tag> to all dist_hosts, except <source> itself (if provided)
+
 		Examples:
 		    ${FUNCNAME[0]} hp-proxy					# distribute $MY_DCD/hp-proxy/{config,script} to ~dist_hosts start with 'hp-proxy'
 		    ${FUNCNAME[0]} hp-proxy hp-proxy.web.76			# latest version is on "hp-proxy.web.76", distribute to other dist_hosts, and backup to local
-		    ${FUNCNAME[0]} hp-proxy hp-proxy.web.76	hp-proxy.web	# as above, but dist_hosts might smaller, since <target_prefix> is more strict
-		    ${FUNCNAME[0]} hp-proxy localhost	hp-proxy.web	# when <source> is local, but need specify <target_prefix>, use 'localhost/127.0.0.1' as <source>
+		    ${FUNCNAME[0]} hp-proxy hp-proxy.web.76 hp-proxy.web	# as above, but dist_hosts might smaller, since <target_prefix> is more strict
+		    ${FUNCNAME[0]} hp-proxy localhost hp-proxy.web		# when <source> is local, but need specify <target_prefix>, use 'localhost/127.0.0.1' as <source>
 		EOF
-	local usage="${desc} \n ${usage} \n" 
 	func_param_check 1 "$@"
 
 	# Parameters

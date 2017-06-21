@@ -84,7 +84,7 @@ func_download_wget() {
 }
 
 func_backup_rsync() {
-	local usage="Usage: ${FUNCNAME[0]} <name> <base> <rsync_addr>" 
+	local usage="Usage: ${FUNCNAME[0]} <name> <base> <rsync_addr> <port - optional>" 
 	local desc="Desc: backup via rsync" 
 	func_param_check 3 "$@"
 
@@ -92,6 +92,7 @@ func_backup_rsync() {
 	local name="${1}"
 	local base="${2%/}"
 	local rsync_addr="${3}"
+	local port="${4:-873}"
 
 	# Variables
 	local bak_path=${base}/${name}/
@@ -107,7 +108,8 @@ func_backup_rsync() {
 	# Perform backup
 	local rsync_pid
 	func_techo info "start to backup ${name}" | tee -a "${log_file}" 
-	nohup /usr/bin/rsync -avz --port=8730 --password-file="${rsync_pass}" "${rsync_addr}" "${bak_path}" >> "${log_file}" 2>&1 &
+	func_techo info "cmd: nohup /usr/bin/rsync -avz --port=${port} --password-file=${rsync_pass} ${rsync_addr} ${bak_path}" | tee -a "${log_file}";
+	nohup /usr/bin/rsync -avz --port="${port}" --password-file="${rsync_pass}" "${rsync_addr}" "${bak_path}" >> "${log_file}" 2>&1 &
 	rsync_pid=$!
 	echo "${rsync_pid}" > "${pid_file}"
 
