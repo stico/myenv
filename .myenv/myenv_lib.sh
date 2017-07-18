@@ -288,6 +288,14 @@ func_is_dir_empty() {
 	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 1 || return 0
 }
 
+func_is_dir_not_empty() {
+	local usage="Usage: ${FUNCNAME[0]} <dir>"
+	local desc="Desc: check if directory is not empty, return 0 if not empty, otherwise 1" 
+	func_param_check 1 "$@"
+
+	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 0 || return 1
+}
+
 func_validate_dir_not_empty() {
 	local usage="Usage: ${FUNCNAME[0]} <dir> ..."
 	local desc="Desc: the directory must exist and NOT empty, otherwise will exit" 
@@ -409,6 +417,9 @@ func_duplicate_dated() {
 func_is_non_interactive() {
 	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
 	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
+
+	# NOTE: when use "bash xxx.sh", it is non-interactive
+
 	# explain: bash manual: PS1 is set and $- includes i if bash is interactive, allowing a shell script or a startup file to test this state.
 	if [ -z "$PS1" ] ; then
 		return 0 

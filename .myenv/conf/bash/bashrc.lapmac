@@ -21,11 +21,11 @@ zbox_use_silent python		2.7.10		# YouCompleteMe@vim still need python 2.x (TODO:
 zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
 zbox_use_silent kotlin		1.1.2.5
+zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
 
 #zbox_use_silent androidsdk	26.0.2		# use Android Studio buildin seems easier
 
 #zbox_use_silent mkvalidator	0.4.0		# NOT often used
-#zbox_use_silent ntfs-3g	2016.2.22	# NOT often used
 #zbox use php			5.5.10		# NOT often used
 #zbox use springloaded		1.2.0.RELEASE	# NOT often used
 

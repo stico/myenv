@@ -13,6 +13,7 @@ vimrc=$HOME/.vimrc
 # DW
 dw=$MY_FCZ/code_dw
 jump=$MY_DCD/ops/jump
+tv=$MY_DCD/tinyvideo/tinyvideo.txt
 
 # ZBOX
 zb=$ZBOX
