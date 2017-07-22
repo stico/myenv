@@ -84,6 +84,11 @@ func_download_wget() {
 }
 
 func_backup_rsync() {
+	# Example used for jrepo2 rsync
+	#	run cmd: func_export_script func_backup_rsync nexus_all.sh
+	#	change last line of nexus_all.sh: func_backup_rsync nexus_all /data/services/ "nexus_all@113.108.231.170::nexus_all/" 8730
+	#	add task to crontab: */18 3-5 * * *	root	bash /data/services/nexus_all_rsync/nexus_all.sh >> /data/services/nexus_all_rsync/cron.log 2>&1
+
 	local usage="Usage: ${FUNCNAME[0]} <name> <base> <rsync_addr> <port - optional>" 
 	local desc="Desc: backup via rsync" 
 	func_param_check 3 "$@"

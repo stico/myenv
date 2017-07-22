@@ -1886,13 +1886,13 @@ func_export_script() {
 
 	# Post process
 	if [[ "${eresult}" = "success" ]] ; then
-		sed -i -e "1i#!/bin/bash								\\
-		\n# Generated Info:									\\
-		\n#    By: $(whoami)									\\
-		\n#    Time: $(func_dati)								\\
-		\n#    Git rev: $("cd" "${HOME}" &>/dev/null && git rev-parse HEAD)			\\
-		\n#    Export cmd: ${FUNCNAME[0]} $*							\\
-		\n#    NOTE: this script is executable, as the last line is invoking function '${1}'	\\
+		sed -i -e "1i#!/bin/bash\\
+		\n# Generated Info:\\
+		#    By: $(whoami)\\
+		#    Time: $(func_dati)\\
+		#    Git rev: $("cd" "${HOME}" &>/dev/null && git rev-parse HEAD)\\
+		#    Export cmd: ${FUNCNAME[0]} $*\\
+		#    NOTE: this script is executable, as the last line is invoking function '${1}'\\
 		" "${target}"
 		echo "${1} \"\${@}\"" >> "${target}"
 		echo "INFO: export success."
