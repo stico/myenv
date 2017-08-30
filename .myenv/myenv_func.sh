@@ -427,6 +427,16 @@ func_clean_less() {
 	func_clean_cat "$@" | less
 }
 
+func_clean_grep() {
+	local usage="Usage: ${FUNCNAME[0]} <grep_str> <file_path>" 
+	func_param_check 2 "$@"
+	
+	local grep_str="${1}"
+	shift
+	func_clean_cat "$@" | grep "${grep_str}"
+}
+
+# some cmd like cless/cgrep are support via alias
 func_clean_cat() {
 	local usage="Usage: ${FUNCNAME[0]} <file_path>" 
 	func_param_check 1 "$@"
