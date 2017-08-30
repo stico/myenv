@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=1090
 
 # NOTE: many tool (e.g. unison) can not accept .bashrc have output in remote style 
 
@@ -15,7 +16,6 @@ SRC_BASH_HOSTNAME=${HOME}/.myenv/conf/bash/bashrc.$(hostname)
 SRC_BASH_MACHINEID=${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)
 
 # Misc
-umask 077
 stty -ixon			# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
 stty -ixoff
 shopt -s histappend
@@ -43,10 +43,12 @@ func_is_personal_machine || func_dist_source_env
 
 # Tool update
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"				# make less more friendly for non-text input files, see lesspipe(1)
-[ -e /etc/infinality-settings.sh ] && . /etc/infinality-settings.sh			# infinality font rendering config
+# shellcheck disable=1091
+[ -e /etc/infinality-settings.sh ] && source /etc/infinality-settings.sh		# infinality font rendering config
 
 # Settings for diff machine type
 if func_is_personal_machine ; then
+	umask 077									# only set this for personal machie
 	func_ssh_agent_init								# Init ssh agent
 	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
 elif func_is_internal_machine ; then 

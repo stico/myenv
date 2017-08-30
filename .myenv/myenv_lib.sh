@@ -758,6 +758,18 @@ func_ip_of_host() {
 	#ping -c 1 "${1%:*}" | head -1 | sed -e "s/[^(]*(//;s/).*//"	# note when host inexist
 }
 
+# shellcheck disable=2155
+func_is_local_addr() {
+	local usage="Usage: ${FUNCNAME[0]} <host>" 
+	local desc="Desc: check if param is address of local machine, return 0 if yes, otherwise no"
+	func_param_check 1 "$@"
+
+	local addr="$(func_ip_of_host "${1}")"
+	[ "${addr}" = "127.0.0.1" ] && return 0
+	func_is_valid_ip "${addr}" || return 1
+	func_ip_list | grep -q "${1}"
+}
+
 func_ip_single() {
 	# some old version of 'sort' NOT support -V, which is better than plain 'sort'
 	func_ip_list | sed -e 's/^\S*\s*//;/^\s*$/d' | sort | tail -1

@@ -433,7 +433,7 @@ func_clean_cat() {
 	
 	func_is_filetype_text "${1}" || func_die "ERROR: ${1} is NOT text file"
 	sed -e '/^\s*$/d;
-		/^\s*\(#\|"\|\/\/\)/d' "${1}"
+		/^\s*\(#\|"\|\/\/\)/d' "$@"
 }
 
 func_vi() {
@@ -1177,7 +1177,10 @@ func_dist_sync() {
 	echo "INFO: verify jump tmpdir, gets content: "${jump_tmpdir_contents}
 	[ -z "${jump_tmpdir_contents}" ] && func_die "ERROR: no content on jump tmpdir, abort!"
 
-	# Distribute
+	# Translate target into ip list
+	# TODO: currently only support use prefix as target
+	#	1： support host in ip address format, which not need translate from /etc/hosts
+	#	2： support target hosts mixed with host and ip
 	local dist_hosts=""
 	if [ "${target_prefix}" = "localhost" ] || [ "${target_prefix}" = "127.0.0.1" ]; then
 		# to avoid grep /etc/hosts, since mights multiple result (e.g. IPv6 addr) or nothing, both are NOT wanted
@@ -1185,6 +1188,8 @@ func_dist_sync() {
 	else
 		dist_hosts="$(grep "^[^#]*[[:blank:]]${target_prefix}" /etc/hosts | sed -e "/${source_ip:-__DIST-INEXIST#STR__}/d;s/\s.*//;" | sort -u)"
 	fi
+
+	# Distribute
 	echo "INFO: distribute to hosts: "${dist_hosts}
 	if func_is_str_blank "${dist_hosts}" ; then
 		echo "WARN: NO dist_hosts could be found, NO distribution!"
@@ -1194,7 +1199,7 @@ func_dist_sync() {
 	fi
 
 	# Backup to local
-	if [ -n "${source_ip}" ]; then
+	if [ -n "${source_ip}" ] && ! func_is_local_addr "${source_ip}" ; then
 		echo "INFO: also backup to local: (${tag_path_local})"
 		mkdir -p "${tag_path_local}/backup"
 

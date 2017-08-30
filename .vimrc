@@ -669,9 +669,9 @@ endfunction
 autocmd TabEnter * call OucrCheck()
 autocmd TabLeave * call OucrRestore()
 
-""" OuToggleAutoHighlight: Ou Toggle Auto highlight, highlight all instances of word under cursor
-command! -nargs=0 OuToggleAutoHighlight :if OuToggleAutoHighlight() | :set hls | endif
-function! OuToggleAutoHighlight()
+""" AutoHighlightToggle: Ou Toggle Auto highlight, highlight all instances of word under cursor
+command! -nargs=0 AutoHighlightToggle :if AutoHighlightToggle() | :set hls | endif
+function! AutoHighlightToggle()
   let @/ = ''
   if exists('#auto_highlight')
     autocmd! auto_highlight
