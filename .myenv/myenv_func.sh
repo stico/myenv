@@ -1,15 +1,25 @@
 #!/bin/bash
 # shellcheck disable=2155,1090
 
-# source lib. To simplify, just try myenv_lib.sh in myenv
-MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
-[ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
+################################################################################
+# Install myenv
+################################################################################
+# $MY_ENV/myenv_init.sh for auto setup
 
+################################################################################
+# Source Dependencies
+################################################################################
 # Deprecated: single line self source
 #source ${HOME}/.myenv/myenv_func.sh || source ./myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 #source $HOME/.myenv/myenv_lib.sh || source ./myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
+# To simplify, just try myenv_lib.sh in myenv
+MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
+[ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
 
-# Const of Path
+################################################################################
+# Constants
+################################################################################
+# Path
 [ -z "$ZBOX" ]			&& ZBOX=$HOME/.zbox
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
@@ -24,7 +34,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=("$MY_FCS/oumisc/oumisc-git" "$MY_FCS/ourepo/ourepo-git")
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
-# Const
+# OS
 [ -z "$MY_OS_VER" ]		&& MY_OS_VER="$(func_os_ver)"
 [ -z "$MY_OS_LEN" ]		&& MY_OS_LEN="$(func_os_len)"
 [ -z "$MY_OS_NAME" ]		&& MY_OS_NAME="$(func_os_name)"
@@ -43,6 +53,9 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 LOCATE_USE_FIND='true'		# seems tuned find is always a good choice (faster than mlocate on both osx/ubuntu). Ref: performance@locate
 LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find, which usually enough
 
+################################################################################
+# Functions
+################################################################################
 # shellcheck disable=2009
 func_validate_user_proc() {
 	func_param_check 1 "$@"

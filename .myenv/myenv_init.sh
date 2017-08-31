@@ -1,14 +1,23 @@
 #!/bin/bash
 
-# DESC: init myenv. See conf/myenv/init_all.sh for setup everything 
+################################################################################
+# Install myenv
+################################################################################
+# conf/myenv/init_all.sh for setup everything 
 # one line cmd: curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/myenv_init.sh' | bash
 
+################################################################################
+# Variable
+################################################################################
 TMP_DIR=/tmp/__init_myenv__
 TMP_PATH="${TMP_DIR}/myenv"
 REPO_ADDR=git://github.com/stico/myenv.git
 #REPO_ADDR=git@github.com:stico/myenv.git	# need privilege
 #REPO_ADDR=https://github.com/stico/myenv.git	# not work when libcurl not support https
 
+################################################################################
+# Functions
+################################################################################
 func_die() {
 	echo -e "$@" 1>&2
 	exit 1
@@ -33,6 +42,9 @@ func_via_git() {
 	echo "INFO: myenv init success (via git)!"
 }
 
+################################################################################
+# Initialize 
+################################################################################
 # Check
 command -v "git" &> /dev/null || func_die "ERROR: git command NOT exist, pls check"
 [ -e "${HOME}/.git" ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && exit 0

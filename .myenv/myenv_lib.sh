@@ -2,6 +2,9 @@
 
 # source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
+################################################################################
+# Misc: functions
+################################################################################
 func_date() { date "+%Y-%m-%d";				}
 func_time() { date "+%H-%M-%S";				}
 func_dati() { date "+%Y-%m-%d_%H-%M-%S";		}
