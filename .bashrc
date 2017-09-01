@@ -9,12 +9,6 @@
 # Variables
 MACPORTS="/opt/local"
 COMPLETION="/etc/bash_completion"
-SRC_ZBOX_FUNC=${HOME}/.zbox/zbox_func.sh
-SRC_BASH_ENV=${HOME}/.myenv/conf/env/env.sh
-SRC_BASH_FUNC=${HOME}/.myenv/myenv_func.sh
-SRC_BASH_LOCAL=${HOME}/.myenv/conf/bash/bashrc.local
-SRC_BASH_HOSTNAME=${HOME}/.myenv/conf/bash/bashrc.$(hostname)
-SRC_BASH_MACHINEID=${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)
 
 # Misc
 stty -ixon			# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
@@ -33,11 +27,12 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval "$(dircolors -b ~/.dir_colors)" |
 complete -F _known_hosts scpx sshx ssht
 
 # Source files
-[ -e "${SRC_BASH_ENV}" ] && source "${SRC_BASH_ENV}"
-[ -e "${SRC_ZBOX_FUNC}" ] && source "${SRC_ZBOX_FUNC}"
-[ -e "${SRC_BASH_FUNC}" ] && source "${SRC_BASH_FUNC}"
-[ -e "${SRC_BASH_HOSTNAME}" ] && source "${SRC_BASH_HOSTNAME}"
-[ -e "${SRC_BASH_MACHINEID}" ] && source "${SRC_BASH_MACHINEID}"
+source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
+source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/bash/bashrc.local" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/bash/bashrc.$(hostname)" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
 
 # source dist tag env for internal and production machine 
 func_is_personal_machine || func_dist_source_env 

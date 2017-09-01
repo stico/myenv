@@ -527,7 +527,8 @@ func_cd_tag() {
 }
 
 func_is_personal_machine() {
-	grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null 
+	#grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null 
+	[ "${bash_prompt_color:-NONONO}" == "green" ] && return 0 || return 1
 }
 
 func_is_internal_machine() {
