@@ -12,6 +12,7 @@ COMPLETION="/etc/bash_completion"
 SRC_ZBOX_FUNC=${HOME}/.zbox/zbox_func.sh
 SRC_BASH_ENV=${HOME}/.myenv/conf/env/env.sh
 SRC_BASH_FUNC=${HOME}/.myenv/myenv_func.sh
+SRC_BASH_LOCAL=${HOME}/.myenv/conf/bash/bashrc.local
 SRC_BASH_HOSTNAME=${HOME}/.myenv/conf/bash/bashrc.$(hostname)
 SRC_BASH_MACHINEID=${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)
 
