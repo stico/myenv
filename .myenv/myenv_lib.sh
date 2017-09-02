@@ -209,6 +209,71 @@ func_vcs_update() {
 	fi
 }
 
+################################################################################
+# Utility: process
+################################################################################
+
+func_sudo_kill_recursive() {
+
+	# TODO: copied from stackoverflow, but NOT verified yet
+	echo "ERROR: this function is NOT ready yet!" 1>&2
+	return 1
+
+	local _pid=$1
+	local _sig=${2:--TERM}
+	kill -stop "${_pid}" # needed to stop quickly forking parent from producing children between child killing and parent killing
+
+	#--------------------- TODO: use 1 solution of 3 -------------------
+	for _child  in $(pgrep -P "$_pid"); do								# works both on osx and linux, NOTE: the output NOT include $pid itself
+
+	#for _child in $(ps -o pid --no-headers --ppid ${_pid}); do					# linux only: -- arguments to ps don't work on osx
+
+	#local _regex="[ ]*([0-9]+)[ ]+${_pid}" 
+	#for _child in $(ps ax -o "pid= ppid=" | grep -E "${_regex}" | sed -E "s/${_regex}/\1/g"); do	# works on osx, NOTE: defined the _regex before the for-loop
+	#--------------------- TODO: use 1 solution of 3 -------------------
+
+		killtree "${_child}" "${_sig}"
+	done
+	kill -"${_sig}" "${_pid}"
+}
+
+func_sudo_kill_self_and_direct_child() {
+	local usage="Usage: ${FUNCNAME[0]} <pid>" 
+	local desc="Desc: kill <pid> and all its child process" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	local need_sudo_kill='true'
+	func_kill_self_and_direct_child "${1}"
+}
+
+func_kill_self_and_direct_child() {
+	local usage="Usage: ${FUNCNAME[0]} <pid>" 
+	local desc="Desc: kill <pid> and all its child process" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	func_is_pid_running "${1}" || return 0
+
+	# NOTE 1: pkill only sends signal to child process, grandchild WILL NOT receive the signal
+	# NOTE 2: if need support multiple pid, use -P <pid1> -P <pid2> ...
+	if [ "${need_sudo_kill}" = 'true' ] ; then
+		sudo pkill -TERM -P "${1}"
+	else
+		pkill -TERM -P "${1}"
+	fi
+
+	# candidate 1: find all sub-process and self, pass to kill
+	#ps -ef | grep "[[:space:]]${pid}[[:space:]]" | grep -v grep | awk '{print $2}' | xargs kill -TERM
+
+	# candidate 2: kill on group, not the "-" prefix: https://stackoverflow.com/questions/392022/best-way-to-kill-all-child-processes/6481337
+	#kill -- -$PGID     Use default signal (TERM = 15)			# use process group id
+	#kill -9 -$PGID     Use the signal KILL (9)				# use process group id
+	#kill -- -$(ps -o pgid= $PID | grep -o '[0-9]*')   (signal TERM)	# use process id
+	#kill -9 -$(ps -o pgid= $PID | grep -o '[0-9]*')   (signal KILL)	# use process id
+
+	# candidate 3: rkill command from pslist package sends given signal (or SIGTERM by default) to specified process and all its descendants:
+	#rkill [-SIG] pid/name...
+}
+
 # shellcheck disable=2155
 func_is_running() {
 	local usage="Usage: ${FUNCNAME[0]} <pid_file>" 
@@ -218,8 +283,23 @@ func_is_running() {
 	local pid_num="$(cat "${1}" 2>/dev/null)"
 	pid_num=${pid_num:-INEXIST_PID_NUM}
 
+	func_is_pid_running "${pid_num}"
+}
+
+func_is_pid_running() {
+	local usage="Usage: ${FUNCNAME[0]} <pid>" 
+	local desc="Desc: check is <pid> running" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	
+	func_is_str_blank "${1}" && return 1
+
+	# NOTE: if the process is in sudo mode, 'kill -0' check will failed, at least some plf will complain permission
 	# 0 is an inexist signal, but helps check if process exist
-	kill -0 "${pid_num}" 2>/dev/null 
+	#kill -0 "${1}" 2>/dev/null 
+
+	# POSIX way, better compatible on diff os
+	# shellcheck disable=2009
+	ps -o pid= -p "${1}" | grep -q "${1}"
 }
 
 ################################################################################

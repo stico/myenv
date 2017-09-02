@@ -1783,9 +1783,43 @@ func_op_compressed_file() {
 }
 
 func_mon_and_run() {
-	watch_path="$1"
+	local watch_path="${1}"
 	shift
-	watch_cmd="$*"
+
+	# TODO: how to kill the last process when Ctrl+C pressed
+	
+	# check if cmd used "sudo"
+	local is_sudo_used='false'
+	[[ "${1}" = sudo* ]] && is_sudo_used='true'
+
+	# fswatch NEED: sudo port/apt-get install fswatch, or install latest git veriosn via zbox
+	local pid num
+	echo "INFO: start to watch: ${watch_path}, with is_sudo_used: ${is_sudo_used}, run cmd: $*"
+	fswatch -o "${watch_path}" | while read -r num ; do
+
+		echo "INFO: $(func_dati) ${time}: target updatd, num: ${num}"
+		if [ -n "${pid}" ] && func_is_pid_running "${pid}" ; then
+			echo "INFO: kill previous process, pid: ${pid}"
+			if [ "${is_sudo_used}" == 'true' ] ; then
+				func_sudo_kill_self_and_direct_child "${pid}"
+			else
+				func_kill_self_and_direct_child "${pid}"
+			fi
+		else
+			echo "INFO: no previous process to kill"
+		fi
+
+		# run command and record pid
+		"$@" &
+		pid=$!
+	done
+}
+
+# Deprecated, fswatch version is better
+func_mon_and_run_inotifywait() {
+	local watch_path="$1"
+	shift
+	local watch_cmd="$*"
 
 	# NEED: sudo apt-get install inotify-tools
 	inotifywait -mr --timefmt '%Y-%m-%d %H:%M:%S' --format '%T %w %f' -e close_write "${watch_path}" | \
