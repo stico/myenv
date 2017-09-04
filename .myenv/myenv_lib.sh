@@ -257,8 +257,10 @@ func_kill_self_and_direct_child() {
 	# NOTE 2: if need support multiple pid, use -P <pid1> -P <pid2> ...
 	if [ "${need_sudo_kill}" = 'true' ] ; then
 		sudo pkill -TERM -P "${1}"
+		sudo kill -TERM "${1}"
 	else
 		pkill -TERM -P "${1}"
+		kill -TERM "${1}"
 	fi
 
 	# candidate 1: find all sub-process and self, pass to kill

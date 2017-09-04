@@ -1782,24 +1782,27 @@ func_op_compressed_file() {
 	echo 33333
 }
 
-func_mon_and_run() {
+func_monitor_and_run() {
 	local watch_path="${1}"
 	shift
 
 	# TODO: how to kill the last process when Ctrl+C pressed
 	
+	# check target exist
+	func_validate_path_exist "${watch_path}"
+
 	# check if cmd used "sudo"
 	local is_sudo_used='false'
 	[[ "${1}" = sudo* ]] && is_sudo_used='true'
 
 	# fswatch NEED: sudo port/apt-get install fswatch, or install latest git veriosn via zbox
-	local pid num
+	local pid event
 	echo "INFO: start to watch: ${watch_path}, with is_sudo_used: ${is_sudo_used}, run cmd: $*"
-	fswatch -o "${watch_path}" | while read -r num ; do
+	func_monitor_fs "${watch_path}" | while read -r event ; do
 
-		echo "INFO: $(func_dati) ${time}: target updatd, num: ${num}"
+		echo "INFO: $(func_dati): target updatd, event: ${event}"
 		if [ -n "${pid}" ] && func_is_pid_running "${pid}" ; then
-			echo "INFO: kill previous process, pid: ${pid}"
+			echo "INFO: kill previous process (and its sub-process), pid: ${pid}"
 			if [ "${is_sudo_used}" == 'true' ] ; then
 				func_sudo_kill_self_and_direct_child "${pid}"
 			else
@@ -1815,19 +1818,29 @@ func_mon_and_run() {
 	done
 }
 
-# Deprecated, fswatch version is better
-func_mon_and_run_inotifywait() {
-	local watch_path="$1"
-	shift
-	local watch_cmd="$*"
+func_monitor_fs() {
+	# INSTALL, see ~zbox for linux, for osx: sudo port install fswatch
+	# NOTE: fswatch not work on ubuntu 10.04, use inotifywait instead
 
-	# NEED: sudo apt-get install inotify-tools
-	inotifywait -mr --timefmt '%Y-%m-%d %H:%M:%S' --format '%T %w %f' -e close_write "${watch_path}" | \
-	while read -r date time dir file; do
-	       updated_file=${dir}${file}
-	       ${watch_cmd}
-	       echo "Target updatd at ${date} ${time}, updated file: ${updated_file}"
-	done
+	# default use fswatch, otherwise inotifywait
+	if func_is_cmd_exist "fswatch" ; then
+		fswatch --one-per-batch --recursive "${1}"
+
+		# seems --directories is useless here
+		#fswatch --one-per-batch --recursive --directories "${1}"
+
+		# --format is incompatible with --one-per-batch
+		# fswatch --format-time '%Y-%m-%d %H:%M:%S' --format "%t %p" --one-per-batch "${1}"
+
+	elif func_is_cmd_exist "fswatch" ; then
+		# --monitor: mon without stop, --quiet: avoid the heading info to raise "false alarm", --event "close_write": seems this event is enough, too much event cause too much lines
+		inotifywait --monitor --quiet --recursive --event "close_write" "${1}"
+
+		# old cmd line
+		#inotifywait -mr --timefmt '%Y-%m-%d %H:%M:%S' --format '%T %w %f' -e close_write "${watch_path}" | \
+	else
+		echo "ERROR: both fswatch and inotifywait NOT exist, pls install them first"
+	fi
 }
 
 func_find_non_utf8_in_content() {
