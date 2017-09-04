@@ -1796,13 +1796,13 @@ func_monitor_and_run() {
 	[[ "${1}" = sudo* ]] && is_sudo_used='true'
 
 	# fswatch NEED: sudo port/apt-get install fswatch, or install latest git veriosn via zbox
-	local pid event
+	local pid lastpid event
 	echo "INFO: start to watch: ${watch_path}, with is_sudo_used: ${is_sudo_used}, run cmd: $*"
 	func_monitor_fs "${watch_path}" | while read -r event ; do
 
 		echo "INFO: $(func_dati): target updatd, event: ${event}"
 		if [ -n "${pid}" ] && func_is_pid_running "${pid}" ; then
-			echo "INFO: kill previous process (and its sub-process), pid: ${pid}"
+			#echo "INFO: kill previous process (and its sub-process), pid: ${pid}"
 			if [ "${is_sudo_used}" == 'true' ] ; then
 				func_sudo_kill_self_and_direct_child "${pid}"
 			else
@@ -1813,8 +1813,12 @@ func_monitor_and_run() {
 		fi
 
 		# run command and record pid
+		lastpid="${pid}"
 		"$@" &
 		pid=$!
+
+		# shellcheck disable=2009
+		echo "INFO: run cmd, lastpid=${lastpid} ($(ps -ef | grep -v grep | grep -q "[[:space:]]${lastpid}[[:space:]]" && echo "FAILED to kill!" || echo "killed")), curent pid=${pid}"
 	done
 }
 
@@ -1840,7 +1844,8 @@ func_monitor_fs() {
 		# old cmd line
 		#inotifywait -mr --timefmt '%Y-%m-%d %H:%M:%S' --format '%T %w %f' -e close_write "${watch_path}" | \
 	else
-		echo "ERROR: both fswatch and inotifywait NOT exist, pls install them first"
+		# output to stderr, in case cause "false alarm" to invoker
+		echo "ERROR: both fswatch and inotifywait NOT exist, pls install them first" 1>&2
 	fi
 }
 
