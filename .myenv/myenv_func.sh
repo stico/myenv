@@ -1819,7 +1819,8 @@ func_monitor_and_run() {
 }
 
 func_monitor_fs() {
-	# INSTALL, see ~zbox for linux, for osx: sudo port install fswatch
+	# INSTALL, fswatch: see ~zbox for linux, for osx: sudo port install fswatch
+	# INSTALL, inotifywait: sudo apt-get install inotify-tools
 	# NOTE: fswatch not work on ubuntu 10.04, use inotifywait instead
 
 	# default use fswatch, otherwise inotifywait
@@ -1832,7 +1833,7 @@ func_monitor_fs() {
 		# --format is incompatible with --one-per-batch
 		# fswatch --format-time '%Y-%m-%d %H:%M:%S' --format "%t %p" --one-per-batch "${1}"
 
-	elif func_is_cmd_exist "fswatch" ; then
+	elif func_is_cmd_exist "inotifywait" ; then
 		# --monitor: mon without stop, --quiet: avoid the heading info to raise "false alarm", --event "close_write": seems this event is enough, too much event cause too much lines
 		inotifywait --monitor --quiet --recursive --event "close_write" "${1}"
 
