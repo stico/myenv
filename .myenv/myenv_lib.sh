@@ -255,6 +255,7 @@ func_kill_self_and_direct_child() {
 
 	# NOTE 1: pkill only sends signal to child process, grandchild WILL NOT receive the signal
 	# NOTE 2: if need support multiple pid, use -P <pid1> -P <pid2> ...
+	# TODO: if -TERM not work, use -9 to try again
 	if [ "${need_sudo_kill}" = 'true' ] ; then
 		sudo pkill -TERM -P "${1}"
 		sudo kill -TERM "${1}"
