@@ -4,8 +4,6 @@
 # IGNORE, for secure reason
 /.ssh/
 /.hgrc
-/.myenv/secu/
-/.myenv/dist/
 /.subversion/
 /.smbcredentials
 
@@ -69,7 +67,7 @@
 !/.unison/*.prf
 !/.unison/deprecated
 
-# IGNORE, for those really not needed, or for secure reason
+# IGNORE, since really not needed
 .DS_Store
 .dl_me.txt
 .fl_me.txt
@@ -78,21 +76,28 @@
 .grep_result.txt
 bash.exe.stackdump
 gVim.exe.stackdump
+
+# IGNORE, for secure reason, 
+# NOTE: dir below .myenv MUST after the 2 lines of "!/.myenv/" and "!/.myenv/*
 /.myenv/zgen/
+/.myenv/secu/
+/.myenv/dist/
 /.vim/.netrwhist
 /.vim/autoload/pathogen.vim
-/.myenv/conf/autokey/autokey.log
-/.myenv/conf/autokey/autokey.pid
-/.myenv/conf/autokey/autokey.json~
-/.myenv/conf/doublecmd/cmdhistory.txt
-/.myenv/conf/doublecmd/dirhistory.txt
-/.myenv/conf/doublecmd/searchhistory.txt
-/.myenv/conf/doublecmd/replacehistory.txt
+
 
 ############################################################
 # Deprecated
 ############################################################
 #
+# Deprecated since no more software config in conf
+#/.myenv/conf/autokey/autokey.log
+#/.myenv/conf/autokey/autokey.pid
+#/.myenv/conf/autokey/autokey.json~
+#/.myenv/conf/doublecmd/cmdhistory.txt
+#/.myenv/conf/doublecmd/dirhistory.txt
+#/.myenv/conf/doublecmd/searchhistory.txt
+#/.myenv/conf/doublecmd/replacehistory.txt
 #
 # Deprecated since might contain mailbox password, or other sensitive info
 #!/.msmtprc
