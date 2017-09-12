@@ -1865,6 +1865,110 @@ func_find_non_utf8_in_content() {
 	cat "${tmp_suspect}"
 }
 
+func_rsync_tmp_stop() {
+	local usage="USAGE: ${FUNCNAME[0]} <TTL>" 
+	local desc="Desc: stop rsync_tmp which started by func_rsync_tmp, if <TTL> (seconds) provided, set a scheduled kill job instead of kill immediately"
+
+	local ttl="${1}"
+	local conf_name="rsync_tmp.server.conf"
+	local pid_file="/tmp/_myenv_rsync_tmp_.pid"
+	local pid_num="$(cat "${pid_file}" 2>/dev/null)"
+
+	func_is_positive_int "${pid_num}" || func_die "ERROR: pid_file (${pid_file}) NOT exist or no valid pid inside!"
+
+	if [ -n "${ttl}" ] && func_is_positive_int "${1}" ; then
+		func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
+
+		echo "INFO: schedule a job to kill rsync_tmp with pid=${pid_num} after <TTL> seconds."
+		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_direct_child ${pid_num}" &
+		return 0
+	fi
+
+	# otherwise kill immediately
+	echo "INFO: kill rsync_tmp with pid=${pid_num}"
+	ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && func_kill_self_and_direct_child "${pid_num}"
+}
+
+func_rsync_tmp() {
+	local usage="USAGE: ${FUNCNAME[0]} <TTL> <path>" 
+
+	# TODO: support change path
+
+	# Arg/Var, NOTE: value of pid_file and conf name, also used in func_rsync_tmp_stop
+	local ttl="${1:-3600}"
+	local base="${2:-${HOME}/amp}"
+	local port="$(func_find_idle_port 8888 8988)"
+	local pid_file="/tmp/_myenv_rsync_tmp_.pid"
+	local log_file="/tmp/_myenv_rsync_tmp_.log"
+	local conf="${MY_ENV}/secu/rsync_tmp.server.conf"
+
+	# Pre-check
+	func_complain_cmd_not_exist rsync && return 1
+	func_complain_path_not_exist "${base}" && return 1
+	func_complain_path_not_exist "${conf}" && return 1
+	[ -z "${port}" ] && echo "ERROR: failed to find idle port!" && return 1
+	[ -f "${pid_file}" ] && func_is_running "${pid_file}" && echo "ERROR: rsync_tmp already running, pls check!" && return 1
+	func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
+
+	# Run
+	rsync --daemon --config "${conf}"
+	echo "INFO: run tmp rsync server, port: ${port}, base: ${base}, pid: $(cat ${pid_file}), log: ${log_file}"
+	echo "INFO: client side command examples"
+	echo "  sync      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr ..."
+	echo "  list      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr --list-only rsync_tmp@$(func_ip_single)::rsync_tmp/"
+	echo "  upload    rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr <source> rsync_tmp@$(func_ip_single)::rsync_tmp/"
+	echo "  download  rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr rsync_tmp@$(func_ip_single)::rsync_tmp/ <target>"
+
+	# Timed kill, if need
+	if [ -n "${ttl}" ] && func_is_positive_int "${ttl}" ; then
+		func_rsync_tmp_stop "${ttl}"
+	fi
+}
+
+func_rsync_backup() {
+	# Example used for jrepo2 rsync
+	#	run cmd			func_export_script func_rsync_backup nexus_all.sh
+	#	update nexus_all.sh	func_rsync_backup nexus_all /data/services/ "nexus_all@113.108.231.170::nexus_all/" 8730
+	#	add crontab task	*/18 3-5 * * *	root	bash /data/services/nexus_all_rsync/nexus_all.sh >> /data/services/nexus_all_rsync/cron.log 2>&1
+
+	local usage="Usage: ${FUNCNAME[0]} <name> <base> <rsync_addr> <port - optional>" 
+	local desc="Desc: backup via rsync" 
+	func_param_check 3 "$@"
+
+	# Parameters
+	local name="${1}"
+	local base="${2%/}"
+	local rsync_addr="${3}"
+	local port="${4:-873}"
+
+	# Variables
+	local bak_path=${base}/${name}/
+	local log_file=${base}/${name}_rsync/${name}.log
+	local pid_file=${base}/${name}_rsync/${name}.pid
+	local rsync_pass=${base}/${name}_rsync/${name}.pass
+
+	# Validation and init
+	[ -f "${rsync_pass}" ] || func_die "ERROR: ${rsync_pass} NOT exist, pls check!"
+	func_is_running "${pid_file}" && func_techo info "${name} backup already running, skip!" && exit 0
+	[ -d "${bak_path}" ] || mkdir -p "${bak_path}" || func_die "ERROR: ${bak_path} NOT dir, pls check!"
+
+	# Perform backup
+	local rsync_pid
+	func_techo info "start to backup ${name}" | tee -a "${log_file}" 
+	func_techo info "cmd: nohup /usr/bin/rsync -avz --port=${port} --password-file=${rsync_pass} ${rsync_addr} ${bak_path}" | tee -a "${log_file}";
+	nohup /usr/bin/rsync -avz --port="${port}" --password-file="${rsync_pass}" "${rsync_addr}" "${bak_path}" >> "${log_file}" 2>&1 &
+	rsync_pid=$!
+	echo "${rsync_pid}" > "${pid_file}"
+
+	# Status followup
+	func_techo info "rsync process id is: ${rsync_pid}"
+	if wait "${rsync_pid}" ; then
+		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a "${log_file}" 
+	else
+		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a "${log_file}" 
+	fi
+}
+
 func_samba_is_mounted() {
 	local usage="USAGE: ${FUNCNAME[0]} <path>" 
 	func_param_check 1 "$@"

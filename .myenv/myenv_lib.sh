@@ -86,50 +86,6 @@ func_download_wget() {
 	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
 }
 
-func_backup_rsync() {
-	# Example used for jrepo2 rsync
-	#	run cmd: func_export_script func_backup_rsync nexus_all.sh
-	#	change last line of nexus_all.sh: func_backup_rsync nexus_all /data/services/ "nexus_all@113.108.231.170::nexus_all/" 8730
-	#	add task to crontab: */18 3-5 * * *	root	bash /data/services/nexus_all_rsync/nexus_all.sh >> /data/services/nexus_all_rsync/cron.log 2>&1
-
-	local usage="Usage: ${FUNCNAME[0]} <name> <base> <rsync_addr> <port - optional>" 
-	local desc="Desc: backup via rsync" 
-	func_param_check 3 "$@"
-
-	# Parameters
-	local name="${1}"
-	local base="${2%/}"
-	local rsync_addr="${3}"
-	local port="${4:-873}"
-
-	# Variables
-	local bak_path=${base}/${name}/
-	local log_file=${base}/${name}_rsync/${name}.log
-	local pid_file=${base}/${name}_rsync/${name}.pid
-	local rsync_pass=${base}/${name}_rsync/${name}.pass
-
-	# Validation and init
-	[ -f "${rsync_pass}" ] || func_die "ERROR: ${rsync_pass} NOT exist, pls check!"
-	func_is_running "${pid_file}" && func_techo info "${name} backup already running, skip!" && exit 0
-	[ -d "${bak_path}" ] || mkdir -p "${bak_path}" || func_die "ERROR: ${bak_path} NOT dir, pls check!"
-
-	# Perform backup
-	local rsync_pid
-	func_techo info "start to backup ${name}" | tee -a "${log_file}" 
-	func_techo info "cmd: nohup /usr/bin/rsync -avz --port=${port} --password-file=${rsync_pass} ${rsync_addr} ${bak_path}" | tee -a "${log_file}";
-	nohup /usr/bin/rsync -avz --port="${port}" --password-file="${rsync_pass}" "${rsync_addr}" "${bak_path}" >> "${log_file}" 2>&1 &
-	rsync_pid=$!
-	echo "${rsync_pid}" > "${pid_file}"
-
-	# Status followup
-	func_techo info "rsync process id is: ${rsync_pid}"
-	if wait "${rsync_pid}" ; then
-		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a "${log_file}" 
-	else
-		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a "${log_file}" 
-	fi
-}
-
 # shellcheck disable=2155,2012
 func_uncompress() {
 	# TODO 1: gz file might be replaced and NOT in the target dir
@@ -284,7 +240,7 @@ func_is_running() {
 	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 	
 	local pid_num="$(cat "${1}" 2>/dev/null)"
-	pid_num=${pid_num:-INEXIST_PID_NUM}
+	func_is_positive_int "${pid_num}" || func_die "ERROR: pid_file (${1}) NOT exist or no valid pid inside!"
 
 	func_is_pid_running "${pid_num}"
 }
@@ -896,6 +852,26 @@ func_ip_list() {
 	fi
 }
 
+func_find_idle_port() {
+	local usage="USAGE: ${FUNCNAME[0]} <port_start> <port_end>" 
+	local desc="Desc: find available/idle port between range <port_start>-<port_end>, if <port_end> missed, will be <port_start>+20. Return 0 and echo 1st idle port, otherwise return 1" 
+	func_param_check 1 "$@"
+	
+	local tmp_port port_end
+	local port_start="${1}"
+	[ -n "${2}" ] && port_end="${2}" || port_end="$((${port_start}+20))"
+
+	func_is_int_in_range "${port_end}" 1025 65535 || func_die "ERROR: port_end (${port_end}) not in range 1025~65535!)"
+	func_is_int_in_range "${port_start}" 1025 65535 || func_die "ERROR: port_start (${port_start}) not in range 1025~65535!)"
+
+	for tmp_port in $(seq ${port_start} ${port_end}) ; do
+		# support linux & osx: netstat on linux/osx use ":/." for port separator
+		netstat -an | head | awk '{print gensub(/.*[\.:]/, "", "g", $4)}' | grep -q "${tmp_port}" && continue
+		echo ${tmp_port} && return 0
+	done
+	return 1
+}
+
 ################################################################################
 # Data Type: array
 ################################################################################
@@ -921,6 +897,28 @@ func_array_contans() {
 ################################################################################
 # Data Type: number
 ################################################################################
+func_is_int_in_range() {
+	local usage="Usage: ${FUNCNAME[0]} <num> <start> <end>"
+	local desc="Desc: return 0 if <num> is number and in range <start> ~ <end>, otherwise return 1" 
+	func_param_check 3 "$@"
+
+	local num="${1}"
+	local start="${2}"
+	local end="${3}"
+
+	func_is_int "${num}" && (( num >= start )) && (( num <= end )) && return 0 || return 1
+}
+
+func_is_int() {
+	local usage="Usage: ${FUNCNAME[0]} <param>"
+	local desc="Desc: return 0 if the param is integer, otherwise will 1" 
+	func_param_check 1 "$@"
+	
+	# NOTE: no quote on the pattern part!
+	local num="${1}"
+	[[ "${num}" =~ ^[-]?[0-9]+$ ]] && return 0 || return 1
+}
+
 func_is_positive_int() {
 	local usage="Usage: ${FUNCNAME[0]} <param>"
 	local desc="Desc: return 0 if the param is positive integer, otherwise will 1" 
@@ -928,7 +926,7 @@ func_is_positive_int() {
 	
 	# NOTE: no quote on the pattern part!
 	local num="${1}"
-	[[ "${num}" =~ ^[-]*[0-9]+$ ]] && (( num > 0 )) && return 0 || return 1
+	func_is_int "${num}" && (( num > 0 )) && return 0 || return 1
 }
 
 func_num_to_human() {

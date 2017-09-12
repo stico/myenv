@@ -4,6 +4,7 @@
 
 # Variable
 base="$HOME/.myenv/conf/env"
+secu_base="$HOME/.myenv/secu/"
 genShPath="$HOME/.myenv/zgen/lu_bash"
 genEnvVar=$genShPath/envVarAll
 genEnvAlias=$genShPath/envAliasAll
@@ -20,13 +21,13 @@ rm "${genShPath}"/* &> /dev/null
 if [[ "$(uname -s)" == CYGWIN* ]] || [[ "$(uname -s)" == MINGW* ]] ; then
 	# winVer=`cmd /C win_ver.bat`			# works in cygwin/bash, not in GIT/bash
 	envVarSrc=(env_var env_var_win_cyg env_var_win)
-	envAliasSrc=(env_alias env_alias_win)
+	envAliasSrc=(env_alias ${secu_base}/env_alias_secu env_alias_win)
 elif [[ "$(uname -s)" == Darwin* ]] ; then 
 	envVarSrc=(env_var env_var_lu env_var_osx)
-	envAliasSrc=(env_alias env_alias_lu env_alias_osx)
+	envAliasSrc=(env_alias ${secu_base}/env_alias_secu env_alias_lu env_alias_osx)
 else
 	envVarSrc=(env_var_lu env_var)
-	envAliasSrc=(env_alias env_alias_lu)
+	envAliasSrc=(env_alias ${secu_base}/env_alias_secu env_alias_lu)
 fi
 [[ -e $HOME/.myenv/secu/env_var_secu ]] && envVarSrc+=(secu/env_var_secu)
 [[ -e $HOME/.myenv/secu/env_alias_secu ]] && envAliasSrc+=(secu/env_alias_secu)
@@ -52,6 +53,8 @@ sed -i -e "0,/:\${PATH}/s///" "$genEnvVar"	# need PATH be clean, so first assign
 # Gen alias
 for aliasFile in "${envAliasSrc[@]}"
 do
+	[ -e "$aliasFile" ] || continue
+
 	# shellcheck disable=2016
 	sed -e '/^\s*#/d' \
 	    -e '/^\s*$/d' \
