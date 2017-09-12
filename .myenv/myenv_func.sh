@@ -1891,6 +1891,7 @@ func_rsync_tmp_stop() {
 
 func_rsync_tmp() {
 	local usage="USAGE: ${FUNCNAME[0]} <TTL> <path>" 
+	local desc="Desc: start a temporary rsync server, shedule a kill job with <TTL> (seconds, default 3600s)"
 
 	# TODO: support change path
 
@@ -1911,8 +1912,8 @@ func_rsync_tmp() {
 	func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 	# Run
-	rsync --daemon --config "${conf}"
-	echo "INFO: run tmp rsync server, port: ${port}, base: ${base}, pid: $(cat ${pid_file}), log: ${log_file}"
+	rsync --daemon --port "${port}" --config "${conf}"
+	echo "INFO: run tmp rsync server, port: ${port}, base: ${base}, pid: $(cat ${pid_file} 2>/dev/null), log: ${log_file}"
 	echo "INFO: client side command examples"
 	echo "  sync      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr ..."
 	echo "  list      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr --list-only rsync_tmp@$(func_ip_single)::rsync_tmp/"
