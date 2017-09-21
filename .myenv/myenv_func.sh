@@ -1879,7 +1879,7 @@ func_rsync_tmp_stop() {
 	if [ -n "${ttl}" ] && func_is_positive_int "${1}" ; then
 		func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
-		echo "INFO: schedule a job to kill rsync_tmp with pid=${pid_num} after <TTL> seconds."
+		echo "INFO: schedule a job to kill rsync_tmp with pid=${pid_num} after ${ttl} seconds."
 		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_direct_child ${pid_num}" &
 		return 0
 	fi
@@ -1912,6 +1912,7 @@ func_rsync_tmp() {
 	func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 	# Run
+	echo "INFO: run rsync server, cmd: rsync --daemon --port ${port} --config ${conf}"
 	rsync --daemon --port "${port}" --config "${conf}"
 	echo "INFO: run tmp rsync server, port: ${port}, base: ${base}, pid: $(cat ${pid_file} 2>/dev/null), log: ${log_file}"
 	echo "INFO: client side command examples"
@@ -1919,6 +1920,7 @@ func_rsync_tmp() {
 	echo "  list      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr --list-only rsync_tmp@$(func_ip_single)::rsync_tmp/"
 	echo "  upload    rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr <source> rsync_tmp@$(func_ip_single)::rsync_tmp/"
 	echo "  download  rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr rsync_tmp@$(func_ip_single)::rsync_tmp/ <target>"
+	echo " "
 
 	# Timed kill, if need
 	if [ -n "${ttl}" ] && func_is_positive_int "${ttl}" ; then
