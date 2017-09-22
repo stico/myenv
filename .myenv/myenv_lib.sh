@@ -219,6 +219,7 @@ func_kill_self_and_direct_child() {
 		fi
 
 		# TODO: if -TERM not work, use -9 to try again
+		sleep 0.5
 		if func_is_pid_running "${pid_tmp}" ; then
 			echo "ERROR: failed to kill, pid: ${pid_tmp}"
 			return 1
