@@ -1782,6 +1782,7 @@ func_op_compressed_file() {
 	echo 33333
 }
 
+# shellcheck disable=2199
 func_monitor_and_run() {
 	local watch_path="${1}"
 	shift
@@ -1801,7 +1802,7 @@ func_monitor_and_run() {
 	local lastpid event
 	local pid_file="/tmp/_myenv_monitor_and_run_sudo-${is_sudo_used}_.pid"
 	local pid="$(cat "${pid_file}" 2>/dev/null)"
-	func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || echo "INFO: no previous process to kill (${pid})"
+	func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || return 1
 
 	# initial run
 	lastpid="${pid}"
@@ -1814,7 +1815,7 @@ func_monitor_and_run() {
 	func_monitor_fs "${watch_path}" | while read -r event ; do
 
 		echo "INFO: $(func_dati): target updatd, event: ${event}"
-		func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || echo "INFO: no previous process to kill (${pid})"
+		func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || return 1
 
 		# run command and record pid
 		lastpid="${pid}"
