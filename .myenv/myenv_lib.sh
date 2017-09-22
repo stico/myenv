@@ -210,15 +210,14 @@ func_kill_self_and_direct_child() {
 	local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn)"
 
 	local pid_tmp 
-	echo "INFO: kill pid_list: "${pid_list}
+	echo "INFO: kill pid_list: $([ "${need_sudo_kill}" = 'true' ] && echo ' (use sudo): ')"${pid_list}
 	for pid_tmp in ${pid_list} ; do
 		if [ "${need_sudo_kill}" = 'true' ] ; then
-			sudo kill -TERM "${pid_tmp}"
+			sudo kill -9 "${pid_tmp}"
 		else
-			kill -TERM "${pid_tmp}"
+			kill -9 "${pid_tmp}"
 		fi
 
-		# TODO: if -TERM not work, use -9 to try again
 		sleep 0.5
 		if func_is_pid_running "${pid_tmp}" ; then
 			echo "ERROR: failed to kill, pid: ${pid_tmp}"
