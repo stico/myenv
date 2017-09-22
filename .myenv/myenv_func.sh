@@ -1786,39 +1786,52 @@ func_monitor_and_run() {
 	local watch_path="${1}"
 	shift
 
-	# TODO: how to kill the last process when Ctrl+C pressed
+	# TODO: the cmd should run at beginning
+	# TODO: record the last_pid, and kill it at beginning
+	# TODO: how to kill the last process when Ctrl+C pressed > seemsm need use a standalone script and trap Ctrl+C
 	
 	# check target exist
 	func_validate_path_exist "${watch_path}"
 
-	# check if cmd used "sudo"
+	# check if *last* cmd used "sudo"
 	local is_sudo_used='false'
-	[[ "${1}" = sudo* ]] && is_sudo_used='true'
+	[[ "${@: -1}" = sudo* ]] && is_sudo_used='true'
+
+	# kill if last process still exist
+	local lastpid event
+	local pid_file="/tmp/_myenv_monitor_and_run_sudo-${is_sudo_used}_.pid"
+	local pid="$(cat "${pid_file}" 2>/dev/null)"
+	func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || echo "INFO: no previous process to kill (${pid})"
+
+	# initial run
+	lastpid="${pid}"
+	func_run_cmds_in_bg "${@}"
+	pid=$!
+	echo "${pid}" > "${pid_file}"
+	echo "INFO: start, pid: ${pid}, watch_path: ${watch_path}, is_sudo_used: ${is_sudo_used}, cmds: $*"
 
 	# fswatch NEED: sudo port/apt-get install fswatch, or install latest git veriosn via zbox
-	local pid lastpid event
-	echo "INFO: start to watch: ${watch_path}, with is_sudo_used: ${is_sudo_used}, run cmd: $*"
 	func_monitor_fs "${watch_path}" | while read -r event ; do
 
 		echo "INFO: $(func_dati): target updatd, event: ${event}"
-		if [ -n "${pid}" ] && func_is_pid_running "${pid}" ; then
-			#echo "INFO: kill previous process (and its sub-process), pid: ${pid}"
-			if [ "${is_sudo_used}" == 'true' ] ; then
-				func_sudo_kill_self_and_direct_child "${pid}"
-			else
-				func_kill_self_and_direct_child "${pid}"
-			fi
-		else
-			echo "INFO: no previous process to kill"
-		fi
+		func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || echo "INFO: no previous process to kill (${pid})"
 
 		# run command and record pid
 		lastpid="${pid}"
-		"$@" &
+		func_run_cmds_in_bg "${@}"
 		pid=$!
+		echo "${pid}" > "${pid_file}"
 
 		# shellcheck disable=2009
-		echo "INFO: run cmd, lastpid=${lastpid} ($(ps -ef | grep -v grep | grep -q "[[:space:]]${lastpid}[[:space:]]" && echo "FAILED to kill!" || echo "killed")), curent pid=${pid}"
+		#echo "INFO: run cmd, lastpid=${lastpid} ($(ps -ef | grep -v grep | grep -q "[[:space:]]${lastpid}[[:space:]]" && echo "FAILED to kill!" || echo "killed")), curent pid=${pid}"
+		echo "INFO: run cmd, lastpid=${lastpid} ($(func_is_pid_or_its_child_running "${lastpid}" && echo "FAILED to kill!" || echo "killed")), curent pid=${pid}"
+	done
+}
+
+func_run_cmds_in_bg() {
+	local cmd
+	for cmd in "$@" ; do
+		eval "${cmd}" &
 	done
 }
 
@@ -1880,13 +1893,13 @@ func_rsync_tmp_stop() {
 		func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 		echo "INFO: schedule a job to kill rsync_tmp with pid=${pid_num} after ${ttl} seconds."
-		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_direct_child ${pid_num}" &
+		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_direct_child 'false' ${pid_num}" &
 		return 0
 	fi
 
 	# otherwise kill immediately
 	echo "INFO: kill rsync_tmp with pid=${pid_num}"
-	ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && func_kill_self_and_direct_child "${pid_num}"
+	ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && func_kill_self_and_direct_child 'false' "${pid_num}"
 }
 
 func_rsync_tmp() {
@@ -1922,7 +1935,7 @@ func_rsync_tmp() {
 	echo "  download  rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr rsync_tmp@$(func_ip_single)::rsync_tmp/ <target>"
 	echo " "
 
-	# Timed kill, if need
+	# shedule a timed kill, if need
 	if [ -n "${ttl}" ] && func_is_positive_int "${ttl}" ; then
 		func_rsync_tmp_stop "${ttl}"
 	fi

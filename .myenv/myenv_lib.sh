@@ -193,35 +193,37 @@ func_sudo_kill_recursive() {
 	kill -"${_sig}" "${_pid}"
 }
 
-func_sudo_kill_self_and_direct_child() {
-	local usage="Usage: ${FUNCNAME[0]} <pid>" 
-	local desc="Desc: kill <pid> and all its child process" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
-
-	local need_sudo_kill='true'
-	func_kill_self_and_direct_child "${1}"
-}
-
 func_kill_self_and_direct_child() {
-	local usage="Usage: ${FUNCNAME[0]} <pid>" 
-	local desc="Desc: kill <pid> and all its child process" 
+	local usage="Usage: ${FUNCNAME[0]} <need_sudo_kill> <pid>" 
+	local desc="Desc: kill <pid> and all its child process, return 0 if killed, return 1 if no process killed or failed to kill" 
 	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	func_is_pid_running "${1}" || return 0
+	local need_sudo_kill="${1}"
+	local pid_num="${2}"
+	func_is_pid_running "${pid_num}" || return 1
 
 	# NOTE 1: pkill only sends signal to child process, grandchild WILL NOT receive the signal
 	# NOTE 2: if need support multiple pid, use -P <pid1> -P <pid2> ...
-	# TODO: if -TERM not work, use -9 to try again
+	# NOTE 3: parent process might already finished, so no error output for 'kill' cmd
 	if [ "${need_sudo_kill}" = 'true' ] ; then
-		sudo pkill -TERM -P "${1}"
-		sudo kill -TERM "${1}"
+		sudo pkill -TERM -P "${pid_num}"
+		sudo kill -TERM "${pid_num}" >/dev/null 2>&1
 	else
-		pkill -TERM -P "${1}"
-		kill -TERM "${1}"
+		pkill -TERM -P "${pid_num}"
+		kill -TERM "${pid_num}" >/dev/null 2>&1
+	fi
+
+	# verify
+	# TODO: if -TERM not work, use -9 to try again
+	if func_is_pid_or_its_child_running "${pid_num}" ; then
+		echo "ERROR: FAILED to kill, pid_num: ${pid_num}"
+		return 1
+	else
+		return 0
 	fi
 
 	# candidate 1: find all sub-process and self, pass to kill
-	#ps -ef | grep "[[:space:]]${pid}[[:space:]]" | grep -v grep | awk '{print $2}' | xargs kill -TERM
+	#ps -ef | grep "[[:space:]]${pid}[[:space:]]" | grep -v grep | awk '{print $pid_num}' | xargs kill -TERM
 
 	# candidate 2: kill on group, not the "-" prefix: https://stackoverflow.com/questions/392022/best-way-to-kill-all-child-processes/6481337
 	#kill -- -$PGID     Use default signal (TERM = 15)			# use process group id
@@ -243,6 +245,14 @@ func_is_running() {
 	func_is_positive_int "${pid_num}" || func_die "ERROR: pid_file (${1}) NOT exist or no valid pid inside!"
 
 	func_is_pid_running "${pid_num}"
+}
+
+func_is_pid_or_its_child_running() {
+	local usage="Usage: ${FUNCNAME[0]} <pid>" 
+	local desc="Desc: check is <pid> running, or any of its child running" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	ps -ef | grep -v grep | grep -q "[[:space:]]${1}[[:space:]]"
 }
 
 func_is_pid_running() {
