@@ -203,7 +203,7 @@ func_pids_of_descendants() {
 	if pstree --version 2>&1 | grep -q "thp.uni-due.de" ; then
 		pstree -w "${pid_num}" | grep -o '\-+= \([0-9]\+\)' | grep -o '[0-9]\+' | tr '\n' ' '
 	elif pstree --version 2>&1 | grep -q "PSmisc" ; then
-		pstree -p "${pid_num}" | grep -o '([0-9]\+)' | grep -o '[0-9]\+'
+		pstree -p "${pid_num}" | grep -o '([0-9]\+)' | grep -o '[0-9]\+' | tr '\n' ' '
 	fi
 }
 
