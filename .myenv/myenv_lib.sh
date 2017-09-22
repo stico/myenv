@@ -210,10 +210,10 @@ func_kill_self_and_direct_child() {
 	# NOTE 3: parent process might already finished, so no error output for 'kill' cmd
 	if [ "${need_sudo_kill}" = 'true' ] ; then
 		echo "INFO: kill cmd: sudo pkill -TERM -P ${pid_num} && sudo kill -TERM ${pid_num} >/dev/null 2>&1"
-		sudo pkill -TERM -P "${pid_num}" && sudo kill -TERM "${pid_num}" >/dev/null 2>&1
+		sudo pkill -TERM -P "${pid_num}" && sleep 1 && sudo kill -TERM "${pid_num}" >/dev/null 2>&1
 	else
-		echo "INFO: kill cmd: pkill -TERM -P ${pid_num} && kill -TERM ${pid_num} >/dev/null 2>&1"
-		pkill -TERM -P "${pid_num}" && kill -TERM "${pid_num}" >/dev/null 2>&1
+		echo "INFO: kill cmd: pkill -TERM -P ${pid_num} && sleep 1 && kill -TERM ${pid_num} >/dev/null 2>&1"
+		pkill -TERM -P "${pid_num}" && sleep 1 && kill -TERM "${pid_num}" >/dev/null 2>&1
 	fi
 
 	# verify
