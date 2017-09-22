@@ -169,29 +169,6 @@ func_vcs_update() {
 # Utility: process
 ################################################################################
 
-func_sudo_kill_recursive() {
-
-	# TODO: copied from stackoverflow, but NOT verified yet
-	echo "ERROR: this function is NOT ready yet!" 1>&2
-	return 1
-
-	local _pid=$1
-	local _sig=${2:--TERM}
-	kill -stop "${_pid}" # needed to stop quickly forking parent from producing children between child killing and parent killing
-
-	#--------------------- TODO: use 1 solution of 3 -------------------
-	#for _child  in $(pgrep -P "$_pid") "$_pid"; do							# NOT recursive. works both on osx and linux, NOTE: the pgrep output NOT include $pid itself
-
-	#for _child in $(ps -o pid --no-headers --ppid ${_pid}); do					# linux only: -- arguments to ps don't work on osx
-
-	#local _regex="[ ]*([0-9]+)[ ]+${_pid}" 
-	#for _child in $(ps ax -o "pid= ppid=" | grep -E "${_regex}" | sed -E "s/${_regex}/\1/g"); do	# works on osx, NOTE: defined the _regex before the for-loop
-	#--------------------- TODO: use 1 solution of 3 -------------------
-		#killtree "${_child}" "${_sig}"
-	#done
-	kill -"${_sig}" "${_pid}"
-}
-
 func_pids_of_descendants() {
 	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
 	local desc="Desc: return pid list of all descendants (including self), or empty if none" 
@@ -228,7 +205,7 @@ func_pids_of_direct_child() {
 }
 
 # shellcheck disable=2009,2155,2086
-func_kill_self_and_direct_child() {
+func_kill_self_and_descendants() {
 	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
 	local desc="Desc: kill <pid> and all its child process, return 0 if killed or not need to kill, return 1 failed to kill" 
 	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
@@ -245,8 +222,6 @@ func_kill_self_and_direct_child() {
 		return 0
 	fi
 
-	#local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn | tr '\n' ' ')"	# NOT recursive
-	#local pid_list="$(pgrep -P "${pid_num}") ${pid_num}"
 	local pid_list="$(func_pids_of_descendants "${pid_num}")"
 	echo "INFO: kill pid_list: ${sudo_cmd} kill -9 ${pid_list}"
 	"${sudo_cmd}" kill -9 ${pid_list}
@@ -262,6 +237,13 @@ func_kill_self_and_direct_child() {
 	if [ -n "${pid_fail}" ] ; then
 		echo "ERROR: failed to kill, pid_fail: ${pid_fail}"
 	fi
+
+
+func_kill_self_and_direct_child() {
+
+	# TODO: copied from stackoverflow, but NOT verified yet
+	echo "ERROR: this function is NOT ready yet!" 1>&2
+	return 1
 
 	# candidate 1: some times failed to kill, and makes child's parent pid becomes 1, because pkill NOT stable?
 	# NOTE 1: pkill only sends signal to child process, grandchild WILL NOT receive the signal

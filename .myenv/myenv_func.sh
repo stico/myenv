@@ -1802,7 +1802,7 @@ func_monitor_and_run() {
 	local lastpid event
 	local pid_file="/tmp/_myenv_monitor_and_run_sudo-${is_sudo_used}_.pid"
 	local pid="$(cat "${pid_file}" 2>/dev/null)"
-	func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || return 1
+	func_kill_self_and_descendants "${is_sudo_used}" "${pid}" || return 1
 
 	# initial run
 	lastpid="${pid}"
@@ -1815,7 +1815,7 @@ func_monitor_and_run() {
 	func_monitor_fs "${watch_path}" | while read -r event ; do
 
 		echo "INFO: $(func_dati): target updatd, event: ${event}"
-		func_kill_self_and_direct_child "${is_sudo_used}" "${pid}" || return 1
+		func_kill_self_and_descendants "${is_sudo_used}" "${pid}" || return 1
 
 		# run command and record pid
 		lastpid="${pid}"
@@ -1879,6 +1879,7 @@ func_find_non_utf8_in_content() {
 	cat "${tmp_suspect}"
 }
 
+# shellcheck disable=2009
 func_rsync_tmp_stop() {
 	local usage="USAGE: ${FUNCNAME[0]} <TTL>" 
 	local desc="Desc: stop rsync_tmp which started by func_rsync_tmp, if <TTL> (seconds) provided, set a scheduled kill job instead of kill immediately"
@@ -1894,13 +1895,13 @@ func_rsync_tmp_stop() {
 		func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 		echo "INFO: schedule a job to kill rsync_tmp with pid=${pid_num} after ${ttl} seconds."
-		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_direct_child 'false' ${pid_num}" &
+		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_descendants 'false' ${pid_num}" &
 		return 0
 	fi
 
 	# otherwise kill immediately
 	echo "INFO: kill rsync_tmp with pid=${pid_num}"
-	ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && func_kill_self_and_direct_child 'false' "${pid_num}"
+	ps -ef | grep -q "${pid_num}.*rsync.*${conf_name}" && func_kill_self_and_descendants 'false' "${pid_num}"
 }
 
 func_rsync_tmp() {
