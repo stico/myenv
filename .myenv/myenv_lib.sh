@@ -193,7 +193,7 @@ func_sudo_kill_recursive() {
 	kill -"${_sig}" "${_pid}"
 }
 
-# shellcheck disable=2009,2155
+# shellcheck disable=2009,2155,2086
 func_kill_self_and_direct_child() {
 	local usage="Usage: ${FUNCNAME[0]} <need_sudo_kill> <pid>" 
 	local desc="Desc: kill <pid> and all its child process, return 0 if killed or not need to kill, return 1 failed to kill" 
@@ -207,10 +207,10 @@ func_kill_self_and_direct_child() {
 	fi
 
 	# gather pid list
-	local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}')"
+	local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn)"
 
 	local pid_tmp 
-	echo "INFO: kill pid_list: ${pid_list}"
+	echo "INFO: kill pid_list: "${pid_list}
 	for pid_tmp in ${pid_list} ; do
 		if [ "${need_sudo_kill}" = 'true' ] ; then
 			sudo kill -TERM "${pid_tmp}"
