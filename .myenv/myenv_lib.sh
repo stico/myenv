@@ -195,42 +195,44 @@ func_sudo_kill_recursive() {
 
 # shellcheck disable=2009,2155,2086
 func_kill_self_and_direct_child() {
-	local usage="Usage: ${FUNCNAME[0]} <need_sudo_kill> <pid>" 
+	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
 	local desc="Desc: kill <pid> and all its child process, return 0 if killed or not need to kill, return 1 failed to kill" 
 	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local need_sudo_kill="${1}"
+	local need_sudo="${1}"
+	local sudo_cmd=""
+	if [ "${need_sudo}" = 'true' ] ; then
+		sudo_cmd="sudo"
+	fi
+
 	local pid_num="${2}"
 	if ! func_is_pid_running "${pid_num}" ; then
 		echo "INFO: process ${pid_num} NOT running, just return"
 		return 0
 	fi
 
-	# gather pid list
-	local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn)"
+	local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn | tr '\n' ' ')"
+	echo "INFO: kill pid_list: ${sudo_cmd} kill -9 ${pid_list}"
+	"${sudo_cmd}" kill -9 ${pid_list}
 
-	local pid_tmp 
-	echo "INFO: kill pid_list: $([ "${need_sudo_kill}" = 'true' ] && echo ' (use sudo): ')"${pid_list}
+	sleep 0.5
+	local pid_tmp
+	local pid_fail=''
 	for pid_tmp in ${pid_list} ; do
-		if [ "${need_sudo_kill}" = 'true' ] ; then
-			sudo kill -9 "${pid_tmp}"
-		else
-			kill -9 "${pid_tmp}"
-		fi
-
-		sleep 0.5
 		if func_is_pid_running "${pid_tmp}" ; then
-			echo "ERROR: failed to kill, pid: ${pid_tmp}"
-			return 1
+			pid_fail="${pid_fail} ${pid_tmp}"
 		fi
 	done
+	if [ -n "${pid_fail}" ] ; then
+		echo "ERROR: failed to kill, pid_fail: ${pid_fail}"
+	fi
 
 	# candidate 1: some times failed to kill, and makes child's parent pid becomes 1, because pkill NOT stable?
 	# NOTE 1: pkill only sends signal to child process, grandchild WILL NOT receive the signal
 	# NOTE 2: if need support multiple pid, use -P <pid1> -P <pid2> ...
 	# NOTE 3: parent process might already finished, so no error output for 'kill' cmd
 	# NOTE 4: why sleep 1? seems some times kill works before pkill, which cause pkill can NOT find child (since parent killed and child's parent becomes pid 1)
-	#if [ "${need_sudo_kill}" = 'true' ] ; then
+	#if [ "${need_sudo}" = 'true' ] ; then
 	#	echo "INFO: kill cmd: sudo pkill -TERM -P ${pid_num} && sleep 1 && sudo kill -TERM ${pid_num} >/dev/null 2>&1"
 	#	sudo pkill -TERM -P "${pid_num}" && sleep 1 && sudo kill -TERM "${pid_num}" >/dev/null 2>&1
 	#else
