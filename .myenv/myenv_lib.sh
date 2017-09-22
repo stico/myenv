@@ -180,7 +180,7 @@ func_sudo_kill_recursive() {
 	kill -stop "${_pid}" # needed to stop quickly forking parent from producing children between child killing and parent killing
 
 	#--------------------- TODO: use 1 solution of 3 -------------------
-	for _child  in $(pgrep -P "$_pid"); do								# works both on osx and linux, NOTE: the output NOT include $pid itself
+	for _child  in $(pgrep -P "$_pid") "$_pid"; do							# works both on osx and linux, NOTE: the pgrep output NOT include $pid itself
 
 	#for _child in $(ps -o pid --no-headers --ppid ${_pid}); do					# linux only: -- arguments to ps don't work on osx
 
@@ -211,7 +211,8 @@ func_kill_self_and_direct_child() {
 		return 0
 	fi
 
-	local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn | tr '\n' ' ')"
+	#local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn | tr '\n' ' ')"	# NOT recursive
+	local pid_list="$(pgrep -P "${pid_num}") ${pid_num}"
 	echo "INFO: kill pid_list: ${sudo_cmd} kill -9 ${pid_list}"
 	"${sudo_cmd}" kill -9 ${pid_list}
 
