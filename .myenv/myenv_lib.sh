@@ -200,15 +200,20 @@ func_kill_self_and_direct_child() {
 
 	local need_sudo_kill="${1}"
 	local pid_num="${2}"
-	func_is_pid_running "${pid_num}" || return 1
+	if ! func_is_pid_running "${pid_num}" ; then
+		echo "INFO: process ${pid_num} NOT running, just return"
+		return 1
+	fi
 
 	# NOTE 1: pkill only sends signal to child process, grandchild WILL NOT receive the signal
 	# NOTE 2: if need support multiple pid, use -P <pid1> -P <pid2> ...
 	# NOTE 3: parent process might already finished, so no error output for 'kill' cmd
 	if [ "${need_sudo_kill}" = 'true' ] ; then
+		echo "INFO: kill cmd: sudo pkill -TERM -P ${pid_num} ; sudo kill -TERM ${pid_num} >/dev/null 2>&1"
 		sudo pkill -TERM -P "${pid_num}"
 		sudo kill -TERM "${pid_num}" >/dev/null 2>&1
 	else
+		echo "INFO: kill cmd: pkill -TERM -P ${pid_num} ; kill -TERM ${pid_num} >/dev/null 2>&1"
 		pkill -TERM -P "${pid_num}"
 		kill -TERM "${pid_num}" >/dev/null 2>&1
 	fi
