@@ -180,17 +180,51 @@ func_sudo_kill_recursive() {
 	kill -stop "${_pid}" # needed to stop quickly forking parent from producing children between child killing and parent killing
 
 	#--------------------- TODO: use 1 solution of 3 -------------------
-	for _child  in $(pgrep -P "$_pid") "$_pid"; do							# works both on osx and linux, NOTE: the pgrep output NOT include $pid itself
+	#for _child  in $(pgrep -P "$_pid") "$_pid"; do							# NOT recursive. works both on osx and linux, NOTE: the pgrep output NOT include $pid itself
 
 	#for _child in $(ps -o pid --no-headers --ppid ${_pid}); do					# linux only: -- arguments to ps don't work on osx
 
 	#local _regex="[ ]*([0-9]+)[ ]+${_pid}" 
 	#for _child in $(ps ax -o "pid= ppid=" | grep -E "${_regex}" | sed -E "s/${_regex}/\1/g"); do	# works on osx, NOTE: defined the _regex before the for-loop
 	#--------------------- TODO: use 1 solution of 3 -------------------
-
-		killtree "${_child}" "${_sig}"
-	done
+		#killtree "${_child}" "${_sig}"
+	#done
 	kill -"${_sig}" "${_pid}"
+}
+
+func_pids_of_descendants() {
+	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
+	local desc="Desc: return pid list of all descendants (including self), or empty if none" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	func_validate_cmd_exist pstree
+
+	local pid_num="${1}"
+	if pstree --version 2>&1 | grep -q "thp.uni-due.de" ; then
+		pstree -w "${pid_num}" | grep -o '\-+= \([0-9]\+\)' | grep -o '[0-9]\+' | tr '\n' ' '
+	elif pstree --version 2>&1 | grep -q "PSmisc" ; then
+		pstree -p "${pid_num}" | grep -o '([0-9]\+)' | grep -o '[0-9]\+'
+	fi
+}
+
+# shellcheck disable=2009
+func_pids_of_direct_child() {
+	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
+	local desc="Desc: return pid list of direct childs (including self), or empty if none" 
+	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	local pid_num="${1}"
+	if ! func_is_pid_running "${pid_num}" ; then
+		return 0
+	fi
+
+	local pid_tmp
+	local pid_list=""
+	local regex="[ ]*([0-9]+)[ ]+${pid_num}" 
+	for pid_tmp in $(ps ax -o "pid= ppid=" | grep -E "${regex}" | sed -E "s/${regex}/\1/g"); do
+		pid_list="${pid_list} ${pid_tmp}"
+	done
+	echo "${pid_list} ${pid_num}"
 }
 
 # shellcheck disable=2009,2155,2086
@@ -212,7 +246,8 @@ func_kill_self_and_direct_child() {
 	fi
 
 	#local pid_list="$(ps -ef | grep "[[:space:]]${pid_num}[[:space:]]" | grep -v grep | awk '{print $2}' | sort -rn | tr '\n' ' ')"	# NOT recursive
-	local pid_list="$(pgrep -P "${pid_num}") ${pid_num}"
+	#local pid_list="$(pgrep -P "${pid_num}") ${pid_num}"
+	local pid_list="$(func_pids_of_descendants "${pid_num}")"
 	echo "INFO: kill pid_list: ${sudo_cmd} kill -9 ${pid_list}"
 	"${sudo_cmd}" kill -9 ${pid_list}
 
