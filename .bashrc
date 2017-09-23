@@ -46,16 +46,19 @@ func_is_personal_machine || func_dist_source_env
 if func_is_personal_machine ; then
 	umask 077									# only set this for personal machie
 	func_ssh_agent_init								# Init ssh agent
-	export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
+	export PS1="\[\e[32m\]\w\$\[\e[0m\]"						# Green line with $ in same line
+	#export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
 elif func_is_internal_machine ; then 
 	func_ssh_agent_init								# Init ssh agent
 	LOCAL_IP=$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
 	#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				# Blue line with $ in same line
-	export PS1="\[\e[34m\]\u@${LOCAL_IP}:\w\$\[\e[0m\]"				# Blue line with $ in same line, prompt as scp address
+	#export PS1="\[\e[34m\]\u@${LOCAL_IP}:\w\$\[\e[0m\]"				# Blue line with $ in same line, prompt as scp address
+	export PS1="${LOCAL_IP}:\w\$\[\e[0m\]"						# Blue line with $ in same line, prompt as scp address without username
 else 
 	LOCAL_IP=$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
 	#export PS1="\[\e[31m\]\u@\h \[\e[31m\]\w\[\e[0m\]\n\$"				# Red line with $ in next line
-	export PS1="\[\e[31m\]\u@${LOCAL_IP}:\w\n\$\[\e[0m\]"				# Red line with $ in next line, prompt as scp address
+	#export PS1="\[\e[31m\]\u@${LOCAL_IP}:\w\n\$\[\e[0m\]"				# Red line with $ in next line, prompt as scp address
+	export PS1="${LOCAL_IP}:\w\n\$\[\e[0m\]"					# Red line with $ in next line, prompt as scp address without username
 fi
 
 ################################################################################

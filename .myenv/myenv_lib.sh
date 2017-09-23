@@ -237,7 +237,7 @@ func_kill_self_and_descendants() {
 	if [ -n "${pid_fail}" ] ; then
 		echo "ERROR: failed to kill, pid_fail: ${pid_fail}"
 	fi
-
+}
 
 func_kill_self_and_direct_child() {
 
