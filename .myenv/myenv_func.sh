@@ -30,6 +30,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_TAGS_NOTE" ]		&& MY_TAGS_NOTE=$MY_ENV/zgen/tags_note
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
 [ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/addi/tags
+[ -z "$MY_TAGS_LOCAL" ]		&& MY_TAGS_LOCAL=$MY_ENV/conf/addi/tags_local
 [ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=("$MY_DCC" "$MY_DCO" "$MY_DCD")
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=("$MY_FCS/oumisc/oumisc-git" "$MY_FCS/ourepo/ourepo-git")
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
@@ -107,7 +108,7 @@ func_filter_comments() {
 
 func_tag_value_raw() {
 	if func_is_personal_machine ; then
-		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}" | head -1
+		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_LOCAL}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}" | head -1
 	else
 		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" | head -1
 	fi
