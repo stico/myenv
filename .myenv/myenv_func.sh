@@ -108,9 +108,9 @@ func_filter_comments() {
 
 func_tag_value_raw() {
 	if func_is_personal_machine ; then
-		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_LOCAL}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}" | head -1
+		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_LOCAL}" "${MY_TAGS_NOTE}" "${MY_TAGS_CODE}" 2>/dev/null | head -1
 	else
-		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" | head -1
+		sed -n -e "s+^${1}=++p" "${MY_TAGS_ADDI}" "${MY_TAGS_LOCAL}" 2>/dev/null | head -1
 	fi
 }
 
