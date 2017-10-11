@@ -1298,6 +1298,8 @@ func_scp_via_jump() {
 	local desc="Desc: scp via jump machine, from <source> to <target> dir, use <jump_tmpdir> if provided" 
 	func_param_check 2 "$@"
 
+	# TODO: support wildcard to transfer multiple file? like: scpx rysnc_tmp.* 58.215.52.71:~/secu
+
 	local jump_tmpdir="${3:-${MY_JUMP_TRANSFER}/$(func_dati)}"
 
 	local source=$(func_scp_host_to_ip "${1}")
