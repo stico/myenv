@@ -106,24 +106,24 @@ func_uncompress() {
 	case "$source_file" in
 		*.jar | *.arr | *.zip)
 				func_complain_cmd_not_exist unzip \
-				&& sudo apt-get install unzip ;                 # try intall
-				unzip "$source_file" &> /dev/null       ;;
+				&& sudo apt-get install unzip ;                 	# try intall
+				unzip "$source_file" &> /dev/null       	;;
 
-		*.tar.gz)	tar -zxvf "$source_file" &> /dev/null	;;	# NOTE, should before "*.gz)"
-		*.tar.bz2)	tar -jxvf "$source_file" &> /dev/null	;;	# NOTE, should before "*.bz2)"
-		*.bz2)		bunzip2 "$source_file" &> /dev/null	;;
-		*.gz)		gunzip "$source_file" &> /dev/null	;;
-		*.7z)		7z e "$source_file" &> /dev/null	;;	# use "-e" will fail, "e" is extract, "x" is extract with full path
-		*.tar)		tar -xvf "$source_file" &> /dev/null	;;
-		*.xz)		tar -Jxvf "$source_file" &> /dev/null	;;
-		*.tgz)		tar -zxvf "$source_file" &> /dev/null	;;
-		*.tbz2)		tar -jxvf "$source_file" &> /dev/null	;;
-		*.Z)		uncompress "$source_file"		;;
+		*.tar.xz)	tar -Jxvf "$source_file" &> /dev/null		;;
+		*.tar.gz)	tar -zxvf "$source_file" &> /dev/null		;;	# NOTE, should before "*.gz)"
+		*.tar.bz2)	tar -jxvf "$source_file" &> /dev/null		;;	# NOTE, should before "*.bz2)"
+		*.bz2)		bunzip2 "$source_file" &> /dev/null		;;
+		*.gz)		gunzip "$source_file" &> /dev/null		;;
+		*.7z)		7z e "$source_file" &> /dev/null		;;	# use "-e" will fail, "e" is extract, "x" is extract with full path
+		*.tar)		tar -xvf "$source_file" &> /dev/null		;;
+		*.xz)		tar -Jxvf "$source_file" &> /dev/null		;;
+		*.tgz)		tar -zxvf "$source_file" &> /dev/null		;;
+		*.tbz2)		tar -jxvf "$source_file" &> /dev/null		;;
+		*.Z)		uncompress "$source_file"			;;
 		*.rar)		func_complain_cmd_not_exist unrar \
-				&& sudo apt-get install unrar ;			# try intall
-				unrar e "$source_file" &> /dev/null	;;	# candidate 1
-		#*.rar)		7z e "$source_file" &> /dev/null	;;	# candidate 2
-		*)		echo "ERROR: unknow format of file: ${source_file}"	;;
+				&& sudo apt-get install unrar ;				# try intall
+				unrar e "$source_file" &> /dev/null		;;	# another candidate is: 7z e "$source_file"
+		*)		echo "ERROR: unknow format: ${source_file}"	;;
 	esac
 
 	func_validate_dir_not_empty "${target_dir}"
@@ -164,6 +164,11 @@ func_vcs_update() {
 		${cmd_init} "${src_addr}" "${target_dir}" || func_die "ERROR: ${cmd_init} failed"
 	fi
 }
+
+################################################################################
+# Utility: output
+################################################################################
+# TODO: good reference: https://github.com/Offirmo/offirmo-shell-lib/blob/master/bin/osl_lib_output.sh
 
 ################################################################################
 # Utility: process
@@ -224,7 +229,9 @@ func_kill_self_and_descendants() {
 
 	local pid_list="$(func_pids_of_descendants "${pid_num}")"
 	echo "INFO: kill pid_list: ${sudo_cmd} kill -9 ${pid_list}"
-	"${sudo_cmd}" kill -9 ${pid_list}
+
+	# no quote on ${sudo_cmd}, otherwise gets "cmd not found" error when empty
+	${sudo_cmd} kill -9 ${pid_list}
 
 	sleep 0.5
 	local pid_tmp
@@ -630,6 +637,7 @@ OS_BSD="bsd"
 OS_SUSE="suse"
 OS_LINUX="linux"
 OS_MINGW="mingw"
+OS_DEBIAN="debian"
 OS_REDHAT="redhat"
 OS_CYGWIN="cygwin"
 OS_SOLARIS="solaris"
@@ -650,6 +658,9 @@ func_os_name() {
 		return
 	elif [ -f /etc/mandrake-release ] ; then
 		echo ${OS_MANDRAKE}
+		return
+	elif [ -f /etc/debian_version ] ; then
+		echo ${OS_DEBIAN}
 		return
 	fi
 
@@ -698,6 +709,9 @@ func_os_ver() {
 	elif [ -f /etc/mandrake-release ] ; then
 		sed s/.*\(// | sed s/\)// /etc/mandrake-release
 		#sed s/.*release\ // /etc/mandrake-release | sed s/\ .*//
+		return
+	elif [ -f /etc/debian_version ] ; then
+		cat /etc/debian_version		# TODO: just cat ?
 		return
 	fi
 

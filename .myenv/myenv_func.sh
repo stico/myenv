@@ -1029,20 +1029,26 @@ func_unison_fs_lapmac_all() {
 			break
 		fi
 	done
-	[ -z "${disk_path}" ] && func_die "ERROR: can NOT find diskXs1 for mounting"
+	[ -z "${disk_path}" ] && echo "ERROR: can NOT find diskXs1 for mounting" && return 1
 
 	# if path not empty AND not writable, need eject first (TODO: make the eject automatically?)
-	func_is_dir_not_empty "${mount_path}" && [ ! -w "${mount_path}" ] && func_die "ERROR: disk already mount in RO mode, pls eject first!"
+	func_is_dir_not_empty "${mount_path}" && [ ! -w "${mount_path}" ] && echo "ERROR: disk already mount in RO mode, pls eject first!" && return 1
 
 	# if target inexist, try to mount the disk
 	if [ ! -e "${mount_path}/backup/DCB" ] ; then
-		command -v unison &> /dev/null || func_die "ERROR: unison NOT in path, pls check"
-		command -v ntfs-3g &> /dev/null || func_die "ERROR: ntfs-3g NOT in path, pls check"
-		[ -e "${disk_path}" ] || func_die "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!"
-		[ -e "${mount_path}" ] || mkdir "${mount_path}"
+		func_complain_cmd_not_exist unison && return 1
+		func_complain_cmd_not_exist ntfs-3g && return 1
+		func_complain_path_not_exist "${disk_path}" "ERROR: ${disk_path} inexist, seems disk NOT attached to computer!" && return 1
 
-		echo "INFO: try to mount ${disk_path} to ${mount_path}"
+		echo "INFO: try to mount ${disk_path} to ${mount_path}, need about 5 seconds"
+		[ -e "${mount_path}" ] || mkdir "${mount_path}"
 		sudo ntfs-3g "${disk_path}" "${mount_path}"
+		sleep 3
+
+		if func_is_dir_empty "${mount_path}" || [ ! -w "${mount_path}" ] ; then
+			echo "ERROR: seems failed to mount disk, you may need to **RESTART** mac/osx!" 
+			return 1
+		fi
 	fi
 
 	unison fs_lapmac_all

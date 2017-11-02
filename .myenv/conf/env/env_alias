@@ -10,7 +10,7 @@ cdf3			"cd $HOME/Documents/FCZ/code_dw/finance.yyembed.yy.com_branch_for_v3.0"
 checklibinode		"ls -li ~/.myenv/myenv_lib.sh ~/.zbox/zbox_lib.sh ~/Documents/FCS/oumisc/oumisc-git/proj/tob/tob_lib.sh"
 
 # Alias - Misc
-c			"cd ; clear"
+c			"\cd ; clear"
 ey			"echo yes"
 en			"echo no"
 eyn			"echo yes || echo no"

@@ -48,6 +48,8 @@ dcs=$MY_DCS
 dcz=$MY_DCZ
 fcs=$MY_FCS
 fcz=$MY_FCZ
+py=$MY_DCC/python
+ml=$MY_DCC/machinelearning
 
 # myenv
 me=$MY_ENV

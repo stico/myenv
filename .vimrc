@@ -181,7 +181,8 @@ let NERDTreeWinSize = 45				" tree window width, default is 31
 "let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
 "let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
-let g:ctrlp_show_hidden = 1
+let g:ctrlp_by_filename = 1				" default to use filename mode
+let g:ctrlp_show_hidden = 1				" also show dotfiles and dotdirs
 let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
 let g:ctrlp_custom_ignore = {
 	\ 'dir':  '\v[\/]\.(git|hg|svn|idea|metadata)$|\/target$',
