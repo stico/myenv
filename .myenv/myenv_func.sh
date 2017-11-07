@@ -1133,6 +1133,16 @@ func_dist_tags() {
 
 # shellcheck disable=2155,2086,2029
 func_dist_sync() {
+	# TODO: in real use, seems too heavy or complex, NOT good enough: 
+	#	1) NOT easily to quickly understand what happend. 
+	#	2) easy to make mistake, e.g. config file updated in /data/services, but NOT updated to ~/.myenv/dist/<tag>, which actually syncs the old files
+	#	3) may lost some info, since used mv/cp, "diffstat" could help on this, but can NOT solve this
+	#	4) (solved) in local host, when current dir is "config/script" dir, will easily confused since the path changed (to backup), but prompt still NOT
+	#
+	#	Candidates Solution
+	#	A) use git on jump machine and sync via it
+	#	B) use git bundle (single file): https://stackoverflow.com/questions/4860166/how-to-synchronize-two-git-repositories
+	#
 	# TODO: how to support internal machine as target? seem jump could connect to internal machine, but need sync pub key before connect
 
 	local usage="Usage: ${FUNCNAME[0]} <tag> <source> <target_prefix> "
@@ -1194,8 +1204,8 @@ func_dist_sync() {
 		echo "INFO: '${tag}' from remote (${source_full_addr}) to jump machine (${jump_tmpdir})"
 		func_scp_prod_to_jump "${source_full_addr}/*" "${jump_tmpdir}"
 
-		# move dist>tag>backup to dist>backup, in case duplicate sync next time, no need to mkdir dist>tag>backup as will already there after distribution for the 1st time
-		func_ssh_cmd_via_jump "${source_ip}" "mv ${tag_path}/backup/* ${MY_DIST_BASE}/backup"
+		# make a copy, in case overwrite next time, dist>tag>backup to dist>backup
+		func_ssh_cmd_via_jump "${source_ip}" "cp -R ${tag_path} ${MY_DIST_BASE}/backup/${tag}_${dati}"
 
 		# WHY: if prefixed with "mkdir -p xxx;" the "*" in mv cmd WILL NOT expand!
 		#local tag_path_synced="${MY_DIST_BASE}/${tag}_synced"
@@ -1225,25 +1235,44 @@ func_dist_sync() {
 	if func_is_str_blank "${dist_hosts}" ; then
 		echo "WARN: NO dist_hosts could be found, NO distribution!"
 	else
-		# NOTE: backup is NOT in the distribution list
+		# NOTE 1: distribute.sh on jump machine, will skip addr "127.0.0.1"
+		# NOTE 2: backup is NOT in the distribution list
 		func_jump_distribute "${dati}" "${tag}" ${dist_hosts}	# NO quote on ${dist_hosts}, otherwise will cross multiple line
 	fi
 
 	# Backup to local
+	local local_backup_path local_updated_path
 	if [ -n "${source_ip}" ] && ! func_is_local_addr "${source_ip}" ; then
-		echo "INFO: also backup to local: (${tag_path_local})"
-		mkdir -p "${tag_path_local}/backup"
+		local_backup_path="${tag_path_local}/backup/${dati}"
+		echo "INFO: also backup to local: (${local_backup_path})"
+		mkdir -p "${local_backup_path}"
 
 		for content in ${jump_tmpdir_contents} ; do
 			# there is only one backup in local machine, so, no move 
 			[ "${content}" = "backup" ] && continue 
 
-			mv "${tag_path_local}/${content}" "${tag_path_local}/backup/${content}_${dati}"
+			local_updated_path="${local_updated_path} ${tag_path_local}/${content}"
+			mv "${tag_path_local}/${content}" "${local_backup_path}"
 		done
 		scp -r -P "${MY_PROD_PORT}" "ouyangzhu@${MY_JUMP_HOST}:${jump_tmpdir}/*" "${tag_path_local}/"
 	fi
 
+	# Update current dir if need, since there is a "mv" action above
+	local cdir="$(pwd)"
+	if [[ "${local_updated_path}" =  *${cdir}* ]] ; then
+		echo "INFO: 'refresh' current dir to the real/latest dir."
+		"cd" "${cdir}" || echo "WARN: failed to cd to: ${cdir}"
+	fi
+
+	# cleanup jump machine
 	func_jump_cleanup
+
+	# show difference
+	for content in ${jump_tmpdir_contents} ; do
+		[ "${content}" = "backup" ] && continue 
+		echo "INFO: difference of: ${content}"
+		diff "${tag_path_local}/${content}" "${local_backup_path}/${content}" | diffstat
+	done
 }
 
 # shellcheck disable=2029
@@ -1270,8 +1299,9 @@ func_scp_prod_to_jump() {
 	# NOTE: only support one <prod_source>, in case too complicated. Enhance if really need
 	local prod_source="${1}"
 	local jump_tmpdir="${2}"
-	ssh "${MY_JUMP_HOST}" "mkdir -p ${jump_tmpdir}"
-	ssh "${MY_JUMP_HOST}" "scp -r -P ${MY_PROD_PORT} ${prod_source} ${jump_tmpdir}"
+	#ssh "-t" "${MY_JUMP_HOST}" "mkdir -p ${jump_tmpdir}"
+	#ssh "-t" "${MY_JUMP_HOST}" "scp -r -P ${MY_PROD_PORT} ${prod_source} ${jump_tmpdir}"
+	ssh "${MY_JUMP_HOST}" "mkdir -p ${jump_tmpdir}; scp -r -P ${MY_PROD_PORT} ${prod_source} ${jump_tmpdir}"
 }
 
 # shellcheck disable=2029
@@ -1290,12 +1320,15 @@ func_scp_local_to_jump() {
 
 # shellcheck disable=2029
 func_jump_distribute() {
+	# NOTE: distribute.sh on jump machine, will skip addr "127.0.0.1"
+	# NOTE: backup @ $MY_DCD/ops/jump/backup/, and also $MY_DCB/dbackup
 	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/distribute.sh $*"
 }
 
 # shellcheck disable=2029
 func_jump_cleanup() {
 	# cleanup, in case too much garbage
+	# NOTE: backup @ $MY_DCD/ops/jump/backup/, and also $MY_DCB/dbackup
 	ssh "${MY_JUMP_HOST}" "bash ${MY_JUMP_TRANSFER}/cleanup.sh"
 }
 
@@ -1904,7 +1937,7 @@ func_rsync_tmp_stop() {
 		func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 		echo "INFO: schedule a job to kill rsync_tmp with pid=${pid_num} after ${ttl} seconds."
-		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_descendants 'false' ${pid_num}" &
+		bash -c "sleep ${ttl} && ps -ef | grep -q '${pid_num}.*rsync.*${conf_name}' && source ${MY_ENV}/myenv_func.sh && func_kill_self_and_descendants 'false' ${pid_num} && rm ${pid_file}" &
 		return 0
 	fi
 
@@ -1917,7 +1950,8 @@ func_rsync_tmp() {
 	local usage="USAGE: ${FUNCNAME[0]} <TTL> <path>" 
 	local desc="Desc: start a temporary rsync server, shedule a kill job with <TTL> (seconds, default 3600s)"
 
-	# TODO: support change path
+	# TODO: support change path, which need to update file $MY_ENV/secu/rsync_tmp.server.conf
+	[ -n "${2}" ] && echo "ERROR: NOT support specify <path> yet!" && return 1
 
 	# Arg/Var, NOTE: value of pid_file and conf name, also used in func_rsync_tmp_stop
 	local ttl="${1:-3600}"
