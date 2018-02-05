@@ -1241,8 +1241,9 @@ func_dist_sync() {
 	fi
 
 	# Backup to local
-	local local_backup_path local_updated_path
-	if [ -n "${source_ip}" ] && ! func_is_local_addr "${source_ip}" ; then
+	local is_backup_to_local local_backup_path local_updated_path
+	[ -n "${source_ip}" ] && ! func_is_local_addr "${source_ip}" && is_backup_to_local="true" || is_backup_to_local="false"
+	if [ "${is_backup_to_local}" = "true" ] ; then
 		local_backup_path="${tag_path_local}/backup/${dati}"
 		echo "INFO: also backup to local: (${local_backup_path})"
 		mkdir -p "${local_backup_path}"
@@ -1267,12 +1268,14 @@ func_dist_sync() {
 	# cleanup jump machine
 	func_jump_cleanup
 
-	# show difference
-	for content in ${jump_tmpdir_contents} ; do
-		[ "${content}" = "backup" ] && continue 
-		echo "INFO: difference of: ${content}"
-		diff "${tag_path_local}/${content}" "${local_backup_path}/${content}" | diffstat
-	done
+	# show difference when backup to local
+	if [ "${is_backup_to_local}" = "true" ] ; then
+		for content in ${jump_tmpdir_contents} ; do
+			[ "${content}" = "backup" ] && continue 
+			echo "INFO: difference of: ${content}"
+			diff "${tag_path_local}/${content}" "${local_backup_path}/${content}" | diffstat
+		done
+	fi
 }
 
 # shellcheck disable=2029
@@ -2087,6 +2090,19 @@ func_samba_mount() {
 	func_samba_is_mounted "${mount_path}" || func_die "ERROR: mount failed! pls check"
 	echo "INFO: mount success at: ${mount_path}"
 	cd "${mount_path}" || echo "ERROR: failed to cd ${mount_path}"
+}
+
+func_update_book_name() {
+	local usage="USAGE: ${FUNCNAME[0]} <match_str> <target_str>" 
+	local desc="Desc: rename books according to parameter" 
+	func_param_check 2 "$@"
+
+	local f
+	for f in $(ls | grep "${1}.*\(pdf\|epub\|azw3\|mobi\)") ; do
+		echo -e "${f}" "\t->\t" "${2}.${f##*.}"
+		mv "${f}" "${2}.${f##*.}"
+	done
+	ls -l
 }
 
 func_export_script() {

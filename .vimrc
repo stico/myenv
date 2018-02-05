@@ -222,6 +222,8 @@ let g:easytags_cmd = '/opt/local/bin/ctags'
 "endfunction
 
 """""""" netrw
+" Use whole "words" when opening URLs. This avoids cutting off parameters (after '?') and anchors (after '#'). See http://vi.stackexchange.com/q/2801/1631
+ let g:netrw_gx="<cWORD>"                                                                                                                   
 " Option 1, disable file creation of .netrwhist
 let g:netrw_dirhistmax=0
 " Option 2, disable file creation of .netrwhist
@@ -392,6 +394,7 @@ inoremap <C-T> <C-E>
 """""""""""""""""""""""""""""" H1 - Topic - Completion
 " NOTE: iskeyword MUST after the "set nocompatible"
 set iskeyword+=-
+set iskeyword-=#	" NOT work, seem some following place set it later
 "set iskeyword+=.
 hi Pmenu	ctermbg=White ctermfg=DarkGrey
 hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue

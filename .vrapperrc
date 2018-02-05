@@ -1,4 +1,6 @@
+" This is for eclipse plugin, vrapper, which support vim motion in eclipse
 " NOTE, you might need put a link in C:\User\ouyangzhu, even the $HOME is set
+
 set ignorecase
 set smartcase
 set smartindent

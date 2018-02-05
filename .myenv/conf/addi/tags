@@ -12,8 +12,10 @@ vimrc=$HOME/.vimrc
 
 # DW
 dw=$MY_FCZ/code_dw
+dwcode=$HOME/Documents/DCD/note/dwcodeaddr.sh
 jump=$MY_DCD/ops/jump
 tv=$MY_DCD/tinyvideo/tinyvideo.txt
+tvbug=$MY_DCD/tinyvideo/tinyvideo_bugs.txt
 
 # ZBOX
 zb=$ZBOX
@@ -50,6 +52,15 @@ fcs=$MY_FCS
 fcz=$MY_FCZ
 py=$MY_DCC/python
 ml=$MY_DCC/machinelearning
+
+# DCC - math
+calculus=$MY_DCC/math/calculus.txt
+geometry=$MY_DCC/math/geometry.txt
+linear_algebra=$MY_DCC/math/linear_algebra.txt
+
+# DCD
+soda=$MY_DCD/note/soda.txt
+rank=$MY_DCD/jury/jury_rank/rank.txt
 
 # myenv
 me=$MY_ENV

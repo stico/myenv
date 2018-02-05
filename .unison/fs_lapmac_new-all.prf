@@ -10,22 +10,22 @@ root=/Users/ouyangzhu/Documents
 rootalias = //lapmac//Users/ouyangzhu/Documents -> //MBP13//Documents
 
 # External
-root=/Volumes/Untitled/backup
-rootalias = //lapmac//Volumes/Untitled/backup -> //MHD//Documents
+root=/Volumes/G2TG/backup
+rootalias = //lapmac//Volumes/G2TG/backup -> //G2TG//Documents
 
 ################################################################################
 # PATH: the -path cmd option not support glob
 ################################################################################
-#path=DCB
-#path=DCC
-#path=DCD
+path=DCB
+path=DCC
+path=DCD
 path=DCM
-#path=DCO
-#path=DCH
-#path=DCS
-#path=DCZ
-#path=FCS
-#
+path=DCO
+path=DCH
+path=DCS
+path=DCZ
+path=FCS
+
 ################################################################################
 # SETTINGS
 ################################################################################
