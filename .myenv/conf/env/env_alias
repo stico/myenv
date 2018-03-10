@@ -104,7 +104,7 @@ mehostsupdate		"sudo -E bash hosts_append.sh"
 
 			# mytest
 mtdb			"mysql -hmtdb -umytest -p123456 -Dmytest"
-mtdbzd			"mysql -hmtdb -uzd_reports -pzd_reports-123 -Dzd_reports"
+mtdbplayer		"mysql -hmtdb -uzd_player -pzd_player -Dzd_player"
 mtdbroot		"echo PLEASE run cmd after ssh to mtdb: /home/ouyangzhu/.zbox/ins/mysql/mysql-5.6.12/bin/mysql -h127.0.0.1 -uroot"
 
 			# Head: d - dev 
