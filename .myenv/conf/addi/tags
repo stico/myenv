@@ -12,6 +12,7 @@ vimrc=$HOME/.vimrc
 
 # DW
 dw=$MY_FCZ/code_dw
+req=$MY_FCZ/code_dw/sv_doc/zaodian/燥点_V1.5/
 dwcode=$HOME/Documents/DCD/note/dwcodeaddr.sh
 jump=$MY_DCD/ops/jump
 tv=$MY_DCD/tinyvideo/tinyvideo.txt
@@ -51,6 +52,7 @@ dcz=$MY_DCZ
 fcs=$MY_FCS
 fcz=$MY_FCZ
 py=$MY_DCC/python
+db=$MY_DCC/database
 ml=$MY_DCC/machinelearning
 
 # DCC - math
@@ -59,7 +61,6 @@ geometry=$MY_DCC/math/geometry.txt
 linear_algebra=$MY_DCC/math/linear_algebra.txt
 
 # DCD
-soda=$MY_DCD/note/soda.txt
 rank=$MY_DCD/jury/jury_rank/rank.txt
 
 # myenv

@@ -9,6 +9,7 @@ set noerrorbells	" no bell when there is error msg, note: those bell without err
 set visualbell		" enable this togehter with set t_vb to empty, press twice ESC will no bell
 set t_vb=		" see 'set visualbell'
 
+"
 """""""""""""""""""""""""""""" H1 - Topic - Font
 " if possbile, set guifont=* to ensure which is perferred, then set guifont? to get value and set in .vimrc
 if has('gui_running') && has('unix')
@@ -16,11 +17,13 @@ if has('gui_running') && has('unix')
 	"set guifont=XHei\ Mono\ 12
 	set guifont=XHei-Mono:h14
 endif
-" <A-+>/<A--> seems works on, but NOT on osx, ref more: keys@vim
+" <A-+>/<A--> seems works on linux, but NOT on osx, ref more: keys@vim
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
 nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
+nnoremap <A-0> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=14', 'g')<CR><CR>
 command! -nargs=0 FontUp :let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')
 command! -nargs=0 FontDown :let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')
+command! -nargs=0 FontReset :let &guifont = substitute(&guifont, '\zs\d\+', '\=14', 'g')
 
 
 """""""""""""""""""""""""""""" H1 - Input Method

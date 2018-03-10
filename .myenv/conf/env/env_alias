@@ -33,6 +33,7 @@ op			"xdg-open"
 ftp			"%MY_ENV_UTIL%#autoftp.exp"
 rmv			"rvm"
 psgf			"ps -ef | grep"
+free			'[ "$(func_os_name)" = "osx" ] && python $MY_ENV/scpt/free_for_osx.py || free'
 tree			"tree -A"
 puff			"bash $MY_ENV/secu/autossh.sh"
 ccat			"func_clean_cat"
@@ -100,6 +101,11 @@ mebackup		"func_backup_myenv"
 meload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
 mehostsupdate		"sudo -E bash hosts_append.sh"
 #eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
+
+			# mytest
+mtdb			"mysql -hmtdb -umytest -p123456 -Dmytest"
+mtdbzd			"mysql -hmtdb -uzd_reports -pzd_reports-123 -Dzd_reports"
+mtdbroot		"echo PLEASE run cmd after ssh to mtdb: /home/ouyangzhu/.zbox/ins/mysql/mysql-5.6.12/bin/mysql -h127.0.0.1 -uroot"
 
 			# Head: d - dev 
 loadrvm			"func_load_rvm"
