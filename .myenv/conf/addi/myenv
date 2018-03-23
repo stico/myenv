@@ -28,7 +28,9 @@ $MY_FCS/oumisc/oumisc-git/proj/tob/tob_func.sh
 # user config
 $HOME/.ssh/
 $HOME/.hgrc
+$HOME/.muttrc
 $HOME/.unison/
+$HOME/.msmtprc
 $HOME/.gitconfig
 $HOME/.subversion/
 $HOME/.VirtualBox/
