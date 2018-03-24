@@ -69,10 +69,6 @@ func_source_lib() {
 	fi
 
 	if [[ "${REUSE_DOWNLOADED_SOURCE}" = true ]] ; then
-
-
-
-
 		local lib_latest="$(find "${tmp_base}/" -name "${lib}" | tail -1)"
 		local func_latest="$(find "${tmp_base}/" -name "${func}" | tail -1)"
 		if [[ -n "${lib_latest}" && -n "${func_latest}" ]] ; then 

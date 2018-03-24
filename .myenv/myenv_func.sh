@@ -1526,7 +1526,9 @@ func_backup_myenv() {
 	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
 
 	echo "INFO: create zip file based on filelist: ${fileList}"
-	zip -rq "${packFile}" "${fileList}" || func_die "ERROR: failed to zip files into ${packFile}"
+
+	# excludes: locate related db, ar.../fp... files in unison
+	zip -rq "${packFile}" -x "*/zgen/mlocate.db" -x "*/zgen/gnulocatedb" -x "*/.unison/[fa][pr][0-9a-z]*" -@ < "${fileList}" || func_die "ERROR: failed to zip files into ${packFile}"
 
 	echo "INFO: bakcup command output, add to the backup zip"
 	mkdir -p "${tmpDir}"
