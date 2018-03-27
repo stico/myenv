@@ -15,7 +15,7 @@ set t_vb=		" see 'set visualbell'
 if has('gui_running') && has('unix')
 	set lines=25 columns=100
 	"set guifont=XHei\ Mono\ 12
-	set guifont=XHei-Mono:h14
+	set guifont=XHei-Mono:h15
 endif
 " <A-+>/<A--> seems works on linux, but NOT on osx, ref more: keys@vim
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>

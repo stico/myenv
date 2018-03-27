@@ -22,6 +22,8 @@ $MY_ENV/zgen
 $HOME/Documents/FCS/oumisc/oumisc-git/note
 
 # scripts depend on myenv_lib
+$HOME/.zbox/README.txt
+$HOME/.zbox/zbox_lib.sh
 $HOME/.zbox/zbox_func.sh
 $MY_FCS/oumisc/oumisc-git/proj/tob/tob_func.sh
 

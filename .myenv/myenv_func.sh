@@ -152,9 +152,12 @@ func_grep_myenv() {
 }
 
 func_fullpath() {
-	func_param_check 1 "$@"
+	local path="${PWD}"
+	if [ $# -ne 0 ] ; then
+		path="${1}"
+	fi
 
-	local fullpath="$(readlink -f "${1}")"
+	local fullpath="$(readlink -f "${path}")"
 	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 		echo "${fullpath}" | tr -d '\n' | pbcopy
 		echo "${fullpath}"
@@ -292,16 +295,6 @@ func_vi_conditional() {
 		return 0
 	fi
 
-	# Terminal mode: prefer vim if available, otherwise vi
-	if [ -z "$DISPLAY" ] ; then
-		if func_is_cmd_exist vim ; then
-			"vim" "$@"
-		else
-			"vi" "$@"
-		fi
-		return 0
-	fi
-
 	# GUI env: use gvim/macvim (gui)
 	# NOTE 1: use window title "SINGLE_VIM" to identify
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
@@ -313,6 +306,7 @@ func_vi_conditional() {
 		# directly use "vim -g" behaves wired (mess up terminal)
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
+		return 0
 	else	
 		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
 			LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@"
@@ -325,6 +319,17 @@ func_vi_conditional() {
 			/usr/bin/wmctrl -l | grep -q 'SINGLE_VIM' || sleep 1
 			/usr/bin/wmctrl -a 'SINGLE_VIM'
 		fi
+		return 0
+	fi
+
+	# Terminal mode: prefer vim if available, otherwise vi
+	if [ -z "$DISPLAY" ] ; then
+		if func_is_cmd_exist vim ; then
+			"vim" "$@"
+		else
+			"vi" "$@"
+		fi
+		return 0
 	fi
 }
 
@@ -1536,6 +1541,8 @@ func_backup_myenv() {
 	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
 	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
 	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
+	\cd ${HOME} && git remote -v		>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	\cd ${HOME}/.zbox && git remote -v	>> "${tmpDir}/cmd_output_git_remote_info.txt"
 	zip -rjq "${packFile}" "${tmpDir}"/*.txt
 
 	func_backup_dated "${packFile}"
