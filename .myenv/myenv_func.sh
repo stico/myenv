@@ -1541,8 +1541,16 @@ func_backup_myenv() {
 	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
 	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
 	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
-	\cd ${HOME} && git remote -v		>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	\cd ${HOME}/.zbox && git remote -v	>> "${tmpDir}/cmd_output_git_remote_info.txt"
+
+	echo -e "\n${HOME}"						>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	\cd ${HOME} && git remote -v					>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	echo -e "\n${HOME}/.zbox"					>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	\cd ${HOME}/.zbox && git remote -v				>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	echo -e "\n${HOME}/.vim/bundle/vim-oumg"			>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	\cd ${HOME}/.vim/bundle/vim-oumg && git remote -v		>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	echo -e "\n${HOME}/Documents/FCS/oumisc/oumisc-git"		>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	\cd ${HOME}/Documents/FCS/oumisc/oumisc-git && git remote -v	>> "${tmpDir}/cmd_output_git_remote_info.txt"
+
 	zip -rjq "${packFile}" "${tmpDir}"/*.txt
 
 	func_backup_dated "${packFile}"
