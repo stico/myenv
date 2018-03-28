@@ -14,9 +14,9 @@ zbox_use_silent maven		3.1.1
 zbox_use_silent mysql		5.6.12
 zbox_use_silent gradle		1.12
 zbox_use_silent nodejs		0.10.29
-zbox_use_silent python		3.3.4
+#zbox_use_silent python		2.7.10
 zbox_use_silent springloaded	1.2.0.RELEASE
-zbox_use_silent oraclejdk		7u51		linux_x64
+zbox_use_silent oraclejdk	8u131		x64
 
 #zbox use androidsdk	23.0.2
 #zbox use idea		14.0.1
