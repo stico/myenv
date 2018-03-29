@@ -1,9 +1,15 @@
 ################################################################################
 # Update by ouyangzhu
-STICKY_OTHER_WRITABLE 05;37;41 # dir that is sticky and other-writable (+t,o+w)
-OTHER_WRITABLE 05;37;41 # dir that is other-writable (o+w) and not sticky
-#STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
-#OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
+
+# dir that is sticky and other-writable (+t,o+w)
+STICKY_OTHER_WRITABLE 05;37;43	
+#STICKY_OTHER_WRITABLE 05;37;41	# for solarized dark theme: clear, but same as broken link, so changed
+#STICKY_OTHER_WRITABLE 30;42   	# for solarized dark theme: NOT clear, the orignal definition?
+
+# dir that is other-writable (o+w) and not sticky
+OTHER_WRITABLE 05;37;43		
+#OTHER_WRITABLE 05;37;41	# for solarized dark theme: clear, but same as broken link, so changed
+#OTHER_WRITABLE 34;42		# for solarized dark theme: NOT clear, the orignal definition?
 ################################################################################
 
 # Exact Solarized color theme for the color GNU ls utility.

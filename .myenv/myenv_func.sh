@@ -19,8 +19,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 ################################################################################
 # Constants
 ################################################################################
-# Path
-[ -z "$ZBOX" ]			&& ZBOX=$HOME/.zbox
+# Path				# NOTE: find system related env def here: $HOME/.myenv/conf/env/env_var
 [ -z "$MY_DOC" ]		&& MY_DOC=$HOME/Documents
 [ -z "$MY_TMP" ]		&& MY_TMP=$HOME/amp
 [ -z "$MY_ENV" ]		&& MY_ENV=$HOME/.myenv
@@ -32,7 +31,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/addi/tags
 [ -z "$MY_TAGS_LOCAL" ]		&& MY_TAGS_LOCAL=$MY_ENV/conf/addi/tags_local
 [ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=("$MY_DCC" "$MY_DCO" "$MY_DCD")
-[ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=("$MY_FCS/oumisc/oumisc-git" "$MY_FCS/ourepo/ourepo-git")
+[ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=("$OUMISC" "$OUREPO")
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
 
 # OS
@@ -306,6 +305,7 @@ func_vi_conditional() {
 		# directly use "vim -g" behaves wired (mess up terminal)
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
+		open -a MacVim
 		return 0
 	else	
 		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
@@ -1542,14 +1542,22 @@ func_backup_myenv() {
 	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
 	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
 
-	echo -e "\n${HOME}"						>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	\cd ${HOME} && git remote -v					>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	echo -e "\n${HOME}/.zbox"					>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	\cd ${HOME}/.zbox && git remote -v				>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	echo -e "\n${HOME}/.vim/bundle/vim-oumg"			>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	\cd ${HOME}/.vim/bundle/vim-oumg && git remote -v		>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	echo -e "\n${HOME}/Documents/FCS/oumisc/oumisc-git"		>> "${tmpDir}/cmd_output_git_remote_info.txt"
-	\cd ${HOME}/Documents/FCS/oumisc/oumisc-git && git remote -v	>> "${tmpDir}/cmd_output_git_remote_info.txt"
+	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd ${HOME} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd ${ZBOX} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd ${OUMISC} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd ${OUREPO} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+
+	\cd ${HOME}/.vim/bundle
+	for f in * ; do 
+		[ ! -d "${f}" ] && continue
+		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${HOME}/.vim/bundle/${f}"
+		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
+	done
 
 	zip -rjq "${packFile}" "${tmpDir}"/*.txt
 

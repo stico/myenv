@@ -13,7 +13,6 @@ CUR_OS_WIN	win
 ################################################################################
 # ENV - Main Path
 ################################################################################
-ZBOX		%HOME%#.zbox
 MY_DOC		%HOME%Documents
 MY_DCB		%HOME%Documents#DCB
 MY_DCC		%HOME%Documents#DCC
@@ -30,6 +29,11 @@ MY_ENV		%HOME%.myenv
 MY_TMP		%HOME%amp
 MY_BLOG		%HOME%Documents#FCS#oublog#oublog-git#_posts
 MY_DEMO		%HOME%Documents#FCS#oumisc#oumisc-git#demo
+
+ZBOX		%HOME%#.zbox
+OUMISC		%HOME%#Documents#FCS#oumisc#oumisc-git
+OUREPO		%HOME%#Documents#FCS#ourepo#ourepo-git
+
 MY_ENV_CONF	%HOME%.myenv#conf
 MY_ENV_INIT	%HOME%.myenv#init
 MY_ENV_CTRL	%HOME%.myenv#ctrl
@@ -39,7 +43,6 @@ MY_ENV_TOOL	%HOME%.myenv#tool
 MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
-
 
 ################################################################################
 # ENV - Misc
