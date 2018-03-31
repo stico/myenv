@@ -282,9 +282,10 @@ au WinEnter * if(&modifiable==0) | nnoremap <Space> <C-f> | else | nnoremap <Spa
 " 	3) <cr>/<enter> for quickfix list, goto location and KEEP the window and cursor back to qf window
 augroup quickfix
 	autocmd!
-	"autocmd FileType qf setlocal wrap			" makes location window also wraps and messup
+	"autocmd FileType qf setlocal wrap				" makes location window also wraps and messup
 	autocmd FileType qf nmap <buffer> <esc> :x<cr>
-	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>
+	"autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>	" Works on old version (lapmac), now need add :x<cr> to quit
+	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>:x<cr>
 augroup END
 
 """""""""""""""""""""""""""""" H1 - Topic - autocmd on help

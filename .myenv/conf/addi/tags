@@ -12,7 +12,7 @@ vimrc=$HOME/.vimrc
 
 # DW
 dw=$MY_FCZ/code_dw
-req=$MY_FCZ/code_dw/sv_doc/zaodian/燥点_V1.5/
+req=$MY_FCZ/code_dw/sv_doc/zaodian/燥点_V1.6/
 dwcode=$HOME/Documents/DCD/note/dwcodeaddr.sh
 jump=$MY_DCD/ops/jump
 tv=$MY_DCD/tinyvideo/tinyvideo.txt
