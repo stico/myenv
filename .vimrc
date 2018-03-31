@@ -275,16 +275,16 @@ au WinEnter * if(&modifiable==0) | nnoremap <Space> <C-f> | else | nnoremap <Spa
 """""""""""""""""""""""""""""" H1 - Topic - autocmd on qf
 " MNT: defaut behavior of <cr>:
 "	1) for location list, goto location and close the window 
-"	2) for quickfix list, goto location and KEEP the window
+"	2) for quickfix list, goto location and KEEP the window, but cursor is in the target window, NOT the quickfix window
 " MNT: mapping update here for purpose/effection
 " 	1) <esc> to quit location / quickfix list
-" 	2) <cr>/<enter> for location list, goto location and close the window 
-" 	3) <cr>/<enter> for quickfix list, goto location and KEEP the window and cursor back to qf window
+" 	2) <cr>/<enter> for location list, goto location > move to center > close the window 
+" 	3) <cr>/<enter> for quickfix list, goto location > move to center > cursor back to qf window	# TODO: NOT work yet, since share the mapping. So perfer better usage for location window, since used much more
 augroup quickfix
 	autocmd!
 	"autocmd FileType qf setlocal wrap				" makes location window also wraps and messup
 	autocmd FileType qf nmap <buffer> <esc> :x<cr>
-	"autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>	" Works on old version (lapmac), now need add :x<cr> to quit
+	"autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>	" Works on old version (lapmac), now need add :x<cr> to quit, why?
 	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>:x<cr>
 augroup END
 
