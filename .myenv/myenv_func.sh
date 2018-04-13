@@ -2003,8 +2003,8 @@ func_rsync_tmp() {
 	func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 	# Run
-	echo "INFO: run rsync server, cmd: rsync --daemon --no-perms --port ${port} --config ${conf}"
-	rsync --daemon --no-perms --port "${port}" --config "${conf}"
+	echo "INFO: run rsync server, cmd: rsync --daemon --port ${port} --config ${conf}"
+	rsync --daemon --port "${port}" --config "${conf}"
 	echo "INFO: run tmp rsync server, port: ${port}, base: ${base}, pid: $(cat ${pid_file} 2>/dev/null), log: ${log_file}"
 	echo "INFO: client side command examples"
 	echo "  sync      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr ..."
