@@ -319,7 +319,7 @@ func_techo() {
 	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
 	func_param_check 2 "$@"
 	
-	echo -e "${1^^}: $(date "+%Y-%m-%d %H:%M:%S"): ${2}"
+	echo -e "$(date "+%Y-%m-%d %H:%M:%S"): ${1^^}: ${2}"
 }
 
 func_decho() {

@@ -28,38 +28,45 @@ command! -nargs=0 FontReset :let &guifont = substitute(&guifont, '\zs\d\+', '\=1
 
 """""""""""""""""""""""""""""" H1 - Input Method
 
-" TODO: Squirrel_v4 (@rime): try smartim plugin (currently only works on mac)
+" TODO: Squirrel_v5 (@rime): try smartim plugin (currently only works on mac)
+
+" Squirrel_v4 (@rime): seems just use these, will works on Mac High Serria 
+" 1) enter/leave insert mode will change input source. 2) search input also works like insert mode (which is NOT really wanted"
+set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
+set noimcmdline		" makes the default cmd line input is EN
+set imsearch=0		" makes the default search input is EN
+set iminsert=0		" NOT sure what for? seems NO effection
 
 " Squirrel_v3 (@rime), improve Squirrel_v2 
 " req: 1) cmd defaults/osascrpit. 2) disable shift for squirrel to switch between en/cn mode. 3) enable accessiblity for osascript (in /System/Library/CoreServices/RemoteManagement/ARDAgent.app)
-if executable('defaults') && executable('osascript') && has('unix')
-
-  set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
-  set ttimeoutlen=150		" for what? google shows it will speedup some operation
-
-  " 0 for EN, 2 for CN (Squirrel)
-  let g:osx_detect_input_cmd = "defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | awk '/Squirrel/{print 2;exit;};/U\.S\./{print 0;exit;}'"
-  let g:input_toggle = 0
-
-  function! Change2cn()
-     let s:input_status = system(g:osx_detect_input_cmd)
-     if s:input_status != 2 && g:input_toggle == 1
-	let l:a = system("osascript $HOME/.vim/applescript/use_squirrel.applescript")
-	let g:input_toggle = 0
-     endif
-  endfunction
-  autocmd InsertEnter * call Change2cn()
-
-  " seems squirrel will trigger into en mode, so InsertLeave just need to record status
-  function! RecordImStatus()
-     let s:input_status = system(g:osx_detect_input_cmd)
-     if s:input_status == 2
-        let g:input_toggle = 1
-	"let l:a = system("osascript $HOME/.vim/applescript/use_english.applescript")
-     endif
-  endfunction
-  autocmd InsertLeave * call RecordImStatus() 
-endif
+"if executable('defaults') && executable('osascript') && has('unix')
+"
+"  set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
+"  set ttimeoutlen=150		" for what? google shows it will speedup some operation
+"
+"  " 0 for EN, 2 for CN (Squirrel)
+"  let g:osx_detect_input_cmd = "defaults read ~/Library/Preferences/com.apple.HIToolbox.plist AppleSelectedInputSources | awk '/Squirrel/{print 2;exit;};/U\.S\./{print 0;exit;}'"
+"  let g:input_toggle = 0
+"
+"  function! Change2cn()
+"     let s:input_status = system(g:osx_detect_input_cmd)
+"     if s:input_status != 2 && g:input_toggle == 1
+"	let l:a = system("osascript ${HOME}/Documents/DCC/osx/applescript/use_squirrel.applescript")
+"	let g:input_toggle = 0
+"     endif
+"  endfunction
+"  autocmd InsertEnter * call Change2cn()
+"
+"  " seems squirrel will trigger into en mode, so InsertLeave just need to record status
+"  function! RecordImStatus()
+"     let s:input_status = system(g:osx_detect_input_cmd)
+"     if s:input_status == 2
+"        let g:input_toggle = 1
+"	"let l:a = system("osascript $HOME/.vim/applescript/use_english.applescript")
+"     endif
+"  endfunction
+"  autocmd InsertLeave * call RecordImStatus() 
+"endif
 
 " Squirrel_v2 (@rime), slow and annoy version. Like FCITX_v1. Detect current input method and change via command. Since the input change need applescript which is heavy, too much InsertEnter/Leave event makes too much "noise"
 " req: 1) cmd defaults/osascrpit. 2) disable shift for squirrel to switch between en/cn mode. 3) enable accessiblity for osascript (in /System/Library/CoreServices/RemoteManagement/ARDAgent.app)

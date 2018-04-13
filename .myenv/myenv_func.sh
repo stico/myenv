@@ -305,7 +305,11 @@ func_vi_conditional() {
 		# directly use "vim -g" behaves wired (mess up terminal)
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
+
+		# Why open 2 vim for the 1st time. Need wait for the 1st time
+		ps -ef | grep -v grep | grep "vim.*--servername SINGLE_VIM" &> /dev/null || sleep 1
 		open -a MacVim
+
 		return 0
 	else	
 		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
@@ -1004,10 +1008,11 @@ func_git_commit_push() {
 }
 
 func_git_commit_check() { 
+	# TODO: check if myenv_lib and zbox_lib is same inode
 	for base in "$HOME" "$HOME/.zbox" "$HOME/Documents/FCS/oumisc/oumisc-git" "$HOME/.vim/bundle/vim-oumg" ; do 
 		pushd "$base" &> /dev/null 
-		git status | grep -q "nothing to commit, working directory clean"	\
-		&& echo "NOT need update: $base"					\
+		git status | grep -q "nothing to commit, .* clean"	\
+		&& echo "NOT need update: $base"			\
 		|| echo "NEED update: $base" 
 		popd &> /dev/null 
 	done
@@ -1998,8 +2003,8 @@ func_rsync_tmp() {
 	func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 	# Run
-	echo "INFO: run rsync server, cmd: rsync --daemon --port ${port} --config ${conf}"
-	rsync --daemon --port "${port}" --config "${conf}"
+	echo "INFO: run rsync server, cmd: rsync --daemon --no-perms --port ${port} --config ${conf}"
+	rsync --daemon --no-perms --port "${port}" --config "${conf}"
 	echo "INFO: run tmp rsync server, port: ${port}, base: ${base}, pid: $(cat ${pid_file} 2>/dev/null), log: ${log_file}"
 	echo "INFO: client side command examples"
 	echo "  sync      rsync -avzP --port=${port} --password-file=\${MY_ENV}/secu/rsync_tmp.client.scr ..."

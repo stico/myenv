@@ -61,13 +61,15 @@
 /.w3m/cookie
 /.w3m/history
 
-# (?) should deprecated since might contain IP for backup
+# UNISON: (?) should deprecated since might contain IP for backup
 !/.unison/
 /.unison/*
 !/.unison/*.prf
 !/.unison/deprecated
 
-# IGNORE, since really not needed
+# IGNORE, since really not needed OR generate on install
+.fzf.zsh
+.fzf.bash
 .DS_Store
 .dl_me.txt
 .fl_me.txt
