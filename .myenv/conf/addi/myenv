@@ -1,8 +1,9 @@
 # stores file/path which not in git, usually secure reason 
 
-# system config
+# system config. TODO: some might need sudo priviledge to copy
 /etc/fstab
 /etc/fstab.d
+/etc/sudoers 
 /etc/rc.local
 /etc/resolv.conf
 /etc/updatedb.conf
@@ -43,6 +44,7 @@ $HOME/.thunderbird/profiles.ini
 $HOME/.local/share/applications/
 $HOME/.kde/share/config/kwalletrc
 $HOME/.kde/share/apps/kwallet/kdewallet.kwl
+$HOME/.config/karabiner/assets/complex_modifications/mv_window.json
 $HOME/.config/fcitx/table/wbpy_LastAutoPhrase.tmp
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml

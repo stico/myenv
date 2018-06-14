@@ -9,12 +9,28 @@ cjapp=/Users/ouyangzhu/Documents/DCD/project/yyfinance/partner/sczq首创证券/
 # Misc
 oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 vimrc=$HOME/.vimrc
+jump=$MY_DCD/ops/jump
 
 # DW
-dw=$MY_FCZ/code_dw
-req=$MY_FCZ/code_dw/sv_doc/zaodian/燥点_V1.6/
-dwcode=$HOME/Documents/DCD/note/dwcodeaddr.sh
-jump=$MY_DCD/ops/jump
+dw=$MY_FCZ/dw
+dwdoc=$MY_FCZ/dw/doc/update.sh
+dwdocconf=$HOME/Documents/DCD/vcs/doc_dw_update.sh
+dwcode=$MY_FCZ/dw/code/update.sh
+dwcodeconf=$HOME/Documents/DCD/note/dwcodeaddr.sh
+
+# Project
+dh=$MY_DCD/dianhu/dianhu.txt
+dhdoc=$MY_FCZ/dw/doc/dh/
+dhcode=$MY_FCZ/dw/code/dh/
+nz=$MY_DCD/noizz/noizz.txt
+nzdoc=$MY_FCZ/dw/doc/nz/
+nzcode=$MY_FCZ/dw/code/nz/
+mg=$MY_DCD/mgvoice/mgvoice.txt
+mgdoc=$MY_FCZ/dw/doc/mg/
+mgcode=$MY_FCZ/dw/code/mg/
+#zd=$MY_DCD/tinyvideo/tinyvideo.txt
+#zddoc=$MY_FCZ/dw/doc/zd/
+#zdcode=$MY_FCZ/dw/code/zd/
 tv=$MY_DCD/tinyvideo/tinyvideo.txt
 tvbug=$MY_DCD/tinyvideo/tinyvideo_bugs.txt
 

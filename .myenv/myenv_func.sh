@@ -162,8 +162,10 @@ func_fullpath() {
 		echo "${fullpath}"
 		return
 	else
-		# clipit: use -p or xclip to put in primary
-		echo "${fullpath}" | tr -d '\n' | clipit -c &> /dev/null
+		if func_is_cmd_exist clipit ; then
+			# clipit: use -p or xclip to put in primary
+			echo "${fullpath}" | tr -d '\n' | clipit -c &> /dev/null
+		fi
 		echo "${fullpath}" 
 		return
 	fi
@@ -969,21 +971,37 @@ func_svn_backup() {
 }
 
 func_svn_update() { 
-	[ -n "$1" ] && src_path="$1" || src_path="."
+	local p="${1:-.}"
 
 	# current dir is already project
-	[ -e $src_path/.svn ] && svn update $src_path && return 0
+	[ -e "${p}/.svn" ] && func_svn_update_single && return 0
 	
 	# projects are in subdir
-	find $src_path -maxdepth 1 -type d | while read -r dir ; do 
+	find "${p}" -maxdepth 1 -type d | while read -r dir ; do 
 		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
-		[ -n "$dir" ] && [ -e "$dir/.svn" ] && svn update "$dir/" 
+		[ -n "${dir}" ] && [ -e "${dir}/.svn" ] && func_svn_update_single "${dir}" 
 	done
 	func_locate_updatedb
 }
 
 func_svn_status() { 
-	svn status | sed -e '/^\s*$/d;/\s*X\s\+/d;/Performing status on external item at /d'
+	local p="${1:-.}"
+
+	# current dir is already project
+	[ -e "${p}/.svn" ] && func_svn_status_single && return 0
+	
+	# projects are in subdir
+	find "${p}" -maxdepth 1 -type d | while read -r dir ; do 
+		[ -n "${dir}" ] && [ -e "${dir}/.svn" ] && func_svn_status_single "${dir}" 
+	done
+}
+
+func_svn_update_single() { 
+	svn update "${1:-.}"
+}
+
+func_svn_status_single() { 
+	svn status "${1:-.}" | sed -e '/^\s*$/d;/\s*X\s\+/d;/Performing status on external item at /d'
 }
 
 func_git_pull() { 
@@ -996,6 +1014,7 @@ func_git_status() {
 }
 
 func_git_commit_push() { 
+
 	[ -n "$*" ] && comment="$*" || comment="update from $(hostname)"
 
 	# git add -A: in git 2.0, will add those even not in current dir (which is what we want), just wait the 2.0
@@ -2133,6 +2152,17 @@ func_update_book_name() {
 		mv "${f}" "${2}.${f##*.}"
 	done
 	ls -l
+}
+
+func_mm_is_moov_in_head() {
+	local usage="USAGE: ${FUNCNAME[0]} <target> ..." 
+	local desc="Desc: check if moov in head part (1st frame will shows faster)<target>" 
+	func_param_check 1 "$@"
+
+	# NOTE: the "-T" is important!!!
+	for f in "$@" ; do
+		AtomicParsley "${f}" -T | sed -n 2p | grep -q "moov" && echo "${f}: yes, in header part" || echo "${f}: no, in tail part"
+	done
 }
 
 func_export_script() {
