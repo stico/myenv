@@ -6,15 +6,15 @@
 #bash_prompt_color=green
 
 # zbox
-zbox_use_silent vim		hg
+zbox_use_silent vim		git
 zbox_use_silent ant		1.9.4
 zbox_use_silent php		5.5.10
-zbox_use_silent ruby		2.2.0
+zbox_use_silent ruby		2.5.1
 zbox_use_silent maven		3.1.1
 zbox_use_silent mysql		5.6.12
 zbox_use_silent gradle		1.12
 zbox_use_silent nodejs		0.10.29
-#zbox_use_silent python		2.7.10
+zbox_use_silent python		3.7.0
 zbox_use_silent springloaded	1.2.0.RELEASE
 zbox_use_silent oraclejdk	8u131		x64
 
