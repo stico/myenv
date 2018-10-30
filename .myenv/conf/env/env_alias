@@ -36,6 +36,7 @@ psgf			"ps -ef | grep"
 free			'[ "$(func_os_name)" = "osx" ] && python $MY_ENV/scpt/free_for_osx.py || free'
 tree			"tree -A"
 puff			"bash $MY_ENV/secu/autossh.sh"
+less			"less -i"
 cleancat		"func_clean_cat"
 cleanless		"func_clean_less"
 cleangrep		"func_clean_grep"
@@ -128,14 +129,14 @@ scpx			"func_scp_via_jump"
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list, NOT use "-F", which makes "ls ~/amp/download" shows a link entry instead of content in dir (need "ls ~/amp/download/" to show content) 
-l			"\ls -h --color=auto"
-ls			"\ls -h --color=auto"
-la			"\ls -h --color=auto -A"
-ll			"\ls -h --color=auto -lh"
-lla			"\ls -h --color=auto -lhA"
-llt			"\ls -h --color=auto -lhtr"
-lld			"\ls -h --color=auto -lh | grep '^d'"
-llf			"\ls -h --color=auto -lh | grep -v '^d'"
+l			"\ls -hF --color=auto"
+ls			"\ls -hF --color=auto"
+la			"\ls -hF --color=auto -A"
+ll			"\ls -hF --color=auto -lh"
+lla			"\ls -hF --color=auto -lhA"
+llt			"\ls -hF --color=auto -lhtr"
+lld			"\ls -hF --color=auto -lh | grep '^d'"
+llf			"\ls -hF --color=auto -lh | grep -v '^d'"
 
 			# Head: f - find
 findname		"find . -name"

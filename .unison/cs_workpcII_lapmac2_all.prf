@@ -23,10 +23,11 @@ path=DCC
 path=DCD
 path=DCM
 path=DCO
-path=DCH
-path=DCS
 path=DCZ
 path=FCS
+#path=FCZ	# SHOULD sync manually
+#path=DCS	# moved to FCZ
+#path=DCH	# moved to FCZ
 
 ################################################################################
 # SETTINGS
@@ -48,6 +49,7 @@ ignore = Regex .*/.DS_Store
 ignore = Regex .*/.grep_result.txt
 ignore = Regex DC./SyncToy_.*.dat
 ignore = Regex EC./SyncToy_.*.dat
+ignore = Regex FCS/maven/m2_repo
 ignore = Regex FCS/[^/]*/[^/]*-hg
 ignore = Regex FCS/[^/]*/[^/]*-git
 ignore = Regex FCS/[^/]*/[^/]*-svn
@@ -55,7 +57,6 @@ ignore = Regex FCS/[^/]*/[^/]*-local
 ignore = Regex DCB/Record/Note/A_NOTE_Copy.txt
 ignore = Regex DCD/mail/mail_archive/ouyangzhu@yy.com.sbd/Archive_Auto.*
 ignore = Regex DCD/mail/mail_archive/ouyangzhu@yy.com.sbd/Archive_Auto_Sentry.*
-ignore = Regex os_spec_.*/m2_repo/repository/.cache
 ignore = Regex os_spec_lu/program/vim
 ignore = Regex os_spec_win/program/A_System_Cygwin_1.7.17/tmp
 ignore = Regex os_spec_win/program/A_System_Ditto_3.18.46.0_x64/Ditto.Settings

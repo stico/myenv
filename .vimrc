@@ -13,8 +13,8 @@ set t_vb=		" see 'set visualbell'
 """""""""""""""""""""""""""""" H1 - Topic - Font
 " if possbile, set guifont=* to ensure which is perferred, then set guifont? to get value and set in .vimrc
 if has('gui_running') && has('unix')
-	set lines=25 columns=100
-	"set guifont=XHei\ Mono\ 12
+	"set lines=25 columns=100	" too small win size for mac
+	"set guifont=XHei\ Mono\ 12	" too small font size for mac
 	set guifont=XHei-Mono:h15
 endif
 " <A-+>/<A--> seems works on linux, but NOT on osx, ref more: keys@vim
@@ -365,6 +365,11 @@ set guioptions-=T					" no toolbar
 set guioptions+=b					" always show buttom scroll-bar
 set mousehide						" Hide the mouse when typing text
 
+" In many terminal emulators the mouse works just fine, thus enable it.
+if has('mouse')
+  set mouse=a
+endif
+
 """""""""""""""""""""""""""""" H1 - Settings - Movement
 set whichwrap+=<,>,[,]					" make the left/right could go cross line in Normal/Visual & Insert/Replace mode
 set whichwrap+=h,l					" make the h/l also
@@ -551,8 +556,9 @@ vnoremap <S-Right> l
 "vnoremap <C-S-Right> e
 vnoremap <S-Left> h
 "vnoremap <C-S-Left> b
-" y in visual mode also copy to clipboard
+" cut/yank in visual mode also to clipboard
 vnoremap y "+y
+vnoremap x "+x
 vnoremap d "+d
 
 """""""""""""""""""""""""""""" H1 - Mapping - Tab/Window
@@ -604,10 +610,16 @@ command! -nargs=0 OuCaa			:tabnew ~/.myenv/zgen/collection/all_content.txt
 
 """""""""""""""""""""""""""""" H1 - Script
 
-""" OuToggleWinMaxRestore: Toggle window size between max/restore state
+" show the diff between current buffer and the original loaded content
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis 
+  	\ | wincmd p | diffthis
+endif
+
+""" OuToggleWinMaxRestore: Toggle window size between maximize/restore state
 "nnoremap <C-m> :call OuToggleWinMaxRestore()<CR>	" can not use C-m, which also effects the <enter> key
 nnoremap <C-w>m :call OuToggleWinMaxRestore()<CR>
-function OuToggleWinMaxRestore()
+function! OuToggleWinMaxRestore()
 	if exists('t:window_max_min_sizes') && (t:window_max_min_sizes.after == winrestcmd())
 		silent! exe t:window_max_min_sizes.before
 		if t:window_max_min_sizes.before != winrestcmd()
@@ -625,7 +637,7 @@ endfunction
 """ OuFilenameAsTabLabel: Use filename as tab label, excluding file path
 set guitablabel=%{OuFilenameAsTabLabel()}
 "set guitablabel=%M%t		" this works the same on macvim (TODO: test on linux)
-function OuFilenameAsTabLabel()
+function! OuFilenameAsTabLabel()
 	" Show root name in ~Oucr mode
 	if exists('t:OucrRoot')
 		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
@@ -635,7 +647,10 @@ function OuFilenameAsTabLabel()
 	" Show tab index and filename/basename
 	let bufnrlist = tabpagebuflist(v:lnum) 
 	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
-	let filename = tabpagenr() . ":" . fnamemodify(label,':t')
+	let filename = v:lnum . ":" . fnamemodify(label,':t')
+
+	" seems tabpagenr() not work in script, result will only filename without label
+	"let filename = tabpagenr() . ":" . fnamemodify(label,':t')	
 
 	return filename
 endfunction
@@ -831,15 +846,6 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  
 """""""""""""""""""""
-" show the diff between current buffer and the original loaded content
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis 
-  	\ | wincmd p | diffthis
-endif
-" In many terminal emulators the mouse works just fine, thus enable it.
-if has('mouse')
-  set mouse=a
-endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deprecated

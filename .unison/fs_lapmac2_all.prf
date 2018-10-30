@@ -21,10 +21,11 @@ path=DCC
 path=DCD
 path=DCM
 path=DCO
-path=DCH
-path=DCS
 path=DCZ
 path=FCS
+#path=FCZ	# SHOULD sync manually
+#path=DCS	# moved to FCZ
+#path=DCH	# moved to FCZ
 
 ################################################################################
 # SETTINGS

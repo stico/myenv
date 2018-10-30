@@ -31,6 +31,8 @@ mgcode=$MY_FCZ/dw/code/mg/
 #zd=$MY_DCD/tinyvideo/tinyvideo.txt
 #zddoc=$MY_FCZ/dw/doc/zd/
 #zdcode=$MY_FCZ/dw/code/zd/
+xh=$MY_DCD/xunhuan/xunhuan.txt
+kxd=$MY_DCD/kaixindou/kaixindou.txt
 tv=$MY_DCD/tinyvideo/tinyvideo.txt
 tvbug=$MY_DCD/tinyvideo/tinyvideo_bugs.txt
 
@@ -56,11 +58,11 @@ oublog=$ZBOX/src/oublog/oublog-git
 outest=$ZBOX/src/outest/outest-local
 
 # MY_DOC
-dcd=$MY_DCD/dcd.txt
 doc=$MY_DOC
 dcb=$MY_DCB
-dcc=$MY_DCC
-cdh=$MY_DCH
+dcc=$MY_DCC/dcc.txt
+dcd=$MY_DCD/dcd.txt
+dch=$MY_DCH
 dcm=$MY_DCM
 dco=$MY_DCO
 dcs=$MY_DCS
@@ -69,7 +71,13 @@ fcs=$MY_FCS
 fcz=$MY_FCZ
 py=$MY_DCC/python
 db=$MY_DCC/database
+mm=$MY_DCC/multimedia
+geo=$MY_DCC/geography
+k8s=$MY_DCC/kubernetes
 ml=$MY_DCC/machinelearning
+cs=$MY_DCC/computer_system
+ca=$MY_DCC/computer_architecture
+ds=$MY_DCC/dsaa/data_structure.txt
 
 # DCC - math
 calculus=$MY_DCC/math/calculus.txt

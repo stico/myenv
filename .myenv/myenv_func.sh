@@ -46,6 +46,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_DIST_BASE" ]		&& MY_DIST_BASE="~/.myenv/dist"			# diff with $MY_ENV_DIST, no expansion here
 [ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
 [ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
+[ -z "$MY_JUMP_MOSCOW_HOST" ]	&& MY_JUMP_MOSCOW_HOST=dw_moscow
 [ -z "$MY_JUMP_TRANSFER" ]	&& MY_JUMP_TRANSFER="~/amp/__transfer__"	# do NOT use $MY_ENV here
 }
 
@@ -567,16 +568,25 @@ func_cd_smart() {
 	# shellcheck disable=2086
 	"ls" ${opts}
 
-	# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
-	# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
-	#if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
-		[ -e ".hg" ] && command -v hg &> /dev/null && hg status
-		[ -e ".svn" ] && command -v svn &> /dev/null && svn status
-		[ -e ".git" ] && command -v git &> /dev/null && git status
-	#fi
-
 	# status code always success, otherwise func_cd_tag NOT work
 	:
+
+	# Deprecated - NO svn status
+
+		# show vcs status: NOT show if jump from sub dir, BUT show for $HOME since most dir are its sub dir
+		# change: the sub dir rule seems confusing, especially when there is symbolic links, or oumisc in zbox 
+		#if [[ "${OLDPWD##$PWD}" = "${OLDPWD}" ]] || [[ "$PWD" = "$HOME" ]]; then
+		#fi
+
+		# There are some dir mount via samba, use svn status makes it wait too long
+		#if [[ "${PWD##*/}" == "dev-res-guide" ]] ; then
+		#	:
+		#	# svn status cost lots time for dev-res-guide, so skip
+		#else	
+		#	[ -e ".hg" ] && command -v hg &> /dev/null && hg status
+		#	[ -e ".svn" ] && command -v svn &> /dev/null && svn status
+		#	[ -e ".git" ] && command -v git &> /dev/null && git status
+		#fi
 }
 
 func_head_cmd() {
@@ -1137,7 +1147,14 @@ func_ssh_via_jump() {
 	shift
 
 	local ssh_via_jump_opts="${ssh_via_jump_opts:-"-t"}"
-	ssh ${ssh_via_jump_opts} "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"			# V1, simple version
+	if [ "${1}" = "10.*" ] ; then
+		# TODO: this only fast for moscow !!!
+		echo "INFO: using "dw_moscow" as jump machine"
+		ssh ${ssh_via_jump_opts} "${MY_JUMP_MOSCOW_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"	# use internal jump address is much faster
+	else
+		echo "INFO: using "dw" as jump machine"
+		ssh ${ssh_via_jump_opts} "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"		# V1, simple version
+	fi
 }
 
 func_dist_source_env() {
