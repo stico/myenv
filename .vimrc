@@ -190,6 +190,7 @@ let NERDTreeWinSize = 45				" tree window width, default is 31
 """""""" Ctrlp@vim
 "let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
 "let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
+"let g:ctrlp_root_markers = ['pom.xml', '.p4ignore']	" for root finder, add additional indicators, default is: .git .hg .svn .bzr _darcs
 let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
 let g:ctrlp_by_filename = 1				" default to use filename mode
 let g:ctrlp_show_hidden = 1				" also show dotfiles and dotdirs
@@ -355,9 +356,9 @@ set viminfo=						" don't want .viminfo everywhere
 
 """""""""""""""""""""""""""""" H1 - Settings - Key Charaters
 "set isfname+=32,38,40,41,44				make the { },{&},{(},{)},{,} as a part of file name, this will be useful for vim cmd gf to go to a file
-"set isfname+=32					" make " " as part of filename, gf (goto file) use it
-"set isfname+=44					" make (,) as part of filename, gf (goto file) use it
-set isfname-=:						" make ":" NOT a part of the filename, gf (goto file) use it
+"set isfname+=32					" make ' ' as part of filename, gf (goto file) use it
+"set isfname+=44					" make ',' as part of filename, gf (goto file) use it
+set isfname-=:						" make ':' NOT a part of the filename, gf (goto file) use it
 
 """""""""""""""""""""""""""""" H1 - Settings - GUI
 set guioptions-=m					" no menu
@@ -378,6 +379,7 @@ set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 inoremap jj <ESC>
+"nnoremap <C-6> <C-^>					" (NOT WORK) when update to macvim 8.1, C-6 NOT work any more, need to use C-S-6
 
 """""""""""""""""""""""""""""" H1 - Mapping - Disable Useless keys
 inoremap <F1> <ESC>
@@ -635,25 +637,29 @@ function! OuToggleWinMaxRestore()
 endfunction
 
 """ OuFilenameAsTabLabel: Use filename as tab label, excluding file path
-set guitablabel=%{OuFilenameAsTabLabel()}
-"set guitablabel=%M%t		" this works the same on macvim (TODO: test on linux)
-function! OuFilenameAsTabLabel()
-	" Show root name in ~Oucr mode
-	if exists('t:OucrRoot')
-		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
-		return tabpagenr() . ":OUCR:" . t:OucrTablabel
-	endif
-	
-	" Show tab index and filename/basename
-	let bufnrlist = tabpagebuflist(v:lnum) 
-	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
-	let filename = v:lnum . ":" . fnamemodify(label,':t')
-
-	" seems tabpagenr() not work in script, result will only filename without label
-	"let filename = tabpagenr() . ":" . fnamemodify(label,':t')	
-
-	return filename
-endfunction
+" TODO: (on macvim) the index NOT work for either solution, NEED to set again after open 2nd tab
+if has('gui_running') && has('unix')
+	set showtabline=2			" always show tab line for gui version
+endif
+set guitablabel=%M%N:%t				" solution 1
+"set guitablabel=%{OuFilenameAsTabLabel()}	" solution 2, WORKS, use function to control 
+"function! OuFilenameAsTabLabel()
+"	" Show root name in ~Oucr mode
+"	if exists('t:OucrRoot')
+"		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
+"		return tabpagenr() . ":OUCR:" . t:OucrTablabel
+"	endif
+"	
+"	" Show tab index and filename/basename
+"	let bufnrlist = tabpagebuflist(v:lnum) 
+"	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+"	let filename = v:lnum . ":" . fnamemodify(label,':t')
+"
+"	" seems tabpagenr() not work in script, result will only filename without label
+"	"let filename = tabpagenr() . ":" . fnamemodify(label,':t')	
+"
+"	return filename
+"endfunction
 
 """ OuCodeReading: (short for: Oucr) use code reading mode
 "command! -nargs=0 Oucr :call OucrSet()		
@@ -970,4 +976,3 @@ endif
 "onoremap <C-A> <C-C>gggH<C-O>G
 "snoremap <C-A> <C-C>gggH<C-O>G
 "xnoremap <C-A> <C-C>ggVG
-

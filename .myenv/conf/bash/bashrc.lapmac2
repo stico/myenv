@@ -9,8 +9,7 @@ bash_prompt_color=green
 export LC_ALL="en_US.UTF-8"
 
 # zbox
-zbox_use_silent python		3.7.0
-#zbox_use_silent python		2.7.10		# YouCompleteMe@vim seems support python3 now
+zbox_use_silent go		1.11.1
 zbox_use_silent macvim		git
 zbox_use_silent maven		3.1.1
 zbox_use_silent mysql		5.6.23
@@ -22,6 +21,8 @@ zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
 zbox_use_silent kotlin		1.1.2.5
 zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
+zbox_use_silent python		3.7.1
+#zbox_use_silent python		2.7.10		# YouCompleteMe@vim seems support python3 now
 
 #zbox_use_silent androidsdk	26.0.2		# use Android Studio buildin seems easier
 

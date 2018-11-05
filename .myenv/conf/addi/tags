@@ -3,6 +3,8 @@ amp=$MY_TMP
 tmp=$MY_TMP
 dl=$MY_TMP/download
 ws=$MY_TMP/workspace
+wsgo=~/amp/workspace/go
+gows=~/amp/workspace/go
 kpi=/Users/ouyangzhu/Documents/DCD/org/kpi/A_NOTE_KPI.txt
 cjapp=/Users/ouyangzhu/Documents/DCD/project/yyfinance/partner/sczq首创证券/2015-11_超级app的支持
 
@@ -51,7 +53,7 @@ tag=$MY_ENV_CONF/addi/tags
 
 # OUMISC
 data=/data
-misc=$ZBOX/src/oumisc/oumisc-git
+misc=$ZBOX/src/oumisc/oumisc-git/misc.txt
 oumisc=$ZBOX/src/oumisc/oumisc-git
 ourepo=$ZBOX/src/ourepo/ourepo-git
 oublog=$ZBOX/src/oublog/oublog-git
