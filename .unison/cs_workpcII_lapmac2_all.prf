@@ -49,6 +49,7 @@ ignore = Regex .*/.DS_Store
 ignore = Regex .*/.grep_result.txt
 ignore = Regex DC./SyncToy_.*.dat
 ignore = Regex EC./SyncToy_.*.dat
+ignore = Regex FCS/go/gopath
 ignore = Regex FCS/maven/m2_repo
 ignore = Regex FCS/[^/]*/[^/]*-hg
 ignore = Regex FCS/[^/]*/[^/]*-git

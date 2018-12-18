@@ -3,8 +3,7 @@ amp=$MY_TMP
 tmp=$MY_TMP
 dl=$MY_TMP/download
 ws=$MY_TMP/workspace
-wsgo=~/amp/workspace/go
-gows=~/amp/workspace/go
+gows=~/go/src/gows
 kpi=/Users/ouyangzhu/Documents/DCD/org/kpi/A_NOTE_KPI.txt
 cjapp=/Users/ouyangzhu/Documents/DCD/project/yyfinance/partner/sczq首创证券/2015-11_超级app的支持
 

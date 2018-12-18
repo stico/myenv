@@ -71,6 +71,7 @@ httpbody		"dev_http_body"
 httpheader		"dev_http_header"
 
 rsync_fs_lapmac2_all		"bash $MY_DCC/rsync/script/doc_bak/doc_bak.sh"
+rsync_disk_g2tg_all		"bash $MY_DCC/rsync/script/doc_bak/g2tg2nd_bak.sh"
 unison_fs_lapmac2_all		"unison fs_lapmac2_all"
 unison_cs_workpcII_lapmac2_all	"unison cs_workpcII_lapmac2_all"
 unison_use_sys_version		"sudo rm /usr/bin/unison ; sudo ln -s /etc/alternatives/unison /usr/bin/unison"
@@ -115,8 +116,9 @@ mehostsupdate		"sudo -E bash hosts_append.sh"
 
 			# mytest
 mtdb			"mysql -hmtdb -umytest -p123456 -Dmytest"
-mtdbplayer		"mysql -hmtdb -uzd_player -pzd_player -Dzd_player"
-mtdbroot		"echo PLEASE run cmd after ssh to mtdb: /home/ouyangzhu/.zbox/ins/mysql/mysql-5.6.12/bin/mysql -h127.0.0.1 -uroot"
+mtdbroot		"mysql -hmtdb -uroot -proot123"
+#mtdbplayer		"mysql -hmtdb -uzd_player -pzd_player -Dzd_player"
+#mtdbroot		"echo PLEASE run cmd after ssh to mtdb: /home/ouyangzhu/.zbox/ins/mysql/mysql-5.6.12/bin/mysql -h127.0.0.1 -uroot"
 
 			# Head: d - dev 
 loadrvm			"func_load_rvm"
