@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=2155,1090
+# shellcheck disable=2155,1090,2034
 
 ################################################################################
 # Install myenv
@@ -158,17 +158,22 @@ func_fullpath() {
 	fi
 
 	local fullpath="$(readlink -f "${path}")"
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
-		echo "${fullpath}" | tr -d '\n' | pbcopy
-		echo "${fullpath}"
-		return
-	else
-		if func_is_cmd_exist clipit ; then
-			# clipit: use -p or xclip to put in primary
-			echo "${fullpath}" | tr -d '\n' | clipit -c &> /dev/null
+
+	if func_is_personal_machine ; then
+		if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+			echo "${fullpath}" | tr -d '\n' | pbcopy
+			echo "${fullpath}"
+			return
+		else
+			if func_is_cmd_exist clipit ; then
+				# clipit: use -p or xclip to put in primary
+				echo "${fullpath}" | tr -d '\n' | clipit -c &> /dev/null
+			fi
+			echo "${fullpath}" 
+			return
 		fi
-		echo "${fullpath}" 
-		return
+	else
+		echo "$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1):${fullpath}"
 	fi
 }
 
@@ -2041,10 +2046,10 @@ func_rsync_tmp() {
 	# Run
 	echo "INFO: run cmd: rsync --daemon --port ${port} --config ${conf}"
 	rsync --daemon --port "${port}" --config "${conf}"
-	if [ "$?" -ne "0" ] {
+	if [ "$?" -ne "0" ] ; then 
 		echo "ERROR: rysnc startup failed, exit code: $?"
 		return 1
-	}
+	fi
 
 	# info for user
 	echo "INFO: rsync server info, port: ${port}, base: ${base}, pid: $(cat ${pid_file} 2>/dev/null), log: ${log_file}"
@@ -2170,7 +2175,9 @@ func_update_book_name() {
 	func_param_check 2 "$@"
 
 	local f
-	for f in $(ls | grep "${1}.*\(pdf\|epub\|azw3\|mobi\)") ; do
+	# update but NOT tested, should work
+	#for f in $(ls | grep "${1}.*\(pdf\|epub\|azw3\|mobi\)") ; do
+	for f in "${1}"*.pdf "${1}"*.epub "${1}"*.azw3 "${1}"*.mobi ; do
 		echo -e "${f}" "\t->\t" "${2}.${f##*.}"
 		mv "${f}" "${2}.${f##*.}"
 	done
