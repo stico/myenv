@@ -17,13 +17,13 @@ if has('gui_running') && has('unix')
 	"set guifont=XHei\ Mono\ 12	" too small font size for mac
 	set guifont=XHei-Mono:h15
 endif
-" <A-+>/<A--> seems works on linux, but NOT on osx, ref more: keys@vim
+" Use Alt-+/Alt--/Alt-0 to activate on linux, use Meta-=/Meta-- to activate on osx (Alt-0 seems NOT work on osx), ref more: keys@vim
 nnoremap <A-+> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')<CR><CR>
 nnoremap <A--> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')<CR><CR>
-nnoremap <A-0> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=14', 'g')<CR><CR>
+nnoremap <A-0> :silent! let &guifont = substitute(&guifont, '\zs\d\+', '\=15', 'g')<CR><CR>
 command! -nargs=0 FontUp :let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)+1)', 'g')
 command! -nargs=0 FontDown :let &guifont = substitute(&guifont, '\zs\d\+', '\=eval(submatch(0)-1)', 'g')
-command! -nargs=0 FontReset :let &guifont = substitute(&guifont, '\zs\d\+', '\=14', 'g')
+command! -nargs=0 FontReset :let &guifont = substitute(&guifont, '\zs\d\+', '\=15', 'g')
 
 
 """""""""""""""""""""""""""""" H1 - Input Method

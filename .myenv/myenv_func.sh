@@ -2258,3 +2258,48 @@ func_export_script() {
 		echo "ERROR: export failed!"
 	fi
 }
+
+func_find_dup_files() {
+	local usage="USAGE: ${FUNCNAME[0]} <function_name> <path> <...>" 
+	local desc="Desc: find duplicated files in paths (use md5)" 
+
+	local tmp_dir="$(mktemp -d)"
+	local tmp_md5_path="${tmp_dir}/tmp_md5_path.txt"
+	local tmp_md5_dup="${tmp_dir}/tmp_md5_dup.txt"
+	local tmp_md5_dup_detail="${tmp_dir}/tmp_md5_dup_detail.txt"
+
+	# STEP 1: gen md5 and file pair
+	local p f
+	if [ $# -eq 0 ] ; then
+		find ./ -type f -print0 | xargs -0 md5sum >> "${tmp_md5_path}"
+	else
+		for p in "$@" ; do
+			find "${p}" -type f -print0 | xargs -0 md5sum >> "${tmp_md5_path}"
+		done
+	fi
+
+	# STEP 2: gen dup report
+	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
+	# https://stackoverflow.com/questions/40134905/merge-values-for-same-key
+	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
+	cut -d' ' -f1 "${tmp_md5_path}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${tmp_md5_dup}"
+
+	local total_count="$(wc -l "${tmp_md5_path}" | cut -d' ' -f1)"
+	local dup_count="$(wc -l "${tmp_md5_dup}" | cut -d' ' -f1)"
+
+	if (( total_count == dup_count )) ; then
+		echo "INFO: no dup files found, tmp dir: ${tmp_dir}"
+	else
+		local count md5
+		while read count md5 ; do
+			if [ "${count}" -eq 1 ] ; then 
+				continue
+			fi
+
+			grep "${md5}" "${tmp_md5_path}" >> "${tmp_md5_dup_detail}"
+			echo >> "${tmp_md5_dup_detail}"
+		done < "${tmp_md5_dup}"
+
+		echo "INFO: found $(wc -l "${tmp_md5_dup_detail}" | cut -d' ' -f1) files, check detail at: ${tmp_md5_dup_detail}"
+	fi
+}
