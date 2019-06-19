@@ -290,10 +290,13 @@ au WinEnter * if(&modifiable==0) | nnoremap <Space> <C-f> | else | nnoremap <Spa
 " 	3) <cr>/<enter> for quickfix list, goto location > move to center > cursor back to qf window	# TODO: NOT work yet, since share the mapping. So perfer better usage for location window, since used much more
 augroup quickfix
 	autocmd!
-	"autocmd FileType qf setlocal wrap				" makes location window also wraps and messup
-	autocmd FileType qf nmap <buffer> <esc> :x<cr>
-	"autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>	" Works on old version (lapmac), now need add :x<cr> to quit, why?
-	autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>:x<cr>
+	"autocmd FileType qf setlocal wrap					" makes location window also wraps and messup
+	"autocmd FileType qf nmap <buffer> <esc> :x<cr>				" Works
+	autocmd FileType qf nmap <buffer> <esc> :x<cr>:noh<cr>
+
+	"autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>		" Works on old version (lapmac), now need add :x<cr> to quit, why?
+	"autocmd FileType qf nmap <buffer> <cr> <cr>zz<c-w><c-p>:x<cr>		" Works
+	autocmd FileType qf nmap <buffer> <cr> <cr><c-w><c-p>:x<cr>zt:noh<cr>
 augroup END
 
 """""""""""""""""""""""""""""" H1 - Topic - autocmd on help

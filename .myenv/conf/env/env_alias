@@ -70,19 +70,19 @@ httpresp		"dev_http_resp"
 httpbody		"dev_http_body"
 httpheader		"dev_http_header"
 
-rsync_fs_lapmac2_all		"bash $MY_DCC/rsync/script/doc_bak/doc_bak.sh"
-rsync_disk_g2tg_all		"bash $MY_DCC/rsync/script/doc_bak/g2tg2nd_bak.sh"
-unison_fs_lapmac2_all		"unison fs_lapmac2_all"
-unison_cs_workpcII_lapmac2_all	"unison cs_workpcII_lapmac2_all"
-unison_use_sys_version		"sudo rm /usr/bin/unison ; sudo ln -s /etc/alternatives/unison /usr/bin/unison"
-unison_use_zbox_version		"sudo rm /usr/bin/unison ; sudo ln -s /home/ouyangzhu/.zbox/ins/unison/unison-2.48.3/unison /usr/bin/unison"
+rsync_fs_lapmac2_to_g2tg-or-mhd500	"bash $MY_DCC/rsync/script/doc_bak/doc_bak.sh"
+rsync_disk_g2tg_to_g2tg2nd		"bash $MY_DCC/rsync/script/doc_bak/g2tg2nd_bak.sh"
+unison_fs_lapmac2_all			"unison fs_lapmac2_all"
+unison_cs_workpcII_lapmac2_all		"unison cs_workpcII_lapmac2_all"
+unison_use_sys_version			"sudo rm /usr/bin/unison ; sudo ln -s /etc/alternatives/unison /usr/bin/unison"
+unison_use_zbox_version			"sudo rm /usr/bin/unison ; sudo ln -s /home/ouyangzhu/.zbox/ins/unison/unison-2.48.3/unison /usr/bin/unison"
 
 # deprecated
-#unison_cs_workpcII_lapII_all	"unison cs_workpcII_lapII_all"
-#unison_cs_lapII_homelap_all	"unison cs_lapII_homelap_all"
-#unison_fs_lapmac_all		"func_unison_fs_lapmac_all"
-#unison_fs_lapmac_new-all	"unison fs_lapmac_new-all"
-#unison_cs_workpcII_lapmac_all	"unison cs_workpcII_lapmac_all"
+#unison_cs_workpcII_lapII_all		"unison cs_workpcII_lapII_all"
+#unison_cs_lapII_homelap_all		"unison cs_lapII_homelap_all"
+#unison_fs_lapmac_all			"func_unison_fs_lapmac_all"
+#unison_fs_lapmac_new-all		"unison fs_lapmac_new-all"
+#unison_cs_workpcII_lapmac_all		"unison cs_workpcII_lapmac_all"
 
 # Alias - By Topic (<topic><action><obj/arg>)
 

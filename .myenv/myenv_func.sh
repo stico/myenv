@@ -2277,6 +2277,7 @@ func_find_dup_files() {
 			find "${p}" -type f -print0 | xargs -0 md5sum >> "${tmp_md5_path}"
 		done
 	fi
+	sed -i '/\/\(.DS_Store\|desktop.ini\|thumbs.db\)$/d;/\/.Trashes\//d;/\/.Spotlight-/d' "${tmp_md5_path}"
 
 	# STEP 2: gen dup report
 	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
@@ -2300,6 +2301,10 @@ func_find_dup_files() {
 			echo >> "${tmp_md5_dup_detail}"
 		done < "${tmp_md5_dup}"
 
-		echo "INFO: found $(wc -l "${tmp_md5_dup_detail}" | cut -d' ' -f1) files, check detail at: ${tmp_md5_dup_detail}"
+		if [ -e "${tmp_md5_dup_detail}" ] ; then
+			echo "INFO: found $(wc -l "${tmp_md5_dup_detail}" | cut -d' ' -f1) files, check detail at: ${tmp_md5_dup_detail}"
+		else
+			echo "INFO: NO dup files found"
+		fi
 	fi
 }

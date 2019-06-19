@@ -11,6 +11,7 @@ cjapp=/Users/ouyangzhu/Documents/DCD/project/yyfinance/partner/sczq首创证券/
 oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 vimrc=$HOME/.vimrc
 jump=$MY_DCD/ops/jump
+biz=$MY_DCO/business/business.txt
 
 # DW
 dw=$MY_FCZ/dw
@@ -20,22 +21,11 @@ dwcode=$MY_FCZ/dw/code/update.sh
 dwcodeconf=$HOME/Documents/DCD/note/dwcodeaddr.sh
 
 # Project
-dh=$MY_DCD/dianhu/dianhu.txt
-dhdoc=$MY_FCZ/dw/doc/dh/
-dhcode=$MY_FCZ/dw/code/dh/
-nz=$MY_DCD/noizz/noizz.txt
-nzdoc=$MY_FCZ/dw/doc/nz/
-nzcode=$MY_FCZ/dw/code/nz/
-mg=$MY_DCD/mgvoice/mgvoice.txt
-mgdoc=$MY_FCZ/dw/doc/mg/
-mgcode=$MY_FCZ/dw/code/mg/
-#zd=$MY_DCD/tinyvideo/tinyvideo.txt
-#zddoc=$MY_FCZ/dw/doc/zd/
-#zdcode=$MY_FCZ/dw/code/zd/
 xh=$MY_DCD/xunhuan/xunhuan.txt
 kxd=$MY_DCD/kaixindou/kaixindou.txt
 tv=$MY_DCD/tinyvideo/tinyvideo.txt
-tvbug=$MY_DCD/tinyvideo/tinyvideo_bugs.txt
+bg=$MY_DCD/biugo/biugo.txt
+bgdoc=$MY_FCZ/dw/doc/biugo/productRequirement
 
 # ZBOX
 zb=$ZBOX
@@ -73,6 +63,7 @@ fcz=$MY_FCZ
 py=$MY_DCC/python
 db=$MY_DCC/database
 mm=$MY_DCC/multimedia
+js=$MY_DCC/javascript
 geo=$MY_DCC/geography
 k8s=$MY_DCC/kubernetes
 ml=$MY_DCC/machinelearning
