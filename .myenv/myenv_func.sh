@@ -314,12 +314,22 @@ func_vi_conditional() {
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 
-		# Why open 2 vim for the 1st time. Need wait for the 1st time
-		ps -ef | grep -v grep | grep "vim.*--servername SINGLE_VIM" &> /dev/null || sleep 1
+		# Need wait for the 1st time. (Why open 2 vim for the 1st time) 
+		ps -ef | grep -v grep | grep "vim.*--servername SINGLE_VIM" &> /dev/null || sleep 2
 		open -a MacVim
-
 		return 0
-	else	
+
+	elif [ -z "$DISPLAY" ] ; then
+		# Terminal mode: prefer vim if available, otherwise vi
+		if func_is_cmd_exist vim ; then
+			"vim" "$@"
+		else
+			"vi" "$@"
+		fi
+		return 0
+
+	elif func_is_cmd_exist gvim ; then
+		# otherwise prefer gvim
 		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
 			LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@"
 		else
@@ -332,10 +342,7 @@ func_vi_conditional() {
 			/usr/bin/wmctrl -a 'SINGLE_VIM'
 		fi
 		return 0
-	fi
-
-	# Terminal mode: prefer vim if available, otherwise vi
-	if [ -z "$DISPLAY" ] ; then
+	else	
 		if func_is_cmd_exist vim ; then
 			"vim" "$@"
 		else

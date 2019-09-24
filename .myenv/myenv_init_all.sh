@@ -95,6 +95,7 @@ func_init_dirs() {
 	echo "INFO: --STEP-- init basic dirs and links"
 
 	mkdir -p ~/amp/delete
+	mkdir -p ~/amp/download
 
 	func_link_init "${HOME}/Documents" /ext/Documents
 	func_link_init "${HOME}/.m2" /ext/Documents/FCS/maven/m2_repo
@@ -427,6 +428,7 @@ func_init_apt_install_basic() {
 	func_init_apt_install_single ssh openssh-server 
 	func_init_apt_install_single p7zip 7zip p7zip-rar
 	func_init_apt_install_single debconf debconf-utils	# help auto select when install software (like mysql, wine, etc)
+	func_init_apt_install_single bsdmainutils bsdmainutils
 
 	# deprecated
 	#func_init_apt_install_single w3m w3m
