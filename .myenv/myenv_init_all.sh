@@ -218,7 +218,7 @@ func_init_myenv_unison() {
 func_init_myenv_local() {
 	echo "INFO: --STEP-- init myenv files for local usage"
 
-	local local_bashrc="${HOME}/.myenv/init/bashrc.$(hostname)"
+	local local_bashrc="${HOME}/.myenv/conf/bash/bashrc.$(hostname)"
 	if [ ! -e "${local_bashrc}" ] ; then
 		touch "${local_bashrc}"
 		echo "INFO: pls add local stuff (e.g. zbox) in: ${local_bashrc}"
@@ -630,6 +630,10 @@ func_init_manual_needed() {
 	sudo apt-get install -y --force-yes ttf-mscorefonts-installer
 }
 
+func_init_myenv() {
+	curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/myenv_init.sh' | bash
+}
+
 # Init. NOTE: the sequence is important!
 echo "INFO: init start, log in tmp dir: ${init_log}"
 func_source_lib			# func_pipe_filter NOT work here
@@ -640,15 +644,15 @@ func_init_apt_distupgrade	| func_pipe_filter "${init_log}"
 func_init_apt_install_lib	| func_pipe_filter "${init_log}"
 func_init_apt_install_basic	| func_pipe_filter "${init_log}"
 func_init_zbox_via_apt		| func_pipe_filter "${init_log}"
-bash "${MY_ENV}/myenv_init.sh"	| func_pipe_filter "${init_log}"
+func_init_myenv			| func_pipe_filter "${init_log}"
 func_init_myenv_local		| func_pipe_filter "${init_log}"
 func_init_myenv_secure		| func_pipe_filter "${init_log}"
 func_init_myenv_unison		| func_pipe_filter "${init_log}"
 func_init_myenv_writable	| func_pipe_filter "${init_log}"
 func_init_myenv_collection	| func_pipe_filter "${init_log}"
 func_init_zbox_writable		| func_pipe_filter "${init_log}"
-func_init_desktop_soft		| func_pipe_filter "${init_log}"
-func_init_desktop_xfce		| func_pipe_filter "${init_log}"
+#func_init_desktop_soft		| func_pipe_filter "${init_log}"	# TODO: old, need update, and how to AUTO skip for server env?
+#func_init_desktop_xfce		| func_pipe_filter "${init_log}"	# deprecated
 
 echo "INFO: ---------------- SUMMARY ----------------"
 sed -n -e "s/^SUMMARY://p" "${init_log}" | cat -n
