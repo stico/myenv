@@ -21,6 +21,7 @@ zbox_use_silent chromedriver	2.19
 zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
 zbox_use_silent kotlin		1.1.2.5
+zbox_use_silent unison		2.48.3
 zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
 zbox_use_silent python		3.7.1
 #zbox_use_silent python		2.7.10		# YouCompleteMe@vim seems support python3 now

@@ -6,6 +6,7 @@ let loaded_settings_of_stico = 1
 
 set nocompatible	" resets some settings (e.g. "iskeyword"), so should happen in the beginning. 
 set noerrorbells	" no bell when there is error msg, note: those bell without error msg (e.g. press twice ESC) is not controlled here
+set nomodeline		" no modeline support, useless and have secure risk
 set visualbell		" enable this togehter with set t_vb to empty, press twice ESC will no bell
 set t_vb=		" see 'set visualbell'
 
@@ -452,10 +453,12 @@ let g:rubycomplete_classes_in_global = 1
 noremap <F11> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
 noremap <F12> :!source $MY_ENV/myenv_func.sh; func_run_file_format_output %:p:gs?\\?/?<Enter>
 
-" open new tab with random tempfile, to avoid losing anything
+" open tmp file. Old way is 'new tab with random tempfile', but not easy to find, so change to fixed file
 " D is <Command> key on osx, buts seems <D-T> is used by macvim self and not really work
-nnoremap <C-T> :exe ":tabnew " . tempname() . "-tmp"<CR>
-nnoremap <D-T> :exe ":tabnew " . tempname() . "-tmp"<CR>
+" nnoremap <C-T> :exe ":tabnew " . tempname() . "-tmp"<CR>
+" nnoremap <D-T> :exe ":tabnew " . tempname() . "-tmp"<CR>
+nnoremap <C-T> :exe ":tabnew ~/amp/delete/vim-tmp.txt"<CR>
+nnoremap <D-T> :exe ":tabnew ~/amp/delete/vim-tmp.txt"<CR>
 
 " open new tab and with the allInOne opened, why need 2 <CR> in the end?
 " failed to update to use <C-A-s>, seems vim never received 
@@ -644,25 +647,25 @@ endfunction
 if has('gui_running') && has('unix')
 	set showtabline=2			" always show tab line for gui version
 endif
+function! OuFilenameAsTabLabel()
+	" Show root name in ~Oucr mode
+	if exists('t:OucrRoot')
+		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
+		return tabpagenr() . ":OUCR:" . t:OucrTablabel
+	endif
+	
+	" Show tab index and filename/basename
+	let bufnrlist = tabpagebuflist(v:lnum) 
+	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+	let filename = v:lnum . ":" . fnamemodify(label,':t')
+
+	" seems tabpagenr() not work in script, result will only filename without label
+	"let filename = tabpagenr() . ":" . fnamemodify(label,':t')	
+
+	return filename
+endfunction
 set guitablabel=%M%N:%t				" solution 1
 "set guitablabel=%{OuFilenameAsTabLabel()}	" solution 2, WORKS, use function to control 
-"function! OuFilenameAsTabLabel()
-"	" Show root name in ~Oucr mode
-"	if exists('t:OucrRoot')
-"		let t:OucrTablabel = fnamemodify(t:OucrRoot,':t')
-"		return tabpagenr() . ":OUCR:" . t:OucrTablabel
-"	endif
-"	
-"	" Show tab index and filename/basename
-"	let bufnrlist = tabpagebuflist(v:lnum) 
-"	let label = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
-"	let filename = v:lnum . ":" . fnamemodify(label,':t')
-"
-"	" seems tabpagenr() not work in script, result will only filename without label
-"	"let filename = tabpagenr() . ":" . fnamemodify(label,':t')	
-"
-"	return filename
-"endfunction
 
 """ OuCodeReading: (short for: Oucr) use code reading mode
 "command! -nargs=0 Oucr :call OucrSet()		

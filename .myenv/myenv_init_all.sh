@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # Usage
-#       V1 (2017-01): works
-#       V1: rm /tmp/myenv.sh ; wget -O /tmp/myenv.sh -q https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh && bash /tmp/myenv.sh 
-#       V2 (2017-01): NOT work any more, gets nothing 
-#       V2: curl https://raw.github.com/stico/myenv/master/.myenv/init/myenv.sh | bash
+#       rm /tmp/myenv_init_all.sh ; wget -O /tmp/myenv_init_all.sh -q https://raw.github.com/stico/myenv/master/.myenv/myenv_init_all.sh && bash /tmp/myenv_init_all.sh
 
 # Design
 #	# Guideline
@@ -401,6 +398,7 @@ func_init_apt_install_lib() {
 	func_complain_sudo_unusable && return 1
 
 	# usually for soft compile/install
+	sudo apt-get install -y apt-utils
 	sudo apt-get install -y linux-headers-`uname -r`	
 	sudo apt-get install -y build-essential build-essential 
 	sudo apt-get install -y libcurl4-gnutls-dev libexpat1-dev gettext libz-dev openssl libssl-dev
@@ -422,19 +420,19 @@ func_init_apt_install_basic() {
 	func_init_apt_install_single cmake cmake
 	func_init_apt_install_single unzip unzip 
 	func_init_apt_install_single unrar unrar 
-	func_init_apt_install_single hg mercurial
 	func_init_apt_install_single expect expect
 	func_init_apt_install_single unison unison
 	func_init_apt_install_single svn subversion 
 	func_init_apt_install_single aptitude aptitude
 	func_init_apt_install_single ssh openssh-server 
 	func_init_apt_install_single p7zip 7zip p7zip-rar
-	func_init_apt_install_single debconf debconf-utils		# help auto select when install software (like mysql, wine, etc)
+	func_init_apt_install_single debconf debconf-utils	# help auto select when install software (like mysql, wine, etc)
 
 	# deprecated
 	#func_init_apt_install_single w3m w3m
 	#func_init_apt_install_single autossh autossh
 	#sudo apt-get install -y tmux autossh w3m		# dev tools
+	#func_init_apt_install_single hg mercurial
 }
 
 func_init_apt_install_single() {
