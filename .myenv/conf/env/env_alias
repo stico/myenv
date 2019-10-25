@@ -128,6 +128,7 @@ loadvirtualenv		"func_load_virtualenvwrapper"
 sshx			"func_ssh_term_via_jump"
 ssht			"ssh -p 32200"
 scpx			"func_scp_via_jump"
+sshawsvm		"ssh -i /Users/ouyangzhu/.ssh/ouyzhu_aws_singapore.pem ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com"
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list, NOT use "-F", which makes "ls ~/amp/download" shows a link entry instead of content in dir (need "ls ~/amp/download/" to show content) 
