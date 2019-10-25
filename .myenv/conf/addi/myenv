@@ -1,9 +1,8 @@
 # stores file/path which not in git, usually secure reason 
 
-# system config. TODO: some might need sudo priviledge to copy
+# system config. Skip files for permission problems: /etc/sudoers 
 /etc/fstab
 /etc/fstab.d
-/etc/sudoers 
 /etc/rc.local
 /etc/resolv.conf
 /etc/updatedb.conf
