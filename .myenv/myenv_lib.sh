@@ -104,7 +104,7 @@ func_uncompress() {
 	func_complain_path_exist "${target_dir}" && return	# seem NOT need exit, just complain is enough?
 
 	echo "INFO: uncompress file, from: ${source_file} to: ${target_dir}"
-	func_mkdir_cd "${2}"
+	func_mkdir_cd "${target_dir}"
 	case "$source_file" in
 		*.jar | *.arr | *.zip)
 				func_complain_cmd_not_exist unzip \
