@@ -34,6 +34,8 @@ $HOME/.muttrc
 $HOME/.unison/
 $HOME/.msmtprc
 $HOME/.gitconfig
+$HOME/.gitconfig.me
+$HOME/.gitconfig.dw
 $HOME/.subversion/
 $HOME/.VirtualBox/
 $HOME/.smbcredentials

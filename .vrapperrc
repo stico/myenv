@@ -17,3 +17,6 @@ set autochdir		" help for :e command to edit files
 nmap <Enter> o<Esc>
 nmap <Space> i<Space><Esc>
 nmap <C-q> <C-V>
+
+"set relativenumber	" use this feature via install plugin "relative line number ruler", find it in eclipse marketplace
+

@@ -27,6 +27,9 @@
 !/.xmodmaprc
 !/.vrapperrc
 !/.tmux.conf
+!/.gitconfig
+!/.gitconfig.dw
+!/.gitconfig.me
 !/.gitignore
 !/.gitignore_global
 !/.dir_colors

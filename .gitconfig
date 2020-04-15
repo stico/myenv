@@ -1,0 +1,19 @@
+[user]
+	name = ouyzhu
+	email = ouyzhu@gmail.com
+[push]
+	default = simple
+
+# SOLUTION B: NOT VERIFIED
+# # Ref: https://stackoverflow.com/questions/34597186/use-a-different-user-email-and-user-name-for-git-config-based-upon-remote-clone
+# # It is very important to use trailing slashes in the condition
+# [includeIf "gitdir:~/Documents/FCZ/dw/code/misc/hp_proxy/"]
+#     path = .gitconfig.dw
+# [includeIf "gitdir:~/.vim/"]
+#     path = .gitconfig.me
+# [includeIf "gitdir:~/.zbox/"]
+#     path = .gitconfig.me
+# [includeIf "gitdir:~/.myenv/"]
+#     path = .gitconfig.me
+# [includeIf "gitdir:~/Documents/FCS/oumisc/"]
+#     path = .gitconfig.me

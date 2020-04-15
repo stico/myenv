@@ -19,6 +19,7 @@ dwdoc=$MY_FCZ/dw/doc/update.sh
 dwdocconf=$HOME/Documents/DCD/vcs/doc_dw_update.sh
 dwcode=$MY_FCZ/dw/code/update.sh
 dwcodeconf=$HOME/Documents/DCD/note/dwcodeaddr.sh
+parkes=$MY_FCZ/dw/code/misc/parkes-framework/
 
 # Project
 xh=$MY_DCD/xunhuan/xunhuan.txt
