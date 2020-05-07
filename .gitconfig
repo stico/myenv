@@ -4,6 +4,9 @@
 [push]
 	default = simple
 
+[url "git@git.yy.com:"]
+	insteadOf = https://git.yy.com/
+
 # SOLUTION B: NOT VERIFIED
 # # Ref: https://stackoverflow.com/questions/34597186/use-a-different-user-email-and-user-name-for-git-config-based-upon-remote-clone
 # # It is very important to use trailing slashes in the condition

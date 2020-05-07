@@ -314,9 +314,10 @@ func_vi_conditional() {
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
 
-		# Need wait for the 1st time. (Why open 2 vim for the 1st time) 
-		ps -ef | grep -v grep | grep "vim.*--servername SINGLE_VIM" &> /dev/null || sleep 2
-		open -a MacVim
+		# Seems osx mojave not need this any more
+		# # Need wait for the 1st time. (Why open 2 vim for the 1st time) 
+		# ps -ef | grep -v grep | grep "vim.*--servername SINGLE_VIM" &> /dev/null || sleep 2
+		# open -a MacVim
 		return 0
 
 	elif [ -z "$DISPLAY" ] ; then
@@ -496,7 +497,8 @@ func_vi() {
 	local base="$(func_tag_value "${1}")"
 	if [ $# -eq 1 ] ; then
 		[ ! -e "${base}" ] && func_die "ERROR: ${base} not exist!"
-		func_vi_conditional "${base}" && return 0 
+		func_vi_conditional "${base}"
+		return 0 
 	fi
 
 	# Version 2, use locate 
@@ -879,6 +881,16 @@ func_repeat() {
 		sleep "$interval"
 		echo -e "\n\n------------------------- Count: $count / $times -------------------------\n\n"
 	done
+}
+
+func_mgrep() {
+	local usage="Usage: ${FUNCNAME[0]} <search_file> <string> <string> ..." 
+	func_param_check 2 "$@"
+
+	# TODO: NOT really useful, unless do thesee: 1) support multiple file like grep (extract file list). 2) grep pattern/string one by one
+	local f="${1}"
+	shift
+	grep "$@" "${f}"
 }
 
 func_grep_cmd() {

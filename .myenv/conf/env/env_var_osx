@@ -9,6 +9,7 @@ PATH		/usr/sbin
 PATH		/usr/local/bin
 PATH		/opt/X11/bin
 PATH		/opt/local/bin
+PATH		/opt/local/sbin
 
-		# to use coreutils without prefix ‘g’, e.g. gawk
+		# to use coreutils without prefix 'g', e.g. gawk
 PATH		/opt/local/libexec/gnubin/

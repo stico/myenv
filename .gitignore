@@ -50,7 +50,10 @@
 !/.screenlayout/*
 !/.xbindkeysrc.d
 !/.xbindkeysrc.d/*
-#!/.vim/
+!/.vim/
+!/.vim/coc-settings.json
+/.vim/bundle/*
+/.vim/autoload/*
 #!/.vim/*
 #!/vimfiles/
 #!/vimfiles/*

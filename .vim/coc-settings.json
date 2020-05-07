@@ -1,0 +1,14 @@
+{
+  "suggest.noselect": false,                    // auto select the 1st option
+  "suggest.autoTrigger": "trigger",             // only trigger when keyword matches, use <C-Space> (defined in .vimrc) to manually trigger
+  "coc.source.file.ignoreHidden": true,         // ignore completion for hidden files, default: true.
+  "coc.source.file.triggerCharacters": [],      // do not want "/" to trigger the file completion
+
+  "languageserver": {
+    "golang": {
+      "command": "gopls",
+      "rootPatterns": ["go.mod", ".vim/", ".git/", ".hg/"],
+      "filetypes": ["go"]
+    }
+  }
+}

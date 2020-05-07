@@ -176,104 +176,6 @@ else
     set background=dark
 endif
 
-"""""""""""""""""""""""""""""" H1 - Plugins
-"""""""" pathogen@vim
-call pathogen#infect()
-
-"""""""" solarized@vim
-let g:solarized_italic = 0				" 0 to set comment font NOT use italic
-colorscheme solarized
-
-"""""""" NERDCommenter@vim
-let NERDSpaceDelims = 1					" add space for comment
-let NERDTreeWinSize = 45				" tree window width, default is 31
-
-"""""""" Ctrlp@vim
-"let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
-"let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
-"let g:ctrlp_root_markers = ['pom.xml', '.p4ignore']	" for root finder, add additional indicators, default is: .git .hg .svn .bzr _darcs
-let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
-let g:ctrlp_by_filename = 1				" default to use filename mode
-let g:ctrlp_show_hidden = 1				" also show dotfiles and dotdirs
-let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
-let g:ctrlp_custom_ignore = {
-	\ 'dir':  '\v[\/]\.(git|hg|svn|idea|metadata)$|\/target$',
-	\ 'file': '\v\.(exe|so|dll|class|jar|svn-base)$',
-	\ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
-	\ }
-
-"""""""" EasyTags@vim
-" "tags" is a Vim buildin setting to locate tags file(s), relative to working dir or buffer (using a leading ./)
-" 1) ./.vimtags	means find file with name ".vimtags" in dir of current file
-" 2) .vimtags	means find file with name ".vimtags" in working directory
-" 3) /		means keep looking up and up until reach /
-set tags=./.vimtags,.vimtags;/
-let g:easytags_dynamic_files = 2 			" seems tag files are big, separate them by project
-
-"let g:easytags_autorecurse = 1				" never set this, which cause frozen (e.g. save .vimrc will gen tag for whole $HOME)
-"let g:easytags_events = ['BufWritePost']
-let g:easytags_events = []				" do NOT gen tag, unless I invoke :UpdateTags
-let g:easytags_autorecurse = 1				" make -R as default
-let g:easytags_always_enabled = 0			" do NOT gen tag, unless I invoke :UpdateTags
-let g:easytags_auto_highlight = 0
-let g:easytags_include_members = 1
-let g:easytags_cmd = '/opt/local/bin/ctags'
-
-"""""""" Tabular@vim
-" auto alignment when input "|". Copied from tabular doc, but NOT work, why?
-"inoremap <silent> <Bar> <Bar><Esc>:call <SID>align()<CR>a
-"function! s:align()
-"  let p = '^\s*|\s.*\s|\s*$'
-"  if exists(':Tabularize') && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
-"    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
-"    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
-"    Tabularize/|/l1
-"    normal! 0
-"    call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
-"  endif
-"endfunction
-
-"""""""" netrw
-" Use whole "words" when opening URLs. This avoids cutting off parameters (after '?') and anchors (after '#'). See http://vi.stackexchange.com/q/2801/1631
- let g:netrw_gx="<cWORD>"                                                                                                                   
-" Option 1, disable file creation of .netrwhist
-let g:netrw_dirhistmax=0
-" Option 2, disable file creation of .netrwhist
-" au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
-
-"""""""" syntastic@vim, 
-" TODO: try async alternative on vim8: ale
-"let g:syntastic_aggregate_errors = 1					" display together the errors found by all checkers
-"let g:syntastic_always_populate_loc_list = 1				" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
-""let g:syntastic_quiet_messages = { "type": "style" }			" filter out some messages types
-"let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']		" checker chain, run one by one (only run laters if current success)
-let g:syntastic_auto_jump = 2						" jump to 1st error (NOT warning)
-let g:syntastic_sh_checkers=['shellcheck']				" syntastic@vim, sub section 'bash'
-let g:syntastic_sh_shellcheck_args=['-fgcc']				" syntastic@vim, sub section 'bash'
-let g:syntastic_python_checkers=['pyflakes']				" syntastic@vim, sub section 'python'
-let g:syntastic_html_checkers=['tidy', 'jshint']
-let g:syntastic_javascript_checkers = ['eslint']			" syntastic@vim, sub section 'javascript'
-
-"""""""" auto-format@vim, @astyle
-let g:formatprg_c = "astyle"
-let g:formatprg_args_c = "--mode=c --style=ansi"
-let g:formatprg_java = "astyle"
-let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --unpad-paren --add-brackets"
-
-"""""""" YouCompleteMe@vim
-"highlight Pmenu ctermfg=2 ctermbg=3 guifg=#005f87 guibg=#EEE8D5	" 菜单补全菜单配色
-"highlight PmenuSel ctermfg=2 ctermbg=3 guifg=#AFD700 guibg=#106900	" 选中项补全菜单配色
-"let g:ycm_complete_in_comments=1					" 补全功能在注释中同样有效
-"let g:ycm_confirm_extra_conf=0						" 允许 vim 加载 .ycm_extra_conf.py 文件，不再提示
-"let g:ycm_collect_identifiers_from_tags_files=1			" 开启 YCM 标签补全引擎
-"set tags+=/data/misc/software/misc./vim/stdcpp.tags			" 引入 C++ 标准库tags
-"inoremap <leader>; <C-x><C-o>						" YCM 集成 OmniCppComplete 补全引擎，设置其快捷键
-"set completeopt-=preview						" 补全内容不以分割子窗口形式出现，只显示补全列表
-"let g:ycm_min_num_of_chars_for_completion=1				" 从第一个键入字符就开始罗列匹配项
-"let g:ycm_cache_omnifunc=0						" 禁止缓存匹配项，每次都重新生成匹配项
-"let g:ycm_seed_identifiers_with_syntax=1				" 语法关键字补全         
-let g:ycm_server_keep_logfiles = 1					" server keeps log, so could use :YcmDebugInfo to check crash info
-
 """""""""""""""""""""""""""""" H1 - Indent
 "au BufRead,BufNewFile jquery.*.js set filetype=javascript syntax=jquery 
 "au FileType javascript set expandtab tabstop=4 shiftwidth=4 
@@ -312,7 +214,7 @@ filetype plugin indent on				" type detection, language-dependent indenting
 set autoread						" auto read if file updated (e.g. by other soft)
 set autochdir						" automatically change current dir
 set autoindent						" auto indent the new line to the previous one
-set dictionary+=$MY_DCO/english/dictionary/words_us
+set dictionary+=$MY_DCO/english/dictionary/words_us	" use <C-N> to trigger 
 set nobackup						" won't leave additional file(s) after close VIM
 set nowritebackup					" default is :set writebackup, will keep a backup file while file is being worked. Once VIM is closed; the backup will vanish.
 set noswapfile						" (1) Keep in mind that this option will keep everything in memory. (2) Don't use this for big files, will be memeory consuming and Recovery will be impossible! (3) In essence; if security is a concern, use this option
@@ -413,28 +315,18 @@ inoremap <C-L> <C-Right>
 " since original C-E (repeat char below) is useful, remap it to <C-T>
 inoremap <C-T> <C-E>
 
-"""""""""""""""""""""""""""""" H1 - Topic - Completion
+"""""""""""""""""""""""""""""" H1 - Topic - Completion (also see 
 " NOTE: iskeyword MUST after the "set nocompatible"
 set iskeyword+=-
-set iskeyword-=#	" NOT work, seem some following place set it later
-"set iskeyword+=.
-hi Pmenu	ctermbg=White ctermfg=DarkGrey
-hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue
+"hi Pmenu	ctermbg=White ctermfg=DarkGrey
+"hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue
 
 """" Make Completion behavior like IDE
 " menu come up even if only one match.
-set completeopt=menuone
+"set completeopt=menuone
 " Enter key will simply select the highlighted menu item, just as <C-Y> does
 "inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<lt>CR>"
-
-" IDE way of completion
-" use onmicomplete
-"inoremap <C-Space> <C-x><C-o>	
-" use YouCompleteMe@vim
-inoremap <C-Space> <C-N>
-" for terminal mapping
-imap <C-@> <C-Space>
+"inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<lt>CR>"
 
 " keeps a menu item always highlighted. This way you can keep typing characters to narrow the matches, and the nearest match will be selected so that you can hit Enter at any time to insert it.
 "inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
@@ -982,3 +874,180 @@ endif
 "onoremap <C-A> <C-C>gggH<C-O>G
 "snoremap <C-A> <C-C>gggH<C-O>G
 "xnoremap <C-A> <C-C>ggVG
+"
+"
+"""""""""""""""""""""""""""""" H1 - Plugins
+"""""""" pathogen@vim
+call pathogen#infect()
+
+"""""""" solarized@vim
+let g:solarized_italic = 0				" 0 to set comment font NOT use italic
+colorscheme solarized
+
+"""""""" NERDCommenter@vim
+let NERDSpaceDelims = 1					" add space for comment
+let NERDTreeWinSize = 45				" tree window width, default is 31
+
+"""""""" Ctrlp@vim
+"let g:ctrlp_cmd = 'CtrlPMixed'				" Good but too noise: search in Files, Buffers and MRU files at the same time.
+"let g:ctrlp_user_command = 'find %s -type f'		" custom option for finding files
+"let g:ctrlp_root_markers = ['pom.xml', '.p4ignore']	" for root finder, add additional indicators, default is: .git .hg .svn .bzr _darcs
+let g:ctrlp_regexp = 1					" 1 to set regexp search as the default
+let g:ctrlp_by_filename = 1				" default to use filename mode
+let g:ctrlp_show_hidden = 1				" also show dotfiles and dotdirs
+let g:ctrlp_working_path_mode = 0			" not manage the root, will use the :pwd as root
+let g:ctrlp_custom_ignore = {
+	\ 'dir':  '\v[\/]\.(git|hg|svn|idea|metadata)$|\/target$',
+	\ 'file': '\v\.(exe|so|dll|class|jar|svn-base)$',
+	\ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
+	\ }
+
+"""""""" EasyTags@vim
+" "tags" is a Vim buildin setting to locate tags file(s), relative to working dir or buffer (using a leading ./)
+" 1) ./.vimtags	means find file with name ".vimtags" in dir of current file
+" 2) .vimtags	means find file with name ".vimtags" in working directory
+" 3) /		means keep looking up and up until reach /
+set tags=./.vimtags,.vimtags;/
+let g:easytags_dynamic_files = 2 			" seems tag files are big, separate them by project
+
+"let g:easytags_autorecurse = 1				" never set this, which cause frozen (e.g. save .vimrc will gen tag for whole $HOME)
+"let g:easytags_events = ['BufWritePost']
+let g:easytags_events = []				" do NOT gen tag, unless I invoke :UpdateTags
+let g:easytags_autorecurse = 1				" make -R as default
+let g:easytags_always_enabled = 0			" do NOT gen tag, unless I invoke :UpdateTags
+let g:easytags_auto_highlight = 0
+let g:easytags_include_members = 1
+let g:easytags_cmd = '/opt/local/bin/ctags'
+
+"""""""" Tabular@vim
+" auto alignment when input "|". Copied from tabular doc, but NOT work, why?
+"inoremap <silent> <Bar> <Bar><Esc>:call <SID>align()<CR>a
+"function! s:align()
+"  let p = '^\s*|\s.*\s|\s*$'
+"  if exists(':Tabularize') && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
+"    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
+"    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
+"    Tabularize/|/l1
+"    normal! 0
+"    call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
+"  endif
+"endfunction
+
+"""""""" netrw
+" Use whole "words" when opening URLs. This avoids cutting off parameters (after '?') and anchors (after '#'). See http://vi.stackexchange.com/q/2801/1631
+ let g:netrw_gx="<cWORD>"                                                                                                                   
+" Option 1, disable file creation of .netrwhist
+let g:netrw_dirhistmax=0
+" Option 2, disable file creation of .netrwhist
+" au VimLeave * if filereadable("~/.vim/.netrwhist") | call delete("~/.vim/.netrwhist") | endif 
+
+"""""""" syntastic@vim
+" TODO: try async alternative on vim8: ale
+"let g:syntastic_aggregate_errors = 1					" display together the errors found by all checkers
+"let g:syntastic_always_populate_loc_list = 1				" Always update location list (update only after ':Errors' cmd by default, to minimise conflicts with other plugins)
+""let g:syntastic_quiet_messages = { "type": "style" }			" filter out some messages types
+"let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']		" checker chain, run one by one (only run laters if current success)
+let g:syntastic_auto_jump = 2						" jump to 1st error (NOT warning)
+let g:syntastic_sh_checkers=['shellcheck']				" syntastic@vim, sub section 'bash'
+let g:syntastic_sh_shellcheck_args=['-fgcc']				" syntastic@vim, sub section 'bash'
+let g:syntastic_python_checkers=['pyflakes']				" syntastic@vim, sub section 'python'
+let g:syntastic_html_checkers=['tidy', 'jshint']
+let g:syntastic_javascript_checkers = ['eslint']			" syntastic@vim, sub section 'javascript'
+
+"""""""" auto-format@vim, @astyle
+let g:formatprg_c = "astyle"
+let g:formatprg_args_c = "--mode=c --style=ansi"
+let g:formatprg_java = "astyle"
+let g:formatprg_args_java = "--style=java --mode=java --indent=tab --pad-oper --unpad-paren --add-brackets"
+
+"""""""" YouCompleteMe@vim >> Deprecated by ~coc.nvim@vim
+"highlight Pmenu ctermfg=2 ctermbg=3 guifg=#005f87 guibg=#EEE8D5	" 菜单补全菜单配色
+"highlight PmenuSel ctermfg=2 ctermbg=3 guifg=#AFD700 guibg=#106900	" 选中项补全菜单配色
+"let g:ycm_complete_in_comments=1					" 补全功能在注释中同样有效
+"let g:ycm_confirm_extra_conf=0						" 允许 vim 加载 .ycm_extra_conf.py 文件，不再提示
+"let g:ycm_collect_identifiers_from_tags_files=1			" 开启 YCM 标签补全引擎
+"set tags+=/data/misc/software/misc./vim/stdcpp.tags			" 引入 C++ 标准库tags
+"inoremap <leader>; <C-x><C-o>						" YCM 集成 OmniCppComplete 补全引擎，设置其快捷键
+"set completeopt-=preview						" 补全内容不以分割子窗口形式出现，只显示补全列表
+"let g:ycm_min_num_of_chars_for_completion=1				" 从第一个键入字符就开始罗列匹配项
+"let g:ycm_cache_omnifunc=0						" 禁止缓存匹配项，每次都重新生成匹配项
+"let g:ycm_seed_identifiers_with_syntax=1				" 语法关键字补全         
+"let g:ycm_server_keep_logfiles = 1					" server keeps log, so could use :YcmDebugInfo to check crash info
+
+"""""""" vim-go@vim
+let g:go_def_mapping_enabled = 0					" disable vim-go :GoDef shortcut (gd). Will use coc.nvim@vim for this.
+let g:go_metalinter_autosave = 1					" call :GoMetaLinter on save
+let g:go_auto_type_info = 1						" always show :GoInfo in status line (DISABLE THIS IF FEEL SLOW, and use :GoSameIds manually)
+"let g:go_auto_sameids = 1						" always highlight same identifier (DISABLE THIS IF FEEL SLOW, and use :GoSameIds manually), 实际使用好像有bug。会有一堆的黄色高亮显示，且错位
+
+"""""""" coc.nvim@vim
+"mostly from coc.nvim default settings
+set hidden								" if hidden is not set, TextEdit might fail.
+set updatetime=300							" Smaller updatetime for CursorHold & CursorHoldI
+set shortmess+=c							" don't give |ins-completion-menu| messages.
+set signcolumn=yes							" always show signcolumns, otherwise it would shift the text each time diagnostics appear/become resolved.
+"set cmdheight=2							" Better display for messages >> use it when really needed
+"set nobackup								" already set
+"set nowritebackup							" already set
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" When suggestion shows, use tab for navigate. Use <c-space> to trigger completion.
+inoremap <silent><expr>  <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" CMD: command to Format/Fold/OrganizeImports for current buffer.
+command! -nargs=0 Format :call CocAction('format')
+command! -nargs=? Fold   :call CocAction('fold', <f-args>)
+command! -nargs=0 OR     :call CocAction('runCommand', 'editor.action.organizeImport')
+
+" EDIT: Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+" EDIT: Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+" EDIT: Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" JUMP: Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+" JUMP: GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Introduce function text object. NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" VIEW: Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" <cr> to confirm, `<C-g>u` means break undo chain at current position. Coc only does snippet and additional edit on confirm.
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+  "inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<lt>CR>"
+endif
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
