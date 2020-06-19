@@ -34,11 +34,11 @@ func_via_git() {
 
 	mv ${TMP_PATH}/* "${HOME}"
 	mv ${TMP_PATH}/.[!.]* "${HOME}"
-	\cd "${HOME}"
-	\git config --global user.email "stico@163.com"
-	\git config --global user.name "stico"
-	\git config --global push.default simple
-	\cd -
+	#\cd "${HOME}"
+	#\git config --global user.email "stico@163.com"
+	#\git config --global user.name "stico"
+	#\git config --global push.default simple
+	#\cd -
 	echo "INFO: myenv init success (via git)!"
 }
 
