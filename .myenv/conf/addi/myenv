@@ -27,6 +27,9 @@ $HOME/.zbox/zbox_lib.sh
 $HOME/.zbox/zbox_func.sh
 $MY_FCS/oumisc/oumisc-git/proj/tob/tob_func.sh
 
+# misc
+$HOME/mail/script/
+
 # user config
 $HOME/.ssh/
 $HOME/.hgrc
@@ -41,6 +44,7 @@ $HOME/.VirtualBox/
 $HOME/.smbcredentials
 $HOME/.m2/settings.xml
 $HOME/.config/autostart/
+$HOME/.getmail/getmailrc
 $HOME/.thunderbird/profiles.ini
 $HOME/.local/share/applications/
 $HOME/.kde/share/config/kwalletrc

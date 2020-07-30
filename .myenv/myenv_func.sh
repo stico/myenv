@@ -556,6 +556,9 @@ func_cd_tag() {
 func_is_personal_machine() {
 	#grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null 
 	[ "${bash_prompt_color:-NONONO}" == "green" ] && return 0 || return 1
+
+	# can NOT use this, otherwise test.16 will have same prompt as lapmac2
+	#[ -e "$HOME/.ssh/stico_github" ] && return 0
 }
 
 func_is_internal_machine() {
@@ -1596,9 +1599,14 @@ func_backup_myenv() {
 	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
 
 	echo "INFO: create zip file based on filelist: ${fileList}"
-
 	# excludes: locate related db, ar.../fp... files in unison
-	zip -rq "${packFile}" -x "*/zgen/mlocate.db" -x "*/zgen/gnulocatedb" -x "*/.unison/[fa][pr][0-9a-z]*" -@ < "${fileList}" || func_die "ERROR: failed to zip files into ${packFile}"
+	zip -r "${packFile}" -x "*/zgen/mlocate.db" -x "*/zgen/gnulocatedb" -x "*/.unison/[fa][pr][0-9a-z]*" -@ < "${fileList}" 2>&1 | sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'
+	if [ "$?" -ne "0" ] ; then
+		echo "WARN: failed to pack some file, pls check"
+	fi
+	if [ ! -e "${packFile}" ] ; then
+		func_die "ERROR: failed to zip files into ${packFile}"
+	fi
 
 	echo "INFO: bakcup command output, add to the backup zip"
 	mkdir -p "${tmpDir}"
@@ -1607,6 +1615,8 @@ func_backup_myenv() {
 	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
 	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
 
+	
+	pushd . &> /dev/null
 	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
 	\cd ${HOME} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
 	echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
@@ -1616,17 +1626,21 @@ func_backup_myenv() {
 	echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
 	\cd ${OUREPO} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
 
-	\cd ${HOME}/.vim/bundle
+	\cd ${HOME}/.vim/bundle &> /dev/null
 	for f in * ; do 
 		[ ! -d "${f}" ] && continue
 		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${HOME}/.vim/bundle/${f}"
+		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null
 		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
 	done
 
 	zip -rjq "${packFile}" "${tmpDir}"/*.txt
-
 	func_backup_dated "${packFile}"
+
+	# should NOT left at /tmp dir
+	echo "INFO: delete tmp pack file"
+	rm "${packFile}"
+	popd &> /dev/null
 }
 
 func_backup_dated() {
@@ -1639,7 +1653,7 @@ func_backup_dated() {
 	local dcb_dated_backup="$MY_DCB/dbackup/latest"
 	
 	# backup path
-	if func_is_personal_machine && [ -d "${dcb_dated_backup}" ]; then
+	if [ -d "${dcb_dated_backup}" ]; then
 		host_name="$(hostname)" 
 		target_path="${dcb_dated_backup}"
 	elif [ -d "${MY_ENV_DIST}" ] ; then

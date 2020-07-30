@@ -110,6 +110,7 @@ gVim.exe.stackdump
 # Deprecated since might contain mailbox password, or other sensitive info
 #!/.msmtprc
 #!/.muttrc
+#!/.getmail/
 #
 # Deprecated since become useless
 #!/.backupMyenv.sh
