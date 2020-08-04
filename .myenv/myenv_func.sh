@@ -1599,6 +1599,7 @@ func_backup_myenv() {
 	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
 
 	echo "INFO: create zip file based on filelist: ${fileList}"
+	func_collect_myenv "no_content"
 	# excludes: locate related db, ar.../fp... files in unison
 	zip -r "${packFile}" -x "*/zgen/mlocate.db" -x "*/zgen/gnulocatedb" -x "*/.unison/[fa][pr][0-9a-z]*" -@ < "${fileList}" 2>&1 | sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'
 	if [ "$?" -ne "0" ] ; then
