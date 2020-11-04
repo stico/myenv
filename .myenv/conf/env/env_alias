@@ -131,6 +131,8 @@ loadvirtualenv		"func_load_virtualenvwrapper"
 sshx			"func_ssh_term_via_jump"
 ssht			"ssh -p 32200"
 scpx			"func_scp_via_jump"
+sshbd			"ssh ouyzhu@ouyzhu_baidu"
+sshbdroot		"ssh ouyzhu_baidu"
 sshgcpvm		"ssh gcpvm"
 sshawsvm		"ssh -i /Users/ouyangzhu/.ssh/ouyzhu_aws_singapore.pem ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com"
 

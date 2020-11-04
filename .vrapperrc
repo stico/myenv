@@ -1,5 +1,5 @@
 " This is for eclipse plugin, vrapper, which support vim motion in eclipse
-" NOTE, you might need put a link in C:\User\ouyangzhu, even the $HOME is set
+" NOTE, for windows, need put a link in C:\User\ouyangzhu, even the $HOME is set
 
 " TODO: map C-V to C-Q
 " TODO: map Y as "copy to end", instead of whole line
@@ -14,17 +14,23 @@ set regexsearch
 set hlsearch
 set incsearch
 set cursorline
-set saney		" Y will yank to line end, not whole line
 set visualmouse		" auto enter visual mode when mouse select
 set autochdir		" help for :e command to edit files
+set gdefault		" make substitute g flag default on
+
+"""""""" NOT Works
+"set saney		" Y will yank to line end, not whole line
 
 """""""""""""""""""""""""""""" Misc - Mappings """""""""""""""""""""""""""""" 
-" Already Works
-" - C-W: (delete back word) in insert mode already works
-" - C-N: simple completion, BUT can NOT show the dialog
-nmap <Enter> o<Esc>
-nmap <Space> i<Space><Esc>
-nmap <C-q> <C-V>
+"""""""" Already Works
+"   C-W: (delete back word) in insert mode already works
+"   C-N: simple completion, BUT can NOT show the dialog
+
+nnoremap Y y$
+nnoremap <C-Q> <C-V>
+nnoremap <Enter> o<Esc>
+nnoremap <Tab> i<Tab><Esc>
+nnoremap <Space> i<Space><Esc>
 
 """""""""""""""""""""""""""""" CMD Liine Motion """""""""""""""""""""""""""""" 
 inoremap <C-K> <Up>
@@ -32,11 +38,14 @@ inoremap <C-J> <Down>
 inoremap <C-B> <Left>
 inoremap <C-F> <Right>
 
-inoremap <C-D> <Del>		" seems eclipse used, unmap in eclipse first
-inoremap <C-E> <End>		" seems eclipse used, unmap in eclipse first
-inoremap <C-A> <Home>		" seems eclipse used, unmap in eclipse first
-inoremap <C-H> <C-Left>		" seems eclipse used, unmap in eclipse first
-inoremap <C-L> <C-Right>	" seems eclipse used, unmap in eclipse first
+"""""""" NOTES
+" NOTE 1: different than vimrc, since these keys NOT work in vrapper: <End> / <Home> / <Del>
+" NOTE 2: for <C-H> need unmap in eclipse > preference > keys ("open search dialog")
+inoremap <C-E> <Esc>$a
+inoremap <C-A> <Esc>I
+inoremap <C-D> <Esc>lxi
+inoremap <C-L> <Esc>lwi
+inoremap <C-H> <Esc>bi
 
 """""""""""""""""""""""""""""" Deprecated """""""""""""""""""""""""""""" 
 "set relativenumber	" use this feature via install plugin "relative line number ruler", find it in eclipse marketplace

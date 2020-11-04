@@ -61,21 +61,24 @@ dcs=$MY_DCS
 dcz=$MY_DCZ
 fcs=$MY_FCS
 fcz=$MY_FCZ
-py=$MY_DCC/python
-db=$MY_DCC/database
-mm=$MY_DCC/multimedia
-js=$MY_DCC/javascript
-geo=$MY_DCC/geography
-k8s=$MY_DCC/kubernetes
-ml=$MY_DCC/machinelearning
-cs=$MY_DCC/computer_system
-ca=$MY_DCC/computer_architecture
+bd=$MY_DCC/baidu/baidu.txt
+py=$MY_DCC/python/python.txt
+db=$MY_DCC/database/database.txt
+mm=$MY_DCC/multimedia/multimedia.txt
+js=$MY_DCC/javascript/javascript.txt
+geo=$MY_DCC/geography/geography.txt
+k8s=$MY_DCC/kubernetes/kubernetes.txt
+ml=$MY_DCC/machinelearning/machinelearning.txt
+cs=$MY_DCC/computer_system/computer_system.txt
+ca=$MY_DCC/computer_architecture/computer_architecture.txt
 ds=$MY_DCC/dsaa/data_structure.txt
 
-# DCC - math
+# DCC - notes
 calculus=$MY_DCC/math/calculus.txt
 geometry=$MY_DCC/math/geometry.txt
 linear_algebra=$MY_DCC/math/linear_algebra.txt
+lc=$MY_DCC/coding/leetcode/README.txt
+leetcode=$MY_DCC/coding/leetcode/README.txt
 
 # DCD
 rank=$MY_DCD/jury/jury_rank/rank.txt
