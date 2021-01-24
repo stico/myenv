@@ -2157,7 +2157,7 @@ func_samba_umount() {
 	# load config
 	func_validate_path_exist "${1}"
 	eval "$(func_gen_local_vars "${1}")"
-	func_contains_blank_str "${mount_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path)"
+	func_str_contains_blank "${mount_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path)"
 
 	# umount
 	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
@@ -2182,7 +2182,7 @@ func_samba_mount() {
 	# load config
 	func_validate_path_exist "${1}"
 	eval "$(func_gen_local_vars "${1}")"
-	func_contains_blank_str "${mount_path}" "${samba_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path/samba_path)"
+	func_str_contains_blank "${mount_path}" "${samba_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path/samba_path)"
 
 	# check
 	mount_path="$(readlink -f "${mount_path}")"
@@ -2229,6 +2229,7 @@ func_mm_is_moov_in_head() {
 	done
 }
 
+# TODO: mv to myenv_lib > For_Script
 func_export_script() {
 	local usage="USAGE: ${FUNCNAME[0]} <function_name> <target_script>" 
 	local desc="Desc: export a runnable script of <function_name> into <target_script>" 
