@@ -1640,7 +1640,7 @@ func_backup_dated() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local target target_path host_name
+	local target target_path host_name ttdir
 	local source="$(readlink -f "$1")"
 	local source_name="$(basename "${source}")"
 	local dcb_dated_backup="$MY_DCB/dbackup/latest"
@@ -1654,7 +1654,10 @@ func_backup_dated() {
 		tags="$(func_dist_tags)"
 		target_path="${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
 	else
-		func_die "ERROR: can NOT decide where to backup!"
+		ttdir="$MY_TMP/delete/$(date '+%Y-%m-%d')"
+		mkdir -p "${ttdir}" &> /dev/null
+		target_path="${ttdir}"
+		#func_die "ERROR: can NOT decide where to backup!"
 	fi
 
 	# prepare and check
