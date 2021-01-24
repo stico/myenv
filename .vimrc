@@ -1,6 +1,6 @@
 """""""""""""""""""""""""""""" H1 - Topic - Basic
 if exists('loaded_settings_of_stico')
-    finish
+	finish
 endif
 let loaded_settings_of_stico = 1
 
@@ -990,8 +990,10 @@ set signcolumn=yes							" always show signcolumns, otherwise it would shift the
 "set nobackup								" already set
 "set nowritebackup							" already set
 
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
+if exists('g:did_coc_loaded')
+	" Highlight the symbol and its references when holding the cursor.
+	autocmd CursorHold * silent call CocActionAsync('highlight')
+endif
 
 " When suggestion shows, use tab for navigate. Use <c-space> to trigger completion.
 inoremap <silent><expr>  <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
