@@ -45,8 +45,7 @@ MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 [ -z "$MY_DIST_BAK" ]		&& MY_DIST_BAK="~/.myenv/dist/backup"
 [ -z "$MY_DIST_BASE" ]		&& MY_DIST_BASE="~/.myenv/dist"			# diff with $MY_ENV_DIST, no expansion here
 [ -z "$MY_PROD_PORT" ]		&& MY_PROD_PORT=32200
-[ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=dw
-[ -z "$MY_JUMP_MOSCOW_HOST" ]	&& MY_JUMP_MOSCOW_HOST=dw_moscow
+[ -z "$MY_JUMP_HOST" ]		&& MY_JUMP_HOST=jump
 [ -z "$MY_JUMP_TRANSFER" ]	&& MY_JUMP_TRANSFER="~/amp/__transfer__"	# do NOT use $MY_ENV here
 }
 
@@ -1174,14 +1173,7 @@ func_ssh_via_jump() {
 	shift
 
 	local ssh_via_jump_opts="${ssh_via_jump_opts:-"-t"}"
-	if [ "${1}" = "10.*" ] ; then
-		# TODO: this only fast for moscow !!!
-		echo "INFO: using "dw_moscow" as jump machine"
-		ssh ${ssh_via_jump_opts} "${MY_JUMP_MOSCOW_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"	# use internal jump address is much faster
-	else
-		echo "INFO: using "dw" as jump machine"
-		ssh ${ssh_via_jump_opts} "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"		# V1, simple version
-	fi
+	ssh ${ssh_via_jump_opts} "${MY_JUMP_HOST}" "ssh -p ${MY_PROD_PORT} ${ip_addr} $*"
 }
 
 func_dist_source_env() {
