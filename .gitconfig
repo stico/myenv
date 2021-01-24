@@ -6,8 +6,9 @@
 [push]
 	default = simple
 
-#[url "git@git.yy.com:"]
-#	insteadOf = https://git.yy.com/
+# without this, will always as user/pass in ubuntu
+[url "git@git.yy.com:"]
+	insteadOf = https://git.yy.com/
 
 # SOLUTION B: NOT VERIFIED
 # # Ref: https://stackoverflow.com/questions/34597186/use-a-different-user-email-and-user-name-for-git-config-based-upon-remote-clone
