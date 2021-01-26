@@ -990,6 +990,7 @@ set signcolumn=yes							" always show signcolumns, otherwise it would shift the
 "set nobackup								" already set
 "set nowritebackup							" already set
 
+let g:coc_disable_startup_warning = 1
 if exists('g:did_coc_loaded')
 	" Highlight the symbol and its references when holding the cursor.
 	autocmd CursorHold * silent call CocActionAsync('highlight')

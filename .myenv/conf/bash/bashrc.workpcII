@@ -6,7 +6,7 @@
 #bash_prompt_color=green
 
 # zbox
-zbox_use_silent go		1.11.1
+zbox_use_silent go		1.15.7
 zbox_use_silent vim		git
 zbox_use_silent ant		1.9.4
 zbox_use_silent php		5.5.10

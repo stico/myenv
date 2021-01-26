@@ -38,6 +38,7 @@
 !/.startxwinrc
 !/.bash_profile
 !/.gitattributes
+!/.config/ghorg/conf.yaml
 
 # INCLUDE: DIR: need 2 line for each dir
 !/.fonts/
