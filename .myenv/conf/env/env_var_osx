@@ -1,5 +1,5 @@
-		# if need specific version: "/usr/libexec/java_home -v 1.7", note to make sure that version is installed
-JAVA_HOME	$(/usr/libexec/java_home)
+		# NOTE: (deprecated, NOT work on Big Sur) if need specific version: "/usr/libexec/java_home -v 1.7"
+JAVA_HOME	$(/usr/libexec/java_home -V 2>&1 | sed -e '/ \/Lib/!d;/Internet Plug-Ins/d;s/[^\/]*//;' | grep 1.8)
 
 PATH		JAVA_HOME
 PATH		/bin

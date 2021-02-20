@@ -552,6 +552,41 @@ func_cd_tag() {
 	#func_cd_smart "${base}/${result_target}"
 }
 
+func_best_hostname() {
+	local usage="Usage: ${FUNCNAME[0]}" 
+	local desc="Desc: try to get a more meaning fullname of host"
+	
+	local ip hostname bakname useless usefull
+
+	# case 1: always use hostname
+	hostname="$(hostname)" 
+	used="/baiduvm/awsvm/"
+	if [ "$(func_os_name)" = "${OS_OSX}" ] || func_is_personal_machine ; then	# check if personal (assume osx also yes)
+		echo "${hostname}"
+		return
+	fi
+	if [[ "${hostname}" = lapmac* ]] || [[ "${hostname}" = workpc* ]] ; then	# might have number to match
+		echo "${hostname}"
+		return
+	fi
+	if [[ "${used}" = */${hostname}/* ]] ; then					# used 
+		echo "${hostname}"
+		return
+	fi
+
+	# case 2: use bakname
+	useless="/ubuntu/to-add-more/"
+	ip="$(func_ip_single)"
+	[ -n "${ip}" ] && bakname="${ip}" || bakname="canNotFindAnySuitableHostname"
+	
+	# TODO: simplify to directly use bakname?
+	if [[ "${useless}" = */${hostname}/* ]] ; then
+		echo "$(bakname)"
+		return
+	fi
+	echo "${bakname}"
+}
+
 func_is_personal_machine() {
 	#grep -q "^bash_prompt_color=green" "${SRC_BASH_HOSTNAME}" "${SRC_BASH_MACHINEID}" &> /dev/null 
 	[ "${bash_prompt_color:-NONONO}" == "green" ] && return 0 || return 1
@@ -1636,38 +1671,88 @@ func_backup_myenv() {
 	popd &> /dev/null
 }
 
+func_backup_dated_gen_exclude_list() {
+	local usage="Usage: ${FUNCNAME[0]} <source>\n\tGenerate exclude list for func_backup_dated()" 
+	func_param_check 1 "$@"
+
+	local base
+	local exfile="$(mktemp)"
+	local EX_FILENAME=".db.exclude" 
+	find "$1" -type f -name "${EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' file; do
+		base="${file%${EX_FILENAME}}"
+		sed -e "s+^+${base}+" "$file" >> "${exfile}"
+	done
+	echo "${exfile}"
+}
+
+func_backup_dated_gen_target_path() {
+	local usage="Usage: ${FUNCNAME[0]}\n\tGenerate target path to store the backup file" 
+
+	local dcb_dated_backup tags
+	dcb_dated_backup="$MY_DCB/dbackup/latest"
+
+	# backup path
+	if [ -d "${dcb_dated_backup}" ]; then
+		echo "${dcb_dated_backup}"
+		return
+	elif [ -d "${MY_ENV_DIST}" ] ; then
+		tags="$(func_dist_tags)"
+		echo "${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
+		return
+	else
+		ttdir="${MY_TMP}/delete/$(date '+%Y-%m-%d')"
+		mkdir -p "${ttdir}" &> /dev/null
+		echo "${ttdir}"
+	fi
+	#func_die "ERROR: can NOT decide where to backup!"
+}
+
+func_backup_dated_of_filelist() {
+	echo "ERROR: NOT implemented yet!"
+	return 1
+
+	local usage="Usage: ${FUNCNAME[0]} <filelist>\n\tDated backup files in <filelist>." 
+	func_param_check 1 "$@"
+
+	local target target_path filelist 
+	target_path="$(func_backup_dated_gen_target_path)"
+
+	# TODO: validate the file list?
+	filelist="${1}"
+
+	# TODO: gen target path (extract from func_backup_dated)
+	target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
+
+	zip -r "${target}" -@ < "${filelist}"
+
+	# TODO: gen result info like func_backup_dated
+}
+
 func_backup_dated() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local target target_path host_name ttdir
-	local source="$(readlink -f "$1")"
-	local source_name="$(basename "${source}")"
-	local dcb_dated_backup="$MY_DCB/dbackup/latest"
+	local source_name source target exfile target_path host_name ttdir
+	source="$(readlink -f "$1")"
+	source_name="$(basename "${source}")"
+	host_name="$(func_best_hostname)" 
+	target_path="$(func_backup_dated_gen_target_path)"
 	
-	# backup path
-	if [ -d "${dcb_dated_backup}" ]; then
-		host_name="$(hostname)" 
-		target_path="${dcb_dated_backup}"
-	elif [ -d "${MY_ENV_DIST}" ] ; then
-		host_name="$(func_ip_single)"
-		tags="$(func_dist_tags)"
-		target_path="${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
-	else
-		ttdir="$MY_TMP/delete/$(date '+%Y-%m-%d')"
-		mkdir -p "${ttdir}" &> /dev/null
-		target_path="${ttdir}"
-		#func_die "ERROR: can NOT decide where to backup!"
-	fi
-
 	# prepare and check
 	mkdir -p "${target_path}"
 	func_validate_path_exist "${source}" 
 
 	# backup
 	if [ -d "${source}" ] ; then
+		exfile="$(func_backup_dated_gen_exclude_list "${source}")"
 		target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
-		zip -r "${target}" "${source}"
+
+		if [ -s  "${exfile}" ] ; then
+			zip -r "${target}" "${source}" -x@"${exfile}" -x .DS_Store
+			echo "INFO: assembled/used exclude file list: ${exfile}"
+		else
+			zip -r "${target}" "${source}" -x .DS_Store
+		fi
 	else
 		target="${target_path}/$(func_dati)_${host_name}_${source_name}"
 		cp -r "${source}" "${target}" 
@@ -1676,7 +1761,7 @@ func_backup_dated() {
 	# addition backup
 	[ -n "${2}" ] && cp -r "${target}" "${2}"
 
-	# show
+	echo "INFO: result:" 
 	"ls" -lh "${target}"
 	[ -n "${2}" ] && "ls" -lh "${2}/$(basename "${target}")"
 }
