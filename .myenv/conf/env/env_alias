@@ -135,6 +135,8 @@ sshbd			"ssh ouyzhu@ouyzhu_baidu"
 sshbdroot		"ssh ouyzhu_baidu"
 sshgcpvm		"ssh gcpvm"
 sshawsvm		"ssh -i /Users/ouyangzhu/.ssh/ouyzhu_aws_singapore.pem ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com"
+scptoawsvm		func_scp_to_awsvm
+scpfromawsvm		func_scp_from_awsvm
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list, NOT use "-F", which makes "ls ~/amp/download" shows a link entry instead of content in dir (need "ls ~/amp/download/" to show content) 

@@ -1483,6 +1483,20 @@ func_scp_via_jump() {
 	#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
 }
 
+func_scp_from_awsvm() {
+	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file from awsvm to current dir." 
+	func_param_check 1 "$@"
+
+	scp -i "${HOME}/.ssh/ouyzhu_aws_singapore.pem" "ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com:${1}" ./
+}
+
+func_scp_to_awsvm() {
+	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file to awsvm ~/Downloads/" 
+	func_param_check 1 "$@"
+
+	scp -i "${HOME}/.ssh/ouyzhu_aws_singapore.pem" "${1}" ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com:~/Downloads/
+}
+
 # shellcheck disable=2029
 func_terminator() { 
 	if [ "${MY_OS_NAME}" = "${OS_CYGWIN}" ] ; then
@@ -1691,20 +1705,25 @@ func_backup_dated_gen_target_path() {
 	local dcb_dated_backup tags
 	dcb_dated_backup="$MY_DCB/dbackup/latest"
 
-	# backup path
+	# dcb for personal computer
 	if [ -d "${dcb_dated_backup}" ]; then
 		echo "${dcb_dated_backup}"
 		return
+
+	# if dirs(tags) in dist, ask for selection
 	elif [ -d "${MY_ENV_DIST}" ] ; then
 		tags="$(func_dist_tags)"
-		echo "${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
-		return
-	else
-		ttdir="${MY_TMP}/delete/$(date '+%Y-%m-%d')"
-		mkdir -p "${ttdir}" &> /dev/null
-		echo "${ttdir}"
+		if [ -n "${tags}" ] ; then
+			# TODO: no need selection if only 1 tag?
+			echo "${MY_ENV_DIST}/$(func_select_line "${tags}")/backup"
+			return
+		fi
 	fi
-	#func_die "ERROR: can NOT decide where to backup!"
+
+	# otherwise always this path
+	dbdir="${MY_TMP}/dbackup/"
+	mkdir -p "${dbdir}" &> /dev/null
+	echo "${dbdir}"
 }
 
 func_backup_dated_of_filelist() {
@@ -1732,7 +1751,7 @@ func_backup_dated() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local source_name source target exfile target_path host_name ttdir
+	local source_name source target exfile target_path host_name
 	source="$(readlink -f "$1")"
 	source_name="$(basename "${source}")"
 	host_name="$(func_best_hostname)" 
