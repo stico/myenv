@@ -14,7 +14,9 @@
 #source $HOME/.myenv/myenv_lib.sh || source ./myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 # To simplify, just try myenv_lib.sh in myenv
 MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
+MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
+[ -f "${MYENV_SECU_PATH}" ] && source "${MYENV_SECU_PATH}"
 
 ################################################################################
 # Constants
@@ -1751,7 +1753,7 @@ func_backup_dated() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local source_name source target exfile target_path host_name
+	local source_name source target exfile target_path host_name cmd_passwd_part passwd cmd_ex_part cmd
 	source="$(readlink -f "$1")"
 	source_name="$(basename "${source}")"
 	host_name="$(func_best_hostname)" 
@@ -1761,20 +1763,37 @@ func_backup_dated() {
 	mkdir -p "${target_path}"
 	func_validate_path_exist "${source}" 
 
+	# prepare target name
+	if [[ "${source_name}" == *.zip ]] ;then
+		# already has .zip ext, not need another
+		target="${target_path}/$(func_dati)_${host_name}_${source_name}"
+	else
+		target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
+	fi
+
+	# prepare cmd part
+	exfile="$(func_backup_dated_gen_exclude_list "${source}")"
+	if [ -s  "${exfile}" ] ; then
+		#cmd_ex_part="-x@'${exfile}'"				# NO ' inside, otherwise will be part of password!
+		cmd_ex_part="-x@${exfile}" 
+	fi
+	if func_is_cmd_exist func_gen_zip_passwd ; then
+		passwd="$(func_gen_zip_passwd "${target}")"
+		if [ -n "${passwd}" ] ; then 
+			#cmd_passwd_part="--password '${passwd}'"	# NO ' inside, otherwise will be part of password!
+			cmd_passwd_part="--password ${passwd}"
+		else
+			echo "WARN: failed to gen password!"
+		fi
+	fi
+
 	# backup
 	if [ -d "${source}" ] ; then
-		exfile="$(func_backup_dated_gen_exclude_list "${source}")"
-		target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
-
-		if [ -s  "${exfile}" ] ; then
-			zip -r "${target}" "${source}" -x@"${exfile}" -x .DS_Store
-			echo "INFO: assembled/used exclude file list: ${exfile}"
-		else
-			zip -r "${target}" "${source}" -x .DS_Store
-		fi
+		zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+		echo "INFO: zip with: ${cmd_passwd_part} ${cmd_ex_part}"
 	else
-		target="${target_path}/$(func_dati)_${host_name}_${source_name}"
-		cp -r "${source}" "${target}" 
+		zip "${target}" "${source}" ${cmd_passwd_part} 
+		echo "INFO: zip with: ${cmd_passwd_part}"
 	fi
 
 	# addition backup
