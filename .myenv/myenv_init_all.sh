@@ -258,51 +258,12 @@ func_init_myenv_secure() {
 	[ -e "$smbcr_bak" ] && cp -rf $smbcr_bak/* ~/.smbcredentials/
 }
 
-func_init_zbox_writable(){
-	echo "INFO: --STEP-- try to update zbox git to writable mode"
-
-	func_init_git_repo_writable ~/.zbox ouyzhu@gmail.com "ouyzhu_github:ouyzhu/zbox.git"
-}
-
 func_init_myenv_collection(){	
 	echo "INFO: --STEP-- try collect notes (func_std_standarize)"
 	
 	[ -e "${HOME}/.myenv/zgen/collection/all_content.txt" ] && echo "INFO: collection already exist, skip" && return 0
 
 	func_std_standarize
-}
-
-func_init_myenv_writable(){
-	echo "INFO: --STEP-- try to update myenv git to writable mode"
-
-	func_init_git_repo_writable ${HOME} ouyzhu@gmail.com "stico_github:stico/myenv.git"
-}
-
-func_init_git_repo_writable() {
-	local usage="Usage: ${FUNCNAME} <repo_path> <repo_mail> <repo_writable_addr>"
-	local desc="Desc: update git to use certification, so repo becomes writable" 
-	func_param_check 2 "${desc} \n ${usage} \n" "$@"
-
-	local repo_dir="${1}"
-	local repo_mail="${2}"
-	local repo_addr="${3}"
-
-	# check, git cmd already checked in func_init_myenv()
-	func_complain_path_not_exist ${repo_dir}/.git "WARN: ${repo_dir}/.git NOT exist, check if repo path correct" && return 1
-	func_complain_path_not_exist ~/.ssh/${repo_addr%%:*} "WARN: ~/.ssh/${repo_addr%%:*} NOT exist, repo still in readonly mode!" && return 1
-
-	\cd ${repo_dir} &> /dev/null
-	if (! \git remote -v | \grep -q "${repo_addr}") ; then
-		echo "INFO: update git config info (origin, mail, set-upstream, etc)"
-		\git remote rm origin
-		\git remote add origin "${repo_addr}"
-		\git push --set-upstream origin master
-		\git config --global user.email "${repo_mail}"
-		\git config --global user.name "${repo_mail%%@*}"
-	else
-		echo "INFO: repo already in writable mode"
-	fi
-	\cd - &> /dev/null
 }
 
 # Deprecated
@@ -650,11 +611,56 @@ func_init_myenv			| func_pipe_filter "${init_log}"
 func_init_myenv_local		| func_pipe_filter "${init_log}"
 func_init_myenv_secure		| func_pipe_filter "${init_log}"
 func_init_myenv_unison		| func_pipe_filter "${init_log}"
-func_init_myenv_writable	| func_pipe_filter "${init_log}"
 func_init_myenv_collection	| func_pipe_filter "${init_log}"
-func_init_zbox_writable		| func_pipe_filter "${init_log}"
+
 #func_init_desktop_soft		| func_pipe_filter "${init_log}"	# TODO: old, need update, and how to AUTO skip for server env?
+#func_init_myenv_writable	| func_pipe_filter "${init_log}"	# deprecated
+#func_init_zbox_writable	| func_pipe_filter "${init_log}"	# deprecated
 #func_init_desktop_xfce		| func_pipe_filter "${init_log}"	# deprecated
 
 echo "INFO: ---------------- SUMMARY ----------------"
 sed -n -e "s/^SUMMARY://p" "${init_log}" | cat -n
+
+
+################################################################################
+# Deprecated
+################################################################################
+
+#func_init_zbox_writable(){
+#	echo "INFO: --STEP-- try to update zbox git to writable mode"
+#
+#	func_init_git_repo_writable ~/.zbox ouyzhu@gmail.com "ouyzhu_github:ouyzhu/zbox.git"
+#}
+#
+#func_init_myenv_writable(){
+#	echo "INFO: --STEP-- try to update myenv git to writable mode"
+#
+#	func_init_git_repo_writable ${HOME} ouyzhu@gmail.com "stico_github:stico/myenv.git"
+#}
+#
+#func_init_git_repo_writable() {
+#	local usage="Usage: ${FUNCNAME} <repo_path> <repo_mail> <repo_writable_addr>"
+#	local desc="Desc: update git to use certification, so repo becomes writable" 
+#	func_param_check 2 "${desc} \n ${usage} \n" "$@"
+#
+#	local repo_dir="${1}"
+#	local repo_mail="${2}"
+#	local repo_addr="${3}"
+#
+#	# check, git cmd already checked in func_init_myenv()
+#	func_complain_path_not_exist ${repo_dir}/.git "WARN: ${repo_dir}/.git NOT exist, check if repo path correct" && return 1
+#	func_complain_path_not_exist ~/.ssh/${repo_addr%%:*} "WARN: ~/.ssh/${repo_addr%%:*} NOT exist, repo still in readonly mode!" && return 1
+#
+#	\cd ${repo_dir} &> /dev/null
+#	if (! \git remote -v | \grep -q "${repo_addr}") ; then
+#		echo "INFO: update git config info (origin, mail, set-upstream, etc)"
+#		\git remote rm origin
+#		\git remote add origin "${repo_addr}"
+#		\git push --set-upstream origin master
+#		\git config --global user.email "${repo_mail}"
+#		\git config --global user.name "${repo_mail%%@*}"
+#	else
+#		echo "INFO: repo already in writable mode"
+#	fi
+#	\cd - &> /dev/null
+#}
