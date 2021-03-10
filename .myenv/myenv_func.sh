@@ -562,7 +562,7 @@ func_best_hostname() {
 
 	# case 1: always use hostname
 	hostname="$(hostname)" 
-	used="/baiduvm/awsvm/"
+	used="/baiduvm/awsvm/myvm/"
 	if [ "$(func_os_name)" = "${OS_OSX}" ] || func_is_personal_machine ; then	# check if personal (assume osx also yes)
 		echo "${hostname}"
 		return
