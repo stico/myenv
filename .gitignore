@@ -27,9 +27,6 @@
 !/.xmodmaprc
 !/.vrapperrc
 !/.tmux.conf
-!/.gitconfig
-!/.gitconfig.dw
-!/.gitconfig.me
 !/.gitignore
 !/.gitignore_global
 !/.dir_colors
@@ -71,12 +68,6 @@
 /.w3m/cookie
 /.w3m/history
 
-# UNISON: (?) should deprecated since might contain IP for backup
-!/.unison/
-/.unison/*
-!/.unison/*.prf
-!/.unison/deprecated
-
 # IGNORE, since really not needed OR generate on install
 .fzf.zsh
 .fzf.bash
@@ -96,7 +87,18 @@ gVim.exe.stackdump
 /.myenv/dist/
 /.vim/.netrwhist
 /.vim/autoload/pathogen.vim
+/.gitconfig
+/.gitconfig.dw
+/.gitconfig.me
+/.unison/
 
+
+# Deprecated: old unison config to include *.prf files
+## UNISON: (?) should deprecated since might contain IP for backup
+#!/.unison/
+#/.unison/*
+#!/.unison/*.prf
+#!/.unison/deprecated
 
 ############################################################
 # Deprecated

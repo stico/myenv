@@ -1,7 +1,9 @@
 [user]
 	#name = ouyzhu
 	#email = ouyzhu@gmail.com
-	name = ouyangzhu
+	#name = ouyangzhu
+	#email = ouyangzhu@yy.com
+	name = stico
 	email = ouyangzhu@yy.com
 [push]
 	default = simple
