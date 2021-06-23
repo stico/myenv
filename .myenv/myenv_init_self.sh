@@ -1,10 +1,9 @@
 #!/bin/bash
 
 ################################################################################
-# Install myenv
+# Install myenv self
 ################################################################################
-# conf/myenv/init_all.sh for setup everything 
-# one line cmd: curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/myenv_init.sh' | bash
+# ONE LINE CMD: curl -sk 'https://raw.githubusercontent.com/stico/myenv/master/.myenv/myenv_init_self.sh' | bash
 
 ################################################################################
 # Variable
@@ -43,10 +42,12 @@ func_via_git() {
 }
 
 ################################################################################
-# Initialize 
+# Install
 ################################################################################
+
 # Check
-command -v "git" &> /dev/null || func_die "ERROR: git command NOT exist, pls check"
+command -v "git" &> /dev/null || func_die "ERROR: git command NOT exist, pls install it first!"
 [ -e "${HOME}/.git" ] && echo "INFO: ${HOME}/.git already exist, skip init myenv" && exit 0
 
+# Install
 func_via_git

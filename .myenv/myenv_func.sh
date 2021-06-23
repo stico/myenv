@@ -695,11 +695,13 @@ func_collect_myenv() {
 	# extract alone as "func_grep_myenv" need update file list frequently
 	# NOTE: myenv_content/myenv_filelist might duplicate with caller
 
-	local myenv_content=${MY_ENV_ZGEN}/collection/myenv_content.txt
-	local myenv_filelist=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
+	local base=${MY_ENV_ZGEN}/collection
+	local myenv_content=${base}/myenv_content.txt
+	local myenv_filelist=${base}/myenv_filelist.txt
 	local myenv_git="$("cd" "$HOME" && git ls-files | sed -e "s+^+$HOME/+")"
 	local myenv_addi="$(eval "$(sed -e "/^\s*$/d;/^\s*#/d;" "$MY_ENV_CONF/addi/myenv" | xargs -I{}  echo echo {} )")"
 
+	[ -e "${base}" ] || mkdir -p "${base}"
 	[ -e "${myenv_filelist}" ] && func_delete_dated "${myenv_filelist}"
 	[ -e "${myenv_content}" ] && [ "${1}" = "true" ] && func_delete_dated "${myenv_content}"
 
@@ -1485,18 +1487,22 @@ func_scp_via_jump() {
 	#func_scp_with_jump ouyangzhu@222.134.66.106:~/test ~/amp/2012-11-01/test
 }
 
+# awsvm@aws
 func_scp_from_awsvm() {
 	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file from awsvm to current dir." 
 	func_param_check 1 "$@"
 
-	scp -i "${HOME}/.ssh/ouyzhu_aws_singapore.pem" "ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com:${1}" ./
+	scp "awsvm:${1}" ./
+	#scp -i "${HOME}/.ssh/ouyzhu_awsvm_hk.pem" "ubuntu@ec2-16-162-34-17.ap-east-1.compute.amazonaws.com:${1}" ./
 }
 
+# awsvm@aws
 func_scp_to_awsvm() {
 	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file to awsvm ~/Downloads/" 
 	func_param_check 1 "$@"
 
-	scp -i "${HOME}/.ssh/ouyzhu_aws_singapore.pem" "${1}" ubuntu@ec2-54-179-167-17.ap-southeast-1.compute.amazonaws.com:~/Downloads/
+	scp "${1}" awsvm:~/amp/download/
+	#scp -i "${HOME}/.ssh/ouyzhu_awsvm_hk.pem" "${1}" ubuntu@ec2-16-162-34-17.ap-east-1.compute.amazonaws.com:~/Downloads/
 }
 
 # shellcheck disable=2029

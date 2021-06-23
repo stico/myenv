@@ -619,11 +619,11 @@ func_validate_function_exist() {
 	func_die "ERROR: ${1} NOT exist or NOT a function!"
 }
 
-func_complain_privilege_not_sudoer() { 
+func_complain_sudo_not_auto() { 
 	local usage="Usage: ${FUNCNAME[0]} <msg>"
-	local desc="Desc: complains if current user not have sudo privilege, return 0 if not have, otherwise 1" 
+	local desc="Desc: complains if current user not have sudo privilege, or need input password, return 0 if not have, otherwise 1" 
 	
-	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege!}" && return 0
+	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege, or NOT auto (need input password), pls check!}" && return 0
 	return 1
 }
 
