@@ -5,10 +5,6 @@
 #
 # Problem: for windows, currently can not deal with this alias contains "|", ")"
 
-# Temp
-cdf3			"cd $HOME/Documents/FCZ/code_dw/finance.yyembed.yy.com_branch_for_v3.0"
-checklibinode		"ls -li ~/.myenv/myenv_lib.sh ~/.zbox/zbox_lib.sh ~/Documents/FCS/oumisc/oumisc-git/proj/tob/tob_lib.sh"
-
 # Alias - Misc
 c			"clear"
 cc			"\cd ; clear"
@@ -94,8 +90,6 @@ unison_use_zbox_version			"sudo rm /usr/bin/unison ; sudo ln -s /home/ouyangzhu/
 svnstatus		"func_svn_status"
 svnupdate		"func_svn_update"
 svnbackup		"func_svn_backup"
-svnlssv			"svn ls https://svn.yy.com/web/gh/yy_short_video/"
-svnlogsv		"svn log -l 30 https://svn.yy.com/web/gh/yy_short_video/"
 
 			# Head: mvn
 mvngen			"func_mvn_gen"

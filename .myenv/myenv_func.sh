@@ -867,7 +867,6 @@ func_collect_all() {
 		-e "/\/DCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
 		-e "/\/FCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
 		-e "/\/target\//d" `# maven project target`		\
-		-e "/open.yy.com_trunk\//d" `# match prefix`		\
 		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`		>> "${mydoc_filelist}"
 
 		#-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
@@ -884,7 +883,6 @@ func_collect_all() {
 		#-e "/\/xiage_trunk\/static\/image\//d"			\
 		#-e "/\/xiage_trunk\/source\/class\//d"			\
 		#-e "/\/xiage_trunk\/source\/plugin\//d"		\
-		#-e "/\/appstore.yy.com_trunk\/framework\//d"		\
 		#| sed -e "/\/\(\.git\|\.svn\|\.hg\|target\)\//d;" | wc -l
 	done
 	echo "INFO: >> $(wc -l "${mydoc_filelist}") lines"
