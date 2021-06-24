@@ -408,14 +408,14 @@ func_file_size() {
 	stat --printf="%s" "${1}"
 }
 
-func_link_init() {
-	local usage="Usage: ${FUNCNAME[0]} <target> <source>"
+func_ln_soft() {
+	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
 	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
 	func_param_check 2 "$@"
 
-	local target="$1"
-	local source="$2"
-	echo "INFO: creating link ${target} --> ${source}"
+	local source="$1"
+	local target="$2"
+	echo "INFO: create soft link ${target} --> ${source}"
 
 	# check, skip if target already link, remove if target empty 
 	func_complain_path_not_exist "${source}" && return 0
