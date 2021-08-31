@@ -175,6 +175,79 @@ func_vcs_update() {
 	fi
 }
 
+func_rsync_v1() {
+	local usage="Usage: ${FUNCNAME[0]} <src> <tgt> <add_options>" 
+	local desc="Desc: rsync between source and target" 
+	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	local src="${1}"
+	local tgt="${2}"
+	local opts="${3}"
+	func_complain_path_not_exist "${src}" && return 1
+	func_complain_path_not_exist "${tgt}" && return 1
+
+	func_techo DEBUG "run cmd: rsync -avP ${opts} ${src} ${tgt} 2>&1"
+	rsync -avP ${opts} "${src}" "${tgt}" 2>&1
+}
+
+func_rsync_del_detect() {
+	local usage="Usage: ${FUNCNAME[0]} <src> <tgt>" 
+	local desc="Desc: detect if any file need delete" 
+	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	#echo rsync --dry-run -rv --delete "${1}" "${2}"
+	rsync --dry-run -rv --delete "${1}" "${2}"	\
+		| grep '^deleting '			\
+		| sed -e 's+/[^/]*$+/+'			\
+		| sort -u
+}
+
+func_rsync_out_filter() {
+	# shellcheck disable=2148
+	awk '
+		/^$/ {			next;}	# skip empty lines
+		/\/$/ {			next;}	# skip dir lines
+		/^sent / {		next;}	# skip rsync lines
+		/^sending / {		next;}	# skip rsync lines
+		/^total size / {	next;}	# skip rsync lines
+		/%.*\/s.*:..:/ {	next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
+		/\(xfr#.*(ir|to)-chk=/ {next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
+
+		# compact those too noisy output, and use the last blank line to trigger the summary count
+		/^FCS\/maven\/m2_repo\/repository/ {
+			mvn_repo_updated_files++;
+			if(mvn_repo_update_flag == 0){
+				print "MAVEN REPO: START TO UPDATE.";
+				mvn_repo_update_flag = 1;
+			}
+			next;
+		} 
+		/^DCD\/mail/ {
+			dcd_mail_updated_files++;
+			if(dcd_mail_updated_flag == 0){
+				print "DCD MAIL: START TO UPDATE.";
+				dcd_mail_updated_flag = 1;
+			}
+			next;
+		} 
+		/^\s*$/ {		
+			if(mvn_repo_update_flag == 1 ) {
+				print "MAVEN REPO: UPDATED FILES: " mvn_repo_updated_files; 
+				mvn_repo_update_flag = 2;
+			}; 
+			if(dcd_mail_updated_flag == 1){
+				print "DCD MAIL: UPDATED_FILES: " dcd_mail_updated_files;
+				dcd_mail_updated_flag = 2;
+			}
+		} 
+
+		# for other lines, just print out
+		!/\/$/ {
+			print $0;
+		}
+	'
+}
+
 ################################################################################
 # Utility: output
 ################################################################################
@@ -405,8 +478,43 @@ func_file_size() {
 	local desc="Desc: get file size, in Bytes" 
 	func_param_check 1 "$@"
 
-	stat --printf="%s" "${1}"
+	if [ -d "${1}" ] ; then
+		# NOTE: even use --apparent-size, still found case, that output is DIFF when dir on diff FS
+		\du --apparent-size --bytes --summarize "${1}" | cut -f1
+	else
+		stat --printf="%s" "${1}"
+	fi
 }
+
+#func_dir_diff() {
+#	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
+#	local desc="Desc: compare diff of dir" 
+#	func_param_check 1 "$@"
+#
+#	func_dir_diff_size "$@" "true" && return 0
+#
+#	echo "TODO: more comparison"
+#}
+#
+#func_dir_diff_size() {
+#	local usage="Usage: ${FUNCNAME[0]} <source> <target> <print=true>"
+#	local desc="Desc: compare size of dir" 
+#	func_param_check 1 "$@"
+#
+#	local src="${1}"
+#	local tgt="${2}"
+#	local prt="${3}"
+#	local src_size="$(func_file_size "${src}")"
+#	local tgt_size="$(func_file_size "${tgt}")"
+#
+#	if (( src_size == tgt_size )) ; then
+#		[ -n "${prt}" ] && echo "same size: $(func_num_to_human ${src_size})"
+#		return 0 
+#	else
+#		[ -n "${prt}" ] && echo "DIFF size: $(func_num_to_human ${src_size}) != $(func_num_to_human ${tgt_size}) (${src} V.S. ${tgt})"
+#		return 1
+#	fi
+#}
 
 func_ln_soft() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
@@ -1139,3 +1247,18 @@ func_str_contains_blank() {
 	return 1
 }
 
+func_str_urldecode() { 
+	# pure bash version, from https://stackoverflow.com/questions/6250698/how-to-decode-url-encoded-string-in-shell
+	# more readable version in comment: urldecode() { local i="${*//+/ }"; echo -e "${i//%/\\x}"; }
+
+	# : 本来是no-op操作符，但这里是为下面的 '$_' 服务的。
+	# 下面的 '$_' 意思是上一个命令的最后一个参数。
+	# 所以这里需要它作为命令，来让后面的参数变成'最后一个参数' 即 '$_'。
+	# 作者有点玩技巧了，原链接的评论里也有人给出了更易读的方案，直接用个变量承载就好了。
+
+	# ${*//+/ } will replace all + with space 
+	: "${*//+/ }";			
+
+	# ${_//%/\\x} will replace all % with \x.
+	echo -e "${_//%/\\x}"; 
+}

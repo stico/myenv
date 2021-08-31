@@ -104,6 +104,7 @@ gitcommitcheck		"func_git_commit_check | sort"
 			# Head: d - dated
 ddelete			"func_delete_dated"
 dbackup			"func_backup_dated"
+dbackuptoremote		"func_backup_dated_to_remote test.163"
 
 			# Head: e - myenv 
 megf			"func_grep_myenv"

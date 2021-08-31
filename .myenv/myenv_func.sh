@@ -18,6 +18,8 @@ MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
 [ -f "${MYENV_SECU_PATH}" ] && source "${MYENV_SECU_PATH}"
 
+DCB_DATED_BACKUP="$MY_DCB/dbackup/latest"
+
 ################################################################################
 # Constants
 ################################################################################
@@ -143,6 +145,9 @@ func_grep_myenv() {
 
 	func_collect_myenv "no_content"
 	xargs -d'\n' -a "${MY_ENV_ZGEN}/collection/myenv_filelist.txt" grep --color -d skip -I -i "$@" 2>&1
+
+	# TODO: grep other exclude files
+	grep --color -d skip -I -i "$@" "${HOME}/.ssh/config" "${MY_ENV}/myenv_secu.sh" 2>&1
 
 	#cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
 	#xargs -d'\n' grep -d skip -I -i "$@" 2>&1		| \
@@ -1167,8 +1172,12 @@ func_ssh_agent_init() {
 	#[ -n "$SSH_AUTH_SOCK" ] && echo "INFO: ssh agent already exist: $SSH_AUTH_SOCK" && return 0
 
 	local cmd="ssh-agent -s"
+	local cert="${HOME}/.ssh/ouyangzhu_duowan"
 	local env_tmp=~/.ssh/ssh_agent_env_tmp
 	local auth_sock="$([ -e "${env_tmp}" ] && grep -o "SSH_AUTH_SOCK=[^;]*" "${env_tmp}" | sed -e "s/SSH_AUTH_SOCK=//" 2> /dev/null)"
+
+	# this function used in .bashrc, which migth block desktop version login, so NO output, NO error
+	[ -e "${cert}" ] || return
 
 	# reuse if already started. NOTE, the SSH_AUTH_SOCK file and the Process must all exist!
 	[ -e "${auth_sock}" ] && . "${env_tmp}" &> /dev/null && func_validate_user_proc "${SSH_AGENT_PID}.*ssh-agent" && return 0
@@ -1178,16 +1187,7 @@ func_ssh_agent_init() {
 	${cmd} | sed "s/^echo/#echo/" > "${env_tmp}"
 	chmod 600 "${env_tmp}"
 	. "${env_tmp}" > /dev/null
-	ssh-add ~/.ssh/ouyangzhu_duowan
-}
-
-func_scp_host_to_ip() {
-	local usage="Usage: ${FUNCNAME[0]} [addr]" 
-	func_param_check 1 "$@"
-
-	func_str_not_contains "${1}" ":" && echo "${1}" && return 0
-
-	echo "$(func_ip_of_host "${1%:*}"):${1#*:}"
+	ssh-add "${cert}"
 }
 
 func_ssh_cmd_via_jump() {
@@ -1378,6 +1378,15 @@ func_dist_sync() {
 			diff "${tag_path_local}/${content}" "${local_backup_path}/${content}" | diffstat
 		done
 	fi
+}
+
+func_scp_host_to_ip() {
+	local usage="Usage: ${FUNCNAME[0]} [addr]" 
+	func_param_check 1 "$@"
+
+	func_str_not_contains "${1}" ":" && echo "${1}" && return 0
+
+	echo "$(func_ip_of_host "${1%:*}"):${1#*:}"
 }
 
 # shellcheck disable=2029
@@ -1708,12 +1717,11 @@ func_backup_dated_gen_exclude_list() {
 func_backup_dated_gen_target_path() {
 	local usage="Usage: ${FUNCNAME[0]}\n\tGenerate target path to store the backup file" 
 
-	local dcb_dated_backup tags
-	dcb_dated_backup="$MY_DCB/dbackup/latest"
+	local tags
 
 	# dcb for personal computer
-	if [ -d "${dcb_dated_backup}" ]; then
-		echo "${dcb_dated_backup}"
+	if [ -d "${DCB_DATED_BACKUP}" ]; then
+		echo "${DCB_DATED_BACKUP}"
 		return
 
 	# if dirs(tags) in dist, ask for selection
@@ -1751,6 +1759,17 @@ func_backup_dated_of_filelist() {
 	zip -r "${target}" -@ < "${filelist}"
 
 	# TODO: gen result info like func_backup_dated
+}
+
+func_backup_dated_to_remote() {
+	local usage="Usage: ${FUNCNAME[0]} [remote-host] [file_path]" 
+	func_param_check 2 "$@"
+
+	func_complain_path_not_exist "${2}" && return
+
+	func_backup_dated "${2}"
+	local bak_path="${DCB_DATED_BACKUP}/$(ls "${DCB_DATED_BACKUP}" | tail -1)"
+	scp "${bak_path}" "${1}:~/Documents/${DCB_DATED_BACKUP##*Documents}"
 }
 
 func_backup_dated() {
@@ -2465,3 +2484,148 @@ func_find_dup_files() {
 		fi
 	fi
 }
+
+func_mydata_sync(){
+	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
+
+	# CONFIG - Common
+	TCA_BASE="/tmp/tca"
+	TCB_BASE="/tmp/tcb"
+	TCZ_BASE="/tmp/tcz"
+	DTB_BASE="/tmp/dtb"
+
+	# DTA have diff name on laptp/lapmac
+	DTA_BASE="/there/is/no/DAT"
+	DTA_BASE_LAPTP="/media/G2TG"
+	DTA_BASE_LAPMAC="/Volumes/G2TG"
+	if [ -d "${DTA_BASE_LAPTP}" ] ; then 
+		DTA_BASE="${DTA_BASE_LAPTP}" 
+	elif [ -d "${DTA_BASE_LAPMAC}" ] ; then 
+		DTA_BASE="${DTA_BASE_LAPMAC}" 
+	fi
+
+	DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
+	DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
+	DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
+	DOC_SRC_BASE="${HOME}/Documents"
+	DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
+
+	VIDEO_SYNC_LIST_DTA="tv course documentary movie" 
+	VIDEO_SRC_BASE_DTA="/${DTA_BASE}/video"
+	VIDEO_TGT_BASE_TCZ="/tmp/tcz/video"
+
+	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_dtatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_dtbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
+	func_mydata_print_summary "${tmp_log}" 
+}
+
+func_mydata_out_filter_del() {
+	sed -e  '
+		# ignore whole dir
+		/FCZ\/backup_DCS\//d;
+
+		# ignore specific dir or file
+		/deleting FCZ\/backup_dbackup\/$/d;
+		/deleting FCZ\/backup_dbackup\/2020/d;
+		/deleting FCZ\/backup_dbackup\/201[0-9]/d;
+		'
+}
+
+func_mydata_rsync_del_detect() {
+	local del_list="$(func_rsync_del_detect "$@" | func_mydata_out_filter_del)"
+
+	if [ -z "${del_list}" ] ; then 
+		func_techo INFO "nothing need to delete manually"
+	else
+		func_techo WARN "Might NEED TO DELETE MANUALLY IN ${2}"
+		echo "${del_list}" 
+	fi
+}
+
+func_mydata_print_summary() {
+	local tmp_log_file="${1}"
+
+	echo -e "\nINFO: ======== FILE NEED MANUAL DELETE ========"
+	grep '^deleting ' "${tmp_log_file}" | mydata_out_filter_del
+
+	echo -e "\nINFO: ======== ERROR/WARN NEED HANDLE ========"
+	sed -n -e '/ ERROR: /p;/ WARN: /p;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
+
+	mv "${tmp_log_file}" "${LOG_BAK_PATH}/"
+	echo -e "\nINFO: detail log: ${LOG_BAK_PATH}/${tmp_log_file##*\/}"
+}
+
+func_mydata_sync_doc() {
+	func_complain_path_not_exist "${DOC_SRC_BASE}" "${DOC_SRC_BASE} not found, skip sync Documents" && return 1
+
+	if [ -d "${DOC_TGT_BASE_TCZ}" ] ; then
+		func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
+	fi
+
+	if [ -d "${DOC_TGT_BASE_DTA}" ] ; then
+		func_mydata_sync_doc_unison 
+	fi
+}
+
+func_mydata_sync_doc_rsync() {
+
+	local target="${1}"
+	func_complain_path_not_exist "${DOC_EX_BASE}" && return 1
+	
+	for d in ${DOC_SYNC_LIST} ; do
+	#for d in FCZ ; do
+		local opts="--exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
+		#local opts="--dry-run --exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
+
+		func_techo INFO       "rsync: ${DOC_SRC_BASE}/${d} -> ${target}"
+		func_rsync_v1                "${DOC_SRC_BASE}/${d}"  "${target}" "${opts}"
+		func_mydata_rsync_del_detect "${DOC_SRC_BASE}/${d}"  "${target}" 
+
+		# NOTE: compare size is NOT good, since ignored some file in rsync
+	done
+}
+
+func_mydata_sync_doc_unison() {
+	func_complain_path_not_exist "${HOME}/.unison" && return 1
+	func_complain_path_not_exist "${DOC_TGT_BASE_DTA}" && return 1
+	unison fs_lapmac2_all
+}
+
+func_mydata_sync_tcatotcz() {
+	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
+	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
+
+	func_techo INFO "TODO: NOT IMPL YET"
+	# TODO: check path
+}
+
+func_mydata_sync_tcbtotcz() {
+	[ ! -d "${TCB_BASE}" ] && func_techo INFO "${TCB_BASE} NOT mount, skip sync with tcb" && return 0
+	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
+
+	func_techo INFO "TODO: NOT IMPL YET"
+	# TODO: check path
+}
+
+func_mydata_sync_dtatotcz() {
+	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
+
+	func_complain_path_not_exist "${VIDEO_SRC_BASE_DTA}" && return 1
+	for d in ${VIDEO_SYNC_LIST_DTA} ; do
+		func_techo INFO       "rsync: ${VIDEO_SRC_BASE_DTA}/${d} -> ${VIDEO_TGT_BASE_TCZ}"
+		func_rsync_v1                "${VIDEO_SRC_BASE_DTA}/${d}"  "${VIDEO_TGT_BASE_TCZ}" "${opts}"
+		func_mydata_rsync_del_detect "${VIDEO_SRC_BASE_DTA}/${d}"  "${VIDEO_TGT_BASE_TCZ}" 
+	done
+}
+
+func_mydata_sync_dtbtotcz() {
+	[ ! -d "${DTB_BASE}" ] && func_techo INFO "${DTB_BASE} NOT there, skip sync with dtb" && return 0
+
+	func_techo INFO "TODO: NOT IMPL YET"
+	# TODO: check path
+}
+
+

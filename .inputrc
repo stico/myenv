@@ -2,9 +2,12 @@
 #
 
 ################## Configuration ##################
-set bell-style none			# never ring the bell
-set bell-style visible			# use visual bell, if available
-set show-all-if-ambiguous on		# list all completions instead of ringing the bell
+# never ring the bell
+set bell-style none
+# use visual bell, if available
+set bell-style visible
+# list all completions instead of ringing the bell
+set show-all-if-ambiguous on
 set completion-ignore-case on
 
 ################## Key Mapping ##################

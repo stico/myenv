@@ -14,8 +14,8 @@ func_init_myenv_local() {
 	# NOTE: not need to check myenv here, since source lib already did
 
 	# local dir
-	mkdir "${MY_ENV_SECU}"
-	mkdir "${MY_ENV_ZGEN}/collection"
+	mkdir "${MY_ENV_SECU}" &> /dev/null
+	mkdir "${MY_ENV_ZGEN}/collection" &> /dev/null
 
 	# local bashrc
 	local local_bashrc="${MY_ENV_CONF}/bash/bashrc.$(hostname)"
