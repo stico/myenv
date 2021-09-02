@@ -2486,34 +2486,38 @@ func_find_dup_files() {
 }
 
 func_mydata_sync(){
-	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
-
 	# CONFIG - Common
-	TCA_BASE="/tmp/tca"
-	TCB_BASE="/tmp/tcb"
-	TCZ_BASE="/tmp/tcz"
-	DTB_BASE="/tmp/dtb"
+	local TCA_BASE="/tmp/tca"
+	local TCB_BASE="/tmp/tcb"
+	local TCZ_BASE="/tmp/tcz"
+	local DTB_BASE="/tmp/dtb"
 
 	# DTA have diff name on laptp/lapmac
-	DTA_BASE="/there/is/no/DAT"
-	DTA_BASE_LAPTP="/media/G2TG"
-	DTA_BASE_LAPMAC="/Volumes/G2TG"
+	local DTA_BASE="/THERE/IS/NO/dta"
+	local DTA_BASE_LAPTP="/media/G2TG"
+	local DTA_BASE_LAPMAC="/Volumes/G2TG"
 	if [ -d "${DTA_BASE_LAPTP}" ] ; then 
 		DTA_BASE="${DTA_BASE_LAPTP}" 
 	elif [ -d "${DTA_BASE_LAPMAC}" ] ; then 
 		DTA_BASE="${DTA_BASE_LAPMAC}" 
 	fi
+	local DTB_BASE="/THERE/IS/NO/dtb"
+	local DTB_BASE_LAPTP="/media/MHD500"
+	local DTB_BASE_LAPMAC="/Volumes/MHD500"
+	if [ -d "${DTB_BASE_LAPTP}" ] ; then 
+		DTB_BASE="${DTB_BASE_LAPTP}" 
+	elif [ -d "${DTA_BASE_LAPMAC}" ] ; then 
+		DTB_BASE="${DTB_BASE_LAPMAC}" 
+	fi
 
-	DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
-	DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
-	DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
-	DOC_SRC_BASE="${HOME}/Documents"
-	DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
+	local DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
+	local DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
+	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
+	local DOC_SRC_BASE="${HOME}/Documents"
+	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
 
-	VIDEO_SYNC_LIST_DTA="tv course documentary movie" 
-	VIDEO_SRC_BASE_DTA="/${DTA_BASE}/video"
-	VIDEO_TGT_BASE_TCZ="/tmp/tcz/video"
 
+	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
 	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_dtatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
@@ -2527,7 +2531,7 @@ func_mydata_out_filter_del() {
 		# ignore whole dir
 		/FCZ\/backup_DCS\//d;
 
-		# ignore specific dir or file
+		# not all dbackup should ignore, so need 3 lines
 		/deleting FCZ\/backup_dbackup\/$/d;
 		/deleting FCZ\/backup_dbackup\/2020/d;
 		/deleting FCZ\/backup_dbackup\/201[0-9]/d;
@@ -2554,8 +2558,7 @@ func_mydata_print_summary() {
 	echo -e "\nINFO: ======== ERROR/WARN NEED HANDLE ========"
 	sed -n -e '/ ERROR: /p;/ WARN: /p;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
 
-	mv "${tmp_log_file}" "${LOG_BAK_PATH}/"
-	echo -e "\nINFO: detail log: ${LOG_BAK_PATH}/${tmp_log_file##*\/}"
+	echo -e "\nINFO: detail log: ${tmp_log_file}"
 }
 
 func_mydata_sync_doc() {
@@ -2610,22 +2613,36 @@ func_mydata_sync_tcbtotcz() {
 	# TODO: check path
 }
 
+func_mydata_sync_totcz() {
+	local src_base="${1}"
+	local sync_list="${2}"
+
+	[ ! -d "${src_base}" ] && func_techo INFO "${src_base} NOT mount, skip sync with dta" && return 0
+
+	for d in ${sync_list} ; do
+		func_complain_path_not_exist "${src_base}/${d}/" && return 1
+		func_complain_path_not_exist "${TCZ_BASE}/${d}/" && return 1
+
+		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${TCZ_BASE}"
+		func_rsync_v1                "${src_base}/${d}/"  "${TCZ_BASE}/${d}/"
+		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${TCZ_BASE}/${d}/" 
+	done
+}
+
+			
+		
 func_mydata_sync_dtatotcz() {
 	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
 
-	func_complain_path_not_exist "${VIDEO_SRC_BASE_DTA}" && return 1
-	for d in ${VIDEO_SYNC_LIST_DTA} ; do
-		func_techo INFO       "rsync: ${VIDEO_SRC_BASE_DTA}/${d} -> ${VIDEO_TGT_BASE_TCZ}"
-		func_rsync_v1                "${VIDEO_SRC_BASE_DTA}/${d}"  "${VIDEO_TGT_BASE_TCZ}" "${opts}"
-		func_mydata_rsync_del_detect "${VIDEO_SRC_BASE_DTA}/${d}"  "${VIDEO_TGT_BASE_TCZ}" 
-	done
+	local DTA_SYNC_LIST="video/tv video/course video/documentary video/movieNdta dudu/tv dudu/book dudu/audio dudu/movie dudu/course dudu/documentary" 
+	func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
 }
 
 func_mydata_sync_dtbtotcz() {
 	[ ! -d "${DTB_BASE}" ] && func_techo INFO "${DTB_BASE} NOT there, skip sync with dtb" && return 0
 
-	func_techo INFO "TODO: NOT IMPL YET"
-	# TODO: check path
+	local DTB_SYNC_LIST="video/movieNdtb" 
+	func_mydata_sync_totcz "${DTB_BASE}" "${DTB_SYNC_LIST}" 
 }
 
 
