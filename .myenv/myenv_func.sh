@@ -2494,21 +2494,16 @@ func_mydata_sync(){
 
 	# DTA have diff name on laptp/lapmac
 	local DTA_BASE="/THERE/IS/NO/dta"
-	local DTA_BASE_LAPTP="/media/G2TG"
+	local DTA_BASE_LAPTP="/media/ouyzhu/G2TG"
 	local DTA_BASE_LAPMAC="/Volumes/G2TG"
-	if [ -d "${DTA_BASE_LAPTP}" ] ; then 
-		DTA_BASE="${DTA_BASE_LAPTP}" 
-	elif [ -d "${DTA_BASE_LAPMAC}" ] ; then 
-		DTA_BASE="${DTA_BASE_LAPMAC}" 
-	fi
+	[ -d "${DTA_BASE_LAPTP}" ] && DTA_BASE="${DTA_BASE_LAPTP}" 
+	[ -d "${DTA_BASE_LAPMAC}" ] && DTA_BASE="${DTA_BASE_LAPMAC}" 
+
 	local DTB_BASE="/THERE/IS/NO/dtb"
-	local DTB_BASE_LAPTP="/media/MHD500"
+	local DTB_BASE_LAPTP="/media/ouyzhu/MHD500"
 	local DTB_BASE_LAPMAC="/Volumes/MHD500"
-	if [ -d "${DTB_BASE_LAPTP}" ] ; then 
-		DTB_BASE="${DTB_BASE_LAPTP}" 
-	elif [ -d "${DTA_BASE_LAPMAC}" ] ; then 
-		DTB_BASE="${DTB_BASE_LAPMAC}" 
-	fi
+	[ -d "${DTB_BASE_LAPTP}" ] && DTB_BASE="${DTB_BASE_LAPTP}" 
+	[ -d "${DTB_BASE_LAPMAC}" ] && DTB_BASE="${DTB_BASE_LAPMAC}" 
 
 	local DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
 	local DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
@@ -2516,8 +2511,8 @@ func_mydata_sync(){
 	local DOC_SRC_BASE="${HOME}/Documents"
 	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
 
-
 	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
+	func_techo INFO "detail log: ${tmp_log}" 
 	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_dtatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
@@ -2553,10 +2548,11 @@ func_mydata_print_summary() {
 	local tmp_log_file="${1}"
 
 	echo -e "\nINFO: ======== FILE NEED MANUAL DELETE ========"
-	grep '^deleting ' "${tmp_log_file}" | mydata_out_filter_del
+	#grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del	# not need, since already filtered
+	grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del
 
 	echo -e "\nINFO: ======== ERROR/WARN NEED HANDLE ========"
-	sed -n -e '/ ERROR: /p;/ WARN: /p;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
+	sed -n -e '/ ERROR: /Ip;/ WARN: /Ip;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
 
 	echo -e "\nINFO: detail log: ${tmp_log_file}"
 }
@@ -2564,13 +2560,14 @@ func_mydata_print_summary() {
 func_mydata_sync_doc() {
 	func_complain_path_not_exist "${DOC_SRC_BASE}" "${DOC_SRC_BASE} not found, skip sync Documents" && return 1
 
-	if [ -d "${DOC_TGT_BASE_TCZ}" ] ; then
-		func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
-	fi
+	[ -d "${DOC_TGT_BASE_DTA}" ] && func_mydata_sync_doc_unison 
+	[ -d "${DOC_TGT_BASE_TCZ}" ] && func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
+}
 
-	if [ -d "${DOC_TGT_BASE_DTA}" ] ; then
-		func_mydata_sync_doc_unison 
-	fi
+func_mydata_sync_doc_unison() {
+	func_complain_path_not_exist "${HOME}/.unison" && return 1
+	func_complain_path_not_exist "${DOC_TGT_BASE_DTA}" && return 1
+	unison fs_lapmac2_all
 }
 
 func_mydata_sync_doc_rsync() {
@@ -2591,28 +2588,6 @@ func_mydata_sync_doc_rsync() {
 	done
 }
 
-func_mydata_sync_doc_unison() {
-	func_complain_path_not_exist "${HOME}/.unison" && return 1
-	func_complain_path_not_exist "${DOC_TGT_BASE_DTA}" && return 1
-	unison fs_lapmac2_all
-}
-
-func_mydata_sync_tcatotcz() {
-	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
-	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
-
-	func_techo INFO "TODO: NOT IMPL YET"
-	# TODO: check path
-}
-
-func_mydata_sync_tcbtotcz() {
-	[ ! -d "${TCB_BASE}" ] && func_techo INFO "${TCB_BASE} NOT mount, skip sync with tcb" && return 0
-	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
-
-	func_techo INFO "TODO: NOT IMPL YET"
-	# TODO: check path
-}
-
 func_mydata_sync_totcz() {
 	local src_base="${1}"
 	local sync_list="${2}"
@@ -2629,8 +2604,22 @@ func_mydata_sync_totcz() {
 	done
 }
 
-			
-		
+func_mydata_sync_tcatotcz() {
+	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
+	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
+
+	local TCA_SYNC_LIST="h8/actor h8/misc" 
+	func_mydata_sync_totcz "${TCA_BASE}" "${TCA_SYNC_LIST}" 
+}
+
+func_mydata_sync_tcbtotcz() {
+	[ ! -d "${TCB_BASE}" ] && func_techo INFO "${TCB_BASE} NOT mount, skip sync with tcb" && return 0
+	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
+
+	local TCB_SYNC_LIST="h8/actor h8/misc movie/Rtcb" 
+	func_mydata_sync_totcz "${TCB_BASE}" "${TCB_SYNC_LIST}" 
+}
+
 func_mydata_sync_dtatotcz() {
 	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
 
