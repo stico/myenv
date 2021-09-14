@@ -2598,17 +2598,22 @@ func_mydata_sync_totcz() {
 		func_complain_path_not_exist "${src_base}/${d}/" && return 1
 		func_complain_path_not_exist "${TCZ_BASE}/${d}/" && return 1
 
-		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${TCZ_BASE}"
+		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${TCZ_BASE}/${d}/"
 		func_rsync_v1                "${src_base}/${d}/"  "${TCZ_BASE}/${d}/"
 		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${TCZ_BASE}/${d}/" 
 	done
+}
+
+func_mydata_sync_tcz_extra() {
+	# only for dir record
+	local TCZ_EXTRA_LIST="backup_rsync" 
 }
 
 func_mydata_sync_tcatotcz() {
 	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
 	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
 
-	local TCA_SYNC_LIST="h8/actor h8/misc" 
+	local TCA_SYNC_LIST="h8/actor h8/zptp video/movieRtca video/misc" 
 	func_mydata_sync_totcz "${TCA_BASE}" "${TCA_SYNC_LIST}" 
 }
 
@@ -2616,7 +2621,7 @@ func_mydata_sync_tcbtotcz() {
 	[ ! -d "${TCB_BASE}" ] && func_techo INFO "${TCB_BASE} NOT mount, skip sync with tcb" && return 0
 	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
 
-	local TCB_SYNC_LIST="h8/actor h8/misc movie/Rtcb" 
+	local TCB_SYNC_LIST="h8/misc" 
 	func_mydata_sync_totcz "${TCB_BASE}" "${TCB_SYNC_LIST}" 
 }
 
