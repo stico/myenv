@@ -2485,12 +2485,30 @@ func_find_dup_files() {
 	fi
 }
 
+func_gen_filelist_with_size(){
+	local usage="USAGE: ${FUNCNAME[0]} <path> <output_path>" 
+	local desc="Desc: gen file list with human readable size" 
+	func_param_check 1 "$@"
+
+	local src_path="${1}"
+	local out_path="${2}"
+	if [ -z "${out_path}" ] ; then
+		local fpath="$(readlink -f "${src_path}")"
+		local name="$(basename "${fpath}")"
+		out_path="/tmp/fl_${name}_$(func_dati).txt"
+	fi
+
+	find "${src_path}" -type f -printf '%s\t%P\n' | numfmt --field=1 --to=si --format="%-6f" > "${out_path}"
+
+	echo "INFO: filelist at: ${out_path}"
+}
+
 func_mydata_sync(){
 	# CONFIG - Common
 	local TCA_BASE="/tmp/tca"
 	local TCB_BASE="/tmp/tcb"
 	local TCZ_BASE="/tmp/tcz"
-	local DTB_BASE="/tmp/dtb"
+	local DTZ_BASE="/tmp/tcy"
 
 	# DTA have diff name on laptp/lapmac
 	local DTA_BASE="/THERE/IS/NO/dta"
@@ -2519,6 +2537,21 @@ func_mydata_sync(){
 	func_mydata_sync_dtbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
 	func_mydata_print_summary "${tmp_log}" 
+
+	func_mydata_gen_fl_and_upload
+}
+
+func_mydata_gen_fl_and_upload(){
+	local fl_dir
+	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
+
+		fl_dir="${d}/alone/fl_record"
+		[ -e "${fl_dir}" ] || mkdir "${fl_dir}"
+
+		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
+		func_scp_to_awsvm "${fl}"
+		mv "${fl}" "${fl_dir}" 
+	done
 }
 
 func_mydata_out_filter_del() {
@@ -2638,5 +2671,4 @@ func_mydata_sync_dtbtotcz() {
 	local DTB_SYNC_LIST="video/movieNdtb" 
 	func_mydata_sync_totcz "${DTB_BASE}" "${DTB_SYNC_LIST}" 
 }
-
 
