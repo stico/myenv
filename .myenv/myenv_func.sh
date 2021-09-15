@@ -2546,7 +2546,7 @@ func_mydata_gen_fl_and_upload(){
 	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
 
 		fl_dir="${d}/alone/fl_record"
-		[ -e "${fl_dir}" ] || mkdir "${fl_dir}"
+		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
 
 		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
 		func_scp_to_awsvm "${fl}"
