@@ -2646,7 +2646,7 @@ func_mydata_sync_tcatotcz() {
 	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
 	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
 
-	local TCA_SYNC_LIST="h8/actor h8/zptp video/miscRtca" 
+	local TCA_SYNC_LIST="h8/actor h8/zptp" 
 	func_mydata_sync_totcz "${TCA_BASE}" "${TCA_SYNC_LIST}" 
 }
 
@@ -2654,7 +2654,7 @@ func_mydata_sync_tcbtotcz() {
 	[ ! -d "${TCB_BASE}" ] && func_techo INFO "${TCB_BASE} NOT mount, skip sync with tcb" && return 0
 	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
 
-	local TCB_SYNC_LIST="h8/misc video/movieRtcb" 
+	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
 	func_mydata_sync_totcz "${TCB_BASE}" "${TCB_SYNC_LIST}" 
 }
 
