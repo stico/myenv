@@ -2508,21 +2508,18 @@ func_mydata_sync(){
 	local TCA_BASE="/tmp/tca"
 	local TCB_BASE="/tmp/tcb"
 	local TCZ_BASE="/tmp/tcz"
-	local DTZ_BASE="/tmp/tcy"
 
 	# DTA have diff name on laptp/lapmac
-	local DTA_BASE="/THERE/IS/NO/dta"
-	local DTA_BASE_LAPTP="/media/ouyzhu/G2TG"
-	local DTA_BASE_LAPMAC="/Volumes/G2TG"
-	[ -d "${DTA_BASE_LAPTP}" ] && DTA_BASE="${DTA_BASE_LAPTP}" 
-	[ -d "${DTA_BASE_LAPMAC}" ] && DTA_BASE="${DTA_BASE_LAPMAC}" 
+	local DTA_BASE="G2TG"
+	local DTB_BASE="MHD500"
+	local DTZ_BASE="G5TG"
+	local BASE_LAPTP="/media/ouyzhu"
+	local BASE_LAPMAC="/Volumes"
+	[ -d "${BASE_LAPTP}/${DTA_BASE}" ] && DTA_BASE="${BASE_LAPTP}/${DTA_BASE}" || DTA_BASE="${BASE_LAPMAC}/${DTA_BASE}" 
+	[ -d "${BASE_LAPTP}/${DTB_BASE}" ] && DTB_BASE="${BASE_LAPTP}/${DTB_BASE}" || DTB_BASE="${BASE_LAPMAC}/${DTB_BASE}" 
+	[ -d "${BASE_LAPTP}/${DTZ_BASE}" ] && DTZ_BASE="${BASE_LAPTP}/${DTZ_BASE}" || DTZ_BASE="${BASE_LAPMAC}/${DTZ_BASE}" 
 
-	local DTB_BASE="/THERE/IS/NO/dtb"
-	local DTB_BASE_LAPTP="/media/ouyzhu/MHD500"
-	local DTB_BASE_LAPMAC="/Volumes/MHD500"
-	[ -d "${DTB_BASE_LAPTP}" ] && DTB_BASE="${DTB_BASE_LAPTP}" 
-	[ -d "${DTB_BASE_LAPMAC}" ] && DTB_BASE="${DTB_BASE_LAPMAC}" 
-
+	# Doc part
 	local DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
 	local DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
 	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
@@ -2545,9 +2542,14 @@ func_mydata_gen_fl_and_upload(){
 	local fl_dir
 	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
 
+		# check existence
+		[ ! -e "${d}" ] && echo "INFO: skip ${d}, since not there" && continue
+
+		# prepare dir
 		fl_dir="${d}/alone/fl_record"
 		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
 
+		# mv and upload
 		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
 		func_scp_to_awsvm "${fl}"
 		mv "${fl}" "${fl_dir}" 
