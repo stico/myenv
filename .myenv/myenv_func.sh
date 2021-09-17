@@ -2510,9 +2510,9 @@ func_mydata_sync(){
 	local TCZ_BASE="/tmp/tcz"
 
 	# DTA have diff name on laptp/lapmac
-	local DTA_BASE="G2TG"
-	local DTB_BASE="MHD500"
-	local DTZ_BASE="G5TG"
+	local DTA_BASE="DTA"	# G2TG
+	local DTB_BASE="DTB"	# MHD500
+	local DTZ_BASE="DTZ"	# G5TG
 	local BASE_LAPTP="/media/ouyzhu"
 	local BASE_LAPMAC="/Volumes"
 	[ -d "${BASE_LAPTP}/${DTA_BASE}" ] && DTA_BASE="${BASE_LAPTP}/${DTA_BASE}" || DTA_BASE="${BASE_LAPMAC}/${DTA_BASE}" 
@@ -2639,16 +2639,19 @@ func_mydata_sync_totcz() {
 	done
 }
 
-func_mydata_sync_tcz_extra() {
+func_mydata_sync_extra() {
+	# alone is common extra dir
+
 	# only for dir record
 	local TCZ_EXTRA_LIST="backup_rsync" 
+	local DTZ_EXTRA_LIST="backup_unison" 
 }
 
 func_mydata_sync_tcatotcz() {
 	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
 	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
 
-	local TCA_SYNC_LIST="h8/actor h8/zptp" 
+	local TCA_SYNC_LIST="h8/actor h8/zptp dudu/course dudu/tv video/tv" 
 	func_mydata_sync_totcz "${TCA_BASE}" "${TCA_SYNC_LIST}" 
 }
 
@@ -2663,7 +2666,7 @@ func_mydata_sync_tcbtotcz() {
 func_mydata_sync_dtatotcz() {
 	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
 
-	local DTA_SYNC_LIST="video/tv video/course video/documentary video/movieNdta dudu/tv dudu/book dudu/audio dudu/movie dudu/course dudu/documentary" 
+	local DTA_SYNC_LIST="video/course video/documentary video/movieNdta dudu/book dudu/audio dudu/movie dudu/documentary dudu/xiaoxue gigi/course book/computer book/misc" 
 	func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
 }
 
@@ -2674,3 +2677,10 @@ func_mydata_sync_dtbtotcz() {
 	func_mydata_sync_totcz "${DTB_BASE}" "${DTB_SYNC_LIST}" 
 }
 
+func_mydata_sync_dtatotcz() {
+	[ ! -d "${DTZ_BASE}" ] && func_techo INFO "${DTZ_BASE} NOT there, skip sync with dtz" && return 0
+
+	#TODO: mv what?
+	#local DTZ_SYNC_LIST="video/movieNdtz" 
+	#func_mydata_sync_totcz "${DTZ_BASE}" "${DTZ_SYNC_LIST}" 
+}
