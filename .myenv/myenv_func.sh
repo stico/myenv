@@ -2530,8 +2530,10 @@ func_mydata_sync(){
 	func_techo INFO "detail log: ${tmp_log}" 
 	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_dtatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_dtbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	#func_mydata_sync_dtatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
 	func_mydata_print_summary "${tmp_log}" 
 
@@ -2663,13 +2665,6 @@ func_mydata_sync_tcbtotcz() {
 	func_mydata_sync_totcz "${TCB_BASE}" "${TCB_SYNC_LIST}" 
 }
 
-func_mydata_sync_dtatotcz() {
-	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
-
-	local DTA_SYNC_LIST="video/course video/documentary video/movieNdta dudu/book dudu/audio dudu/movie dudu/documentary dudu/xiaoxue gigi/course book/computer book/misc" 
-	func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
-}
-
 func_mydata_sync_dtbtotcz() {
 	[ ! -d "${DTB_BASE}" ] && func_techo INFO "${DTB_BASE} NOT there, skip sync with dtb" && return 0
 
@@ -2677,10 +2672,27 @@ func_mydata_sync_dtbtotcz() {
 	func_mydata_sync_totcz "${DTB_BASE}" "${DTB_SYNC_LIST}" 
 }
 
+func_mydata_sync_dtatodtz() {
+	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
+
+	local DTA_SYNC_LIST="dudu/xiaoxue gigi/course book/computer book/misc"
+	func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
+}
+
 func_mydata_sync_dtatotcz() {
+	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
+
+	echo "INFO: seems NO need sync from DTA to tcz, skip"
+	return
+
+	#local DTA_SYNC_LIST="" 
+	#func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
+}
+
+func_mydata_sync_dtztotcz() {
 	[ ! -d "${DTZ_BASE}" ] && func_techo INFO "${DTZ_BASE} NOT there, skip sync with dtz" && return 0
 
-	#TODO: mv what?
-	#local DTZ_SYNC_LIST="video/movieNdtz" 
-	#func_mydata_sync_totcz "${DTZ_BASE}" "${DTZ_SYNC_LIST}" 
+	local DTZ_SYNC_LIST="video/course video/documentary dudu/book dudu/audio dudu/movie dudu/documentary "
+	func_mydata_sync_totcz "${DTZ_BASE}" "${DTZ_SYNC_LIST}" 
 }
+
