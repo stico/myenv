@@ -205,6 +205,8 @@ func_rsync_del_detect() {
 func_rsync_out_filter() {
 	# shellcheck disable=2148
 	awk '
+		/DEBUG: |WARN: |ERROR: |FATAL: |TRACE: / {print $0;}	# reserve log lines
+
 		/^$/ {			next;}	# skip empty lines
 		/\/$/ {			next;}	# skip dir lines
 		/^sent / {		next;}	# skip rsync lines

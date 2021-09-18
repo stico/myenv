@@ -2522,9 +2522,7 @@ func_mydata_sync(){
 	# Doc part
 	local DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
 	local DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
-	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
 	local DOC_SRC_BASE="${HOME}/Documents"
-	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
 
 	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
 	func_techo INFO "detail log: ${tmp_log}" 
@@ -2537,7 +2535,11 @@ func_mydata_sync(){
 	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
 	func_mydata_print_summary "${tmp_log}" 
 
-	func_mydata_gen_fl_and_upload
+	if [ "${1}" == "-nofl" ] ; then
+		:
+	else
+		func_mydata_gen_fl_and_upload
+	fi
 }
 
 func_mydata_gen_fl_and_upload(){
@@ -2545,7 +2547,8 @@ func_mydata_gen_fl_and_upload(){
 	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
 
 		# check existence
-		[ ! -e "${d}" ] && echo "INFO: skip ${d}, since not there" && continue
+		[ ! -e "${d}" ] && func_techo info "skip ${d}, since not there" && continue
+		! df | grep -o "${d}" && func_techo info "skip ${d}, since not mount" && continue
 
 		# prepare dir
 		fl_dir="${d}/alone/fl_record"
@@ -2595,22 +2598,27 @@ func_mydata_print_summary() {
 }
 
 func_mydata_sync_doc() {
-	func_complain_path_not_exist "${DOC_SRC_BASE}" "${DOC_SRC_BASE} not found, skip sync Documents" && return 1
-
-	[ -d "${DOC_TGT_BASE_DTA}" ] && func_mydata_sync_doc_unison 
+	[ -d "${DOC_TGT_BASE_DTZ}" ] && func_mydata_sync_doc_unison 
 	[ -d "${DOC_TGT_BASE_TCZ}" ] && func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
 }
 
 func_mydata_sync_doc_unison() {
-	func_complain_path_not_exist "${HOME}/.unison" && return 1
-	func_complain_path_not_exist "${DOC_TGT_BASE_DTA}" && return 1
+	# use DOC_EX_BASE to indicate if need sync Documents
+	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
+	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
+
+	[ ! -e "${HOME}/.unison" ] && func_techo info "${HOME}/.unison NOT exist, skip sync Documents" && return 0
+
 	unison fs_lapmac2_all
 }
 
 func_mydata_sync_doc_rsync() {
+	# use DOC_EX_BASE to indicate if need sync Documents
+	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
+	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
 
 	local target="${1}"
-	func_complain_path_not_exist "${DOC_EX_BASE}" && return 1
+	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
 	
 	for d in ${DOC_SYNC_LIST} ; do
 	#for d in FCZ ; do
@@ -2625,19 +2633,21 @@ func_mydata_sync_doc_rsync() {
 	done
 }
 
-func_mydata_sync_totcz() {
+func_mydata_rsync_with_list() {
 	local src_base="${1}"
-	local sync_list="${2}"
+	local tgt_base="${2}"
+	local sync_list="${3}"
 
-	[ ! -d "${src_base}" ] && func_techo INFO "${src_base} NOT mount, skip sync with dta" && return 0
+	! df | grep -o "${tgt_base}" && func_techo info "skip ${tgt_base}, since not mount" && return 1
+	! df | grep -o "${src_base}" && func_techo info "skip ${src_base}, since not mount" && return 1
 
 	for d in ${sync_list} ; do
 		func_complain_path_not_exist "${src_base}/${d}/" && return 1
-		func_complain_path_not_exist "${TCZ_BASE}/${d}/" && return 1
+		func_complain_path_not_exist "${tgt_base}/${d}/" && return 1
 
-		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${TCZ_BASE}/${d}/"
-		func_rsync_v1                "${src_base}/${d}/"  "${TCZ_BASE}/${d}/"
-		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${TCZ_BASE}/${d}/" 
+		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${tgt_base}/${d}/"
+		func_rsync_v1                "${src_base}/${d}/"  "${tgt_base}/${d}/"
+		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${tgt_base}/${d}/" 
 	done
 }
 
@@ -2649,50 +2659,40 @@ func_mydata_sync_extra() {
 	local DTZ_EXTRA_LIST="backup_unison" 
 }
 
-func_mydata_sync_tcatotcz() {
-	[ ! -d "${TCA_BASE}" ] && func_techo INFO "${TCA_BASE} NOT mount, skip sync with tca" && return 0
-	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
-
-	local TCA_SYNC_LIST="h8/actor h8/zptp dudu/course dudu/tv video/tv" 
-	func_mydata_sync_totcz "${TCA_BASE}" "${TCA_SYNC_LIST}" 
-}
-
-func_mydata_sync_tcbtotcz() {
-	[ ! -d "${TCB_BASE}" ] && func_techo INFO "${TCB_BASE} NOT mount, skip sync with tcb" && return 0
-	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
-
-	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
-	func_mydata_sync_totcz "${TCB_BASE}" "${TCB_SYNC_LIST}" 
-}
-
-func_mydata_sync_dtbtotcz() {
-	[ ! -d "${DTB_BASE}" ] && func_techo INFO "${DTB_BASE} NOT there, skip sync with dtb" && return 0
-
-	local DTB_SYNC_LIST="video/movieNdtb" 
-	func_mydata_sync_totcz "${DTB_BASE}" "${DTB_SYNC_LIST}" 
-}
-
-func_mydata_sync_dtatodtz() {
-	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
-
-	local DTA_SYNC_LIST="dudu/xiaoxue gigi/course book/computer book/misc"
-	func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
-}
-
 func_mydata_sync_dtatotcz() {
-	[ ! -d "${DTA_BASE}" ] && func_techo INFO "${DTA_BASE} NOT mount, skip sync with dta" && return 0
-
 	echo "INFO: seems NO need sync from DTA to tcz, skip"
 	return
 
 	#local DTA_SYNC_LIST="" 
-	#func_mydata_sync_totcz "${DTA_BASE}" "${DTA_SYNC_LIST}" 
+	#func_mydata_rsync_with_list "${DTA_BASE}" "${TCZ_BASE}" "${DTA_SYNC_LIST}" 
+}
+
+func_mydata_sync_tcatotcz() {
+	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
+
+	local TCA_SYNC_LIST="h8/actor h8/zptp dudu/course dudu/tv video/tv" 
+	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
+}
+
+func_mydata_sync_tcbtotcz() {
+	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
+
+	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
+	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
+}
+
+func_mydata_sync_dtbtotcz() {
+	local DTB_SYNC_LIST="video/movieNdtb" 
+	func_mydata_rsync_with_list "${DTB_BASE}" "${TCZ_BASE}" "${DTB_SYNC_LIST}" 
+}
+
+func_mydata_sync_dtatodtz() {
+	local DTA_SYNC_LIST="dudu/xiaoxue gigi/course book/computer book/misc"
+	func_mydata_rsync_with_list "${DTA_BASE}" "${DTZ_BASE}" "${DTA_SYNC_LIST}" 
 }
 
 func_mydata_sync_dtztotcz() {
-	[ ! -d "${DTZ_BASE}" ] && func_techo INFO "${DTZ_BASE} NOT there, skip sync with dtz" && return 0
-
 	local DTZ_SYNC_LIST="video/course video/documentary dudu/book dudu/audio dudu/movie dudu/documentary "
-	func_mydata_sync_totcz "${DTZ_BASE}" "${DTZ_SYNC_LIST}" 
+	func_mydata_rsync_with_list "${DTZ_BASE}" "${TCZ_BASE}" "${DTZ_SYNC_LIST}" 
 }
 
