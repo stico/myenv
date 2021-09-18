@@ -2547,8 +2547,7 @@ func_mydata_gen_fl_and_upload(){
 	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
 
 		# check existence
-		[ ! -e "${d}" ] && func_techo info "skip ${d}, since not there" && continue
-		! df | grep -o "${d}" && func_techo info "skip ${d}, since not mount" && continue
+		! df | grep -q "${d}" && func_techo info "skip ${d}, since not mount" && continue
 
 		# prepare dir
 		fl_dir="${d}/alone/fl_record"
@@ -2638,8 +2637,8 @@ func_mydata_rsync_with_list() {
 	local tgt_base="${2}"
 	local sync_list="${3}"
 
-	! df | grep -o "${tgt_base}" && func_techo info "skip ${tgt_base}, since not mount" && return 1
-	! df | grep -o "${src_base}" && func_techo info "skip ${src_base}, since not mount" && return 1
+	! df | grep -q "${tgt_base}" && func_techo info "skip ${tgt_base}, since not mount" && return 1
+	! df | grep -q "${src_base}" && func_techo info "skip ${src_base}, since not mount" && return 1
 
 	for d in ${sync_list} ; do
 		func_complain_path_not_exist "${src_base}/${d}/" && return 1
