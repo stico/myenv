@@ -2554,6 +2554,7 @@ func_mydata_gen_fl_and_upload(){
 		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
 
 		# mv and upload
+		func_techo info "start to gen filelist for: ${d}"
 		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
 		func_scp_to_awsvm "${fl}"
 		mv "${fl}" "${fl_dir}" 
@@ -2597,25 +2598,21 @@ func_mydata_print_summary() {
 }
 
 func_mydata_sync_doc() {
+	# use DOC_EX_BASE to indicate if need sync Documents
+	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
+	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
+
 	[ -d "${DOC_TGT_BASE_DTZ}" ] && func_mydata_sync_doc_unison 
 	[ -d "${DOC_TGT_BASE_TCZ}" ] && func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
 }
 
 func_mydata_sync_doc_unison() {
-	# use DOC_EX_BASE to indicate if need sync Documents
-	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
-	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
-
 	[ ! -e "${HOME}/.unison" ] && func_techo info "${HOME}/.unison NOT exist, skip sync Documents" && return 0
 
 	unison fs_lapmac2_all
 }
 
 func_mydata_sync_doc_rsync() {
-	# use DOC_EX_BASE to indicate if need sync Documents
-	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
-	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
-
 	local target="${1}"
 	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
 	
@@ -2669,7 +2666,7 @@ func_mydata_sync_dtatotcz() {
 func_mydata_sync_tcatotcz() {
 	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
 
-	local TCA_SYNC_LIST="h8/actor h8/zptp dudu/course dudu/tv video/tv" 
+	local TCA_SYNC_LIST="h8/actor h8/magzine h8/zptp dudu/course dudu/tv video/tv" 
 	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
 }
 
@@ -2681,8 +2678,11 @@ func_mydata_sync_tcbtotcz() {
 }
 
 func_mydata_sync_dtbtotcz() {
-	local DTB_SYNC_LIST="video/movieNdtb" 
-	func_mydata_rsync_with_list "${DTB_BASE}" "${TCZ_BASE}" "${DTB_SYNC_LIST}" 
+	func_techo info "all movie in DTB are not synced, have a bak in DTZ/alone/movieNdtb"
+	return 0
+
+	#local DTB_SYNC_LIST="video/movieNdtb" 
+	#func_mydata_rsync_with_list "${DTB_BASE}" "${TCZ_BASE}" "${DTB_SYNC_LIST}" 
 }
 
 func_mydata_sync_dtatodtz() {
