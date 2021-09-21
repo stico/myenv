@@ -2453,9 +2453,21 @@ func_find_dup_files() {
 			find "${p}" -type f -print0 | xargs -0 md5sum >> "${tmp_md5_path}"
 		done
 	fi
-	sed -i '/\/\(.DS_Store\|desktop.ini\|thumbs.db\)$/d;/\/.Trashes\//d;/\/.Spotlight-/d' "${tmp_md5_path}"
 
-	# STEP 2: gen dup report
+	# STEP 2: remove useless files
+	# TODO: , , , 
+	sed -i '/\/\(.DS_Store\|desktop.ini\|thumbs.db\)$/d;
+		/DCC\/coding\/leetcode\/answer_shdll\//d;
+		/FCS\/maven\/m2_repo\//d;
+		/FCS\/oumisc\//d;
+		/FCS\/ourepo\//d;
+		/FCS\/macvim\//d;
+		/FCS\/vim\//d;
+		/.git\/info\/exclude$/d;
+		/\/.Trashes\//d;
+		/\/.Spotlight-/d' "${tmp_md5_path}"
+
+	# STEP 3: gen dup report
 	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
 	# https://stackoverflow.com/questions/40134905/merge-values-for-same-key
 	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
