@@ -2698,12 +2698,13 @@ func_mydata_sync_dtbtotcz() {
 }
 
 func_mydata_sync_dtatodtz() {
-	local DTA_SYNC_LIST="dudu/xiaoxue gigi/course book/computer book/misc"
+	local DTA_SYNC_LIST="dudu/xiaoxue dudu/chuzhong dudu/gaozhong gigi/course book/computer book/misc"
 	func_mydata_rsync_with_list "${DTA_BASE}" "${DTZ_BASE}" "${DTA_SYNC_LIST}" 
 }
 
 func_mydata_sync_dtztotcz() {
-	local DTZ_SYNC_LIST="video/course video/documentary dudu/book dudu/audio dudu/movie dudu/documentary "
+	func_techo info "SKIP DIR: video/documentary, SINCE TOO BIG"
+	local DTZ_SYNC_LIST="video/course dudu/book dudu/audio dudu/movie dudu/documentary "
 	func_mydata_rsync_with_list "${DTZ_BASE}" "${TCZ_BASE}" "${DTZ_SYNC_LIST}" 
 }
 
