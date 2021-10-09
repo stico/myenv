@@ -855,6 +855,7 @@ func_collect_all() {
 	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  ECS ; do			# v2, deprecated, put ECS in the end
 	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCS ; do				# v3, compacted docs
 		# shellcheck disable=2015
+		# TODO: use func_pipe_remove_lines instead
 		( [ "${MY_OS_NAME}" = "${OS_OSX}" ]			\
 		&& find "${MY_DOC}/${d}" -type f			\
 		|| locate "$(readlink -f "${MY_DOC}/${d}")" )		\
@@ -1656,8 +1657,17 @@ func_backup_myenv() {
 
 	echo "INFO: create zip file based on filelist: ${fileList}"
 	func_collect_myenv "no_content"
-	# excludes: locate related db, ar.../fp... files in unison
-	zip -r "${packFile}" -x "*/zgen/mlocate.db" -x "*/zgen/gnulocatedb" -x "*/.unison/[fa][pr][0-9a-z]*" -@ < "${fileList}" 2>&1 | sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'
+
+	# excludes: locate related db, ar.../fp... files in unison, duplicate collection
+	zip -r "${packFile}"					\
+		-x "*/zgen/mlocate.db" 				\
+		-x "*/zgen/gnulocatedb" 			\
+		-x "*/.unison/[fa][pr][0-9a-z]*"		\
+		-x "*/zgen/collection/all_content.txt"		\
+		-x "*/zgen/collection/code_content.txt"		\
+		-x "*/zgen/collection/stdnote_content.txt"	\
+		-@ < "${fileList}" 2>&1 | sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'
+
 	if [ "$?" -ne "0" ] ; then
 		echo "WARN: failed to pack some file, pls check"
 	fi
@@ -1695,6 +1705,10 @@ func_backup_myenv() {
 	func_backup_dated "${packFile}"
 
 	# should NOT left at /tmp dir
+	local final_zip_list="$(mktemp)"
+	unzip -l "${packFile}" > "${final_zip_list}"
+	echo "INFO: final pack file list: ${final_zip_list}"
+
 	echo "INFO: delete tmp pack file"
 	rm "${packFile}"
 	popd &> /dev/null
@@ -2164,6 +2178,8 @@ func_find_non_utf8_in_content() {
 
 	local tmp_suspect=$(mktemp)
 	echo "INFO: grep suspected files into: ${tmp_suspect}"
+
+	# TODO: use func_pipe_remove_lines instead
 	xargs -a "${tmp_filelist}" -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > "${tmp_suspect}"
 
 	echo "INFO: suspected files are:"
@@ -2568,12 +2584,32 @@ func_mydata_gen_fl_and_upload(){
 		# mv and upload
 		func_techo info "start to gen filelist for: ${d}"
 		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
+		sed -i -e "
+			/\.Trashes\//d;
+			/\.fseventsd\//d;
+			/\.Spotlight-V100\//d;
+			/\/FCS\//d;
+			/\/DCM\/Inbox\//d;
+			/\/DCM_[-0-9_]*\//d;
+			/\/DCC\/zz_deprecated\//d;
+			/\/DCC\/coding\/leetcode\//d;
+			/\/DCD\/mail\//d;
+			/\/DCD\/zdep\/s1.yy.com\//d;
+			/\/DCD\/hp-proxy\/backup\//d;
+			/\/DCD\/zdep\/payplf\/doc\/Doc_3PP_易宝（Yeepay）\//d;
+			" "${fl}"
+
+			# more 
+			#/\/FCS\/maven\/m2_repo\//d;	# included in /FCS?
+
 		func_scp_to_awsvm "${fl}"
 		mv "${fl}" "${fl_dir}" 
 	done
 }
 
 func_mydata_out_filter_del() {
+
+	# TODO: use func_pipe_remove_lines instead
 	sed -e  '
 		# ignore whole dir
 		/FCZ\/backup_DCS\//d;

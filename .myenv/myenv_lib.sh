@@ -475,6 +475,58 @@ func_mkdir_cd() {
 	#func_mkdir "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir or cd into it ($1)"
 }
 
+func_sed_gen_d_cmd() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
+	local desc="Desc: gen d cmd for sed" 
+	func_param_check 1 "$@"
+
+	local sed_cmd p
+	for p in "$@" ; do
+		sed_cmd="${sed_cmd}/${p//\//\\/}/d;"
+	done
+	echo "${sed_cmd}"
+
+}
+
+func_pipe_remove_lines() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
+	local desc="Desc: remove patterns in pipe, this helps when pattern are path, improve readability" 
+	func_param_check 1 "$@"
+
+	local sed_cmd="$(func_sed_gen_d_cmd "$@")"
+	echo "INFO: sed cmd: sed -e '${sed_cmd}'" >&2
+	sed -e "${sed_cmd}"
+}
+
+func_file_remove_lines() {
+	# TODO: NOT really test yet
+
+	local usage="Usage: ${FUNCNAME[0]} <file> <pattern> [pattern] ..."
+	local desc="Desc: remove patterns in file, this helps when pattern are path, improve readability" 
+	func_param_check 2 "$@"
+
+	local file="${1}"
+	shift
+	[ ! -f "${file}" ] && echo "ERROR: $file is NOT a file, pls check" && return 1
+
+	local FILE_SIZELIMIT=1234567
+	local file_size="$(func_file_size "${file}")"
+	if (( file_size > FILE_SIZELIMIT )) ; then 
+		echo "ERROR: too big to create a copy, pls change the limit"
+		return 1
+	fi
+	local copy="/tmp/$(basename "${file}").bak.of.sed.cmd.$(func_dati)"
+	echo "INFO: make a copy before perform: "
+	cp "${file}" "${copy}"
+
+	local sed_cmd="$(func_sed_gen_d_cmd "$@")"
+	echo "INFO: sed cmd: sed -e '${sed_cmd}' '${file}'" >&2
+	sed -e "${sed_cmd}" "${file}"
+
+	# works, but bak is in same dir
+	#sed --in-place=".bak-of-sed-cmd.$(func_dati)" -e "${sed_cmd}" "${file}"
+}
+
 func_file_size() {
 	local usage="Usage: ${FUNCNAME[0]} <target>"
 	local desc="Desc: get file size, in Bytes" 
@@ -735,14 +787,6 @@ func_complain_sudo_not_auto() {
 	
 	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege, or NOT auto (need input password), pls check!}" && return 0
 	return 1
-}
-
-func_pipe_filter() {
-	if [ -z "${1}" ] ; then
-		sed -n -e "/^\(Desc\|INFO\|WARN\|ERROR\):/p"
-	else
-		tee -a "${1}" | sed -n -e "/^\(Desc\|INFO\|WARN\|ERROR\):/p"
-	fi
 }
 
 func_gen_local_vars() {
