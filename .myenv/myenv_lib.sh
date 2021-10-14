@@ -504,7 +504,7 @@ func_file_remove_lines() {
 	func_param_check 2 "$@"
 
 	# Var & Check
-	local PATTERN_SPLIT_COUNT="100"
+	local PATTERN_SPLIT_COUNT="1000"
 	local pattern_file="${1}"
 	local input_file="${2}"
 	local target_file="${2}.removed.$(func_dati)"
