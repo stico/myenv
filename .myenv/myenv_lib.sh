@@ -494,37 +494,80 @@ func_pipe_remove_lines() {
 	func_param_check 1 "$@"
 
 	local sed_cmd="$(func_sed_gen_d_cmd "$@")"
-	echo "INFO: sed cmd: sed -e '${sed_cmd}'" >&2
+	echo "INFO: func_pipe_remove_lines: sed cmd: sed -e '${sed_cmd}'" >&2
 	sed -e "${sed_cmd}"
 }
 
 func_file_remove_lines() {
-	# TODO: NOT really test yet
-
-	local usage="Usage: ${FUNCNAME[0]} <file> <pattern> [pattern] ..."
-	local desc="Desc: remove patterns in file, this helps when pattern are path, improve readability" 
+	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
+	local desc="Desc: remove patterns listed in file, useful when pattern list a very long" 
 	func_param_check 2 "$@"
 
-	local file="${1}"
-	shift
-	[ ! -f "${file}" ] && echo "ERROR: $file is NOT a file, pls check" && return 1
+	# Var & Check
+	local PATTERN_SPLIT_COUNT="100"
+	local pattern_file="${1}"
+	local input_file="${2}"
+	local target_file="${2}.removed.$(func_dati)"
+	func_complain_path_not_exist "${input_file}" && return 1
+	func_complain_path_not_exist "${pattern_file}" && return 1
 
-	local FILE_SIZELIMIT=1234567
-	local file_size="$(func_file_size "${file}")"
-	if (( file_size > FILE_SIZELIMIT )) ; then 
-		echo "ERROR: too big to create a copy, pls change the limit"
-		return 1
+	# Remove
+	local result_file="$(mktemp -d)/$(basename "${input_file}").REMOVED" 
+	local pattern_count="$(func_file_line_count "${pattern_file}")"
+	if (( pattern_count <= PATTERN_SPLIT_COUNT )) ; then 
+		echo "INFO: pattern lines NOT need split ( $pattern_count <= $PATTERN_SPLIT_COUNT )"
+		func_file_remove_lines_simple "${pattern_file}" "${input_file}" > "${result_file}"
+	else
+		echo "INFO: too much pattern lines, need split ( $pattern_count > $PATTERN_SPLIT_COUNT )"
+
+		# split patterns
+		local pattern_file_md5="$(md5sum "${pattern_file}" | cut -d' ' -f1)"
+		local tmp_p_dir="/tmp/func_file_remove_lines-patterns-${PATTERN_SPLIT_COUNT}-${pattern_file_md5}"
+		if [ ! -d "${tmp_p_dir}" ] ; then
+			mkdir -p "${tmp_p_dir}" 
+			split -d -l "${PATTERN_SPLIT_COUNT}" "${pattern_file}" "${tmp_p_dir}/${pattern_file}" 
+			echo "INFO: splited pattern files: ${tmp_p_dir}"
+		else
+			echo "INFO: reuse splited pattern files ${tmp_p_dir}"
+		fi
+
+		# use splited pattern files one by one
+		local tmp_out
+		local tmp_in="${input_file}" 
+		for f in ${tmp_p_dir}/* ; do
+			tmp_out="${result_file}.${f##*/}" 
+			func_file_remove_lines_simple "${f}" "${tmp_in}" > "${tmp_out}"
+			tmp_in="${tmp_out}"
+		done
+		result_file="${tmp_out}"
 	fi
-	local copy="/tmp/$(basename "${file}").bak.of.sed.cmd.$(func_dati)"
-	echo "INFO: make a copy before perform: "
-	cp "${file}" "${copy}"
 
-	local sed_cmd="$(func_sed_gen_d_cmd "$@")"
-	echo "INFO: sed cmd: sed -e '${sed_cmd}' '${file}'" >&2
-	sed -e "${sed_cmd}" "${file}"
+	# Show result
+	local input_lines="$(func_file_line_count "${input_file}")"
+	local result_lines="$(func_file_line_count "${result_file}")"
+	echo "INFO: result/input lines: ${result_lines}/${input_lines}, result file: ${result_file}"
 
-	# works, but bak is in same dir
+	# Old solution: works, but bak is in same dir
+	#local sed_cmd="$(func_sed_gen_d_cmd "$@")"
 	#sed --in-place=".bak-of-sed-cmd.$(func_dati)" -e "${sed_cmd}" "${file}"
+}
+
+func_file_remove_lines_simple() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
+	local desc="Desc: remove patterns listed in file, and output to stdout" 
+	func_param_check 2 "$@"
+
+	# remove lines with grep -v, $2 could be regex patterns
+	grep -ivf "${1}" "${2}"
+}
+
+func_file_line_count() {
+	local usage="Usage: ${FUNCNAME[0]} <file>"
+	local desc="Desc: output only lines of file" 
+	func_param_check 1 "$@"
+
+	func_complain_path_not_exist "${1}" && return 1
+	wc -l "${1}" | cut -d' ' -f1
 }
 
 func_file_size() {
