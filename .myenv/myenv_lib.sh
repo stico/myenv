@@ -525,7 +525,7 @@ func_file_remove_lines() {
 		local tmp_p_dir="/tmp/func_file_remove_lines-patterns-${PATTERN_SPLIT_COUNT}-${pattern_file_md5}"
 		if [ ! -d "${tmp_p_dir}" ] ; then
 			mkdir -p "${tmp_p_dir}" 
-			split -d -l "${PATTERN_SPLIT_COUNT}" "${pattern_file}" "${tmp_p_dir}/${pattern_file}" 
+			split -d -l "${PATTERN_SPLIT_COUNT}" "${pattern_file}" "${tmp_p_dir}/${pattern_file##*/}" 
 			echo "INFO: splited pattern files: ${tmp_p_dir}"
 		else
 			echo "INFO: reuse splited pattern files ${tmp_p_dir}"
