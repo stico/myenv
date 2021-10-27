@@ -204,8 +204,7 @@ func_rsync_del_detect() {
 
 func_rsync_out_filter() {
 	# shellcheck disable=2148
-	awk '
-		/DEBUG: |INFO: |WARN: |ERROR: |FATAL: |TRACE: / {print $0;}	# reserve log lines
+	awk '	/DEBUG: |INFO: |WARN: |ERROR: |FATAL: |TRACE: / {print $0;next;}	# reserve log lines
 
 		/^$/ {			next;}	# skip empty lines
 		/\/$/ {			next;}	# skip dir lines
@@ -215,7 +214,7 @@ func_rsync_out_filter() {
 		/%.*\/s.*:..:/ {	next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
 		/\(xfr#.*(ir|to)-chk=/ {next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
 
-		# compact those too noisy output, and use the last blank line to trigger the summary count
+		# compact those too noisy output. Use last blank line to trigger the summary count
 		/^FCS\/maven\/m2_repo\/repository/ {
 			mvn_repo_updated_files++;
 			if(mvn_repo_update_flag == 0){
@@ -241,13 +240,14 @@ func_rsync_out_filter() {
 				print "DCD MAIL: UPDATED_FILES: " dcd_mail_updated_files;
 				dcd_mail_updated_flag = 2;
 			}
+			next;
 		} 
 
 		# for other lines, just print out
 		!/\/$/ {
 			print $0;
-		}
-	'
+			next;
+		}'
 }
 
 ################################################################################
@@ -499,6 +499,9 @@ func_pipe_remove_lines() {
 }
 
 func_file_remove_lines() {
+
+	# USE CASE: func_file_remove_lines fhr.lst <quick_code_file.txt>
+
 	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
 	local desc="Desc: remove patterns listed in file, useful when pattern list a very long" 
 	func_param_check 2 "$@"
@@ -526,9 +529,9 @@ func_file_remove_lines() {
 		if [ ! -d "${tmp_p_dir}" ] ; then
 			mkdir -p "${tmp_p_dir}" 
 			split -d -l "${PATTERN_SPLIT_COUNT}" "${pattern_file}" "${tmp_p_dir}/${pattern_file##*/}" 
-			echo "INFO: splited pattern files: ${tmp_p_dir}"
+			echo "INFO: splited pattern files in: ${tmp_p_dir}/"
 		else
-			echo "INFO: reuse splited pattern files ${tmp_p_dir}"
+			echo "INFO: reuse splited pattern files in: ${tmp_p_dir}/"
 		fi
 
 		# use splited pattern files one by one

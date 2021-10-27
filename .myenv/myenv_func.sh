@@ -2547,11 +2547,6 @@ func_mydata_sync(){
 	[ -d "${BASE_LAPTP}/${DTB_BASE}" ] && DTB_BASE="${BASE_LAPTP}/${DTB_BASE}" || DTB_BASE="${BASE_LAPMAC}/${DTB_BASE}" 
 	[ -d "${BASE_LAPTP}/${DTZ_BASE}" ] && DTZ_BASE="${BASE_LAPTP}/${DTZ_BASE}" || DTZ_BASE="${BASE_LAPMAC}/${DTZ_BASE}" 
 
-	# Doc part
-	local DOC_TGT_BASE_DTA="/${DTA_BASE}/backup"
-	local DOC_TGT_BASE_TCZ="/${TCZ_BASE}/backup_rsync"
-	local DOC_SRC_BASE="${HOME}/Documents"
-
 	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
 	func_techo INFO "detail log: ${tmp_log}" 
 	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
@@ -2559,7 +2554,6 @@ func_mydata_sync(){
 	func_mydata_sync_dtbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	#func_mydata_sync_dtatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
 	func_mydata_print_summary "${tmp_log}" 
 
@@ -2650,7 +2644,10 @@ func_mydata_sync_doc() {
 	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
 	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
 
+	local DOC_TGT_BASE_DTZ="${DTZ_BASE}/backup_unison"
 	[ -d "${DOC_TGT_BASE_DTZ}" ] && func_mydata_sync_doc_unison 
+
+	local DOC_TGT_BASE_TCZ="${TCZ_BASE}/backup_rsync"
 	[ -d "${DOC_TGT_BASE_TCZ}" ] && func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
 }
 
@@ -2662,6 +2659,7 @@ func_mydata_sync_doc_unison() {
 
 func_mydata_sync_doc_rsync() {
 	local target="${1}"
+	local DOC_SRC_BASE="${HOME}/Documents"
 	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
 	
 	for d in ${DOC_SYNC_LIST} ; do
@@ -2703,23 +2701,15 @@ func_mydata_sync_extra() {
 	local DTZ_EXTRA_LIST="backup_unison" 
 }
 
-func_mydata_sync_dtatotcz() {
-	echo "INFO: seems NO need sync from DTA to tcz, skip"
-	return
-
-	#local DTA_SYNC_LIST="" 
-	#func_mydata_rsync_with_list "${DTA_BASE}" "${TCZ_BASE}" "${DTA_SYNC_LIST}" 
-}
-
 func_mydata_sync_tcatotcz() {
-	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
+	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCA_BASE}" && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
 
 	local TCA_SYNC_LIST="h8/actor h8/magzine h8/zptp dudu/course dudu/tv video/tv" 
 	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
 }
 
 func_mydata_sync_tcbtotcz() {
-	[ "${HOSTNAME}" == "lapmac2" ] && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
+	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCB_BASE}" && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
 
 	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
 	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
