@@ -1496,6 +1496,13 @@ func_scp_via_jump() {
 }
 
 # awsvm@aws
+func_mebackup_awsvm() {
+	local usage="Usage: ${FUNCNAME[0]} run mebackup on awsvm and copy back" 
+
+	ssh awsvm func_backup_myenv
+}
+
+# awsvm@aws
 func_scp_from_awsvm() {
 	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file from awsvm to current dir." 
 	func_param_check 1 "$@"
@@ -1685,13 +1692,22 @@ func_backup_myenv() {
 	
 	pushd . &> /dev/null
 	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd ${HOME} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
 	echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd ${ZBOX} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-	echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd ${OUMISC} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-	echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd ${OUREPO} && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+
+	if [ -e "${OUMISC}" ] ; then
+		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
+	else
+		echo "INFO: ${OUMISC} NOT exist, skip"
+	fi
+	if [ -e "${OUREPO}" ] ; then
+		echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${OUREPO}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
+	else
+		echo "INFO: ${OUREPO} NOT exist, skip"
+	fi
 
 	\cd ${HOME}/.vim/bundle &> /dev/null
 	for f in * ; do 
@@ -2390,7 +2406,7 @@ func_mm_is_moov_in_head() {
 func_export_script() {
 	local usage="USAGE: ${FUNCNAME[0]} <function_name> <target_script>" 
 	local desc="Desc: export a runnable script of <function_name> into <target_script>" 
-	func_param_check 1 "$@"
+	func_param_check 2 "$@"
 
 	# TODO: support global VAR export
 
@@ -2460,6 +2476,10 @@ func_find_dup_files() {
 	local tmp_md5_dup="${tmp_dir}/tmp_md5_dup.txt"
 	local tmp_md5_dup_detail="${tmp_dir}/tmp_md5_dup_detail.txt"
 
+	# tool script
+	# - 01: split result file by lines of dup
+	#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
+
 	# STEP 1: gen md5 and file pair
 	local p f
 	if [ $# -eq 0 ] ; then
@@ -2471,7 +2491,6 @@ func_find_dup_files() {
 	fi
 
 	# STEP 2: remove useless files
-	# TODO: , , , 
 	sed -i '/\/\(.DS_Store\|desktop.ini\|thumbs.db\)$/d;
 		/DCC\/coding\/leetcode\/answer_shdll\//d;
 		/FCS\/maven\/m2_repo\//d;
@@ -2489,27 +2508,27 @@ func_find_dup_files() {
 	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
 	cut -d' ' -f1 "${tmp_md5_path}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${tmp_md5_dup}"
 
-	local total_count="$(wc -l "${tmp_md5_path}" | cut -d' ' -f1)"
 	local dup_count="$(wc -l "${tmp_md5_dup}" | cut -d' ' -f1)"
-
-	if (( total_count == dup_count )) ; then
+	if (( dup_count == 0 )) ; then
 		echo "INFO: no dup files found, tmp dir: ${tmp_dir}"
-	else
-		local count md5
-		while read count md5 ; do
-			if [ "${count}" -eq 1 ] ; then 
-				continue
-			fi
+		return 0
+	fi
 
-			grep "${md5}" "${tmp_md5_path}" >> "${tmp_md5_dup_detail}"
-			echo >> "${tmp_md5_dup_detail}"
-		done < "${tmp_md5_dup}"
-
-		if [ -e "${tmp_md5_dup_detail}" ] ; then
-			echo "INFO: found $(wc -l "${tmp_md5_dup_detail}" | cut -d' ' -f1) files, check detail at: ${tmp_md5_dup_detail}"
-		else
-			echo "INFO: NO dup files found"
+	local count md5
+	while read count md5 ; do
+		if [ "${count}" -eq 1 ] ; then 
+			echo "ERROR: should NOT found count=1 md5 here"
+			continue
 		fi
+
+		grep "${md5}" "${tmp_md5_path}" >> "${tmp_md5_dup_detail}"
+		echo >> "${tmp_md5_dup_detail}"
+	done < "${tmp_md5_dup}"
+
+	if [ -e "${tmp_md5_dup_detail}" ] ; then
+		echo "INFO: found $(wc -l "${tmp_md5_dup_detail}" | cut -d' ' -f1) files, check detail at: ${tmp_md5_dup_detail}"
+	else
+		echo "INFO: NO dup files found"
 	fi
 }
 

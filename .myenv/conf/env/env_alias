@@ -135,6 +135,7 @@ sshgcpvm		"ssh gcpvm"
 sshawsvm		"ssh awsvm"
 scptoawsvm		func_scp_to_awsvm
 scpfromawsvm		func_scp_from_awsvm
+mebackupawsvm		func_mebackup_awsvm
 
 # Alias - By Action (<action><obj/arg>)
 			# Head: l - list, NOT use "-F", which makes "ls ~/amp/download" shows a link entry instead of content in dir (need "ls ~/amp/download/" to show content) 

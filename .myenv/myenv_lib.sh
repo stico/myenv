@@ -1294,8 +1294,17 @@ func_is_str_empty() {
 	[ -z "${1}" ] && return 0 || return 1
 }
 
+func_is_str_digit() {
+	local usage="Usage: ${FUNCNAME[0]} <string>"
+	local desc="Desc: check if string is digit, return 0 if yes, otherwise 1" 
+	func_param_check 1 "$@"
+
+	# TODO: _-. might also in digit?
+	[[ "${1}" =~ ^[0-9]+$ ]] && return 0 || return 1
+}
+
 func_is_str_blank() {
-	local usage="Usage: ${FUNCNAME[0]} <string...>"
+	local usage="Usage: ${FUNCNAME[0]} <string>"
 	local desc="Desc: check if string is blank (or not defined), return 0 if empty, otherwise 1" 
 	func_param_check 1 "$@"
 	
