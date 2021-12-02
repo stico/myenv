@@ -2416,6 +2416,10 @@ func_export_script() {
 	local desc="Desc: export a runnable script of <function_name> into <target_script>" 
 	func_param_check 2 "$@"
 
+	# TODO: 
+	#	FAILED: func_export_script func_backup_myenv func_backup_myenv.alone.sh
+	#	REASON: func_backup_myenv used eval inside (by sub call of func_collect_myenv), which cat $$LOC_HOSTS inside, and $LOC_HOSTS is empty !
+
 	local fdone=()
 	local ftodo=("${1}")
 	local target="${2}"
@@ -2462,7 +2466,7 @@ func_export_script() {
 		var_strings="$(grep "${var_pattern}" ~/.myenv/myenv_func.sh)"
 		
 		#[ -n "${var_strings}" ] && sed -i -e "1i${var_strings}" "${target}"
-		[ -n "${var_strings}" ] && echo "----> ${var_strings}" && echo "${var_strings}" | sed -i -e '1r /dev/stdin' "${target}"
+		[ -n "${var_strings}" ] && echo "${var_strings}" | sed -i -e '1r /dev/stdin' "${target}"
 
 		# Gen note
 		sed -i -e "1i#!/bin/bash\\
