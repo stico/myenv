@@ -1499,7 +1499,13 @@ func_scp_via_jump() {
 func_mebackup_awsvm() {
 	local usage="Usage: ${FUNCNAME[0]} run mebackup on awsvm and copy back" 
 
-	ssh awsvm func_backup_myenv
+	local fpath
+
+	fpath="$(ssh awsvm 'bash "$HOME/.myenv/secu/awsvm/script/z/func_backup_myenv.alone.sh"' | grep _awsvm_myenv_backup.zip | cut -d" " -f10)"
+	echo "INFO: gen remove backup, remove path: $fpath"
+
+	\cd "$HOME/Documents/DCB/dbackup/latest/"
+	func_scp_from_awsvm "$fpath"
 }
 
 # awsvm@aws
@@ -1693,9 +1699,11 @@ func_backup_myenv() {
 	pushd . &> /dev/null
 	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
 	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-	echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
 
+	if [ -e "${ZBOX}" ] ; then
+		echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	fi
 	if [ -e "${OUMISC}" ] ; then
 		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
 		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
@@ -2408,8 +2416,6 @@ func_export_script() {
 	local desc="Desc: export a runnable script of <function_name> into <target_script>" 
 	func_param_check 2 "$@"
 
-	# TODO: support global VAR export
-
 	local fdone=()
 	local ftodo=("${1}")
 	local target="${2}"
@@ -2430,6 +2436,8 @@ func_export_script() {
 		# Export and record
 		c=${ftodo[0]}
 		func_complain_function_not_exist "${c}" && eresult="fail" && break
+
+		echo "" >> "${target}"
 		type "${c}" | sed -e '1d' >> "${target}"
 		fdone+=("${c}")
 		ftodo=("${ftodo[@]:1}")
@@ -2447,6 +2455,16 @@ func_export_script() {
 
 	# Post process
 	if [[ "${eresult}" = "success" ]] ; then
+
+		# Export MY_ENV_xxx VAR
+		local var_pattern var_strings
+		var_pattern="$(grep -o "MY_ENV[_A-Z]*" func_backup_myenv.alone.sh | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/$/MY_ENV\\)=/;')"
+		var_strings="$(grep "${var_pattern}" ~/.myenv/myenv_func.sh)"
+		
+		#[ -n "${var_strings}" ] && sed -i -e "1i${var_strings}" "${target}"
+		[ -n "${var_strings}" ] && echo "----> ${var_strings}" && echo "${var_strings}" | sed -i -e '1r /dev/stdin' "${target}"
+
+		# Gen note
 		sed -i -e "1i#!/bin/bash\\
 		\n# Generated Info:\\
 		#    By: $(whoami)\\
