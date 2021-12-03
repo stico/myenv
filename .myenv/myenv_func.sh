@@ -2460,12 +2460,10 @@ func_export_script() {
 	# Post process
 	if [[ "${eresult}" = "success" ]] ; then
 
-		# Export MY_ENV_xxx VAR
+		# Export MY_ENV_xxx VAR. TODO: 1) one time grep is NOT enough (the var assignment migth contain other var). 2) only grep myenv_func.sh might NOT enough
 		local var_pattern var_strings
-		var_pattern="$(grep -o "MY_[_A-Z]*" "${target}" | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/|$/)=/;')"
+		var_pattern="$(grep -o "MY_[_A-Z]*" "${target}" | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/$/MY_ENV\\)=/;')"
 		var_strings="$(grep "${var_pattern}" ~/.myenv/myenv_func.sh)"
-		
-		#[ -n "${var_strings}" ] && sed -i -e "1i${var_strings}" "${target}"
 		[ -n "${var_strings}" ] && echo "${var_strings}" | sed -i -e '1r /dev/stdin' "${target}"
 
 		# Gen note
