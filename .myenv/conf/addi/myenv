@@ -63,7 +63,7 @@ $HOME/Library/Rime/wubi_pinyin.custom.yaml
 
 # eval: /ext structure
 `[ -e "$MY_EXT" ] && tree -L 2 $MY_EXT > $MY_ENV/zgen/tree_ext.txt && echo $MY_ENV/zgen/tree_ext.txt`
-`cat $LOC_HOSTS > $MY_ENV/zgen/hosts && echo $MY_ENV/zgen/hosts`
+`cat ${LOC_HOSTS:-/etc/hosts} > $MY_ENV/zgen/hosts && echo $MY_ENV/zgen/hosts`
 
 # Deprecared
 #$HOME/.unison/ar*	# NOT work?
