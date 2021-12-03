@@ -2462,7 +2462,7 @@ func_export_script() {
 
 		# Export MY_ENV_xxx VAR
 		local var_pattern var_strings
-		var_pattern="$(grep -o "MY_ENV[_A-Z]*" func_backup_myenv.alone.sh | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/$/MY_ENV\\)=/;')"
+		var_pattern="$(grep -o "MY_[_A-Z]*" func_backup_myenv.alone.sh | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/|$/)=/;')"
 		var_strings="$(grep "${var_pattern}" ~/.myenv/myenv_func.sh)"
 		
 		#[ -n "${var_strings}" ] && sed -i -e "1i${var_strings}" "${target}"
