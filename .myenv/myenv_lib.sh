@@ -1152,36 +1152,70 @@ func_ip_single() {
 func_ip_list() {
 	# NOTE: "tr -s ' '" compact space to single for better field identify
 	local os_name=${MY_OS_NAME:-$(func_os_name)}
+
 	if [ "${os_name}" = "${OS_CYGWIN}" ] ; then
-		# non-cygwin env: ifconfig
-		/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
-		/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
+		func_ip_list_via_ifconfig_cygwin
 	elif [ "${os_name}" = "${OS_OSX}" ] ; then
-		/sbin/ifconfig -a | tr -s ' '		\
-		| awk -F'[% ]' '			
-			/^[a-z]/{print "";printf $1}	
-			/^\s*inet /{printf " " $2}	
-			# Un-comment to show IPv6 addr	
-			# /^\s*inet6 /{printf " " $2}	
-			END{print ""}'			\
-		| sed -e "/127.0.0.1/d;/^\s*$/d;/\s/!d;"\
-		| column -t -s " "
+		func_ip_list_via_ifconfig_osx
 	elif [ "${os_name}" = "${OS_WIN}" ] ; then
-		# seem directly pipe the output of ipconfig is very slow
-		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
-		raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
-		#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
+		func_ip_list_via_ipconfig_win
 	else
-		/sbin/ifconfig -a | tr -s ' '		\
-		| awk '					
-			/^[a-z]/{printf $1 }		
-			/inet /{printf " " $2}	
-			# Un-comment to show IPv6 addr	
-			#/inet6 addr:/{printf " " $3}	
-			/^$/{print}'			\
-		| sed -e "/127.0.0.1/d;s/addr://" 	\
-		| column -t -s " "
+		func_ip_list_lu
 	fi
+}
+
+func_ip_list_via_ipconfig_win() {
+	# seem directly pipe the output of ipconfig is very slow
+	raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[4] Address/s/^[^:]*: //p"	# IPv4
+	raw_data=$(ipconfig) ; echo "$raw_data" | sed -n -e "/IPv[46] Address/s/^[^:]*: //p"	# IPv4 & IPv6
+	#ipconfig | sed -n -e '/inet addr/s/.*inet addr:\([.0-9]*\).*/\1/p'
+}
+
+func_ip_list_via_ifconfig_cygwin() {
+	# non-cygwin env: ifconfig
+	/sbin/ifconfig | sed -n -e '/inet addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4
+	/sbin/ifconfig | sed -n -e '/inet6* addr/s/.*inet6* addr:\s*\([.:a-z0-9]*\).*/\1/p'	# IPv4 & IPv6
+}
+
+func_ip_list_via_ifconfig_osx() {
+	# output sample: en0:  172.29.160.219
+	/sbin/ifconfig -a | tr -s ' '		\
+	| awk -F'[% ]' '			
+		/^[a-z]/{print "";printf $1}	
+		/^\s*inet /{printf " " $2}	
+		# Un-comment to show IPv6 addr	
+		# /^\s*inet6 /{printf " " $2}	
+		END{print ""}'			\
+	| sed -e "/127.0.0.1/d;/^\s*$/d;/\s/!d;"\
+	| column -t -s " "
+}
+
+func_ip_list_lu() {
+	if func_is_cmd_exist ip ; then
+		func_ip_list_via_ip_lu
+	else func_is_cmd_exist ifconfig ; then
+		func_ip_list_via_ifconfig_lu
+	fi
+}
+
+func_ip_list_via_ifconfig_lu() {
+	/sbin/ifconfig -a | tr -s ' '		\
+	| awk '					
+		/^[a-z]/{printf $1 }		
+		/inet /{printf " " $2}	
+		# Un-comment to show IPv6 addr	
+		#/inet6 addr:/{printf " " $3}	
+		/^$/{print}'			\
+	| sed -e "/127.0.0.1/d;s/addr://" 	\
+	| column -t -s " "
+}
+
+func_ip_list_via_ip_lu() {
+	/bin/ip addr |				\
+	awk '
+		/^[0-9]/{printf $2 }; 
+		/inet /{print " " $2};'		\
+	| sed -e '/127.0.0.1/d;s/\/[0-9][0-9]$//'
 }
 
 func_find_idle_port() {
@@ -1281,6 +1315,25 @@ func_num_to_human() {
 		let unit_index++
 	done
 	echo "${number}${fraction}${UNIT[$unit_index]}"
+}
+
+func_sum_1st_columm_SI() {
+	local usage="Usage: ${FUNCNAME[0]} <disk> [name]"
+	local desc="Desc: sum total size of 1st column, support optional unit suffix (SI unit, 1K=1000, KMGTPEZY)"
+
+	awk '
+	BEBIN {sum=0}
+	{
+		ex = index("KMGTPEZY", substr($1, length($1)))
+		if (ex == 0) {
+			size = $1
+		} else {
+			val = substr($1, 0, length($1) - 1)
+			size = val * 10^(ex * 3)
+		}
+		sum += size
+	}
+	END {print sum}' | numfmt --field=1 --to=si --format="%-6f"
 }
 
 ################################################################################

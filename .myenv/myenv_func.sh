@@ -4,7 +4,7 @@
 ################################################################################
 # Install myenv
 ################################################################################
-# $MY_ENV/myenv_init.sh for auto setup
+# $MY_ENV/myenv_init_self.sh for auto setup
 
 ################################################################################
 # Source Dependencies
@@ -1499,13 +1499,20 @@ func_scp_via_jump() {
 func_mebackup_awsvm() {
 	local usage="Usage: ${FUNCNAME[0]} run mebackup on awsvm and copy back" 
 
-	local fpath
+	local fpath bakpath
+	bakpath="$HOME/Documents/DCB/dbackup/latest/"
+
+	if ! \cd "${bakpath}"; then
+		echo "INFO: cd to dir ($bakpath) FAILED, pls check!"
+		return 1
+	fi
 
 	fpath="$(ssh awsvm 'bash "$HOME/.myenv/secu/awsvm/script/z/func_backup_myenv.alone.sh"' | grep _awsvm_myenv_backup.zip | cut -d" " -f10)"
-	echo "INFO: gen remove backup, remove path: $fpath"
+	echo "INFO: remote backup generated, remote path: $fpath"
 
-	\cd "$HOME/Documents/DCB/dbackup/latest/"
 	func_scp_from_awsvm "$fpath"
+	ls -l | tail -1
+	\cd - &> /dev/null
 }
 
 # awsvm@aws
@@ -2460,7 +2467,7 @@ func_export_script() {
 	# Post process
 	if [[ "${eresult}" = "success" ]] ; then
 
-		# Export MY_ENV_xxx VAR. TODO: 1) one time grep is NOT enough (the var assignment migth contain other var). 2) only grep myenv_func.sh might NOT enough
+		# Export MY_ENV_xxx VAR. TODO: 1) one time grep is NOT enough (the var assignment migth contain other var OR func_). 2) only grep myenv_func.sh might NOT enough
 		local var_pattern var_strings
 		var_pattern="$(grep -o "MY_[_A-Z]*" "${target}" | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/$/MY_ENV\\)=/;')"
 		var_strings="$(grep "${var_pattern}" ~/.myenv/myenv_func.sh)"
@@ -2590,9 +2597,9 @@ func_mydata_sync(){
 	func_techo INFO "detail log: ${tmp_log}" 
 	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_dtbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_dtbtodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
 	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
 	func_mydata_print_summary "${tmp_log}" 
 
@@ -2614,9 +2621,11 @@ func_mydata_gen_fl_and_upload(){
 		fl_dir="${d}/alone/fl_record"
 		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
 
-		# mv and upload
+		# gen file
 		func_techo info "start to gen filelist for: ${d}"
 		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
+
+		# remove useless lines
 		sed -i -e "
 			/\.Trashes\//d;
 			/\.fseventsd\//d;
@@ -2635,6 +2644,7 @@ func_mydata_gen_fl_and_upload(){
 			# more 
 			#/\/FCS\/maven\/m2_repo\//d;	# included in /FCS?
 
+		# mv to disk and upload
 		func_scp_to_awsvm "${fl}"
 		mv "${fl}" "${fl_dir}" 
 	done
@@ -2754,22 +2764,31 @@ func_mydata_sync_tcbtotcz() {
 	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
 }
 
-func_mydata_sync_dtbtotcz() {
-	func_techo info "all movie in DTB are not synced, have a bak in DTZ/alone/movieNdtb"
-	return 0
-
-	#local DTB_SYNC_LIST="video/movieNdtb" 
-	#func_mydata_rsync_with_list "${DTB_BASE}" "${TCZ_BASE}" "${DTB_SYNC_LIST}" 
-}
-
 func_mydata_sync_dtatodtz() {
-	local DTA_SYNC_LIST="dudu/xiaoxue dudu/chuzhong dudu/gaozhong gigi/course book/computer book/misc"
+	local DTA_SYNC_LIST="dudu/xiaoxue dudu/chuzhong dudu/gaozhong dudu/english"
 	func_mydata_rsync_with_list "${DTA_BASE}" "${DTZ_BASE}" "${DTA_SYNC_LIST}" 
 }
 
+func_mydata_sync_dtbtodtz() { 
+	echo "TODO TODO TODO TODO TODO: DTB无法放这么多子目录，后面也装不下"
+	return 1
+	local DTB_SYNC_LIST="" 
+	func_mydata_rsync_with_list "${DTB_BASE}" "${DTZ_BASE}" "${DTB_SYNC_LIST}" 
+}
+
 func_mydata_sync_dtztotcz() {
-	func_techo info "SKIP DIR: video/documentary, SINCE TOO BIG"
-	local DTZ_SYNC_LIST="video/course dudu/book dudu/audio dudu/movie dudu/documentary "
+	local DTZ_SKIP_LIST="video/documentary"
+	func_techo info "SKIP: ${DTZ_SKIP_LIST}"
+
+	local DTZ_SYNC_LIST="gigi video/course dudu/audio dudu/book dudu/documentary dudu/knowledge dudu/movie zz/talk zz/computer zz/outing"
 	func_mydata_rsync_with_list "${DTZ_BASE}" "${TCZ_BASE}" "${DTZ_SYNC_LIST}" 
 }
 
+func_mydata_sync_note() {
+	echo "ERROR: this function is ONLY for notes"
+	return 1
+	# Chain:
+	#	TCA/TCB > TCZ	# h8 / alone
+	#	DTA/DTB > DTZ	# dudu/(k12: xx,cz,gz,en)
+	#	DTZ > TCZ	# ???
+}
