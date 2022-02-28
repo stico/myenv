@@ -1193,7 +1193,7 @@ func_ip_list_via_ifconfig_osx() {
 func_ip_list_lu() {
 	if func_is_cmd_exist ip ; then
 		func_ip_list_via_ip_lu
-	else func_is_cmd_exist ifconfig ; then
+	else func_is_cmd_exist ifconfig
 		func_ip_list_via_ifconfig_lu
 	fi
 }
