@@ -2494,50 +2494,149 @@ func_export_script() {
 	fi
 }
 
-func_find_dup_files() {
+func_dup_gather_PRIVATE_try_bakpath() {
+	local usage="USAGE: ${FUNCNAME[0]} <filepath>" 
+	local desc="Desc: if path is doc backup, try diff path for DTZ/TCZ/lap" 
+	func_param_check 1 "$@"
+
+	echo "aaaaaaaaa" >&2
+	local tline1 tline2
+	# NOTE: NO prefix chars for these 2 path !
+	if [[ "${1}" = backup_unison/* ]] ; then 
+		tline1="${1#backup_unison/}"
+		tline2="${1/backup_unison/backup_rsync/}"
+		[ -e "${tline1}" ] && echo "${tline1}" && return
+		[ -e "${tline2}" ] && echo "${tline2}" && return
+	fi
+
+	if [[ "${1}" = backup_rsync/* ]] ; then
+		tline1="${1#backup_rsync/}"
+		tline2="${1/backup_rsync/backup_unison/}"
+		[ -e "${tline1}" ] && echo "${tline1}" && return
+		[ -e "${tline2}" ] && echo "${tline2}" && return
+	fi
+
+	echo "${1}"
+}
+
+func_dup_gather() {
+	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
+	local desc="Desc: gather files in <filelist>, preserve dir structure.\nNOTE: the filelist is output of func_dup_find"
+	func_param_check 1 "$@"
+
+	# Pre-check
+	func_complain_path_not_exist "${1}"
+	
+	# Pre-process: remove blank line, comment line, md5sum and prefix "./"
+	local input="$(mktemp)"
+	func_clean_cat "${1}" | sed -e 's/^[[:alnum:]]\{32\} \+//' | sed -e 's+^\./++' >  "${input}"
+
+	# Process each file
+	local line tpath tfile log
+	local dup_dir="A_GATHER_DIR_$(func_dati)"
+	local log="${dup_dir}/A.log"
+	mkdir "${dup_dir}"
+	while read line ; do
+		# normal case: file inexist. 
+		if [ ! -e "${line}" ] ; then
+			# for doc backup path, try alternative paths
+			if [[ "${line}" = backup_unison/* ]] || [[ "${line}" = backup_rsync/* ]] ; then
+				line="$(func_dup_gather_PRIVATE_try_bakpath ${line})"
+			fi
+		fi
+		[ ! -e "${line}" ] && echo "MV_SKIP: skip since inexist: ${line}" >> "${log}" && continue
+
+		# move (preserve path structure)
+		tpath="${dup_dir}/$(dirname "${line}")"
+		[ -d "${tpath}" ] || mkdir -p "${tpath}"
+		mv "$line" "${tpath}"
+
+		# verify
+		tfile="${tpath}/$(basename "${line}")"
+		[ -e "${line}" ] && echo "MV_FAIL: failed to move, file still there: ${line}"       >> "${log}" && continue
+		[ ! -e "${tfile}" ] && echo "MV_FAIL: failed to move, file NOT in target: ${tfile}" >> "${log}" && continue
+		echo "MV_DONE: move file success: ${tfile}"                                         >> "${log}" && continue
+	done < "${input}"
+
+	echo "INFO: ==================================== SUMMARY ===================================="
+	local fail="$(grep "MV_FAIL" "${log}" | wc -l | cut -d' ' -f1)"
+	local skip="$(grep "MV_SKIP" "${log}" | wc -l | cut -d' ' -f1)"
+	local success="$(grep "MV_DONE" "${log}" | wc -l | cut -d' ' -f1)"
+	echo "INFO: files moved to (size: $(du -sh "${dup_dir}" | wc -l | cut -d' ' -f1) ): ${dup_dir}"
+	echo "INFO: ${fail} fail, ${success} success, ${skip} skip, see detail: ${log}"
+}
+
+func_dup_find_PRIVATE_gen_md5() {
+	# TODO: What to do with empty file: d41d8cd98f00b204e9800998ecf8427e
+
+	# Skip path
+	if echo "${1}" | grep -q -f "${dup_skip_path_patterns}" ; then
+		echo "DUP_SKIP_PATH: ${1}" >> "${dup_log}"
+		return
+	fi
+
+	# Skip md5
+	local md5_out="$(md5sum "${1}")"
+	if grep -q "${md5_out%% *}" "${DUP_SKIP_MD5}" ; then
+		echo "DUP_SKIP_MD5: ${md5_out}" >> "${dup_log}"
+		return
+	fi
+
+	# Record md5
+	echo "${md5_out}" >> "${list_md5}"
+}
+
+func_dup_find() {
 	local usage="USAGE: ${FUNCNAME[0]} <function_name> <path> <...>" 
 	local desc="Desc: find duplicated files in paths (use md5)" 
 
-	local tmp_dir="$(mktemp -d)"
-	local tmp_md5_path="${tmp_dir}/tmp_md5_path.txt"
-	local tmp_md5_dup="${tmp_dir}/tmp_md5_dup.txt"
-	local tmp_md5_dup_detail="${tmp_dir}/tmp_md5_dup_detail.txt"
+	local DUP_CONFIG="${MY_ENV}/secu/personal/dup_config/"
+	local DUP_SKIP_MD5="${DUP_CONFIG}/dup_skip_md5"
+	local DUP_SKIP_PATH="${DUP_CONFIG}/dup_skip_path"
 
-	# tool script
-	# - 01: split result file by lines of dup
-	#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
+	local dup_base="/tmp/dup_$(func_dati)"
+	local list_md5="${dup_base}/list_md5.txt"
+	local list_dup_count="${dup_base}/list_dup_count.txt"
+	local list_dup_detail="${dup_base}/list_dup_detail.txt"
+	local dup_log="${dup_base}/a.dup_log.txt"
+	local dup_skip_path_patterns="${dup_base}/dup_skip_path_patterns"
+
+	# Pattern file must clean, empty line makes everything match
+	mkdir -p "${dup_base}"
+	func_clean_cat "${DUP_SKIP_PATH}" >> "${dup_skip_path_patterns}"
+
+	local input
+	if [[ ! -e "${DUP_SKIP_MD5}" ]] || [[ ! -e "${DUP_SKIP_PATH}" ]] ; then
+		echo "WARN: DUP_CONFIG NOT exist (WILL BE VERY SLOW), contiue (y/n)?"
+		read -e input
+		[[ "${input}" != "y" ]] && [[ "${input}" != "Y" ]] && return
+	fi
 
 	# STEP 1: gen md5 and file pair
 	local p f
 	if [ $# -eq 0 ] ; then
-		find ./ -type f -print0 | xargs -0 md5sum >> "${tmp_md5_path}"
+		#find ./ -type f -print0 | xargs -0 md5sum >> "${list_md5}"		# old version
+		find ./ -type f -print0 | while IFS= read -r -d $'\0' line; do 
+			func_dup_find_PRIVATE_gen_md5 "${line}"
+		done
 	else
 		for p in "$@" ; do
-			find "${p}" -type f -print0 | xargs -0 md5sum >> "${tmp_md5_path}"
+			#find "${p}" -type f -print0 | xargs -0 md5sum >> "${list_md5}"		# old version
+			find "${p}" -type f -print0 | while IFS= read -r -d $'\0' line; do 
+				func_dup_find_PRIVATE_gen_md5 "${line}"
+			done
 		done
 	fi
 
-	# STEP 2: remove useless files
-	sed -i '/\/\(.DS_Store\|desktop.ini\|thumbs.db\)$/d;
-		/DCC\/coding\/leetcode\/answer_shdll\//d;
-		/FCS\/maven\/m2_repo\//d;
-		/FCS\/oumisc\//d;
-		/FCS\/ourepo\//d;
-		/FCS\/macvim\//d;
-		/FCS\/vim\//d;
-		/.git\/info\/exclude$/d;
-		/\/.Trashes\//d;
-		/\/.Spotlight-/d' "${tmp_md5_path}"
-
-	# STEP 3: gen dup report
+	# STEP 2: gen dup report
 	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
 	# https://stackoverflow.com/questions/40134905/merge-values-for-same-key
 	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
-	cut -d' ' -f1 "${tmp_md5_path}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${tmp_md5_dup}"
+	cut -d' ' -f1 "${list_md5}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${list_dup_count}"
 
-	local dup_count="$(wc -l "${tmp_md5_dup}" | cut -d' ' -f1)"
+	local dup_count="$(wc -l "${list_dup_count}" | cut -d' ' -f1)"
 	if (( dup_count == 0 )) ; then
-		echo "INFO: no dup files found, tmp dir: ${tmp_dir}"
+		echo "INFO: no dup files found, tmp dir: ${dup_base}"
 		return 0
 	fi
 
@@ -2548,12 +2647,16 @@ func_find_dup_files() {
 			continue
 		fi
 
-		grep "${md5}" "${tmp_md5_path}" >> "${tmp_md5_dup_detail}"
-		echo >> "${tmp_md5_dup_detail}"
-	done < "${tmp_md5_dup}"
+		# TOOL SCRIPT
+		# - 01: split result file by lines of dup
+		#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
 
-	if [ -e "${tmp_md5_dup_detail}" ] ; then
-		echo "INFO: found $(wc -l "${tmp_md5_dup_detail}" | cut -d' ' -f1) files, check detail at: ${tmp_md5_dup_detail}"
+		grep "${md5}" "${list_md5}" >> "${list_dup_detail}"
+		echo >> "${list_dup_detail}"
+	done < "${list_dup_count}"
+
+	if [ -e "${list_dup_detail}" ] ; then
+		echo "INFO: found $(wc -l "${list_dup_detail}" | cut -d' ' -f1) files, check detail at: ${list_dup_detail}"
 	else
 		echo "INFO: NO dup files found"
 	fi
