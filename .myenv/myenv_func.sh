@@ -2523,25 +2523,27 @@ func_dup_gather() {
 	local desc="Desc: gather files in <filelist> (use default list if not provided), preserve dir structure.\nNOTE: the filelist is output of func_dup_find"
 
 	local DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
-	local DUP_DEL_LIST="${DUP_CONFIG}/del_list"
+	local DUP_DEL_LIST_W="${DUP_CONFIG}/del_list.w.md5"
+	local DUP_DEL_LIST_N="${DUP_CONFIG}/del_list.n.md5"
 
 	# Pre-check
 	local del_list
 	local user_input
-	if [[ -z "${1}" ]] &&[[ -e "${DUP_DEL_LIST}" ]] ; then
-		echo "INFO: default del_list: ${DUP_DEL_LIST}"
+	if [[ -z "${1}" ]] && [[ -e "${DUP_DEL_LIST_W}" ]] ; then
+		echo "INFO: default del_list: ${DUP_DEL_LIST_W} / ${DUP_DEL_LIST_N##*/}"
 		echo "WARN: NO del_list provided, use default list? (y/n)"
 		read -e user_input
 		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
-		del_list="${DUP_DEL_LIST}"
+		del_list="${DUP_DEL_LIST_W}"
 	else
-		del_list="${1}	"
+		del_list="${1}"
 	fi
 	func_complain_path_not_exist "${del_list}" && return
 	
 	# Pre-process: remove blank line, comment line, md5sum and prefix "./"
 	local del_list_clean="$(mktemp)"
-	func_clean_cat "${del_list}" | sed -e 's/^[[:alnum:]]\{32\} \+//' | sed -e 's+^\./++' >  "${del_list_clean}"
+	func_clean_cat "${del_list}" | sed -e 's/^[[:alnum:]]\{32\} \+//' | sed -e 's+^\./++' > "${del_list_clean}"
+	[[ "${del_list}" == "${DUP_DEL_LIST_W}" ]] && cat "${DUP_DEL_LIST_N}"                 >> "${del_list_clean}"
 
 	# Process each file
 	local line tpath tfile log
@@ -2581,6 +2583,7 @@ func_dup_gather() {
 func_dup_find_PRIVATE_gen_md5() {
 	# TODO: What to do with empty file: d41d8cd98f00b204e9800998ecf8427e
 	# TODO: check log, if symbolic check works?
+	# TODO: update info_md5: remove ignore path & md5, remove d41d8cd98f00b204e9800998ecf8427e
 
 	# Skip symbolic link
 	if [ -h "${1}" ] ; then 
@@ -2594,21 +2597,22 @@ func_dup_find_PRIVATE_gen_md5() {
 		return
 	fi
 
-	# TODO: update info_md5: remove ignore path, remove ignore md5
-	# Reuse md5 if possible. To make better match: always remove "./" prefix, and remove "backup_rsync/backup_unison" if have
+	# Reuse md5 if possible. 
+	# - To make better match: always remove "./" prefix, and remove "backup_rsync/backup_unison" if have
+	# - always ignore empty file md5 (reuse this might cause delete by mistake)
 	local md5_out
 	local sname="${1}" 
 	[[ "${sname}" = ./* ]]             && sname="${sname#./}"
 	[[ "${sname}" = backup_rsync/* ]]  && sname="${sname#*backup_rsync/}"
 	[[ "${sname}" = backup_unison/* ]] && sname="${sname#*backup_unison/}"
-	md5_out="$(grep "${sname}" "${DUP_INFO_MD5}" | head -1)"
+	md5_out="$(grep "${sname}" "${DUP_INFO_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
 	if [[ -n "${md5_out}" ]] ; then
 		md5_out="${md5_out%% *}  ${1}"
 	else
 		md5_out="$(md5sum "${1}")"
 	fi
 
-	# Skip md5
+	# Skip md5, only match md5, might ingore more but also safe
 	if grep -q "${md5_out%% *}" "${DUP_SKIP_MD5}" ; then
 		echo "DUP_SKIP_MD5: ${md5_out}" >> "${dup_log}"
 		return
@@ -2618,7 +2622,12 @@ func_dup_find_PRIVATE_gen_md5() {
 	echo "${md5_out}" >> "${list_md5}"
 }
 
-func_dup_find() {
+func_dup_gather_then_find() {
+	func_dup_gather
+	func_dup_find_CALL_GATHER_FIRST
+}
+
+func_dup_find_CALL_GATHER_FIRST() {
 	# TOOL SCRIPT
 	# - 01: split result file by lines of dup
 	#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
@@ -2650,7 +2659,7 @@ func_dup_find() {
 
 	# Pattern file must clean, empty line makes everything match
 	mkdir -p "${dup_base}"
-	func_clean_cat "${DUP_SKIP_PATH}" >> "${dup_skip_path_patterns}"
+	func_clean_cat "${DUP_SKIP_PATH}" > "${dup_skip_path_patterns}"
 
 	# STEP 1: gen md5 and file pair
 	local p f
