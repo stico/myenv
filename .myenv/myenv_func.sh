@@ -486,6 +486,9 @@ func_clean_cat() {
 	local usage="Usage: ${FUNCNAME[0]} <file_path>" 
 	func_param_check 1 "$@"
 	
+	# empty file, just return
+	[[ -s "${1}" ]] || return
+
 	func_is_filetype_text "${1}" || func_die "ERROR: ${1} is NOT text file"
 	sed -e '/^\s*$/d;
 		/^\s*\(#\|"\|\/\/\)/d' "$@"
@@ -2605,7 +2608,7 @@ func_dup_find_PRIVATE_gen_md5() {
 	[[ "${sname}" = ./* ]]             && sname="${sname#./}"
 	[[ "${sname}" = backup_rsync/* ]]  && sname="${sname#*backup_rsync/}"
 	[[ "${sname}" = backup_unison/* ]] && sname="${sname#*backup_unison/}"
-	md5_out="$(grep "${sname}" "${DUP_INFO_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
+	md5_out="$(grep -F "${sname}" "${DUP_INFO_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
 	if [[ -n "${md5_out}" ]] ; then
 		md5_out="${md5_out%% *}  ${1}"
 	else
