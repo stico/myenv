@@ -3,7 +3,7 @@
 # source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
 ################################################################################
-# Misc: functions
+# Time
 ################################################################################
 func_date() { date "+%Y-%m-%d";				}
 func_time() { date "+%H-%M-%S";				}
@@ -11,6 +11,9 @@ func_dati() { date "+%Y-%m-%d_%H-%M-%S";		}
 func_nanosec()  { date +%s%N;				}
 func_millisec() { echo $(($(date +%s%N)/1000000));	}
 
+################################################################################
+# Misc
+################################################################################
 func_die() {
 	local usage="Usage: ${FUNCNAME[0]} <error_info>" 
 	local desc="Desc: echo error info to stderr and exit" 
@@ -20,6 +23,24 @@ func_die() {
 	exit 1 
 	# ~signal@bash: -INT NOT suitable, as it actually only breaks from function
 	#func_is_non_interactive && exit 1 || kill -INT $$
+}
+
+func_techo() {
+	local usage="Usage: ${FUNCNAME[0]} <level> <msg>" 
+	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
+	func_param_check 2 "$@"
+	
+	echo -e "$(date "+%Y-%m-%d %H:%M:%S"): ${1^^}: ${2}"
+}
+
+func_decho() {
+	local usage="Usage: ${FUNCNAME[0]} <msg>" 
+	local desc="Desc: echo msg as DEBUG level, based on env var ME_DEBUG=true to really show"
+	func_param_check 1 "$@"
+	
+	[ "${ME_DEBUG}" = 'true' ] || return 0
+	#echo -e "DEBUG: ${1}"
+	func_techo "DEBUG" "${1}"
 }
 
 func_param_check() {
@@ -43,108 +64,6 @@ func_param_check() {
 
 	# real parameter check
 	[ $# -lt "${count}" ] && func_die "${error_msg}"
-}
-
-func_download() {
-	local usage="Usage: ${FUNCNAME[0]} <url> <target>"
-	local desc="Desc: download from url to local target" 
-	func_param_check 2 "$@"
-	
-	[ -z "${1}" ] && func_die "ERROR: url is null or empty, download failed"
-	[ -f "${2}" ] && echo "INFO: file (${2}) already exist, skip download" && return 0
-
-	# TODO: curl has a feature --metalink <addr> (if target site support), which could make use of mirrors (e.g. for failover)
-	case "${1}" in
-		*)		func_download_wget "$@"	;;
-		#http://*)	func_download_wget "$@" ;;
-		#https://*)	func_download_wget "$@" ;;
-	esac
-}
-
-func_download_wget() {
-	local usage="Usage: ${FUNCNAME[0]} <url> <target_dir>"
-	local desc="Desc: download using wget" 
-	func_param_check 2 "$@"
-
-	# if the target exist is an file, just return
-	local dl_fullpath="${2}/${1##*/}"
-	[ -f "${dl_fullpath}" ] && echo "INFO: file (${dl_fullpath}) already exist, skip download" && return 0
-
-	func_mkdir_cd "${2}" 
-	echo "INFO: start download, url=${1} target=${dl_fullpath}"
-
-	# TODO: add control to unsecure options?
-
-	wget --progress=dot --no-check-certificate "${1}" 2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" 
-
-	# Note, some awk version NOT works friendly
-	# Command line explain: [Showing File Download Progress Using Wget](http://fitnr.com/showing-file-download-progress-using-wget.html)
-	#wget --progress=dot --no-check-certificate ${1}	2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk 'BEGIN{printf("INFO: Download progress:  0%")}{printf("\b\b\b\b%4s", $2)}'
-
-	echo "" # next line should in new line
-	[ -f "${dl_fullpath}" ] || func_die "ERROR: ${dl_fullpath} not found, seems download faild!"
-	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
-}
-
-# shellcheck disable=2155,2012
-func_uncompress() {
-	# TODO 1: gz file might be replaced and NOT in the target dir
-
-	local usage="Usage: ${FUNCNAME[0]} <source> <target_dir>"
-	local desc="Desc: uncompress file, based on filename extension, <target_dir> will be the top level dir for uncompressed content" 
-	func_param_check 1 "$@"
-	func_validate_path_exist "${1}"
-
-	# use readlink to avoid relative path
-	local source_file="$(readlink -f "${1}")"
-	local target_dir="${source_file%.*}"
-
-	[ -n "${2}" ] && target_dir="$(readlink -f "${2}")"
-	[ -z "${target_dir}" ] && target_dir="${2}"		# NOTE: readlink -f on mac seems gets empty str, if more than last 2 level path inexist, so need "backup" here
-	func_complain_path_exist "${target_dir}" && return	# seem NOT need exit, just complain is enough?
-
-	echo "INFO: uncompress file, from: ${source_file} to: ${target_dir}"
-	func_mkdir_cd "${target_dir}"
-	case "$source_file" in
-		*.jar | *.arr | *.zip)
-				func_complain_cmd_not_exist unzip \
-				&& (sudo apt-get install unzip \
-				    || sudo port install unzip) ;			# try intall
-				unzip "$source_file" &> /dev/null       	;;
-
-		*.tar.xz)	tar -Jxvf "$source_file" &> /dev/null		;;
-		*.tar.gz)	tar -zxvf "$source_file" &> /dev/null		;;	# NOTE, should before "*.gz)"
-		*.tar.bz2)	tar -jxvf "$source_file" &> /dev/null		;;	# NOTE, should before "*.bz2)"
-		*.bz2)		bunzip2 "$source_file" &> /dev/null		;;
-		*.gz)		gunzip "$source_file" &> /dev/null		;;
-		*.tar)		tar -xvf "$source_file" &> /dev/null		;;
-		*.xz)		tar -Jxvf "$source_file" &> /dev/null		;;
-		*.tgz)		tar -zxvf "$source_file" &> /dev/null		;;
-		*.tbz2)		tar -jxvf "$source_file" &> /dev/null		;;
-		*.Z)		uncompress "$source_file"			;;
-
-		*.7z)		func_complain_cmd_not_exist 7z \
-				&& (sudo apt-get install p7zip \
-				    || sudo port install p7zip) ;			# try intall
-				7z e "$source_file" &> /dev/null		;;	# use "-e" will fail, "e" is extract, "x" is extract with full path
-
-		*.rar)		func_complain_cmd_not_exist unrar \
-				&& (sudo apt-get install unrar \
-				    || sudo port install unrar);			# try intall
-				unrar e "$source_file" &> /dev/null		;;	# another candidate is: 7z e "$source_file"
-
-		*)		echo "ERROR: unknow format: ${source_file}"	;;
-	esac
-
-	func_validate_dir_not_empty "${target_dir}"
-
-	# try to move dir level up, there might be only 1 file/dir in the uncompressed 
-	if [ "$(ls -A "${target_dir}" | wc -l)" = 1 ] ; then
-		mv -f "${target_dir}"/**/* "${target_dir}"/**/.* "${target_dir}"/ &> /dev/null 
-		rmdir "${target_dir}"/**/ &> /dev/null 
-	fi
-
-	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
 }
 
 func_vcs_update() {
@@ -175,88 +94,8 @@ func_vcs_update() {
 	fi
 }
 
-func_rsync_v1() {
-	local usage="Usage: ${FUNCNAME[0]} <src> <tgt> <add_options>" 
-	local desc="Desc: rsync between source and target" 
-	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
-
-	local src="${1}"
-	local tgt="${2}"
-	local opts="${3}"
-	func_complain_path_not_exist "${src}" && return 1
-	func_complain_path_not_exist "${tgt}" && return 1
-
-	func_techo DEBUG "run cmd: rsync -avP ${opts} ${src} ${tgt} 2>&1"
-	rsync -avP ${opts} "${src}" "${tgt}" 2>&1
-}
-
-func_rsync_del_detect() {
-	local usage="Usage: ${FUNCNAME[0]} <src> <tgt>" 
-	local desc="Desc: detect if any file need delete" 
-	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
-
-	#echo rsync --dry-run -rv --delete "${1}" "${2}"
-	rsync --dry-run -rv --delete "${1}" "${2}"	\
-		| grep '^deleting '			\
-		| sed -e 's+/[^/]*$+/+'			\
-		| sort -u
-}
-
-func_rsync_out_filter() {
-	# shellcheck disable=2148
-	awk '	/DEBUG: |INFO: |WARN: |ERROR: |FATAL: |TRACE: / {print $0;next;}	# reserve log lines
-
-		/^$/ {			next;}	# skip empty lines
-		/\/$/ {			next;}	# skip dir lines
-		/^sent / {		next;}	# skip rsync lines
-		/^sending / {		next;}	# skip rsync lines
-		/^total size / {	next;}	# skip rsync lines
-		/%.*\/s.*:..:/ {	next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
-		/\(xfr#.*(ir|to)-chk=/ {next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
-
-		# compact those too noisy output. Use last blank line to trigger the summary count
-		/^FCS\/maven\/m2_repo\/repository/ {
-			mvn_repo_updated_files++;
-			if(mvn_repo_update_flag == 0){
-				print "MAVEN REPO: START TO UPDATE.";
-				mvn_repo_update_flag = 1;
-			}
-			next;
-		} 
-		/^DCD\/mail/ {
-			dcd_mail_updated_files++;
-			if(dcd_mail_updated_flag == 0){
-				print "DCD MAIL: START TO UPDATE.";
-				dcd_mail_updated_flag = 1;
-			}
-			next;
-		} 
-		/^\s*$/ {		
-			if(mvn_repo_update_flag == 1 ) {
-				print "MAVEN REPO: UPDATED FILES: " mvn_repo_updated_files; 
-				mvn_repo_update_flag = 2;
-			}; 
-			if(dcd_mail_updated_flag == 1){
-				print "DCD MAIL: UPDATED_FILES: " dcd_mail_updated_files;
-				dcd_mail_updated_flag = 2;
-			}
-			next;
-		} 
-
-		# for other lines, just print out
-		!/\/$/ {
-			print $0;
-			next;
-		}'
-}
-
 ################################################################################
-# Utility: output
-################################################################################
-# TODO: good reference: https://github.com/Offirmo/offirmo-shell-lib/blob/master/bin/osl_lib_output.sh
-
-################################################################################
-# Utility: process
+# Process
 ################################################################################
 
 func_pids_of_descendants() {
@@ -397,48 +236,131 @@ func_is_pid_running() {
 }
 
 ################################################################################
-# Utility: logging
+# Pattern matching (regex / patterns)
 ################################################################################
-func_techo() {
-	local usage="Usage: ${FUNCNAME[0]} <level> <msg>" 
-	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
-	func_param_check 2 "$@"
-	
-	echo -e "$(date "+%Y-%m-%d %H:%M:%S"): ${1^^}: ${2}"
+func_grepf() {
+	local usage="Usage: ${FUNCNAME[0]} <-param1> <-param2> ... <-paramN> [--] <pattern-file> [file]"
+	local desc="Desc: grep patterns in file" 
+	# NO func_param_check, since will pollut output in pipe
+
+	local params p
+	for p in "$@"; do 
+		[[ -z "${p}" ]] && shift && continue
+		[[ "${p}" == "--" ]] && shift && break
+
+		if [[ "${p}" == -* ]] ; then
+			params="${params} ${p}"
+			shift
+		fi
+	done
+
+	local f_pattern="${1}"
+	shift
+	[ ! -e "${f_pattern}" ] && echo "ERROR: pattern file ${f_pattern} NOT exist!" >&2 && return 1
+
+	# NOTE: do NOT use " with $params
+	if [[ -z "${1}" ]] ; then
+		# run in pipe
+		grep ${params} -f <(func_del_blank_lines "${f_pattern}")
+	else
+		grep ${params} -f <(func_del_blank_lines "${f_pattern}") "$@"
+	fi
 }
 
-func_decho() {
-	local usage="Usage: ${FUNCNAME[0]} <msg>" 
-	local desc="Desc: echo msg as DEBUG level, based on env var ME_DEBUG=true to really show"
+func_del_pattern_lines() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern1> <pattern2> ... <patternN> -- <file1> <file2> ... <fileN>"
+	local desc="Desc: delete those lines which match patterns, NOTE: if against files the '--' MUST used as separator!" 
+	# NO func_param_check, since will pollut output in pipe
+
+	local p patterns
+	for p in "$@"; do 
+		[[ -z "${p}" ]] && shift && continue
+		[[ "${p}" == "--" ]] && shift && break
+
+		patterns="${patterns}\|${p}"
+		shift
+	done
+
+	if [[ -z "${1}" ]] ; then
+		grep -v "${patterns#\\|}"
+	else
+		grep -v "${patterns#\\|}" "$@"
+	fi
+}
+
+func_del_blank_lines() {
+	func_del_pattern_lines '^[[:space:]]*$' -- "$@"
+}
+
+func_del_blank_and_hash_lines() {
+	func_del_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' -- "$@"
+}
+
+################################################################################
+# Text Process
+################################################################################
+func_shrink_blank_lines() {
+	local usage="Usage: ${FUNCNAME[0]} [file]"
+	local desc="Desc: shrink blank lines, multiple consecutive blank lines into 1" 
+
+	if [[ -n "${1}" ]] ; then
+		func_complain_path_not_exist "${1}" && return 1
+		sed -r 's/^\s+$//' "${1}" | cat -s
+	else
+		sed -r 's/^\s+$//' | cat -s
+	fi
+
+}
+
+func_shrink_dup_lines() {
+	local usage="Usage: ${FUNCNAME[0]} [pattern-file]"
+	local desc="Desc: shrink duplicated lines (and merge blank lines), without sorting" 
+
+	# Candidates
+	# awk '!x[$0]++'				# remove duplicate lines without sorting. (++) is performed after (!), which is crucial
+	# awk '!x[$0]++ { print $0; fflush() }'		# helps when output a.s.a.p.
+	# awk 'length==0 || !x[$0]++'			# retain empty line
+	# awk '($0 ~ /^[[:space:]]*$/) || !x[$0]++'	# retain blank line
+
+	if [[ -n "${1}" ]] ; then
+		func_complain_path_not_exist "${1}" && return 1
+		awk '($0 ~ /^[[:space:]]*$/) || !x[$0]++' "${1}" | func_shrink_blank_lines
+	else
+		awk '($0 ~ /^[[:space:]]*$/) || !x[$0]++' | func_shrink_blank_lines
+	fi
+}
+
+func_shrink_pattern_lines() {
+	# USED_IN: secu/awsvm/telegram (shrink kword.title) 
+	# NOTE: secu/personal/dup/del_list (func_dup_gather based on path, NOT pattern, can shrink with str which ending with "/", but not simply sub str)
+	#	if really want to use: 
+	#	step 1) func_shrink_pattern_lines del_list &> /dev/null ; 
+	#	step 2) ls -lhtr $TMPDIR/ ; (vi the latest file, find lines than matches 'match-line-found.*\/$', which could be deleted
+	local usage="Usage: ${FUNCNAME[0]} <pattern-file>"
+	local desc="Desc: shrink pattern lines (and merge blank lines), e.g. if lineA is sub string of lineB, lineB will be removed" 
+	local note="Note 1: NOT support pipe, seems not needed" 
+	local note="Note 2: useful for shrinking pattern file used in func_grepf()" 
+
 	func_param_check 1 "$@"
-	
-	[ "${ME_DEBUG}" = 'true' ] || return 0
-	echo -e "DEBUG: ${1}"
+	local input_file lines_to_del tmp_grep line
+
+	# Collect: lines to delete. NOTE: '-F' is necessary, otherwise gets 'grep: Invalid range end' if have such sub str: '[9-1]'
+	input_file="${1}"
+	lines_to_del="$(mktemp)"
+	while read line; do
+		tmp_grep="$(grep -F "${line}" "${input_file}" | grep -v -x -F "${line}")"
+		func_is_str_blank "${tmp_grep}" && continue
+		echo -e "# match-line-found-with-this-line: ${line}\n${tmp_grep}" >> "${lines_to_del}"
+	done < <(func_del_blank_lines "${input_file}")
+	[[ ! -e "${lines_to_del}" ]] && echo "INFO: nothing to shrink, nothing performed" && return
+
+	# Shrink '-x' seems unnecessary here. NOTE, will also delete duplicated lines (and merge blank lines)
+	func_grepf -v -F "${lines_to_del}" "${input_file}" | func_shrink_dup_lines
 }
 
-################################################################################
-# Utility: For_Script
-################################################################################
-func_script_base_of_parent() { 
-	local usage="Usage: ${FUNCNAME[0]} (MUST invoke in script !!!)" 
-	local desc="Desc: get parent dir of current script" 
-
-	func_script_base "/../"
-}
-
-func_script_base() { 
-	local usage="Usage: ${FUNCNAME[0]} <suffix> (MUST invoke in script !!!)" 
-	local desc="Desc: get dir of current script, suffix will be directly added to the base dir" 
-
-	script_dir="$(dirname ${0})"
-	func_is_str_empty "${script_dir}" && func_die "ERROR: script dir MUST NOT empty, pls check"
-
-	readlink -f "${script_dir}/${*}"
-	#base="$(readlink -f $(dirname ${0}))"
-}
 
 ################################################################################
-# Utility: FileSystem
+# File System
 ################################################################################
 func_cd() {
 	local usage="Usage: ${FUNCNAME[0]} <path>" 
@@ -475,32 +397,30 @@ func_mkdir_cd() {
 	#func_mkdir "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir or cd into it ($1)"
 }
 
-func_sed_gen_d_cmd() {
-	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
-	local desc="Desc: gen d cmd for sed" 
+func_file_backup_tmp() {
+	local usage="Usage: ${FUNCNAME[0]} <path>"
+	local desc="Desc: backup fie in /tmp, which is a temp backup" 
 	func_param_check 1 "$@"
 
-	local sed_cmd p
-	for p in "$@" ; do
-		sed_cmd="${sed_cmd}/${p//\//\\/}/d;"
-	done
-	echo "${sed_cmd}"
+	[[ ! -e "${1}" ]] && echo "ERROR: ${1} NOT exist, can NOT backup." >&2 && return 1
 
-}
+	local target="/tmp/func_file_backup_tmp_${1//\//@}_$(func_dati)"
+	if [[ -d "${1}" ]] ; then
+		cp -r "${1}" "${target}"
+	else
+		cp "${1}" "${target}"
+	fi
 
-func_pipe_remove_lines() {
-	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
-	local desc="Desc: remove patterns in pipe, this helps when pattern are path, improve readability" 
-	func_param_check 1 "$@"
-
-	local sed_cmd="$(func_sed_gen_d_cmd "$@")"
-	echo "INFO: func_pipe_remove_lines: sed cmd: sed -e '${sed_cmd}'" >&2
-	sed -e "${sed_cmd}"
+	# very important, many case need know the backup path
+	echo "${target}" 
 }
 
 func_file_remove_lines() {
 
 	# USE CASE: func_file_remove_lines fhr.lst <quick_code_file.txt>
+
+	# TODO: how to merge this with func_del_pattern_lines
+	# TODO: if pattern file contais blank line, will cause problem (in grep, blank line matches everything)
 
 	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
 	local desc="Desc: remove patterns listed in file, useful when pattern list a very long" 
@@ -510,7 +430,7 @@ func_file_remove_lines() {
 	local PATTERN_SPLIT_COUNT="1000"
 	local pattern_file="${1}"
 	local input_file="${2}"
-	local target_file="${2}.removed.$(func_dati)"
+	#local target_file="${2}.removed.$(func_dati)"
 	func_complain_path_not_exist "${input_file}" && return 1
 	func_complain_path_not_exist "${pattern_file}" && return 1
 
@@ -586,36 +506,6 @@ func_file_size() {
 	fi
 }
 
-#func_dir_diff() {
-#	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
-#	local desc="Desc: compare diff of dir" 
-#	func_param_check 1 "$@"
-#
-#	func_dir_diff_size "$@" "true" && return 0
-#
-#	echo "TODO: more comparison"
-#}
-#
-#func_dir_diff_size() {
-#	local usage="Usage: ${FUNCNAME[0]} <source> <target> <print=true>"
-#	local desc="Desc: compare size of dir" 
-#	func_param_check 1 "$@"
-#
-#	local src="${1}"
-#	local tgt="${2}"
-#	local prt="${3}"
-#	local src_size="$(func_file_size "${src}")"
-#	local tgt_size="$(func_file_size "${tgt}")"
-#
-#	if (( src_size == tgt_size )) ; then
-#		[ -n "${prt}" ] && echo "same size: $(func_num_to_human ${src_size})"
-#		return 0 
-#	else
-#		[ -n "${prt}" ] && echo "DIFF size: $(func_num_to_human ${src_size}) != $(func_num_to_human ${tgt_size}) (${src} V.S. ${tgt})"
-#		return 1
-#	fi
-#}
-
 func_ln_soft() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
 	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
@@ -684,7 +574,7 @@ func_complain_path_exist() {
 	local desc="Desc: complains if path already exist, return 0 if exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
-	[ -e "${1}" ] && echo "${2:-WARN: path ${1} already exist!}" && return 0
+	[ -e "${1}" ] && echo "${2:-WARN: path ${1} already exist!}" 1>&2 && return 0
 	return 1
 }
 
@@ -693,7 +583,7 @@ func_complain_path_not_exist() {
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
-	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist!}" && return 0
+	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist!}" 1>&2 && return 0
 	return 1
 }
 
@@ -756,8 +646,213 @@ func_duplicate_dated() {
 }
 
 ################################################################################
-# Utility: shell
+# File transfer
 ################################################################################
+func_download() {
+	local usage="Usage: ${FUNCNAME[0]} <url> <target>"
+	local desc="Desc: download from url to local target" 
+	func_param_check 2 "$@"
+	
+	[ -z "${1}" ] && func_die "ERROR: url is null or empty, download failed"
+	[ -f "${2}" ] && echo "INFO: file (${2}) already exist, skip download" && return 0
+
+	# TODO: curl has a feature --metalink <addr> (if target site support), which could make use of mirrors (e.g. for failover)
+	case "${1}" in
+		*)		func_download_wget "$@"	;;
+		#http://*)	func_download_wget "$@" ;;
+		#https://*)	func_download_wget "$@" ;;
+	esac
+}
+
+func_download_wget() {
+	local usage="Usage: ${FUNCNAME[0]} <url> <target_dir>"
+	local desc="Desc: download using wget" 
+	func_param_check 2 "$@"
+
+	# if the target exist is an file, just return
+	local dl_fullpath="${2}/${1##*/}"
+	[ -f "${dl_fullpath}" ] && echo "INFO: file (${dl_fullpath}) already exist, skip download" && return 0
+
+	func_mkdir_cd "${2}" 
+	echo "INFO: start download, url=${1} target=${dl_fullpath}"
+
+	# TODO: add control to unsecure options?
+
+	wget --progress=dot --no-check-certificate "${1}" 2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" 
+
+	# Note, some awk version NOT works friendly
+	# Command line explain: [Showing File Download Progress Using Wget](http://fitnr.com/showing-file-download-progress-using-wget.html)
+	#wget --progress=dot --no-check-certificate ${1}	2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk 'BEGIN{printf("INFO: Download progress:  0%")}{printf("\b\b\b\b%4s", $2)}'
+
+	echo "" # next line should in new line
+	[ -f "${dl_fullpath}" ] || func_die "ERROR: ${dl_fullpath} not found, seems download faild!"
+	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
+}
+
+# shellcheck disable=2155,2012
+func_uncompress() {
+	# TODO 1: gz file might be replaced and NOT in the target dir
+
+	local usage="Usage: ${FUNCNAME[0]} <source> <target_dir>"
+	local desc="Desc: uncompress file, based on filename extension, <target_dir> will be the top level dir for uncompressed content" 
+	func_param_check 1 "$@"
+	func_validate_path_exist "${1}"
+
+	# use readlink to avoid relative path
+	local source_file="$(readlink -f "${1}")"
+	local target_dir="${source_file%.*}"
+
+	[ -n "${2}" ] && target_dir="$(readlink -f "${2}")"
+	[ -z "${target_dir}" ] && target_dir="${2}"		# NOTE: readlink -f on mac seems gets empty str, if more than last 2 level path inexist, so need "backup" here
+	func_complain_path_exist "${target_dir}" && return	# seem NOT need exit, just complain is enough?
+
+	echo "INFO: uncompress file, from: ${source_file} to: ${target_dir}"
+	func_mkdir_cd "${target_dir}"
+	case "$source_file" in
+		*.jar | *.arr | *.zip)
+				func_complain_cmd_not_exist unzip \
+				&& (sudo apt-get install unzip \
+				    || sudo port install unzip) ;			# try intall
+				unzip "$source_file" &> /dev/null       	;;
+
+		*.tar.xz)	tar -Jxvf "$source_file" &> /dev/null		;;
+		*.tar.gz)	tar -zxvf "$source_file" &> /dev/null		;;	# NOTE, should before "*.gz)"
+		*.tar.bz2)	tar -jxvf "$source_file" &> /dev/null		;;	# NOTE, should before "*.bz2)"
+		*.bz2)		bunzip2 "$source_file" &> /dev/null		;;
+		*.gz)		gunzip "$source_file" &> /dev/null		;;
+		*.tar)		tar -xvf "$source_file" &> /dev/null		;;
+		*.xz)		tar -Jxvf "$source_file" &> /dev/null		;;
+		*.tgz)		tar -zxvf "$source_file" &> /dev/null		;;
+		*.tbz2)		tar -jxvf "$source_file" &> /dev/null		;;
+		*.Z)		uncompress "$source_file"			;;
+
+		*.7z)		func_complain_cmd_not_exist 7z \
+				&& (sudo apt-get install p7zip \
+				    || sudo port install p7zip) ;			# try intall
+				7z e "$source_file" &> /dev/null		;;	# use "-e" will fail, "e" is extract, "x" is extract with full path
+
+		*.rar)		func_complain_cmd_not_exist unrar \
+				&& (sudo apt-get install unrar \
+				    || sudo port install unrar);			# try intall
+				unrar e "$source_file" &> /dev/null		;;	# another candidate is: 7z e "$source_file"
+
+		*)		echo "ERROR: unknow format: ${source_file}"	;;
+	esac
+
+	func_validate_dir_not_empty "${target_dir}"
+
+	# try to move dir level up, there might be only 1 file/dir in the uncompressed 
+	if [ "$(ls -A "${target_dir}" | wc -l)" = 1 ] ; then
+		mv -f "${target_dir}"/**/* "${target_dir}"/**/.* "${target_dir}"/ &> /dev/null 
+		rmdir "${target_dir}"/**/ &> /dev/null 
+	fi
+
+	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
+}
+
+func_rsync_v1() {
+	local usage="Usage: ${FUNCNAME[0]} <src> <tgt> <add_options>" 
+	local desc="Desc: rsync between source and target" 
+	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	local src="${1}"
+	local tgt="${2}"
+	local opts="${3}"
+	func_complain_path_not_exist "${src}" && return 1
+	func_complain_path_not_exist "${tgt}" && return 1
+
+	func_techo DEBUG "run cmd: rsync -avP ${opts} ${src} ${tgt} 2>&1"
+	rsync -avP ${opts} "${src}" "${tgt}" 2>&1
+}
+
+func_rsync_del_detect() {
+	local usage="Usage: ${FUNCNAME[0]} <src> <tgt>" 
+	local desc="Desc: detect if any file need delete" 
+	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	#echo rsync --dry-run -rv --delete "${1}" "${2}"
+	rsync --dry-run -rv --delete "${1}" "${2}"	\
+		| grep '^deleting '			\
+		| sed -e 's+/[^/]*$+/+'			\
+		| sort -u
+}
+
+func_rsync_out_filter() {
+	# shellcheck disable=2148
+	awk '	/DEBUG: |INFO: |WARN: |ERROR: |FATAL: |TRACE: / {print $0;next;}	# reserve log lines
+
+		/^$/ {			next;}	# skip empty lines
+		/\/$/ {			next;}	# skip dir lines
+		/^sent / {		next;}	# skip rsync lines
+		/^sending / {		next;}	# skip rsync lines
+		/^total size / {	next;}	# skip rsync lines
+		/%.*\/s.*:..:/ {	next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
+		/\(xfr#.*(ir|to)-chk=/ {next;}	# skip rsync lines (progress), sample: "171,324 100%   66.07MB/s    0:00:00 (xfr#1, ir-chk=1038/78727)"
+
+		# compact those too noisy output. Use last blank line to trigger the summary count
+		/^FCS\/maven\/m2_repo\/repository/ {
+			mvn_repo_updated_files++;
+			if(mvn_repo_update_flag == 0){
+				print "MAVEN REPO: START TO UPDATE.";
+				mvn_repo_update_flag = 1;
+			}
+			next;
+		} 
+		/^DCD\/mail/ {
+			dcd_mail_updated_files++;
+			if(dcd_mail_updated_flag == 0){
+				print "DCD MAIL: START TO UPDATE.";
+				dcd_mail_updated_flag = 1;
+			}
+			next;
+		} 
+		/^\s*$/ {		
+			if(mvn_repo_update_flag == 1 ) {
+				print "MAVEN REPO: UPDATED FILES: " mvn_repo_updated_files; 
+				mvn_repo_update_flag = 2;
+			}; 
+			if(dcd_mail_updated_flag == 1){
+				print "DCD MAIL: UPDATED_FILES: " dcd_mail_updated_files;
+				dcd_mail_updated_flag = 2;
+			}
+			next;
+		} 
+
+		# for other lines, just print out
+		!/\/$/ {
+			print $0;
+			next;
+		}'
+}
+
+################################################################################
+# Shell Scripting
+################################################################################
+func_script_self() { 
+	local usage="Usage: ${FUNCNAME[0]}" 
+	local desc="Desc: get fullpath of self (script)" 
+
+	test -L "$0" && readlink "$0" || echo "$0"
+}
+
+func_script_base() { 
+	local usage="Usage: ${FUNCNAME[0]} <suffix> (MUST invoke in script !!!)" 
+	local desc="Desc: get dir of current script, suffix will be directly added to the base dir" 
+
+	local script_dir="$(dirname ${0})"
+	func_is_str_empty "${script_dir}" && func_die "ERROR: script dir MUST NOT empty, pls check"
+
+	readlink -f "${script_dir}/${*}"
+	#base="$(readlink -f $(dirname ${0}))"
+}
+
+func_script_base_of_parent() { 
+	local usage="Usage: ${FUNCNAME[0]} (MUST invoke in script !!!)" 
+	local desc="Desc: get parent dir of current script" 
+
+	func_script_base "/../"
+}
+
 func_is_non_interactive() {
 	# command 1: echo $- | grep -q "i" && echo interactive || echo non-interactive
 	# command 2: [ -z "$PS1" ] && echo interactive || echo non-interactive
@@ -786,7 +881,7 @@ func_complain_cmd_not_exist() {
 	func_param_check 1 "$@"
 
 	func_is_cmd_exist "${1}" && return 1
-	echo "${2:-WARN: cmd ${1} NOT exist!}" 
+	echo "${2:-WARN: cmd ${1} NOT exist!}" 1>&2 
 	return 0
 }
 
@@ -798,6 +893,15 @@ func_validate_cmd_exist() {
 	for p in "$@" ; do
 		func_is_cmd_exist "${p}" || func_die "ERROR: cmd (${p}) NOT exist!"
 	done
+}
+
+func_validate_function_exist() {
+	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
+	local desc="Desc: check if <function-name> exist as a function" 
+	func_param_check 1 "$@"
+	
+	func_is_function_exist "${1}" && return 0
+	func_die "ERROR: ${1} NOT exist or NOT a function!"
 }
 
 func_is_function_exist() {
@@ -815,23 +919,14 @@ func_complain_function_not_exist() {
 	func_param_check 1 "$@"
 
 	func_is_function_exist "${1}" && return 1
-	echo "WARN: ${1} NOT exist or NOT a function!"
-}
-
-func_validate_function_exist() {
-	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
-	local desc="Desc: check if <function-name> exist as a function" 
-	func_param_check 1 "$@"
-	
-	func_is_function_exist "${1}" && return 0
-	func_die "ERROR: ${1} NOT exist or NOT a function!"
+	echo "WARN: ${1} NOT exist or NOT a function!" 1>&2
 }
 
 func_complain_sudo_not_auto() { 
 	local usage="Usage: ${FUNCNAME[0]} <msg>"
 	local desc="Desc: complains if current user not have sudo privilege, or need input password, return 0 if not have, otherwise 1" 
 	
-	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege, or NOT auto (need input password), pls check!}" && return 0
+	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege, or NOT auto (need input password), pls check!}" 1>&2 && return 0
 	return 1
 }
 
@@ -903,7 +998,7 @@ func_gen_local_vars_secure() {
 }
 
 ################################################################################
-# Utility: os/platform/machine
+# System: os/platform/machine
 ################################################################################
 OS_OSX="osx"
 OS_WIN="win"
@@ -1022,7 +1117,7 @@ func_os_info() {
 }
 
 ################################################################################
-# Utility: network
+# System: network
 ################################################################################
 func_is_valid_ip() {
 	local usage="Usage: ${FUNCNAME[0]} <address>" 
@@ -1362,7 +1457,8 @@ func_is_str_blank() {
 	func_param_check 1 "$@"
 	
 	# remove all space and use -z to check
-	[ -z "${1//[[:blank:]]}" ] && return 0 || return 1
+	#[ -z "${1//[[:blank:]]}" ] && return 0 || return 1
+	[ -z "${1//[[:space:]]}" ] && return 0 || return 1
 }
 
 func_str_not_contains() {
@@ -1416,3 +1512,87 @@ func_str_urldecode() {
 	# ${_//%/\\x} will replace all % with \x.
 	echo -e "${_//%/\\x}"; 
 }
+
+################################################################################
+# Output
+################################################################################
+# TODO: good reference: https://github.com/Offirmo/offirmo-shell-lib/blob/master/bin/osl_lib_output.sh
+
+# Deprecated
+#func_sed_gen_d_cmd() {
+#	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
+#	local desc="Desc: gen d cmd for sed" 
+#	func_param_check 1 "$@"
+#
+#	local sed_cmd p
+#	for p in "$@" ; do
+#		# replace '/' to '\/' (for path)
+#		sed_cmd="${sed_cmd}/${p//\//\\/}/d;"
+#	done
+#	echo "${sed_cmd}"
+#
+#}
+#
+#func_pipe_remove_pattern_lines() {
+#	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
+#	local desc="Desc: remove patterns in pipe, good for multiple patterns (not need '-e' for each pattern)" 
+#	func_param_check 1 "$@"
+#
+#	local patterns
+#
+#	# merge params with '\|'
+#	printf -v patterns "%s\\|" "${@}"
+#
+#	# remember to remove the trailing '\|'
+#	grep -v "${patterns%\\|}"
+#}
+#
+#func_pipe_remove_blank_and_hash_lines() {
+#	# remove blank lines and hash comment lines (start with "#")
+#	func_pipe_remove_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' 
+#}
+#
+#func_pipe_remove_blank_lines() {
+#	func_pipe_remove_pattern_lines '^[[:space:]]*$'
+#}
+#
+#func_file_remove_blank_and_hash_lines() {
+#	func_complain_path_not_exist "${1}" && return 1
+#	cat "$@" | func_pipe_remove_blank_and_hash_lines
+#}
+#
+#func_file_remove_blank_lines() {
+#	func_complain_path_not_exist "${1}" && return 1
+#	cat "$@" | func_pipe_remove_blank_lines
+#}
+#
+#func_dir_diff() {
+#	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
+#	local desc="Desc: compare diff of dir" 
+#	func_param_check 1 "$@"
+#
+#	func_dir_diff_size "$@" "true" && return 0
+#
+#	echo "TODO: more comparison"
+#}
+#
+#func_dir_diff_size() {
+#	local usage="Usage: ${FUNCNAME[0]} <source> <target> <print=true>"
+#	local desc="Desc: compare size of dir" 
+#	func_param_check 1 "$@"
+#
+#	local src="${1}"
+#	local tgt="${2}"
+#	local prt="${3}"
+#	local src_size="$(func_file_size "${src}")"
+#	local tgt_size="$(func_file_size "${tgt}")"
+#
+#	if (( src_size == tgt_size )) ; then
+#		[ -n "${prt}" ] && echo "same size: $(func_num_to_human ${src_size})"
+#		return 0 
+#	else
+#		[ -n "${prt}" ] && echo "DIFF size: $(func_num_to_human ${src_size}) != $(func_num_to_human ${tgt_size}) (${src} V.S. ${tgt})"
+#		return 1
+#	fi
+#}
+

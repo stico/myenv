@@ -424,6 +424,9 @@ inoremap <C-S>		<C-O>:update<CR>
 "vmap <S-Insert>		<C-V>>
 
 """""""""""""""""""""""""""""" H1 - Mapping - Input (mswin.vim)
+" Good for bash scripting, 'wb' moves cursor to the 1st char of current word
+noremap ysv wbi"${<ESC>ea}"<ESC>
+noremap ysV wbi${<ESC>ea}<ESC>
 " mswin.vim mapped this to ^Y as undo cmd in windows, but this shield the useful auto complete cmd in vim (auto input the char above)
 inoremap <C-Y> <C-Y>
 noremap <C-Y> <C-Y>

@@ -469,7 +469,7 @@ func_locate_via_locate() {
 }
 
 func_clean_less() {
-	func_clean_cat "$@" | less
+	cat "$@" | func_del_blank_and_hash_lines | less
 }
 
 func_clean_grep() {
@@ -478,20 +478,19 @@ func_clean_grep() {
 	
 	local grep_str="${1}"
 	shift
-	func_clean_cat "$@" | grep "${grep_str}"
+
+	# grep in pipe end, to reserve highlights of match part
+	if [[ "$#" -eq 1 ]] ; then
+		cat "$@" | func_del_blank_and_hash_lines | grep "${grep_str}"
+	else
+		# need heading filename for multiple file grep
+		grep '' "$@" | func_del_blank_and_hash_lines | grep "${grep_str}"
+	fi
 }
 
-# some cmd like cless/cgrep are support via alias
+# keep here just for backward compitability, should use func inside directly
 func_clean_cat() {
-	local usage="Usage: ${FUNCNAME[0]} <file_path>" 
-	func_param_check 1 "$@"
-	
-	# empty file, just return
-	[[ -s "${1}" ]] || return
-
-	func_is_filetype_text "${1}" || func_die "ERROR: ${1} is NOT text file"
-	sed -e '/^\s*$/d;
-		/^\s*\(#\|"\|\/\/\)/d' "$@"
+	func_del_blank_and_hash_lines "$@"
 }
 
 func_vi() {
@@ -2526,28 +2525,21 @@ func_dup_gather() {
 	local desc="Desc: gather files in <filelist> (use default list if not provided), preserve dir structure.\nNOTE: the filelist is output of func_dup_find"
 
 	local DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
-	local DUP_DEL_LIST_W="${DUP_CONFIG}/del_list.w.md5"
-	local DUP_DEL_LIST_N="${DUP_CONFIG}/del_list.n.md5"
+	local DUP_DEL_LIST="${DUP_CONFIG}/del_list"
 
 	# Pre-check
-	local del_list
-	local user_input
-	if [[ -z "${1}" ]] && [[ -e "${DUP_DEL_LIST_W}" ]] ; then
-		echo "INFO: default del_list: ${DUP_DEL_LIST_W} / ${DUP_DEL_LIST_N##*/}"
+	local del_list user_input
+	if [[ -z "${1}" ]] && [[ -e "${DUP_DEL_LIST}" ]] ; then
+		echo "INFO: default del_list: ${DUP_DEL_LIST}"
 		echo "WARN: NO del_list provided, use default list? (y/n)"
 		read -e user_input
 		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
-		del_list="${DUP_DEL_LIST_W}"
+		del_list="${DUP_DEL_LIST}"
 	else
 		del_list="${1}"
 	fi
-	func_complain_path_not_exist "${del_list}" && return
+	func_complain_path_not_exist "${del_list}" && return 1
 	
-	# Pre-process: remove blank line, comment line, md5sum and prefix "./"
-	local del_list_clean="$(mktemp)"
-	func_clean_cat "${del_list}" | sed -e 's/^[[:alnum:]]\{32\} \+//' | sed -e 's+^\./++' > "${del_list_clean}"
-	[[ "${del_list}" == "${DUP_DEL_LIST_W}" ]] && cat "${DUP_DEL_LIST_N}"                 >> "${del_list_clean}"
-
 	# Process each file
 	local line tpath tfile log
 	local dup_dir="A_GATHER_DIR_$(func_dati)"
@@ -2573,36 +2565,35 @@ func_dup_gather() {
 		[ -e "${line}" ] && echo "MV_FAIL: failed to move, file still there: ${line}"       >> "${log}" && continue
 		[ ! -e "${tfile}" ] && echo "MV_FAIL: failed to move, file NOT in target: ${tfile}" >> "${log}" && continue
 		echo "MV_DONE: move file success: ${tfile}"                                         >> "${log}" && continue
-	done < "${del_list_clean}"
+
+	done < <(func_del_blank_and_hash_lines "${del_list}")
 
 	echo "INFO: ==================================== SUMMARY ===================================="
-	local fail="$(grep "MV_FAIL" "${log}" | wc -l | cut -d' ' -f1)"
-	local skip="$(grep "MV_SKIP" "${log}" | wc -l | cut -d' ' -f1)"
-	local success="$(grep "MV_DONE" "${log}" | wc -l | cut -d' ' -f1)"
-	echo "INFO: files moved to (size: $(du -sh "${dup_dir}" | wc -l | cut -d' ' -f1) ): ${dup_dir}"
+	local fail="$(grep "MV_FAIL" "${log}" | wc -l)"
+	local skip="$(grep "MV_SKIP" "${log}" | wc -l)"
+	local success="$(grep "MV_DONE" "${log}" | wc -l)"
+	echo "INFO: files moved to (size: $(du -sh "${dup_dir}" | cut -d' ' -f1) ): ${dup_dir}"
 	echo "INFO: ${fail} fail, ${success} success, ${skip} skip, see detail: ${log}"
 }
 
 func_dup_find_PRIVATE_gen_md5() {
-	# TODO: What to do with empty file: d41d8cd98f00b204e9800998ecf8427e
-	# TODO: check log, if symbolic check works?
-	# TODO: update info_md5: remove ignore path & md5, remove d41d8cd98f00b204e9800998ecf8427e
-
 	# Skip symbolic link
 	if [ -h "${1}" ] ; then 
+		# TODO: NOT found such log, why?
 		echo "DUP_SKIP_LINK: ${1}" >> "${dup_log}"
 		return
 	fi
 
 	# Skip path
-	if echo "${1}" | grep -q -f "${dup_skip_path_patterns}" ; then
+	#if echo "${1}" | grep -q -f "${dup_skip_path_patterns}" ; then
+	if echo "${1}" | func_grepf -q "${DUP_SKIP_PATH}" ; then
 		echo "DUP_SKIP_PATH: ${1}" >> "${dup_log}"
 		return
 	fi
 
 	# Reuse md5 if possible. 
 	# - To make better match: always remove "./" prefix, and remove "backup_rsync/backup_unison" if have
-	# - always ignore empty file md5 (reuse this might cause delete by mistake)
+	# - always ignore empty file md5 (reuse this might cause delete by mistake): d41d8cd98f00b204e9800998ecf8427e
 	local md5_out
 	local sname="${1}" 
 	[[ "${sname}" = ./* ]]             && sname="${sname#./}"
@@ -2610,9 +2601,10 @@ func_dup_find_PRIVATE_gen_md5() {
 	[[ "${sname}" = backup_unison/* ]] && sname="${sname#*backup_unison/}"
 	md5_out="$(grep -F "${sname}" "${DUP_INFO_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
 	if [[ -n "${md5_out}" ]] ; then
-		md5_out="${md5_out%% *}  ${1}"
+		md5_out="${md5_out%% *} ${1}"
 	else
 		md5_out="$(md5sum "${1}")"
+		echo "DUP_CALC_MD5: ${1}" >> "${dup_log}"
 	fi
 
 	# Skip md5, only match md5, might ingore more but also safe
@@ -2650,7 +2642,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 	local list_dup_count="${dup_base}/list_dup_count.txt"
 	local list_dup_detail="${dup_base}/list_dup_detail.txt"
 	local dup_log="${dup_base}/a.dup_log.txt"
-	local dup_skip_path_patterns="${dup_base}/dup_skip_path_patterns"
+	#local dup_skip_path_patterns="${dup_base}/dup_skip_path_patterns"
 
 	# Pre-check
 	local user_input
@@ -2662,31 +2654,29 @@ func_dup_find_CALL_GATHER_FIRST() {
 
 	# Pattern file must clean, empty line makes everything match
 	mkdir -p "${dup_base}"
-	func_clean_cat "${DUP_SKIP_PATH}" > "${dup_skip_path_patterns}"
+	#func_file_remove_blank_and_hash_lines "${DUP_SKIP_PATH}" > "${dup_skip_path_patterns}"
 
-	# STEP 1: gen md5 and file pair
+	echo "INFO: ($(func_dati)) start to gen md5/file pair"
 	local p f
 	if [ $# -eq 0 ] ; then
-		#find ./ -type f -print0 | xargs -0 md5sum >> "${list_md5}"		# old version
 		find ./ -type f -print0 | while IFS= read -r -d $'\0' line; do 
 			func_dup_find_PRIVATE_gen_md5 "${line}"
 		done
 	else
 		for p in "$@" ; do
-			#find "${p}" -type f -print0 | xargs -0 md5sum >> "${list_md5}"		# old version
 			find "${p}" -type f -print0 | while IFS= read -r -d $'\0' line; do 
 				func_dup_find_PRIVATE_gen_md5 "${line}"
 			done
 		done
 	fi
 
-	# STEP 2: gen dup report
+	echo "INFO: ($(func_dati)) start to gen dup report"
 	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
 	# https://stackoverflow.com/questions/40134905/merge-values-for-same-key
 	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
 	cut -d' ' -f1 "${list_md5}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${list_dup_count}"
 
-	local dup_count="$(wc -l "${list_dup_count}" | cut -d' ' -f1)"
+	local dup_count="$(func_file_line_count "${list_dup_count}")"
 	if (( dup_count == 0 )) ; then
 		echo "INFO: no dup files found, tmp dir: ${dup_base}"
 		return 0
@@ -2704,7 +2694,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 	done < "${list_dup_count}"
 
 	if [ -e "${list_dup_detail}" ] ; then
-		echo "INFO: found $(wc -l "${list_dup_detail}" | cut -d' ' -f1) files, check detail at: ${list_dup_detail}"
+		echo "INFO: found $(func_file_line_count "${list_dup_detail}") files, check detail at: ${list_dup_detail}"
 	else
 		echo "INFO: NO dup files found"
 	fi
