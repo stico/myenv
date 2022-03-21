@@ -14,10 +14,28 @@ func_millisec() { echo $(($(date +%s%N)/1000000));	}
 ################################################################################
 # Misc
 ################################################################################
+func_info() { func_techo "INFO" "$@" ; }
+func_warn() { func_techo "WARN" "$@" ; }
+func_error() { func_techo "ERROR" "$@" ; }
+func_debug() { [ "${ME_DEBUG}" = 'true' ] && func_techo "DEBUG" "$@" ; }
+
+# for backward compitability
+func_decho() { func_debug "$@" ; }
+
+func_techo() {
+	local usage="Usage: ${FUNCNAME[0]} <level> <msg>" 
+	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
+	func_param_check 2 "$@"
+	
+	local level="${1}"
+	shift
+	echo -e "${level^^}: $(date "+%Y-%m-%d %H:%M:%S"): $@"
+}
+
 func_die() {
 	local usage="Usage: ${FUNCNAME[0]} <error_info>" 
 	local desc="Desc: echo error info to stderr and exit" 
-	[ $# -lt 1 ] && echo -e "${desc}\n${usage}\n" && exit 1
+	[ $# -lt 1 ] && echo -e "${desc}\n${usage}\n" 1>&2 && exit 1
 	
 	echo -e "$@" 1>&2
 	exit 1 
@@ -25,32 +43,13 @@ func_die() {
 	#func_is_non_interactive && exit 1 || kill -INT $$
 }
 
-func_techo() {
-	local usage="Usage: ${FUNCNAME[0]} <level> <msg>" 
-	local desc="Desc: echo msg format: <level-in-uppercase>: <TIME>: <msg>"
-	func_param_check 2 "$@"
-	
-	echo -e "$(date "+%Y-%m-%d %H:%M:%S"): ${1^^}: ${2}"
-}
-
-func_decho() {
-	local usage="Usage: ${FUNCNAME[0]} <msg>" 
-	local desc="Desc: echo msg as DEBUG level, based on env var ME_DEBUG=true to really show"
-	func_param_check 1 "$@"
-	
-	[ "${ME_DEBUG}" = 'true' ] || return 0
-	#echo -e "DEBUG: ${1}"
-	func_techo "DEBUG" "${1}"
-}
-
 func_param_check() {
+	# Self param check. use -lt, so the exit status will not changed in legal condition
 	# NOT use desc/usage var name, so invoker could call 'func_param_check 2 "$@"' instead of 'func_param_check 2 "${desc}\n${usage}\n" "$@"'
-	local s_usage="Usage: ${FUNCNAME[0]} <count> <string> ..."
-	local s_desc="Desc: check if parameter number >= <count>, otherwise print error_msg and exit. If invoker defined var desc/usage, error_msg will be \${desc}\\\\n\${usage}\\\\n, ohterwise use default"
-	local s_warn="Warn: (YOU SCRIPT HAS BUG) might be: \n\t1) NOT provide <count> or any <string> \n\t2) called ${FUNCNAME[0]} but actually not need to check" 
-
-	# self parameter check. use -lt, so the exit status will not changed in legal condition
-	[ $# -lt 1 ] && func_die "${s_warn}\n${s_desc}\n${s_usage}\n"	
+	local self_usage="Usage: ${FUNCNAME[0]} <count> <string> ..."
+	local self_desc="Desc: check if parameter number >= <count>, otherwise print error_msg and exit. If invoker defined var desc/usage, error_msg will be \${desc}\\\\n\${usage}\\\\n, ohterwise use default"
+	local self_warn="Warn: (YOU SCRIPT HAS BUG) might be: \n\t1) NOT provide <count> or any <string> \n\t2) called ${FUNCNAME[0]} but actually not need to check" 
+	[ $# -lt 1 ] && func_die "${self_warn}\n${self_desc}\n${self_usage}\n"	
 	
 	local count=$1
 	shift
@@ -67,6 +66,7 @@ func_param_check() {
 }
 
 func_vcs_update() {
+	# USED_IN: $MY_DCD/vcs/code_dw_update.sh
 	local usage="Usage: ${FUNCNAME[0]} <src_type> <src_addr> <target_dir>"
 	local desc="Desc: init or update vcs like hg/git/svn"
 	func_param_check 3 "$@"
@@ -97,11 +97,10 @@ func_vcs_update() {
 ################################################################################
 # Process
 ################################################################################
-
 func_pids_of_descendants() {
 	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
 	local desc="Desc: return pid list of all descendants (including self), or empty if none" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	#func_param_check 1 "$@"
 
 	func_validate_cmd_exist pstree
 
@@ -117,7 +116,7 @@ func_pids_of_descendants() {
 func_pids_of_direct_child() {
 	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
 	local desc="Desc: return pid list of direct childs (including self), or empty if none" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	#func_param_check 1 "$@"
 
 	local pid_num="${1}"
 	if ! func_is_pid_running "${pid_num}" ; then
@@ -137,7 +136,7 @@ func_pids_of_direct_child() {
 func_kill_self_and_descendants() {
 	local usage="Usage: ${FUNCNAME[0]} <need_sudo> <pid>" 
 	local desc="Desc: kill <pid> and all its child process, return 0 if killed or not need to kill, return 1 failed to kill" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	#func_param_check 1 "$@"
 
 	local need_sudo="${1}"
 	local sudo_cmd=""
@@ -203,7 +202,7 @@ func_kill_self_and_direct_child() {
 func_is_running() {
 	local usage="Usage: ${FUNCNAME[0]} <pid_file>" 
 	local desc="Desc: check is pid in <pid_file> is running" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	#func_param_check 1 "$@"
 	
 	local pid_num="$(cat "${1}" 2>/dev/null)"
 	func_is_positive_int "${pid_num}" || func_die "ERROR: pid_file (${1}) NOT exist or no valid pid inside!"
@@ -214,7 +213,7 @@ func_is_running() {
 func_is_pid_or_its_child_running() {
 	local usage="Usage: ${FUNCNAME[0]} <pid>" 
 	local desc="Desc: check is <pid> running, or any of its child running" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	#func_param_check 1 "$@"
 
 	ps -ef | grep -v grep | grep -q "[[:space:]]${1}[[:space:]]"
 }
@@ -222,7 +221,7 @@ func_is_pid_or_its_child_running() {
 func_is_pid_running() {
 	local usage="Usage: ${FUNCNAME[0]} <pid>" 
 	local desc="Desc: check is <pid> running" 
-	[ $# -lt 1 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	#func_param_check 1 "$@"
 	
 	func_is_str_blank "${1}" && return 1
 
@@ -239,10 +238,11 @@ func_is_pid_running() {
 # Pattern matching (regex / patterns)
 ################################################################################
 func_grepf() {
-	local usage="Usage: ${FUNCNAME[0]} <-param1> <-param2> ... <-paramN> [--] <pattern-file> [file]"
+	local usage="Usage: ${FUNCNAME[0]} [-param1] [-param2] ... [-paramN] [--] <pattern-file> [file]"
 	local desc="Desc: grep patterns in file" 
-	# NO func_param_check, since will pollut output in pipe
+	func_param_check 1 "$@"
 
+	# Parse params
 	local params p
 	for p in "$@"; do 
 		[[ -z "${p}" ]] && shift && continue
@@ -254,23 +254,23 @@ func_grepf() {
 		fi
 	done
 
-	local f_pattern="${1}"
+	# Check pattern file
+	local pattern_file="${1}"
+	func_complain_path_not_exist "${pattern_file}" && return 1
 	shift
-	[ ! -e "${f_pattern}" ] && echo "ERROR: pattern file ${f_pattern} NOT exist!" >&2 && return 1
 
-	# NOTE: do NOT use " with $params
+	# NOTE: run with pipe or file, do NOT quote $params. TODO: split pattern_file if too big?
 	if [[ -z "${1}" ]] ; then
-		# run in pipe
-		grep ${params} -f <(func_del_blank_lines "${f_pattern}")
+		grep ${params} -f <(func_del_blank_lines "${pattern_file}")
 	else
-		grep ${params} -f <(func_del_blank_lines "${f_pattern}") "$@"
+		grep ${params} -f <(func_del_blank_lines "${pattern_file}") "$@"
 	fi
 }
 
 func_del_pattern_lines() {
-	local usage="Usage: ${FUNCNAME[0]} <pattern1> <pattern2> ... <patternN> -- <file1> <file2> ... <fileN>"
+	local usage="Usage: ${FUNCNAME[0]} <pattern1> <pattern2> ... <patternN> -- [file1] [file2] ... [fileN]"
 	local desc="Desc: delete those lines which match patterns, NOTE: if against files the '--' MUST used as separator!" 
-	# NO func_param_check, since will pollut output in pipe
+	func_param_check 1 "$@"
 
 	local p patterns
 	for p in "$@"; do 
@@ -289,10 +289,12 @@ func_del_pattern_lines() {
 }
 
 func_del_blank_lines() {
+	# can run with pipe or file
 	func_del_pattern_lines '^[[:space:]]*$' -- "$@"
 }
 
 func_del_blank_and_hash_lines() {
+	# can run with pipe or file
 	func_del_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' -- "$@"
 }
 
@@ -303,6 +305,7 @@ func_shrink_blank_lines() {
 	local usage="Usage: ${FUNCNAME[0]} [file]"
 	local desc="Desc: shrink blank lines, multiple consecutive blank lines into 1" 
 
+	# NOT use func_del_blank_lines, since it delete all blank lines
 	if [[ -n "${1}" ]] ; then
 		func_complain_path_not_exist "${1}" && return 1
 		sed -r 's/^\s+$//' "${1}" | cat -s
@@ -340,7 +343,6 @@ func_shrink_pattern_lines() {
 	local desc="Desc: shrink pattern lines (and merge blank lines), e.g. if lineA is sub string of lineB, lineB will be removed" 
 	local note="Note 1: NOT support pipe, seems not needed" 
 	local note="Note 2: useful for shrinking pattern file used in func_grepf()" 
-
 	func_param_check 1 "$@"
 	local input_file lines_to_del tmp_grep line
 
@@ -357,7 +359,6 @@ func_shrink_pattern_lines() {
 	# Shrink '-x' seems unnecessary here. NOTE, will also delete duplicated lines (and merge blank lines)
 	func_grepf -v -F "${lines_to_del}" "${input_file}" | func_shrink_dup_lines
 }
-
 
 ################################################################################
 # File System

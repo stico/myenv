@@ -2393,6 +2393,34 @@ func_samba_mount() {
 	cd "${mount_path}" || echo "ERROR: failed to cd ${mount_path}"
 }
 
+func_ls_tmp() {
+	if [[ -z "${TMPDIR}" ]] || [[ "${TMPDIR}" -ef "/tmp/" ]] ; then
+		ls -lhtr /tmp/
+		return 0
+	fi
+
+	# "${TMPDIR}" and "/tmp/" is different, need both ls
+	local a b
+	a="$(ls -htr "/tmp/" | tail)"
+	b="$(ls -htr "${TMPDIR}" | tail)"
+	echo "---------------- ${TMPDIR} ----------------"
+	echo "$a"
+	echo "-------------------------------------- /tmp/ --------------------------------------"
+	echo "$b"
+
+	return 0
+
+	# 都不太好用
+	#pr -2 -t <<-eof	# 长度不够，会覆盖，看不清
+	column -c 20 <<-eof	# 勉强可以看，和上面的直接输出差不多
+	FILE_IN_/TMP/: /tmp/
+	$a
+
+	FILE_IN_TMPDIR: ${TMPDIR}
+	$b
+	eof
+}
+
 func_update_book_name() {
 	local usage="USAGE: ${FUNCNAME[0]} <match_str> <target_str>" 
 	local desc="Desc: rename books according to parameter" 
