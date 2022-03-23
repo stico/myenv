@@ -2,6 +2,9 @@
 
 # source ${HOME}/.myenv/myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 
+# TODO: 
+# - func_file_remove_lines: simplify?
+
 ################################################################################
 # Time
 ################################################################################
@@ -398,30 +401,10 @@ func_mkdir_cd() {
 	#func_mkdir "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir or cd into it ($1)"
 }
 
-func_file_backup_tmp() {
-	local usage="Usage: ${FUNCNAME[0]} <path>"
-	local desc="Desc: backup fie in /tmp, which is a temp backup" 
-	func_param_check 1 "$@"
-
-	[[ ! -e "${1}" ]] && echo "ERROR: ${1} NOT exist, can NOT backup." >&2 && return 1
-
-	local target="/tmp/func_file_backup_tmp_${1//\//@}_$(func_dati)"
-	if [[ -d "${1}" ]] ; then
-		cp -r "${1}" "${target}"
-	else
-		cp "${1}" "${target}"
-	fi
-
-	# very important, many case need know the backup path
-	echo "${target}" 
-}
-
 func_file_remove_lines() {
 
 	# USE CASE: func_file_remove_lines fhr.lst <quick_code_file.txt>
-
 	# TODO: how to merge this with func_del_pattern_lines
-	# TODO: if pattern file contais blank line, will cause problem (in grep, blank line matches everything)
 
 	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
 	local desc="Desc: remove patterns listed in file, useful when pattern list a very long" 
@@ -501,7 +484,7 @@ func_file_size() {
 
 	if [ -d "${1}" ] ; then
 		# NOTE: even use --apparent-size, still found case, that output is DIFF when dir on diff FS
-		\du --apparent-size --bytes --summarize "${1}" | cut -f1
+		\du --apparent-size --bytes --summarize "${1}" | awk '{print $1}'
 	else
 		stat --printf="%s" "${1}"
 	fi
@@ -620,30 +603,59 @@ func_validate_path_owner() {
 	[ "${real}" != "${expect}" ] && func_die "ERROR: owner NOT match, expect: ${expect}, real: ${real}"
 }
 
-# shellcheck disable=2015
-func_duplicate_dated() {
-	local usage="Usage: ${FUNCNAME[0]} <file> ..."
-	local desc="Desc: backup file, with suffixed date" 
+func_backup_tmp() {
+	func_backup_simple "${1}" "/tmp/${1##*/}_$(func_dati)"
+}
+
+func_backup_aside() {
+	func_backup_simple "${1}" "${1}_$(func_dati)"
+}
+
+# NOTE: func_backup_dated is in myenv_func.sh
+func_backup_simple() {
+	local usage="Usage: ${FUNCNAME[0]} <path>"
+	local desc="Desc: backup file" 
+	func_param_check 2 "$@"
+	func_validate_path_exist "${1}"
+	func_validate_path_not_exist "${2}"
+
+	# check size of file
+	local size="$(func_file_size "${1}")"
+	if (( size > 100*1000*1000 )) ; then
+		func_error "file size too big (${size}): ${1}" 1>&2
+		return 1
+	fi
+
+	# prepare target dir
+	local target_dir="$(dirname "${2}")"
+	[[ -e "${target_dir}" ]] || mkdir "${target_dir}"
+
+	# check size of available space
+	local available_space="$(func_available_space_of_path "${target_dir}")"
+	if (( size + 500*1000*1000 > available_space )); then
+		func_error "available space too small ($(func_num_to_human "${available_space}")), less than 500M after copy" 1>&2
+		return 1
+	fi
+
+	# check privilidge and cp
+	if [ -w "${p}" ] ; then
+		cp -r "${1}" "${2}"
+	else
+		sudo cp -r "${1}" "${2}"
+	fi
+
+	# very important, many case need this info
+	echo "${2}" 
+}
+
+func_available_space_of_path() {
+	local usage="Usage: ${FUNCNAME[0]} <file>"
+	local desc="Desc: show the remain space of path (partition of that path)" 
 	func_param_check 1 "$@"
+	func_validate_path_exist "${1}"
 	
-	for p in "$@" ; do
-		func_complain_path_not_exist "${p}" && continue
-
-		# if target is dir, check size first (>100M will warn and skip)
-		if [ -d "${p}" ] ; then
-			p_size=$(stat -c%s "${p}")
-			p_size_h=$(func_num_to_human zip_size)
-			(( p_size > 104857600 )) && echo "WARN: ${p} size (${p_size_h}) too big (>100M), skip" && continue 
-		fi
-
-		target="${p}.bak.$(func_dati)"
-		echo "INFO: backup file, ${p} --> ${target}"
-		if [ -w "${p}" ] ; then
-			cp -r "${p}" "${target}"	|| echo "WARN: backup ${p} failed, pls check!"
-		else
-			sudo cp -r "${p}" "${target}"	|| echo "WARN: backup ${p} failed (with sudo priviledge), pls check!"
-		fi
-	done
+	# unit: bytes
+	\df "${1}" -B1 | tail -1 | awk '{print $4}'
 }
 
 ################################################################################
@@ -1138,19 +1150,6 @@ func_is_valid_ipv4() {
 	# candiate: use python: socket.inet_pton(socket.AF_INET, sys.argv[1])
 	# candiate: seems tool ipcalc/sipcalc could do this, but need install
 
-	# Test
-	#func_is_valid_ip4 4.2.2.2 && echo yes || echo no
-	#func_is_valid_ip4 192.168.1.1 && echo yes || echo no
-	#func_is_valid_ip4 0.0.0.0 && echo yes || echo no
-	#func_is_valid_ip4 255.255.255.255 && echo yes || echo no
-	#func_is_valid_ip4 192.168.0.1 && echo yes || echo no
-	#func_is_valid_ip4 " 169.252.12.253       " && eyn
-	#echo "^^^^^^^^^^^ is yes -------- vvvvvvvv below is no"
-	#func_is_valid_ip4 255.255.255.256 && echo yes || echo no
-	#func_is_valid_ip4 a.b.c.d && echo yes || echo no
-	#func_is_valid_ip4 192.168.0 && echo yes || echo no
-	#func_is_valid_ip4 1234.123.123.123 && echo yes || echo no
-
 	# seems accurate enough
 	local part="25[0-5]\|2[0-4][0-9]\|1[0-9][0-9]\|[1-9][0-9]\|[0-9]"
 
@@ -1166,13 +1165,6 @@ func_is_valid_ipv6() {
 	
 	# candiate: https://twobit.us/2011/07/validating-ip-addresses/
 	# candiate: use python: socket.inet_pton(socket.AF_INET6, sys.argv[1])
-
-	# Test
-	#func_is_valid_ip6 1:2:3:4:5:6:7:8 && eyn
-	#func_is_valid_ip6 1:2:3:4:5:6:7:9999 && eyn
-	#echo "^^^^^^^^^^^ is yes -------- vvvvvvvv below is no"
-	#func_is_valid_ip6 1:2:3:4:5:6:7: && eyn
-	#func_is_valid_ip6 1:2:3:4:5:6:7:9999999 && eyn
 
 	# Source: http://stackoverflow.com/questions/53497/regular-expression-that-matches-valid-ipv6-addresses
 	# Comment: use POSIX regex, seems have some flaw, improve it if really need to 
@@ -1344,6 +1336,8 @@ func_is_array_not_empty() {
 	[[ "$#" -gt 0 ]] && return 0 || return 1
 }
 
+
+func_is_array_contans() { func_array_contans "$@" ;}
 func_array_contans() {
 	local usage="USAGE: ${FUNCNAME[0]} <element> <array>" 
 	local desc="Desc: check if <array> contains <element>, return 0 if contains, otherwise 1" 
@@ -1484,6 +1478,7 @@ func_str_starts_with() {
 	func_param_check 2 "$@"
 	
 	# TODO
+	func_error "${FUNCNAME[0]} NOT impl yet !!!"
 }
 
 func_str_contains_blank() {
@@ -1500,12 +1495,10 @@ func_str_contains_blank() {
 
 func_str_urldecode() { 
 	# pure bash version, from https://stackoverflow.com/questions/6250698/how-to-decode-url-encoded-string-in-shell
-	# more readable version in comment: urldecode() { local i="${*//+/ }"; echo -e "${i//%/\\x}"; }
+	# '$_' 意思是上一个命令的最后一个参数。利用 : (no-op操作符)，让后面的参数变成可以被下一行的 '$_' 来引用到
+	# 作者有点玩技巧了，原链接的评论里也有人给出了更易读的方案，直接用个变量承载就好了: urldecode() { local i="${*//+/ }"; echo -e "${i//%/\\x}"; }
 
-	# : 本来是no-op操作符，但这里是为下面的 '$_' 服务的。
-	# 下面的 '$_' 意思是上一个命令的最后一个参数。
-	# 所以这里需要它作为命令，来让后面的参数变成'最后一个参数' 即 '$_'。
-	# 作者有点玩技巧了，原链接的评论里也有人给出了更易读的方案，直接用个变量承载就好了。
+	# 注意: 针对有Unicode的情况，没有验证过
 
 	# ${*//+/ } will replace all + with space 
 	: "${*//+/ }";			
@@ -1595,5 +1588,30 @@ func_str_urldecode() {
 #		[ -n "${prt}" ] && echo "DIFF size: $(func_num_to_human ${src_size}) != $(func_num_to_human ${tgt_size}) (${src} V.S. ${tgt})"
 #		return 1
 #	fi
+#}
+# shellcheck disable=2015
+#func_duplicate_dated() {
+#	local usage="Usage: ${FUNCNAME[0]} <file> ..."
+#	local desc="Desc: backup file, with suffixed date" 
+#	func_param_check 1 "$@"
+#	
+#	for p in "$@" ; do
+#		func_complain_path_not_exist "${p}" && continue
+#
+#		# if target is dir, check size first (>100M will warn and skip)
+#		if [ -d "${p}" ] ; then
+#			p_size=$(stat -c%s "${p}")
+#			p_size_h=$(func_num_to_human zip_size)
+#			(( p_size > 104857600 )) && echo "WARN: ${p} size (${p_size_h}) too big (>100M), skip" && continue 
+#		fi
+#
+#		target="${p}.bak.$(func_dati)"
+#		echo "INFO: backup file, ${p} --> ${target}"
+#		if [ -w "${p}" ] ; then
+#			cp -r "${p}" "${target}"	|| echo "WARN: backup ${p} failed, pls check!"
+#		else
+#			sudo cp -r "${p}" "${target}"	|| echo "WARN: backup ${p} failed (with sudo priviledge), pls check!"
+#		fi
+#	done
 #}
 

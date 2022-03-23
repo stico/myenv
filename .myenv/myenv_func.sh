@@ -60,36 +60,19 @@ LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find
 ################################################################################
 # Functions
 ################################################################################
-# shellcheck disable=2009
-func_validate_user_proc() {
-	func_param_check 1 "$@"
-
-	ps -ef | grep "$1" | grep -v grep > /dev/null && return 0
-	return 1
-}
-
 func_validate_user_name() {
 	func_param_check 1 "$@"
-	
 	[ "$(whoami)" != "$*" ] && echo "ERROR: username is not $* !" && exit 1
 }
 
 func_validate_user_exist() {
 	func_param_check 1 "$@"
-	
 	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
 }
 
 func_validate_available_port() {
 	func_param_check 1 "$@"
-	
 	[ "$(netstat -an | grep -c "$1" 2>/dev/null)" = "1" ] && func_die "ERROR: port $1 has been used!"
-}
-
-func_validate_cmd_exist() {
-	func_param_check 1 "$@"
-
-	( ! command -v "$1" &> /dev/null) && echo "ERROR: command '$1' not found (in PATH)" && exit 1
 }
 
 func_filter_inexist_files() {
@@ -101,12 +84,6 @@ func_filter_inexist_files() {
 		result+=("${file}")
 	done
 	echo "${result[@]}"
-}
-
-func_filter_comments() {
-	func_param_check 1 "$@"
-
-	sed -e "/^\s*#/d;/^\s*$/d" "$@"
 }
 
 func_tag_value_raw() {
@@ -147,6 +124,7 @@ func_grep_myenv() {
 	xargs -d'\n' -a "${MY_ENV_ZGEN}/collection/myenv_filelist.txt" grep --color -d skip -I -i "$@" 2>&1
 
 	# TODO: grep other exclude files
+	# TODO: grep all files in .myenv, but skip zgen?
 	grep --color -d skip -I -i "$@" "${HOME}/.ssh/config" "${MY_ENV}/myenv_secu.sh" 2>&1
 
 	#cat $MY_ENV_ZGEN/collection/myenv_filelist.txt		| \
@@ -1170,27 +1148,25 @@ func_unison_fs_lapmac_all() {
 }
 
 func_ssh_agent_init() {
-	# do nothing if already set
-	# The unison remote style can not accept .bashrc have output
-	#[ -n "$SSH_AUTH_SOCK" ] && echo "INFO: ssh agent already exist: $SSH_AUTH_SOCK" && return 0
-
-	local cmd="ssh-agent -s"
-	local cert="${HOME}/.ssh/ouyangzhu_duowan"
-	local env_tmp=~/.ssh/ssh_agent_env_tmp
-	local auth_sock="$([ -e "${env_tmp}" ] && grep -o "SSH_AUTH_SOCK=[^;]*" "${env_tmp}" | sed -e "s/SSH_AUTH_SOCK=//" 2> /dev/null)"
-
-	# this function used in .bashrc, which migth block desktop version login, so NO output, NO error
-	[ -e "${cert}" ] || return
+	local usage="Usage: ${FUNCNAME[0]}" 
+	local desc="Desc: start ssh agent, skip if already started" 
+	local note="NOTE: this func used in .bashrc, which migth block desktop version login / unison remote style, etc. So NO output, NO error"
 
 	# reuse if already started. NOTE, the SSH_AUTH_SOCK file and the Process must all exist!
-	[ -e "${auth_sock}" ] && . "${env_tmp}" &> /dev/null && func_validate_user_proc "${SSH_AGENT_PID}.*ssh-agent" && return 0
+	local env_tmp="${HOME}/.ssh/ssh_agent_env_tmp"
+	[[ -e "${env_tmp}" ]] && source "${env_tmp}" &> /dev/null 
+	[[ -e "${SSH_AUTH_SOCK}" ]] && func_is_pid_running "${SSH_AGENT_PID}" && return 0
 
-	# otherwise start a new one
-	echo -e "INFO: Initialising new SSH agent...\n"
-	${cmd} | sed "s/^echo/#echo/" > "${env_tmp}"
-	chmod 600 "${env_tmp}"
-	. "${env_tmp}" > /dev/null
-	ssh-add "${cert}"
+	# start a new one
+	ssh-agent -s | sed "s/^echo/#echo/" > "${env_tmp}"
+	chmod 600 "${env_tmp}" &> /dev/null
+	source "${env_tmp}"    &> /dev/null
+
+	# add cert
+	local cert="${HOME}/.ssh/ouyangzhu_duowan"
+	if [[ -e "${cert}" ]] ; then
+		ssh-add "${cert}" &> /dev/null
+	fi
 }
 
 func_ssh_cmd_via_jump() {
@@ -1764,9 +1740,8 @@ func_backup_dated_gen_exclude_list() {
 func_backup_dated_gen_target_path() {
 	local usage="Usage: ${FUNCNAME[0]}\n\tGenerate target path to store the backup file" 
 
-	local tags
-
 	# dcb for personal computer
+	local tags
 	if [ -d "${DCB_DATED_BACKUP}" ]; then
 		echo "${DCB_DATED_BACKUP}"
 		return

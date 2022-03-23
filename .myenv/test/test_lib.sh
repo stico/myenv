@@ -32,6 +32,16 @@ test_echo_summary() {
 	fi
 }
 
+test_verify_rcode_success() {
+	local rcode="$?"
+	[[ "${rcode}" == "0" ]] || test_echo_error "return code error: '${rcode}' != '0' (expect)" 
+}
+
+test_verify_rcode_failure() {
+	local rcode="$?"
+	[[ "${rcode}" == "0" ]] && test_echo_error "return code error: '${rcode}' (expect: > 0)"
+}
+
 test_verify_str_equals() {  
 	[[ "${1}" == "${2}" ]] || test_echo_error "str NOT equal: '${1}' != '${2}' (expect)"
 }

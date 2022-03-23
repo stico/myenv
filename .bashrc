@@ -26,7 +26,7 @@ SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval "$(dircolors -b ~/.dir_colors)" |
 [ -f "${MACPORTS}/${COMPLETION}" ] && source "${MACPORTS}/${COMPLETION}"
 complete -F _known_hosts scpx sshx ssht
 
-# Source files
+# Source files. NOTE: unison remote style can NOT accept .bashrc have output
 source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
@@ -45,11 +45,11 @@ func_is_personal_machine || func_dist_source_env
 # Settings for diff machine type
 if func_is_personal_machine ; then
 	umask 077									# only set this for personal machie
-	func_ssh_agent_init								# Init ssh agent
+	func_ssh_agent_init &> /dev/null						# Init ssh agent
 	export PS1="\[\e[32m\]\w\$\[\e[0m\]"						# Green line with $ in same line
 	#export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
 elif func_is_internal_machine ; then 
-	func_ssh_agent_init								# Init ssh agent
+	func_ssh_agent_init &> /dev/null						# Init ssh agent
 	LOCAL_IP=$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
 	#export PS1="\[\e[34m\]\u@\h \[\e[34m\]\w\$\[\e[0m\]"				# Blue line with $ in same line
 	#export PS1="\[\e[34m\]\u@${LOCAL_IP}:\w\$\[\e[0m\]"				# Blue line with $ in same line, prompt as scp address

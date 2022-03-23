@@ -58,19 +58,14 @@ test_run_all() {
 }
 
 test_func_complain_path_exist() {
-	func_complain_path_exist "${FILE_1}" &> /dev/null
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
-
-	func_complain_path_exist "${FILE_2_NOT_EXIST}" &> /dev/null
-	test_verify_str_equals "$?" "${EXPECT_STR_1}"
+	func_complain_path_exist "/tmp" &> /dev/null;				test_verify_rcode_success
+	func_complain_path_exist "${FILE_1}" &> /dev/null;			test_verify_rcode_success
+	func_complain_path_exist "${FILE_2_NOT_EXIST}" &> /dev/null;		test_verify_rcode_failure
 }
 
 test_func_complain_path_not_exist() {
-	func_complain_path_not_exist "${FILE_1}" &> /dev/null
-	test_verify_str_equals "$?" "${EXPECT_STR_1}"
-
-	func_complain_path_not_exist "${FILE_2_NOT_EXIST}" &> /dev/null
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
+	func_complain_path_not_exist "${FILE_1}" &> /dev/null;			test_verify_rcode_failure
+	func_complain_path_not_exist "${FILE_2_NOT_EXIST}" &> /dev/null;	test_verify_rcode_success
 }
 
 test_func_shrink_pattern_lines() {
@@ -116,21 +111,13 @@ test_func_shrink_blank_lines() {
 }
 
 test_func_is_str_blank() {
-	func_is_str_blank "${STR_VAR_NOT_DEFINED}"
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
-
-	func_is_str_blank "${STR_3_BLANK_SP}"
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
-
-	func_is_str_blank "${STR_4_BLANK_TAB}"
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
-
-	func_is_str_blank "${STR_5_BLANK_NONE}"
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
-
-	func_is_str_blank "${STR_6_BLANK_ALL}"
-	test_verify_str_equals "$?" "${EXPECT_STR_0}"
-
+	func_is_str_blank "${STR_1_EN_CHAR}";		test_verify_rcode_failure
+	func_is_str_blank "${STR_2_COMMENT}";		test_verify_rcode_failure
+	func_is_str_blank "${STR_VAR_NOT_DEFINED}";	test_verify_rcode_success
+	func_is_str_blank "${STR_3_BLANK_SP}";		test_verify_rcode_success
+	func_is_str_blank "${STR_4_BLANK_TAB}";		test_verify_rcode_success
+	func_is_str_blank "${STR_5_BLANK_NONE}";	test_verify_rcode_success
+	func_is_str_blank "${STR_6_BLANK_ALL}";		test_verify_rcode_success
 }
 
 test_func_del_blank_lines() {
@@ -161,6 +148,26 @@ test_func_del_blank_and_hash_lines() {
 
 	test_verify_str_line_count "${result}" 3
 	test_verify_str_contains "${result}" "${STR_1_EN_CHAR}"
+}
+
+test_func_is_valid_ipv4() {
+	func_is_valid_ipv4 4.2.2.2;			test_verify_rcode_success
+	func_is_valid_ipv4 192.168.1.1;			test_verify_rcode_success
+	func_is_valid_ipv4 0.0.0.0;			test_verify_rcode_success
+	func_is_valid_ipv4 255.255.255.255;		test_verify_rcode_success
+	func_is_valid_ipv4 192.168.0.1;			test_verify_rcode_success
+	func_is_valid_ipv4 " 169.252.12.253    ";	test_verify_rcode_success
+	func_is_valid_ipv4 255.255.255.256 ;		test_verify_rcode_failure
+	func_is_valid_ipv4 a.b.c.d ;			test_verify_rcode_failure
+	func_is_valid_ipv4 192.168.0 ;			test_verify_rcode_failure
+	func_is_valid_ipv4 1234.123.123.123 ;		test_verify_rcode_failure
+}
+
+test_func_is_valid_ipv6() {
+	func_is_valid_ipv6 1:2:3:4:5:6:7:8;		test_verify_rcode_success
+	func_is_valid_ipv6 1:2:3:4:5:6:7:9999;		test_verify_rcode_success
+	func_is_valid_ipv6 1:2:3:4:5:6:7:;		test_verify_rcode_failure
+	func_is_valid_ipv6 1:2:3:4:5:6:7:9999999;	test_verify_rcode_failure
 }
 
 ################################################################################
