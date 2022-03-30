@@ -163,10 +163,10 @@ func_fullpath() {
 
 func_to_clipboard() {
 	# read from stdin
-	#func_param_check 1 "$@"
 
 	# put data into clipboard, each line as an entry
-	while read -r line ; do echo "$line"
+	while IFS= read -r line || [[ -n "${line}" ]]; do 
+		echo "$line"
 		if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 			echo "${line}" | tr -d '\n' | pbcopy
 		else
@@ -437,7 +437,7 @@ func_locate_via_locate() {
 	local base="$(readlink -f "${2}")"	# important: use the formal path
 	shift; shift
 	local pattern="$(echo "${base}/ $* " | sed -e "s/\s/.*/g")"
-	locate -i --regex "${pattern}" | while read -r line; do
+	locate -i --regex "${pattern}" | while IFS= read -r line; do
 		case "${type}" in
 			FILE)	[ -f "${line}" ] && echo "${line}" && return 0 ;;
 			DIR)	[ -d "${line}" ] && echo "${line}" && return 0 ;;
@@ -757,7 +757,7 @@ func_collect_all() {
 	else
 		locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
 	fi
-	while read -r line ; do
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
 		echo -e "\n\n@${line}\n"  >> "${miscnote_content}"
 		sed -e "s///" "${line}" >> "${miscnote_content}"
 	done < "${miscnote_filelist}"
@@ -822,7 +822,7 @@ func_collect_all() {
 	-e "/\/ant\/.*\/reports\//d"					\
 	-e "/\/html\/ref_html.*.htm/d"					\
 	-e "/\/template_war_spring\/.*\/blueprint\//d"			\
-	"${code_filelist}" | while read -r line ; do
+	"${code_filelist}" | while IFS= read -r line || [[ -n "${line}" ]] ; do
 		func_is_filetype_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
 		sed -e "s///" "${line}" >> "${code_content}"
@@ -943,11 +943,11 @@ func_mvn_clean() {
 
 	pushd . &> /dev/null
 	echo "INFO: start to do 'mvn clean', check log at: $log"
-	find "$PWD" -name pom.xml | while read -r line ; do
+	while IFS= read -r -d '' line ; do
 		local d=$(dirname "$line")
 		echo "INFO: cd $d && mvn clean"
 		"cd" "$d" && mvn clean >> "$log" 2>&1
-	done
+	done < <(find "$PWD" -name pom.xml -print0)
 	popd &> /dev/null
 }
 
@@ -1020,9 +1020,9 @@ func_svn_backup() {
 	
 	# projects are in subdir
 	mkdir -p "$tmp_path"
-	find "$src_path" -maxdepth 1 -type d | while read -r dir ; do 
+	while IFS= read -r -d '' dir ; do 
 		[ -n "$dir" ] && [ -e "$dir/.svn" ] && svn export "$dir/"  "$tmp_path/$(basename "$dir")"
-	done
+	done < <(find "$src_path" -maxdepth 1 -type d -print0)
 
 	# backup
 	func_backup_dated "$tmp_path"
@@ -1036,10 +1036,10 @@ func_svn_update() {
 	[ -e "${p}/.svn" ] && func_svn_update_single && return 0
 	
 	# projects are in subdir
-	find "${p}" -maxdepth 1 -type d | while read -r dir ; do 
+	while IFS= read -r -d '' dir ; do 
 		# suppress blank line and external file in output: svn update $dir/ | sed "/[Ee]xternal \(item into\|at revision\)/d;/^\s*$/d"
 		[ -n "${dir}" ] && [ -e "${dir}/.svn" ] && func_svn_update_single "${dir}" 
-	done
+	done < <(find "${p}" -maxdepth 1 -type d -print0)
 	func_locate_updatedb
 }
 
@@ -1050,9 +1050,9 @@ func_svn_status() {
 	[ -e "${p}/.svn" ] && func_svn_status_single && return 0
 	
 	# projects are in subdir
-	find "${p}" -maxdepth 1 -type d | while read -r dir ; do 
+	while IFS= read -r -d '' dir ; do 
 		[ -n "${dir}" ] && [ -e "${dir}/.svn" ] && func_svn_status_single "${dir}" 
-	done
+	done < <(find "${p}" -maxdepth 1 -type d -print0 )
 }
 
 func_svn_update_single() { 
@@ -2125,7 +2125,7 @@ func_monitor_and_run() {
 	echo "INFO: start, pid: ${pid}, watch_path: ${watch_path}, is_sudo_used: ${is_sudo_used}, cmds: $*"
 
 	# fswatch NEED: sudo port/apt-get install fswatch, or install latest git veriosn via zbox
-	func_monitor_fs "${watch_path}" | while read -r event ; do
+	func_monitor_fs "${watch_path}" | while IFS= read -r event || [[ -n "${event}" ]] ; do
 
 		echo "INFO: $(func_dati): target updatd, event: ${event}"
 		func_kill_self_and_descendants "${is_sudo_used}" "${pid}" || return 1
@@ -2548,7 +2548,7 @@ func_dup_gather() {
 	local dup_dir="A_GATHER_DIR_$(func_dati)"
 	local log="${dup_dir}/A.log"
 	mkdir "${dup_dir}"
-	while read line ; do
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
 		# normal case: file inexist. 
 		if [ ! -e "${line}" ] ; then
 			# for doc backup path, try alternative paths
@@ -2686,12 +2686,8 @@ func_dup_find_CALL_GATHER_FIRST() {
 	fi
 
 	local count md5
-	while read count md5 ; do
-		if [ "${count}" -eq 1 ] ; then 
-			echo "ERROR: should NOT found count=1 md5 here"
-			continue
-		fi
-
+	while IFS= read -r count md5 || [[ -n "${count}" ]] ; do
+		[[ "${count}" -eq 1 ]] && echo "ERROR: should NOT found count=1 md5 here" && continue
 		grep "${md5}" "${list_md5}" >> "${list_dup_detail}"
 		echo >> "${list_dup_detail}"
 	done < "${list_dup_count}"

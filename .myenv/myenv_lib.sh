@@ -304,6 +304,27 @@ func_del_blank_and_hash_lines() {
 ################################################################################
 # Text Process
 ################################################################################
+func_merge_lines() { func_combine_lines "$@"; }
+func_combine_lines() {
+	local usage="Usage: ${FUNCNAME[0]} <n> <separator> [file]"
+	local desc="Desc: combine <n> lines into 1 line" 
+	func_param_check 2 "$@"
+
+	local count="${1}" 
+	local separator="${2}"
+	shift; shift;
+
+	#'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
+	awk -v count="${count}" -v separator="${separator}" \
+	'NR%count {
+		printf "%s%s", $0, separator;
+		next;
+	}
+	{
+		print $0
+	}' "$@"
+}
+
 func_shrink_blank_lines() {
 	local usage="Usage: ${FUNCNAME[0]} [file]"
 	local desc="Desc: shrink blank lines, multiple consecutive blank lines into 1" 
@@ -352,7 +373,7 @@ func_shrink_pattern_lines() {
 	# Collect: lines to delete. NOTE: '-F' is necessary, otherwise gets 'grep: Invalid range end' if have such sub str: '[9-1]'
 	input_file="${1}"
 	lines_to_del="$(mktemp)"
-	while read line; do
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
 		tmp_grep="$(grep -F "${line}" "${input_file}" | grep -v -x -F "${line}")"
 		func_is_str_blank "${tmp_grep}" && continue
 		echo -e "# match-line-found-with-this-line: ${line}\n${tmp_grep}" >> "${lines_to_del}"
@@ -654,7 +675,7 @@ func_available_space_of_path() {
 	func_param_check 1 "$@"
 	func_validate_path_exist "${1}"
 	
-	# unit: bytes
+	# unit: bytes. '-B1' == "--block-size=1"
 	\df "${1}" -B1 | tail -1 | awk '{print $4}'
 }
 
