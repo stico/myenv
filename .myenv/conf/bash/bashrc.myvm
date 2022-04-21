@@ -1,0 +1,23 @@
+# lapmac
+# 	HW	mac book pro (15")
+# 	OS	High Sierra (2018-05)
+# 	FOR	work
+
+# view this as a internal machine
+#bash_prompt_color=green
+
+# cmd `ls` need this to correctly show Chinese filename
+export LC_ALL="en_US.UTF-8"
+
+# zbox
+#zbox_use_silent go		1.14.2
+#zbox_use_silent macvim		git
+#zbox_use_silent maven		3.1.1
+#zbox_use_silent mysql		5.6.23
+#zbox_use_silent ruby		2.2.0
+#zbox_use_silent gradle		4.0
+#zbox_use_silent chromedriver	2.19
+#zbox_use_silent fzf		git
+#zbox_use_silent shellcheck	git
+#zbox_use_silent unison		2.48.3
+#zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
