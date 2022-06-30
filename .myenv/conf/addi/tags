@@ -39,6 +39,7 @@ stg=$ZBOX/stg
 conf=$MY_ENV_CONF
 dist=$MY_ENV_DIST
 zgen=$MY_ENV_ZGEN
+secu=$MY_ENV_SECU
 tag=$MY_ENV_CONF/addi/tags
 
 # OUMISC
