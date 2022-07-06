@@ -1,7 +1,0 @@
-# dev.yypm.com
-# 	73e57243e50dd60c7495f4d1000002c2 is content of file `cat /var/lib/dbus/machine-id`
-
-#bash_prompt_color=green
-
-# cmd `svn` need this to correctly work
-export LC_ALL="en_US.UTF-8"

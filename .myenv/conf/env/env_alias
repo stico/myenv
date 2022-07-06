@@ -108,7 +108,7 @@ dbackuptoremote		"func_backup_dated_to_remote test.163"
 			# Head: e - myenv 
 megf			"func_grep_myenv"
 mebackup		"func_backup_myenv"
-meload			"pushd ~ >> /dev/null; source %HOME%/.bashrc; popd >> /dev/null"
+meload			"pushd ~ >> /dev/null; echo 'old pid: '$$', load time: '$(a='$'; eval echo '${a}MYENV_LOAD_TIME'); source %HOME%/.bashrc; echo 'new pid: '$$', load time: '$(a='$'; eval echo '${a}MYENV_LOAD_TIME'); popd >> /dev/null"
 mehostsupdate		"sudo -E bash hosts_append.sh"
 #eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
 
@@ -131,7 +131,7 @@ sshbdroot		"ssh ouyzhu_baidu"
 sshgcpvm		"ssh gcpvm"
 
 # use ~/.ssh/config
-sshawsvm		"ssh awsvm"
+sshawsvm		"echo 'Run it in myvm'"
 scptoawsvm		func_scp_to_awsvm
 scpfromawsvm		func_scp_from_awsvm
 mebackupawsvm		func_mebackup_awsvm

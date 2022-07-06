@@ -62,12 +62,12 @@ LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find
 ################################################################################
 func_validate_user_name() {
 	func_param_check 1 "$@"
-	[ "$(whoami)" != "$*" ] && echo "ERROR: username is not $* !" && exit 1
+	[ "$(whoami)" != "$*" ] && echo "ERROR: username is not $* " && exit 1
 }
 
 func_validate_user_exist() {
 	func_param_check 1 "$@"
-	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist!" && exit 1
+	( ! grep -q "^$*:" /etc/passwd ) && echo "ERROR: user '$*' not exist" && exit 1
 }
 
 func_validate_available_port() {
@@ -184,7 +184,8 @@ func_std_gen_tags() {
 	rm "${MY_TAGS_NOTE}"
 	for d in "${MY_ROOTS_NOTE[@]}" ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
-		for note_file in ${d}/note/*.txt ; do
+		for note_file in "${d}"/note/*.txt ; do
+			[[ -e "$note_file" ]] || continue
 			local note_filename="${note_file##*/}"
 			local topic_linkpath="${d}/${note_filename%.txt}/${note_filename}"
 			if [ -e "${topic_linkpath}" ] ; then
@@ -197,7 +198,9 @@ func_std_gen_tags() {
 
 	rm "${MY_TAGS_CODE}"
 	for d in "${MY_ROOTS_CODE[@]}" ; do
-		for dd in ${d}/* ; do
+		[[ -e "$d" ]] || continue
+		for dd in "${d}"/* ; do
+			[[ -e "$dd" ]] || continue
 			echo "${dd##*/}=${dd}" >> "${MY_TAGS_CODE}"
 		done
 	done
@@ -209,7 +212,8 @@ func_std_gen_links() {
 	local d note_file
 	for d in "${MY_ROOTS_NOTE[@]}" ; do
 		[ ! -e "${d}/note" ] && func_die "ERROR: ${d}/note not exist!"
-		for note_file in ${d}/note/*.txt ; do
+		for note_file in "${d}"/note/*.txt ; do
+			[[ -e "$note_file" ]] || continue
 			local note_filename="${note_file##*/}"
 			local topic_basepath="${d}/${note_filename%.txt}"
 			if [ -d "${topic_basepath}" ] && [ ! -f "${topic_basepath}/${note_filename}" ] ; then
@@ -237,7 +241,7 @@ func_select_line() {
 	
 	# content empty
 	if func_is_str_blank "${content}" ; then
-		echo "WARN: content for selection is blank!" 1>&2
+		echo "WARN: content for selection is blank" 1>&2
 		return
 	fi
 
@@ -253,27 +257,6 @@ func_select_line() {
 		read -r -e selection
 	done
 	echo "${content}" | sed -n -e "${selection}p"
-}
-
-func_log() {
-	local usage="Usage: ${FUNCNAME[0]} <level> <prefix> <log_path> <str>" 
-	func_param_check 4 "$@"
-
-	local level="$1"
-	local prefix="$2"
-	local log_path="$3"
-	shift; shift; shift
-
-	[ ! -e "$log_path" ] && mkdir -p "$(dirname "$log_path")" && touch "$log_path"
-
-	echo "$(func_dati) $level [$prefix] $*" >> "$log_path"
-}
-
-func_log_info() {
-	local usage="Usage: ${FUNCNAME[0]} <prefix> <log_path> <str>" 
-	func_param_check 3 "$@"
-
-	func_log "INFO" "$@"
 }
 
 func_vi_conditional() {
@@ -441,7 +424,7 @@ func_locate_via_locate() {
 		case "${type}" in
 			FILE)	[ -f "${line}" ] && echo "${line}" && return 0 ;;
 			DIR)	[ -d "${line}" ] && echo "${line}" && return 0 ;;
-			*)	echo "ERROR: func_locate_via_locate need a TYPE parameter! 1>&2"
+			*)	echo "ERROR: func_locate_via_locate need a TYPE parameter" 1>&2
 		esac
 	done
 }
@@ -665,7 +648,8 @@ func_collect_statistics() {
 	local f 
 	local base=$MY_ENV_ZGEN/collection
 
-	for f in ${base}/* ; do
+	for f in "${base}"/* ; do
+		[[ -e "$f" ]] || continue
 		echo "${f}"
 		# TODO
 
@@ -730,10 +714,11 @@ func_collect_all() {
 	local stdnote_filelist=${base}/stdnote_filelist.txt
 	local stdnote_quicklist=${base}/stdnote_quicklist.txt
 	for d in "${MY_ROOTS_NOTE[@]}" ; do
-		for f in $d/note/* ; do  
+		for f in "${d}"/note/* ; do  
+			[[ -e "$f" ]] || continue
 			local filename=${f##*/} 
 			local dirname="${d}/note"
-			local fullpath="${d}/note/${f#${dirname}}"
+			local fullpath="${d}/note/${f#"${dirname}"}"
 
 			echo "${fullpath}"							>> "${stdnote_filelist}"
 
@@ -1113,14 +1098,14 @@ func_unison_fs_lapmac_all() {
 			echo "INFO: ${disk_path} alread mounted, try next"
 			disk_path=""
 		else
-			echo "INFO: found! ${disk_path} is available"
+			echo "INFO: found: ${disk_path} is available"
 			break
 		fi
 	done
 	[ -z "${disk_path}" ] && echo "ERROR: can NOT find diskXs1 for mounting" && return 1
 
 	# if path not empty AND not writable, need eject first (TODO: make the eject automatically?)
-	func_is_dir_not_empty "${mount_path}" && [ ! -w "${mount_path}" ] && echo "ERROR: disk already mount in RO mode, pls eject first!" && return 1
+	func_is_dir_not_empty "${mount_path}" && [ ! -w "${mount_path}" ] && echo "ERROR: disk already mount in RO mode, pls eject first" && return 1
 
 	# if target inexist, try to mount the disk
 	if [ ! -e "${mount_path}/backup/DCB" ] ; then
@@ -1134,7 +1119,7 @@ func_unison_fs_lapmac_all() {
 		sleep 3
 
 		if func_is_dir_empty "${mount_path}" || [ ! -w "${mount_path}" ] ; then
-			echo "ERROR: seems failed to mount disk, you may need to **RESTART** mac/osx!" 
+			echo "ERROR: seems failed to mount disk, you may need to **RESTART** mac/osx" 
 			return 1
 		fi
 	fi
@@ -1314,7 +1299,7 @@ func_dist_sync() {
 	# Distribute
 	echo "INFO: distribute to hosts: "${dist_hosts}
 	if func_is_str_blank "${dist_hosts}" ; then
-		echo "WARN: NO dist_hosts could be found, NO distribution!"
+		echo "WARN: NO dist_hosts could be found, NO distribution"
 	else
 		# NOTE 1: distribute.sh on jump machine, will skip addr "127.0.0.1"
 		# NOTE 2: backup is NOT in the distribution list
@@ -1481,7 +1466,7 @@ func_mebackup_awsvm() {
 	bakpath="$HOME/Documents/DCB/dbackup/latest/"
 
 	if ! \cd "${bakpath}"; then
-		echo "INFO: cd to dir ($bakpath) FAILED, pls check!"
+		echo "INFO: cd to dir ($bakpath) FAILED, pls check"
 		return 1
 	fi
 
@@ -1555,13 +1540,13 @@ func_translate() {
 }
 
 func_translate_IPA_google() { 
-	echo "WARN: not implemented yet!"
+	echo "WARN: not implemented yet"
 	# IPA: International Phonetic Alphabet (IPA), tells pronunciation of words
 	# TODO: google api, IPA extraction: http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q=example&sl=en&tl=en
 }
 
 func_translate_youdao() { 
-	echo "WARN: not implemented yet!"
+	echo "WARN: not implemented yet"
 	# address	http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=
 	# example 1	http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=test
 	# example 2	http://fanyi.youdao.com/openapi.do?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q=测试
@@ -1636,7 +1621,7 @@ func_delete_dated() {
 
 	local t_name=""
 	for t in "$@" ; do
-		[ ! -e "${t}" ] && echo "WARN: ${t} inexist, will NOT perform dated delete!" && continue
+		[ ! -e "${t}" ] && echo "WARN: ${t} inexist, will NOT perform dated delete" && continue
 
 		t_name=$(basename "${t}")
 		if [[ ${t_name} == .* ]] ; then 
@@ -1664,11 +1649,10 @@ func_backup_myenv() {
 		-x "*/zgen/collection/all_content.txt"		\
 		-x "*/zgen/collection/code_content.txt"		\
 		-x "*/zgen/collection/stdnote_content.txt"	\
-		-@ < "${fileList}" 2>&1 | sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'
+		-@ < "${fileList}" 2>&1				\
+	| sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'	\
+	|| echo "WARN: failed to pack some file, pls check"
 
-	if [ "$?" -ne "0" ] ; then
-		echo "WARN: failed to pack some file, pls check"
-	fi
 	if [ ! -e "${packFile}" ] ; then
 		func_die "ERROR: failed to zip files into ${packFile}"
 	fi
@@ -1680,7 +1664,6 @@ func_backup_myenv() {
 	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
 	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
 
-	
 	pushd . &> /dev/null
 	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
 	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
@@ -1702,11 +1685,11 @@ func_backup_myenv() {
 		echo "INFO: ${OUREPO} NOT exist, skip"
 	fi
 
-	\cd ${HOME}/.vim/bundle &> /dev/null
+	\cd "${HOME}/.vim/bundle" &> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle"
 	for f in * ; do 
 		[ ! -d "${f}" ] && continue
 		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null
+		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle/${f}"
 		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
 	done
 
@@ -1763,7 +1746,7 @@ func_backup_dated_gen_target_path() {
 }
 
 func_backup_dated_of_filelist() {
-	echo "ERROR: NOT implemented yet!"
+	echo "ERROR: NOT implemented yet"
 	return 1
 
 	local usage="Usage: ${FUNCNAME[0]} <filelist>\n\tDated backup files in <filelist>." 
@@ -1828,7 +1811,7 @@ func_backup_dated() {
 			#cmd_passwd_part="--password '${passwd}'"	# NO ' inside, otherwise will be part of password!
 			cmd_passwd_part="--password ${passwd}"
 		else
-			echo "WARN: failed to gen password!"
+			echo "WARN: failed to gen password"
 		fi
 	fi
 
@@ -1919,8 +1902,7 @@ func_run_file() {
 	func_param_check 1 "$@" 
 	
 	local file="${1}"
-	#filename="$(basename ${file})"
-	[ ! -e "${file}" ] && echo "ERROR: $file not exist!" && return 1
+	func_complain_path_not_exist "${file}" && return 1 
 
 	if [[ "$file" = *.c ]] ; then		(func_run_file_c "$file")	# use subshell, could make sure "stay in current dir" even used ^C, but subshell stderr seems lost (can NOT get msg like "Segmentation fault", also NOTE, the "Segmentation fault" msg is print by shell, not by the crashed app)
 	#if [[ "$file" = *.c ]] ; then		func_run_file_c $file		# not using subshell, current dir might change to "target" when use ^C
@@ -1935,7 +1917,7 @@ func_run_file() {
 	elif [[ "$file" = *.groovy ]] ; then	groovy "$file"
 	elif [[ "$file" = *.ps1 ]] ; then	/cygdrive/c/Windows/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -File "${file//\\/\/}"
 	else
-		echo "ERROR: can not run file $file !"
+		echo "ERROR: can not run file $file"
 	fi
 }
 
@@ -1973,7 +1955,8 @@ func_mytask_all() {
 	func_log_info "${FUNCNAME[0]}" "$log" "start"
 
 	# find all files to execute
-	for f in $base/todo_* ; do
+	for f in "$base"/todo_* ; do
+		[[ -e "$f" ]] || continue
 		func_log_info "${FUNCNAME[0]}" "$log" "found $f"
 		IFS="_" read -ra fa <<< "$f"
 		"func_mytask_${fa[1]}_run" "$f"
@@ -2091,7 +2074,7 @@ func_op_compressed_file() {
 	echo 111111111111111
 	local target_file="$(ls ./*"${file_suffix}")"
 	echo 22222
-	[ "$(echo "${target_file}" | wc -l)" -eq 1 ] && xdg-open "${target_file}" || echo "WARN: more than one file with suffix: ${file_suffix}, pls open manually!"
+	[ "$(echo "${target_file}" | wc -l)" -eq 1 ] && xdg-open "${target_file}" || echo "WARN: more than one file with suffix: ${file_suffix}, pls open manually"
 	echo 33333
 }
 
@@ -2137,8 +2120,8 @@ func_monitor_and_run() {
 		echo "${pid}" > "${pid_file}"
 
 		# shellcheck disable=2009
-		#echo "INFO: run cmd, lastpid=${lastpid} ($(ps -ef | grep -v grep | grep -q "[[:space:]]${lastpid}[[:space:]]" && echo "FAILED to kill!" || echo "killed")), curent pid=${pid}"
-		echo "INFO: run cmd, lastpid=${lastpid} ($(func_is_pid_or_its_child_running "${lastpid}" && echo "FAILED to kill!" || echo "killed")), curent pid=${pid}"
+		#echo "INFO: run cmd, lastpid=${lastpid} ($(ps -ef | grep -v grep | grep -q "[[:space:]]${lastpid}[[:space:]]" && echo "FAILED to kill" || echo "killed")), curent pid=${pid}"
+		echo "INFO: run cmd, lastpid=${lastpid} ($(func_is_pid_or_its_child_running "${lastpid}" && echo "FAILED to kill" || echo "killed")), curent pid=${pid}"
 	done
 }
 
@@ -2224,7 +2207,7 @@ func_rsync_tmp() {
 	local desc="Desc: start a temporary rsync server, shedule a kill job with <TTL> (seconds, default 3600s)"
 
 	# TODO: support change path, which need to update file $MY_ENV/secu/rsync_tmp.server.conf
-	[ -n "${2}" ] && echo "ERROR: NOT support specify <path> yet!" && return 1
+	[ -n "${2}" ] && echo "ERROR: NOT support specify <path> yet" && return 1
 
 	# Arg/Var, NOTE: value of pid_file and conf name, also used in func_rsync_tmp_stop
 	local ttl="${1:-3600}"
@@ -2238,8 +2221,8 @@ func_rsync_tmp() {
 	func_complain_cmd_not_exist rsync && return 1
 	func_complain_path_not_exist "${base}" && return 1
 	func_complain_path_not_exist "${conf}" && return 1
-	[ -z "${port}" ] && echo "ERROR: failed to find idle port!" && return 1
-	[ -f "${pid_file}" ] && func_is_running "${pid_file}" && echo "ERROR: rsync_tmp already running, pls check!" && return 1
+	[ -z "${port}" ] && echo "ERROR: failed to find idle port" && return 1
+	[ -f "${pid_file}" ] && func_is_running "${pid_file}" && echo "ERROR: rsync_tmp already running, pls check" && return 1
 	func_is_int_in_range "${ttl}" 10 2592000 || func_die "ERROR: TTL value NOT in ranage 10~2592000 (10s ~ 30days), NOT allowed!"
 
 	# Run
@@ -2289,7 +2272,7 @@ func_rsync_backup() {
 
 	# Validation and init
 	[ -f "${rsync_pass}" ] || func_die "ERROR: ${rsync_pass} NOT exist, pls check!"
-	func_is_running "${pid_file}" && func_techo info "${name} backup already running, skip!" && exit 0
+	func_is_running "${pid_file}" && func_techo info "${name} backup already running, skip" && exit 0
 	[ -d "${bak_path}" ] || mkdir -p "${bak_path}" || func_die "ERROR: ${bak_path} NOT dir, pls check!"
 
 	# Perform backup
@@ -2305,7 +2288,7 @@ func_rsync_backup() {
 	if wait "${rsync_pid}" ; then
 		func_techo info "backup ${name} (pid ${rsync_pid}) success" | tee -a "${log_file}" 
 	else
-		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check!" | tee -a "${log_file}" 
+		func_techo error "backup ${name} (pid ${rsync_pid}) FAILED, pls check" | tee -a "${log_file}" 
 	fi
 }
 
@@ -2374,6 +2357,10 @@ func_ls_tmp() {
 		return 0
 	fi
 
+	# find cmd alternative
+	# Explain: '-not -path' performs exclude matching. NOTE: there are 2 place of the $TMPDIR
+	# find $TMPDIR -maxdepth 1 -not -path '*/.*' -not -path "$TMPDIR" -printf '%T@ %p\n'  | sort -n | tail
+
 	# "${TMPDIR}" and "/tmp/" is different, need both ls
 	local a b
 	a="$(ls -htr "/tmp/" | tail)"
@@ -2405,6 +2392,7 @@ func_update_book_name() {
 	# update but NOT tested, should work
 	#for f in $(ls | grep "${1}.*\(pdf\|epub\|azw3\|mobi\)") ; do
 	for f in "${1}"*.pdf "${1}"*.epub "${1}"*.azw3 "${1}"*.mobi ; do
+		[[ -e "$f" ]] || continue
 		echo -e "${f}" "\t->\t" "${2}.${f##*.}"
 		mv "${f}" "${2}.${f##*.}"
 	done
@@ -2495,7 +2483,7 @@ func_export_script() {
 		\nexit 1													\\
 		\n# Generated at: $(func_dati), git rev: $("cd" "${HOME}" &> /dev/null && git rev-parse HEAD)			\\
 		" "${target}"
-		echo "ERROR: export failed!"
+		echo "ERROR: export failed"
 	fi
 }
 
@@ -2572,9 +2560,9 @@ func_dup_gather() {
 	done < <(func_del_blank_and_hash_lines "${del_list}")
 
 	echo "INFO: ==================================== SUMMARY ===================================="
-	local fail="$(grep "MV_FAIL" "${log}" | wc -l)"
-	local skip="$(grep "MV_SKIP" "${log}" | wc -l)"
-	local success="$(grep "MV_DONE" "${log}" | wc -l)"
+	local fail="$(grep -c "MV_FAIL" "${log}")"
+	local skip="$(grep -c "MV_SKIP" "${log}")"
+	local success="$(grep -c "MV_DONE" "${log}")"
 	echo "INFO: files moved to (size: $(du -sh "${dup_dir}" | cut -d' ' -f1) ): ${dup_dir}"
 	echo "INFO: ${fail} fail, ${success} success, ${skip} skip, see detail: ${log}"
 }
@@ -2690,7 +2678,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 		[[ "${count}" -eq 1 ]] && echo "ERROR: should NOT found count=1 md5 here" && continue
 		grep "${md5}" "${list_md5}" >> "${list_dup_detail}"
 		echo >> "${list_dup_detail}"
-	done < "${list_dup_count}"
+	done < "${list_dup_count}" 
 
 	if [ -e "${list_dup_detail}" ] ; then
 		echo "INFO: found $(func_file_line_count "${list_dup_detail}") files, check detail at: ${list_dup_detail}"
@@ -2891,14 +2879,14 @@ func_mydata_sync_extra() {
 }
 
 func_mydata_sync_tcatotcz() {
-	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCA_BASE}" && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2!" && return 1
+	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCA_BASE}" && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2" && return 1
 
 	local TCA_SYNC_LIST="h8/actor h8/magzine h8/zptp dudu/course dudu/tv video/tv" 
 	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
 }
 
 func_mydata_sync_tcbtotcz() {
-	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCB_BASE}" && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2!" && return 1
+	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCB_BASE}" && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2" && return 1
 
 	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
 	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
@@ -2932,3 +2920,7 @@ func_mydata_sync_note() {
 	#	DTA/DTB > DTZ	# dudu/(k12: xx,cz,gz,en)
 	#	DTZ > TCZ	# ???
 }
+
+
+# THIS MUST IN THE END OF SCRIPT
+MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script

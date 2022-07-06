@@ -30,9 +30,9 @@ complete -F _known_hosts scpx sshx ssht
 source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
-source "${HOME}/.myenv/conf/bash/bashrc.local" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(hostname)" >/dev/null 2>&1
-source "${HOME}/.myenv/conf/bash/bashrc.z.mid.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/bash/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
 
 # source dist tag env for internal and production machine 
 func_is_personal_machine || func_dist_source_env 

@@ -32,7 +32,7 @@ func_techo() {
 	
 	local level="${1}"
 	shift
-	echo -e "${level^^}: $(date "+%Y-%m-%d %H:%M:%S"): $@"
+	echo -e "${level^^}: $(date "+%Y-%m-%d %H:%M:%S"): $*"
 }
 
 func_die() {
@@ -175,7 +175,7 @@ func_kill_self_and_descendants() {
 func_kill_self_and_direct_child() {
 
 	# TODO: copied from stackoverflow, but NOT verified yet
-	echo "ERROR: this function is NOT ready yet!" 1>&2
+	echo "ERROR: this function is NOT ready yet" 1>&2
 	return 1
 
 	# candidate 1: some times failed to kill, and makes child's parent pid becomes 1, because pkill NOT stable?
@@ -263,6 +263,7 @@ func_grepf() {
 	shift
 
 	# NOTE: run with pipe or file, do NOT quote $params. TODO: split pattern_file if too big?
+	# shellcheck disable=2086
 	if [[ -z "${1}" ]] ; then
 		grep ${params} -f <(func_del_blank_lines "${pattern_file}")
 	else
@@ -358,6 +359,10 @@ func_shrink_dup_lines() {
 }
 
 func_shrink_pattern_lines() {
+	# TODO: seems this case NOT work. expect line2 removed, but NOT
+	# line1: AAA..BBB
+	# line2: AAA33BBB
+
 	# USED_IN: secu/awsvm/telegram (shrink kword.title) 
 	# NOTE: secu/personal/dup/del_list (func_dup_gather based on path, NOT pattern, can shrink with str which ending with "/", but not simply sub str)
 	#	if really want to use: 
@@ -462,7 +467,8 @@ func_file_remove_lines() {
 		# use splited pattern files one by one
 		local tmp_out
 		local tmp_in="${input_file}" 
-		for f in ${tmp_p_dir}/* ; do
+		for f in "${tmp_p_dir}"/* ; do
+			[[ -e "$f" ]] || continue
 			tmp_out="${result_file}.${f##*/}" 
 			func_file_remove_lines_simple "${f}" "${tmp_in}" > "${tmp_out}"
 			tmp_in="${tmp_out}"
@@ -541,6 +547,7 @@ func_is_dir_empty() {
 	local desc="Desc: check if directory is empty or inexist, return 0 if empty, otherwise 1" 
 	func_param_check 1 "$@"
 
+	# enough for me to use, for better solution: https://mywiki.wooledge.org/BashFAQ/004
 	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 1 || return 0
 }
 
@@ -549,6 +556,7 @@ func_is_dir_not_empty() {
 	local desc="Desc: check if directory is not empty, return 0 if not empty, otherwise 1" 
 	func_param_check 1 "$@"
 
+	# enough for me to use, for better solution: https://mywiki.wooledge.org/BashFAQ/004
 	[ "$(ls -A "${1}" 2> /dev/null)" ] && return 0 || return 1
 }
 
@@ -579,7 +587,7 @@ func_complain_path_exist() {
 	local desc="Desc: complains if path already exist, return 0 if exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
-	[ -e "${1}" ] && echo "${2:-WARN: path ${1} already exist!}" 1>&2 && return 0
+	[ -e "${1}" ] && echo "${2:-WARN: path ${1} already exist}" 1>&2 && return 0
 	return 1
 }
 
@@ -588,7 +596,7 @@ func_complain_path_not_exist() {
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
-	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist!}" 1>&2 && return 0
+	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist}" 1>&2 && return 0
 	return 1
 }
 
@@ -639,20 +647,21 @@ func_backup_simple() {
 	func_param_check 2 "$@"
 	func_validate_path_exist "${1}"
 	func_validate_path_not_exist "${2}"
+	local size target_dir available_space
 
 	# check size of file
-	local size="$(func_file_size "${1}")"
+	size="$(func_file_size "${1}")"
 	if (( size > 100*1000*1000 )) ; then
 		func_error "file size too big (${size}): ${1}" 1>&2
 		return 1
 	fi
 
 	# prepare target dir
-	local target_dir="$(dirname "${2}")"
+	target_dir="$(dirname "${2}")"
 	[[ -e "${target_dir}" ]] || mkdir "${target_dir}"
 
 	# check size of available space
-	local available_space="$(func_available_space_of_path "${target_dir}")"
+	available_space="$(func_available_space_of_path "${target_dir}")"
 	if (( size + 500*1000*1000 > available_space )); then
 		func_error "available space too small ($(func_num_to_human "${available_space}")), less than 500M after copy" 1>&2
 		return 1
@@ -721,6 +730,31 @@ func_download_wget() {
 	echo "" # next line should in new line
 	[ -f "${dl_fullpath}" ] || func_die "ERROR: ${dl_fullpath} not found, seems download faild!"
 	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
+}
+
+func_log() {
+	local usage="Usage: ${FUNCNAME[0]} <level> <prefix> <log_path> <str>" 
+	func_param_check 4 "$@"
+
+	local level="$1"
+	local prefix="$2"
+	local log_path="$3"
+	shift; shift; shift
+
+	[ ! -e "$log_path" ] && mkdir -p "$(dirname "$log_path")" && touch "$log_path"
+
+	echo "$(func_dati) $level [$prefix] $*" >> "$log_path"
+}
+
+func_log_info() {
+	local usage="Usage: ${FUNCNAME[0]} <prefix> <log_path> <str>" 
+	func_param_check 3 "$@"
+
+	func_log "INFO" "$@"
+}
+
+func_log_filter_brief() {
+	sed -n -e "/^\(Desc\|INFO\|WARN\|ERROR\):/p"
 }
 
 # shellcheck disable=2155,2012
@@ -915,7 +949,7 @@ func_complain_cmd_not_exist() {
 	func_param_check 1 "$@"
 
 	func_is_cmd_exist "${1}" && return 1
-	echo "${2:-WARN: cmd ${1} NOT exist!}" 1>&2 
+	echo "${2:-WARN: cmd ${1} NOT exist}" 1>&2 
 	return 0
 }
 
@@ -953,14 +987,14 @@ func_complain_function_not_exist() {
 	func_param_check 1 "$@"
 
 	func_is_function_exist "${1}" && return 1
-	echo "WARN: ${1} NOT exist or NOT a function!" 1>&2
+	echo "WARN: ${1} NOT exist or NOT a function" 1>&2
 }
 
 func_complain_sudo_not_auto() { 
 	local usage="Usage: ${FUNCNAME[0]} <msg>"
 	local desc="Desc: complains if current user not have sudo privilege, or need input password, return 0 if not have, otherwise 1" 
 	
-	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege, or NOT auto (need input password), pls check!}" 1>&2 && return 0
+	( ! sudo -n ls &> /dev/null) && echo "${2:-WARN: current user NOT have sudo privilege, or NOT auto (need input password), pls check}" 1>&2 && return 0
 	return 1
 }
 
@@ -1088,8 +1122,8 @@ func_os_name() {
 		linux*)		echo "${OS_LINUX}"	;return ;;
 		msys*)		echo "${OS_MINGW}"	;return ;;	# Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
 		bsd*)		echo "${OS_BSD}"	;return ;;
-		win*)		echo "${OS_WIN}"	;return ;;	# NOT sure, check on windows!
-		aix*)		echo "${OS_AIX}"	;return ;;	# NOT sure, check on windows!
+		win*)		echo "${OS_WIN}"	;return ;;	# NOT sure, check on windows
+		aix*)		echo "${OS_AIX}"	;return ;;	# NOT sure, check on windows
 	esac
 
 	# final
@@ -1510,7 +1544,7 @@ func_str_contains_blank() {
 	local str
 	for str in "$@" ; do
 		func_is_str_blank "${str}" && return 0
-	done
+	done 
 	return 1
 }
 
@@ -1527,112 +1561,3 @@ func_str_urldecode() {
 	# ${_//%/\\x} will replace all % with \x.
 	echo -e "${_//%/\\x}"; 
 }
-
-################################################################################
-# Output
-################################################################################
-# TODO: good reference: https://github.com/Offirmo/offirmo-shell-lib/blob/master/bin/osl_lib_output.sh
-
-# Deprecated
-#func_sed_gen_d_cmd() {
-#	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
-#	local desc="Desc: gen d cmd for sed" 
-#	func_param_check 1 "$@"
-#
-#	local sed_cmd p
-#	for p in "$@" ; do
-#		# replace '/' to '\/' (for path)
-#		sed_cmd="${sed_cmd}/${p//\//\\/}/d;"
-#	done
-#	echo "${sed_cmd}"
-#
-#}
-#
-#func_pipe_remove_pattern_lines() {
-#	local usage="Usage: ${FUNCNAME[0]} <pattern> [pattern] ..."
-#	local desc="Desc: remove patterns in pipe, good for multiple patterns (not need '-e' for each pattern)" 
-#	func_param_check 1 "$@"
-#
-#	local patterns
-#
-#	# merge params with '\|'
-#	printf -v patterns "%s\\|" "${@}"
-#
-#	# remember to remove the trailing '\|'
-#	grep -v "${patterns%\\|}"
-#}
-#
-#func_pipe_remove_blank_and_hash_lines() {
-#	# remove blank lines and hash comment lines (start with "#")
-#	func_pipe_remove_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' 
-#}
-#
-#func_pipe_remove_blank_lines() {
-#	func_pipe_remove_pattern_lines '^[[:space:]]*$'
-#}
-#
-#func_file_remove_blank_and_hash_lines() {
-#	func_complain_path_not_exist "${1}" && return 1
-#	cat "$@" | func_pipe_remove_blank_and_hash_lines
-#}
-#
-#func_file_remove_blank_lines() {
-#	func_complain_path_not_exist "${1}" && return 1
-#	cat "$@" | func_pipe_remove_blank_lines
-#}
-#
-#func_dir_diff() {
-#	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
-#	local desc="Desc: compare diff of dir" 
-#	func_param_check 1 "$@"
-#
-#	func_dir_diff_size "$@" "true" && return 0
-#
-#	echo "TODO: more comparison"
-#}
-#
-#func_dir_diff_size() {
-#	local usage="Usage: ${FUNCNAME[0]} <source> <target> <print=true>"
-#	local desc="Desc: compare size of dir" 
-#	func_param_check 1 "$@"
-#
-#	local src="${1}"
-#	local tgt="${2}"
-#	local prt="${3}"
-#	local src_size="$(func_file_size "${src}")"
-#	local tgt_size="$(func_file_size "${tgt}")"
-#
-#	if (( src_size == tgt_size )) ; then
-#		[ -n "${prt}" ] && echo "same size: $(func_num_to_human ${src_size})"
-#		return 0 
-#	else
-#		[ -n "${prt}" ] && echo "DIFF size: $(func_num_to_human ${src_size}) != $(func_num_to_human ${tgt_size}) (${src} V.S. ${tgt})"
-#		return 1
-#	fi
-#}
-# shellcheck disable=2015
-#func_duplicate_dated() {
-#	local usage="Usage: ${FUNCNAME[0]} <file> ..."
-#	local desc="Desc: backup file, with suffixed date" 
-#	func_param_check 1 "$@"
-#	
-#	for p in "$@" ; do
-#		func_complain_path_not_exist "${p}" && continue
-#
-#		# if target is dir, check size first (>100M will warn and skip)
-#		if [ -d "${p}" ] ; then
-#			p_size=$(stat -c%s "${p}")
-#			p_size_h=$(func_num_to_human zip_size)
-#			(( p_size > 104857600 )) && echo "WARN: ${p} size (${p_size_h}) too big (>100M), skip" && continue 
-#		fi
-#
-#		target="${p}.bak.$(func_dati)"
-#		echo "INFO: backup file, ${p} --> ${target}"
-#		if [ -w "${p}" ] ; then
-#			cp -r "${p}" "${target}"	|| echo "WARN: backup ${p} failed, pls check!"
-#		else
-#			sudo cp -r "${p}" "${target}"	|| echo "WARN: backup ${p} failed (with sudo priviledge), pls check!"
-#		fi
-#	done
-#}
-
