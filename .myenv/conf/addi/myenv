@@ -18,8 +18,8 @@ $LOC_CONF_SAMBA
 $MY_ENV/secu
 $MY_ENV/zgen
 
-# notes in git
-$HOME/Documents/FCS/oumisc/oumisc-git/note
+# notes
+$HOME/Documents/DCB/note
 
 # scripts depend on myenv_lib
 $HOME/.zbox/README.txt

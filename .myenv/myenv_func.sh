@@ -19,6 +19,7 @@ MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_SECU_PATH}" ] && source "${MYENV_SECU_PATH}"
 
 DCB_DATED_BACKUP="$MY_DCB/dbackup/latest"
+DCB_DATED_BACKUP_EX_FILENAME=".db.exclude"
 
 ################################################################################
 # Constants
@@ -1462,6 +1463,9 @@ func_scp_via_jump() {
 func_mebackup_awsvm() {
 	local usage="Usage: ${FUNCNAME[0]} run mebackup on awsvm and copy back" 
 
+	echo "ERROR: TODO: not work yet, pls fix it (the func_backup_myenv.alone.sh path has changed)"
+	return 1
+
 	local fpath bakpath
 	bakpath="$HOME/Documents/DCB/dbackup/latest/"
 
@@ -1694,9 +1698,17 @@ func_backup_myenv() {
 	done
 
 	zip -rjq "${packFile}" "${tmpDir}"/*.txt
+	## gen exclude cmd part
+	#ex_fl="$(func_backup_dated_gen_exclude_list "${source}")"
+	#if [ -s  "${ex_fl}" ] ; then
+	#	#cmd_ex_part="-x@'${ex_fl}'"				# NO ' inside, otherwise will be part of password!
+	#	cmd_ex_part="-x@${ex_fl}" 
+	#fi
+	## TODO: delete: zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+
+	# passwd will be used if available
 	func_backup_dated "${packFile}"
 
-	# should NOT left at /tmp dir
 	local final_zip_list="$(mktemp)"
 	unzip -l "${packFile}" > "${final_zip_list}"
 	echo "INFO: final pack file list: ${final_zip_list}"
@@ -1710,25 +1722,25 @@ func_backup_dated_gen_exclude_list() {
 	local usage="Usage: ${FUNCNAME[0]} <source>\n\tGenerate exclude list for func_backup_dated()" 
 	func_param_check 1 "$@"
 
-	local base
-	local exfile="$(mktemp)"
-	local EX_FILENAME=".db.exclude" 
-	find "$1" -type f -name "${EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' file; do
-		base="${file%${EX_FILENAME}}"
-		sed -e "s+^+${base}+" "$file" >> "${exfile}"
+	local base ex_fl ex_file
+	ex_fl="$(mktemp)"
+
+	# for each exclude list: 1) add path prefix. 2) gather together
+	find "$1" -type f -name "${DCB_DATED_BACKUP_EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' ex_file; do
+		base="${ex_file%"${DCB_DATED_BACKUP_EX_FILENAME}"}"
+		sed -e "s+^+${base}+" "${ex_file}" >> "${ex_fl}"
 	done
-	echo "${exfile}"
+	echo "${ex_fl}"
 }
 
-func_backup_dated_gen_target_path() {
-	local usage="Usage: ${FUNCNAME[0]}\n\tGenerate target path to store the backup file" 
+func_backup_dated_gen_target_base() {
+	local usage="Usage: ${FUNCNAME[0]}\n\tGenerate target base to store the backup file" 
 
 	# dcb for personal computer
 	local tags
 	if [ -d "${DCB_DATED_BACKUP}" ]; then
 		echo "${DCB_DATED_BACKUP}"
 		return
-
 	# if dirs(tags) in dist, ask for selection
 	elif [ -d "${MY_ENV_DIST}" ] ; then
 		tags="$(func_dist_tags)"
@@ -1745,27 +1757,6 @@ func_backup_dated_gen_target_path() {
 	echo "${dbdir}"
 }
 
-func_backup_dated_of_filelist() {
-	echo "ERROR: NOT implemented yet"
-	return 1
-
-	local usage="Usage: ${FUNCNAME[0]} <filelist>\n\tDated backup files in <filelist>." 
-	func_param_check 1 "$@"
-
-	local target target_path filelist 
-	target_path="$(func_backup_dated_gen_target_path)"
-
-	# TODO: validate the file list?
-	filelist="${1}"
-
-	# TODO: gen target path (extract from func_backup_dated)
-	target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
-
-	zip -r "${target}" -@ < "${filelist}"
-
-	# TODO: gen result info like func_backup_dated
-}
-
 func_backup_dated_to_remote() {
 	local usage="Usage: ${FUNCNAME[0]} [remote-host] [file_path]" 
 	func_param_check 2 "$@"
@@ -1773,63 +1764,134 @@ func_backup_dated_to_remote() {
 	func_complain_path_not_exist "${2}" && return
 
 	func_backup_dated "${2}"
-	local bak_path="${DCB_DATED_BACKUP}/$(ls "${DCB_DATED_BACKUP}" | tail -1)"
+	#local bak_path="${DCB_DATED_BACKUP}/$(ls "${DCB_DATED_BACKUP}" | tail -1)"
+	local bak_path="${DCB_DATED_BACKUP}/$(find "${DCB_DATED_BACKUP}" -maxdepth 1 -type f | sort | tail -1)"
 	scp "${bak_path}" "${1}:~/Documents/${DCB_DATED_BACKUP##*Documents}"
 }
 
 func_backup_dated() {
-	local usage="Usage: ${FUNCNAME[0]} <source> <addi_bak_path>\n\tCurrently only support backup up single target (file/dir)." 
+	local usage="Usage: ${FUNCNAME[0]} <source>"
+	local desc="Desc: Currently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local source_name source target exfile target_path host_name cmd_passwd_part passwd cmd_ex_part cmd
-	source="$(readlink -f "$1")"
-	source_name="$(basename "${source}")"
-	host_name="$(func_best_hostname)" 
-	target_path="$(func_backup_dated_gen_target_path)"
-	
-	# prepare and check
-	mkdir -p "${target_path}"
-	func_validate_path_exist "${source}" 
-
-	# prepare target name
-	if [[ "${source_name}" == *.zip ]] ;then
-		# already has .zip ext, not need another
-		target="${target_path}/$(func_dati)_${host_name}_${source_name}"
+	local src_path src_name tmp_base tmp_fl ex_fl
+	if [[ "${1}" == "./" ]] || [[ "${1}" == "." ]] ; then				# in case <source> is ".", we need its name
+		src_path="$(readlink -f "${1}")"
 	else
-		target="${target_path}/$(func_dati)_${host_name}_${source_name}.zip"
+		src_path="${1}"
+	fi
+	src_name="$(basename "${src_path%.zip}")"					# .zip will be added later (de-dup here)
+	tmp_base="$(mktemp -d)" 
+	tmp_fl="${tmp_base}/${src_name}"
+
+	# backup
+	if [ -d "${src_path}" ] ; then
+		# prepare filelist
+		#find "${src_path}" -print0 > "${tmp_fl}"				# output includes empty dir and .* files
+		find "${src_path}" > "${tmp_fl}"					# WORKS. Output includes empty dir and .* files
+
+		# prepare exclude filelist
+		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
+		if [ -s  "${ex_fl}" ] ; then
+			# NO ' inside "". WRONG: x@'${ex_fl}'"				
+			cmd_ex_part="-x@${ex_fl}" 
+		fi
+
+		func_backup_dated_PRIVATE_of_filelist "${tmp_fl}" "${ex_fl}"
+	else
+		# for single file, not need path in zip, and not need ex_fl
+		echo "${src_path}" > "${tmp_fl}"
+		func_backup_dated_PRIVATE_of_filelist "${tmp_fl}"
+	fi
+}
+
+func_backup_dated_PRIVATE_of_filelist() {
+	local usage="Usage: ${FUNCNAME[0]} <file_list> <exclude_list>"
+	local desc="Desc: backup files in list and exclude those listed" 
+	func_param_check 1 "$@"
+
+	# check and prepare
+	func_validate_path_exist "${1}" 
+	local tgt_path tgt_base src_fl src_name passwd_str cmd_opts 
+	src_fl="${1}"
+	src_name="$(basename "${src_fl%.zip}")"					# .zip will be added later (de-dup here)
+	tgt_base="$(func_backup_dated_gen_target_base)"
+	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
+	mkdir -p "${tgt_base}"
+
+	# prepare password option if available
+	if func_is_cmd_exist func_gen_zip_passwd ; then
+		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
+		if [ -n "${passwd_str}" ] ; then 
+			# NO ' inside "". WRONG: "--password '${passwd_str}'"
+			cmd_opts="--password ${passwd_str}"
+		else
+			echo "WARN: failed to gen password"
+		fi
 	fi
 
-	# prepare cmd part
-	exfile="$(func_backup_dated_gen_exclude_list "${source}")"
-	if [ -s  "${exfile}" ] ; then
-		#cmd_ex_part="-x@'${exfile}'"				# NO ' inside, otherwise will be part of password!
-		cmd_ex_part="-x@${exfile}" 
+	# prepare exclude option if available
+	if [[ -n "${2}" ]] && [[ -s "${2}" ]] ; then
+		# NO ' inside "". WRONG: x@'${ex_fl}'"				
+		cmd_opts="${cmd_opts} -x@${2}" 
 	fi
+
+	# TODO: no path perserved for single file backup
+	# ref:	https://serverfault.com/questions/652892/create-zip-based-on-contents-of-a-file-list
+	# 	last answer said "-@ - <" will works on all plf, while `man zip` said simply -@ will NOT work on mac
+	# shellcheck disable=2086 # cmd_opts must NOT embrace with "", since have spaces which need expansion
+	zip ${cmd_opts} -r -@ - < "${src_fl}" > "${tgt_path}" 
+	echo "INFO: cmd: zip ${cmd_opts} -r -@ - <  ${src_fl} > ${tgt_path}"
+	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
+}
+
+func_backup_dated_OLD_VERSION() {
+	local usage="Usage: ${FUNCNAME[0]} <source>"
+	local desc="Desc: Currently only support backup up single target (file/dir)." 
+	func_param_check 1 "$@"
+
+	# check and prepare
+	func_validate_path_exist "${1}" 
+	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
+	src_path="$(readlink -f "$1")"
+	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
+	tgt_base="$(func_backup_dated_gen_target_base)"
+	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
+	mkdir -p "${tgt_base}"
+
+	# prepare password if available
 	if func_is_cmd_exist func_gen_zip_passwd ; then
-		passwd="$(func_gen_zip_passwd "${target}")"
-		if [ -n "${passwd}" ] ; then 
-			#cmd_passwd_part="--password '${passwd}'"	# NO ' inside, otherwise will be part of password!
-			cmd_passwd_part="--password ${passwd}"
+		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
+		if [ -n "${passwd_str}" ] ; then 
+			# NO ' inside "". WRONG: "--password '${passwd_str}'"
+			cmd_passwd_part="--password ${passwd_str}"
 		else
 			echo "WARN: failed to gen password"
 		fi
 	fi
 
 	# backup
-	if [ -d "${source}" ] ; then
-		zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-		echo "INFO: zip with: ${cmd_passwd_part} ${cmd_ex_part}"
+	if [ -d "${src_path}" ] ; then
+
+		# prepare exclude filelist
+		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
+		if [ -s  "${ex_fl}" ] ; then
+			# NO ' inside "". WRONG: x@'${ex_fl}'"				
+			cmd_ex_part="-x@${ex_fl}" 
+		fi
+
+		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
+		zip -r "${tgt_path}" "${src_path}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+		cmd_info="${cmd_passwd_part} ${cmd_ex_part}"
 	else
-		zip "${target}" "${source}" ${cmd_passwd_part} 
-		echo "INFO: zip with: ${cmd_passwd_part}"
+		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
+		zip "${tgt_path}" "${src_path}" ${cmd_passwd_part} 
+		cmd_info="${cmd_passwd_part}"
 	fi
 
-	# addition backup
-	[ -n "${2}" ] && cp -r "${target}" "${2}"
-
-	echo "INFO: result:" 
-	"ls" -lh "${target}"
-	[ -n "${2}" ] && "ls" -lh "${2}/$(basename "${target}")"
+	# echo result
+	func_is_str_blank "${cmd_info}" && echo "INFO: no password or exclude list used." || echo "INFO: cmd param: ${cmd_info}"
+	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
 }
 
 func_run_file_c() {

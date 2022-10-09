@@ -42,12 +42,9 @@ zgen=$MY_ENV_ZGEN
 secu=$MY_ENV_SECU
 tag=$MY_ENV_CONF/addi/tags
 
-# OUMISC
+# OUREPO
 data=/data
-misc=$ZBOX/src/oumisc/oumisc-git/misc.txt
-oumisc=$ZBOX/src/oumisc/oumisc-git
 ourepo=$ZBOX/src/ourepo/ourepo-git
-oublog=$ZBOX/src/oublog/oublog-git
 outest=$ZBOX/src/outest/outest-local
 
 # MY_DOC
