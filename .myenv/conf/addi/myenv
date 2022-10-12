@@ -22,7 +22,7 @@ $MY_ENV/zgen
 $HOME/Documents/DCB/note
 
 # scripts depend on myenv_lib
-$HOME/.zbox/README.txt
+$HOME/.zbox/README.md
 $HOME/.zbox/zbox_lib.sh
 $HOME/.zbox/zbox_func.sh
 $MY_FCS/oumisc/oumisc-git/proj/tob/tob_func.sh
@@ -49,7 +49,7 @@ $HOME/.thunderbird/profiles.ini
 $HOME/.local/share/applications/
 $HOME/.kde/share/config/kwalletrc
 $HOME/.kde/share/apps/kwallet/kdewallet.kwl
-$HOME/.config/karabiner/assets/complex_modifications/mv_window.json
+$HOME/.config/karabiner/assets/complex_modifications/
 $HOME/.config/fcitx/table/wbpy_LastAutoPhrase.tmp
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml

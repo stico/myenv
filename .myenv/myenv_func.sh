@@ -1479,7 +1479,7 @@ func_mebackup_awsvm() {
 
 	func_scp_from_awsvm "$fpath"
 	ls -l | tail -1
-	\cd - &> /dev/null
+	\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
 }
 
 # awsvm@aws
@@ -1637,7 +1637,76 @@ func_delete_dated() {
 	done
 }
 
+func_backup_myenv_cmd_out() { 
+	func_param_check 1 "$@"
+	local vim_dir cmd_out_dir dircolors d
+	cmd_out_dir="${1}"
+	vim_dir="${HOME}/.vim/bundle"
+	dircolors="${MY_ENV}/conf/colors/dircolors-solarized"
+
+	echo "INFO: backup command output"
+	mkdir -p "${cmd_out_dir}"
+
+	# disk & links
+	df -h					> "${cmd_out_dir}/cmd_output_df_h.txt"
+	find ~ -maxdepth 1 -type l -ls		> "${cmd_out_dir}/cmd_output_links_in_home.txt"
+	find / -maxdepth 1 -type l -ls		> "${cmd_out_dir}/cmd_output_links_in_root.txt"
+	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${cmd_out_dir}/cmd_output_links_in_zbox.txt"
+
+	# git remote
+	pushd . &> /dev/null
+	for d in "${HOME}" "${ZBOX}" "${OUREPO}" "${dircolors}" "${vim_dir}"/* ; do
+		[ ! -d "${d}" ] && continue
+		echo -e "\n${d}"			>> "${cmd_out_dir}/cmd_output_git_remote.txt"
+		if \cd "${d}" ; then
+			git remote -v			>> "${cmd_out_dir}/cmd_output_git_remote.txt"
+		else
+			echo "INFO: ${d} inexist, skip"	>> "${cmd_out_dir}/cmd_output_git_remote.txt"
+		fi
+	done
+	popd &> /dev/null || return
+}
+
 func_backup_myenv() { 
+	local tmp_dir ex_fl bak_fl myenv_fl tmp_ex_fl tmp_str
+
+	tmp_dir="$(mktemp -d)"
+	cmd_out="${tmp_dir}/cmd_out"
+	ex_fl="${tmp_dir}/myenv_exclude"
+	bak_fl="${tmp_dir}/myenv_backup"
+	myenv_fl=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
+
+	# collect myenv files
+	func_collect_myenv "no_content"
+	func_validate_path_exist "${myenv_fl}"
+	func_backup_myenv_cmd_out "${cmd_out}"
+
+	# prepare filelist
+	for tmp_str in "${cmd_out}" "${ex_fl}" "${bak_fl}" ; do
+		# not using cmd "basename", in case not in tmp_dir
+		echo "${tmp_str#"${tmp_dir}/"}" >>  "${bak_fl}"
+	done
+	#(echo "${cmd_out}"; echo "${ex_fl}"; echo "${bak_fl}") >>  "${bak_fl}"
+	cat "${myenv_fl}" >>  "${bak_fl}"
+
+	# prepare exclude filelist
+	tmp_ex_fl="$(func_backup_dated_gen_exclude_list "${MY_ENV}")"
+	mv "${tmp_ex_fl}" "${ex_fl}"
+	cat >> "${ex_fl}" <<-'EOF'
+		*/zgen/mlocate.db
+		*/zgen/gnulocatedb
+		*/.unison/[fa][pr][0-9a-z]*
+		*/zgen/collection/all_content.txt
+		*/zgen/collection/code_content.txt
+		*/zgen/collection/stdnote_content.txt
+	EOF
+
+	! \cd "${tmp_dir}" && echo "ERROR: failed to cd to ${tmp_dir}, give up!" && return
+	func_backup_dated_with_fl_PRIVATE "${bak_fl}" "${ex_fl}"
+	\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
+}
+
+func_backup_myenv_OLD_VERSION() { 
 	local tmpDir="$(mktemp -d)"
 	local packFile="${tmpDir}/myenv_backup.zip"
 	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
@@ -1733,7 +1802,7 @@ func_backup_dated_gen_exclude_list() {
 	echo "${ex_fl}"
 }
 
-func_backup_dated_gen_target_base() {
+func_backup_dated_sel_target_base() {
 	local usage="Usage: ${FUNCNAME[0]}\n\tGenerate target base to store the backup file" 
 
 	# dcb for personal computer
@@ -1786,36 +1855,30 @@ func_backup_dated() {
 
 	# backup
 	if [ -d "${src_path}" ] ; then
-		# prepare filelist
-		#find "${src_path}" -print0 > "${tmp_fl}"				# output includes empty dir and .* files
-		find "${src_path}" > "${tmp_fl}"					# WORKS. Output includes empty dir and .* files
-
-		# prepare exclude filelist
+		#find "${src_path}" > "${tmp_fl}"					# WORKS. Also list empty dir and .* files
+		find "${src_path}" -print0 > "${tmp_fl}"				# WORKS. Also list empty dir and .* files
 		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
-		if [ -s  "${ex_fl}" ] ; then
-			# NO ' inside "". WRONG: x@'${ex_fl}'"				
-			cmd_ex_part="-x@${ex_fl}" 
-		fi
-
-		func_backup_dated_PRIVATE_of_filelist "${tmp_fl}" "${ex_fl}"
+		func_backup_dated_with_fl_PRIVATE "${tmp_fl}" "${ex_fl}"
 	else
-		# for single file, not need path in zip, and not need ex_fl
+		# for single file, not need path in zip, and not need exlude filelist
 		echo "${src_path}" > "${tmp_fl}"
-		func_backup_dated_PRIVATE_of_filelist "${tmp_fl}"
+		func_backup_dated_with_fl_PRIVATE "${tmp_fl}"
 	fi
 }
 
-func_backup_dated_PRIVATE_of_filelist() {
+func_backup_dated_with_fl_PRIVATE() {
 	local usage="Usage: ${FUNCNAME[0]} <file_list> <exclude_list>"
 	local desc="Desc: backup files in list and exclude those listed" 
 	func_param_check 1 "$@"
 
+	# TODO: currently 1-round zip, `unzip -l` still works!
+
 	# check and prepare
 	func_validate_path_exist "${1}" 
-	local tgt_path tgt_base src_fl src_name passwd_str cmd_opts 
+	local tgt_path tgt_base src_fl src_name passwd_str cmd_opts zip_cmd_log
 	src_fl="${1}"
 	src_name="$(basename "${src_fl%.zip}")"					# .zip will be added later (de-dup here)
-	tgt_base="$(func_backup_dated_gen_target_base)"
+	tgt_base="$(func_backup_dated_sel_target_base)"
 	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
 	mkdir -p "${tgt_base}"
 
@@ -1836,12 +1899,16 @@ func_backup_dated_PRIVATE_of_filelist() {
 		cmd_opts="${cmd_opts} -x@${2}" 
 	fi
 
-	# TODO: no path perserved for single file backup
 	# ref:	https://serverfault.com/questions/652892/create-zip-based-on-contents-of-a-file-list
 	# 	last answer said "-@ - <" will works on all plf, while `man zip` said simply -@ will NOT work on mac
+	# note:	for the "-" in cmd, from zip manual: zip will also accept a single dash ("-") as the zip file name, 
+	#	in which case it will write the zip file to standard output, allowing the output to be piped to another program. 
+	zip_cmd_log="$(mktemp)"
 	# shellcheck disable=2086 # cmd_opts must NOT embrace with "", since have spaces which need expansion
-	zip ${cmd_opts} -r -@ - < "${src_fl}" > "${tgt_path}" 
-	echo "INFO: cmd: zip ${cmd_opts} -r -@ - <  ${src_fl} > ${tgt_path}"
+	zip ${cmd_opts} -r -@ - < "${src_fl}" > "${tgt_path}" 2> "${zip_cmd_log}"
+
+	echo "INFO: cmd: zip ${cmd_opts} -r -@ - <  ${src_fl} > ${tgt_path} 2> ${zip_cmd_log}"
+	echo "INFO: check zip cmd out at: ${zip_cmd_log}"
 	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
 }
 
@@ -1855,7 +1922,7 @@ func_backup_dated_OLD_VERSION() {
 	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
 	src_path="$(readlink -f "$1")"
 	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
-	tgt_base="$(func_backup_dated_gen_target_base)"
+	tgt_base="$(func_backup_dated_sel_target_base)"
 	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
 	mkdir -p "${tgt_base}"
 
@@ -2549,7 +2616,7 @@ func_export_script() {
 	fi
 }
 
-func_dup_gather_PRIVATE_try_bakpath() {
+func_dup_gather_try_bakpath_PRIVATE() {
 	local usage="USAGE: ${FUNCNAME[0]} <filepath>" 
 	local desc="Desc: if path is doc backup, try diff path for DTZ/TCZ/lap" 
 	func_param_check 1 "$@"
@@ -2585,7 +2652,7 @@ func_dup_gather() {
 	if [[ -z "${1}" ]] && [[ -e "${DUP_DEL_LIST}" ]] ; then
 		echo "INFO: default del_list: ${DUP_DEL_LIST}"
 		echo "WARN: NO del_list provided, use default list? (y/n)"
-		read -e user_input
+		read -r -e user_input
 		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
 		del_list="${DUP_DEL_LIST}"
 	else
@@ -2603,7 +2670,7 @@ func_dup_gather() {
 		if [ ! -e "${line}" ] ; then
 			# for doc backup path, try alternative paths
 			if [[ "${line}" = backup_unison/* ]] || [[ "${line}" = backup_rsync/* ]] ; then
-				line="$(func_dup_gather_PRIVATE_try_bakpath ${line})"
+				line="$(func_dup_gather_try_bakpath_PRIVATE "${line}")"
 			fi
 		fi
 		[ ! -e "${line}" ] && echo "MV_SKIP: skip since inexist: ${line}" >> "${log}" && continue
@@ -2629,7 +2696,7 @@ func_dup_gather() {
 	echo "INFO: ${fail} fail, ${success} success, ${skip} skip, see detail: ${log}"
 }
 
-func_dup_find_PRIVATE_gen_md5() {
+func_dup_find_gen_md5_PRIVATE() {
 	# Skip symbolic link
 	if [ -h "${1}" ] ; then 
 		# TODO: NOT found such log, why?
@@ -2713,12 +2780,12 @@ func_dup_find_CALL_GATHER_FIRST() {
 	local p f
 	if [ $# -eq 0 ] ; then
 		find ./ -type f -print0 | while IFS= read -r -d $'\0' line; do 
-			func_dup_find_PRIVATE_gen_md5 "${line}"
+			func_dup_find_gen_md5_PRIVATE "${line}"
 		done
 	else
 		for p in "$@" ; do
 			find "${p}" -type f -print0 | while IFS= read -r -d $'\0' line; do 
-				func_dup_find_PRIVATE_gen_md5 "${line}"
+				func_dup_find_gen_md5_PRIVATE "${line}"
 			done
 		done
 	fi
