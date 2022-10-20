@@ -534,7 +534,19 @@ func_ln_soft() {
 	"ln" -s "${source}" "${target}"
 }
 
-func_is_filetype_text() {
+func_is_file_ext_image() {
+	local usage="Usage: ${FUNCNAME[0]} <path>"
+	local desc="Desc: check if file name extension is image, return 0 if yes, otherwise 1" 
+	func_param_check 1 "$@"
+
+	# for sed cmd: '/\.\(jpg\|jpeg\|gif\|png\|apng\|avif\|svg\|webp\|bmp\|ico\|tiff\|tif\)$/d;'
+
+	[[ "${1,,}" =~ .*\.(jpg|jpeg|gif|png|apng|avif|svg|webp|bmp|ico|tiff|tif) ]] && return 0	# ordinary ext
+	[[ "${1,,}" =~ .*\.(raw|cr2|nef|orf|sr2) ]] && return 0						# raw ext
+	return 1
+}
+
+func_is_file_type_text() {
 	local usage="Usage: ${FUNCNAME[0]} <path>"
 	local desc="Desc: check if filetype is text, return 0 if yes, otherwise 1" 
 	func_param_check 1 "$@"

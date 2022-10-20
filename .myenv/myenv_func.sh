@@ -18,8 +18,9 @@ MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
 [ -f "${MYENV_SECU_PATH}" ] && source "${MYENV_SECU_PATH}"
 
-DCB_DATED_BACKUP="$MY_DCB/dbackup/latest"
-DCB_DATED_BACKUP_EX_FILENAME=".db.exclude"
+DBACKUP_EX_FILENAME=".db.exclude"
+DBACKUP_RESULT_STR="DBACKUP_RESULT: "
+DBACKUP_BASE_DCB="${HOME}/Documents/DCB/dbackup/latest"
 
 ################################################################################
 # Constants
@@ -656,8 +657,8 @@ func_collect_statistics() {
 
 		# use function in pipe
 		#export -f func_param_check
-		#export -f func_is_filetype_text
-		#cat myenv_filelist.txt | xargs -n 1 -I{} bash -c 'func_is_filetype_text {} && wc -l {}' | sort -n | tee /tmp/2
+		#export -f func_is_file_type_text
+		#cat myenv_filelist.txt | xargs -n 1 -I{} bash -c 'func_is_file_type_text {} && wc -l {}' | sort -n | tee /tmp/2
 	done
 }
 
@@ -682,7 +683,7 @@ func_collect_myenv() {
 		echo "${f}" >> "${myenv_filelist}"
 
 		[ "${1}" = "with_content" ] || continue
-		func_is_filetype_text "${f}" || continue
+		func_is_file_type_text "${f}" || continue
 		echo -e "\n\n@${f}\n"  >> "${myenv_content}"
 		sed -e "s///" "${f}" >> "${myenv_content}"
 	done
@@ -809,7 +810,7 @@ func_collect_all() {
 	-e "/\/html\/ref_html.*.htm/d"					\
 	-e "/\/template_war_spring\/.*\/blueprint\//d"			\
 	"${code_filelist}" | while IFS= read -r line || [[ -n "${line}" ]] ; do
-		func_is_filetype_text "${line}" || continue
+		func_is_file_type_text "${line}" || continue
 		echo -e "\n\n@${line}\n"  >> "${code_content}"
 		sed -e "s///" "${line}" >> "${code_content}"
 	done
@@ -1702,89 +1703,8 @@ func_backup_myenv() {
 	EOF
 
 	! \cd "${tmp_dir}" && echo "ERROR: failed to cd to ${tmp_dir}, give up!" && return
-	func_backup_dated_with_fl_PRIVATE "${bak_fl}" "${ex_fl}"
+	func_backup_dated_on_fl_PRIVATE  "${bak_fl}" "${ex_fl}"
 	\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
-}
-
-func_backup_myenv_OLD_VERSION() { 
-	local tmpDir="$(mktemp -d)"
-	local packFile="${tmpDir}/myenv_backup.zip"
-	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
-
-	echo "INFO: create zip file based on filelist: ${fileList}"
-	func_collect_myenv "no_content"
-
-	# excludes: locate related db, ar.../fp... files in unison, duplicate collection
-	zip -r "${packFile}"					\
-		-x "*/zgen/mlocate.db" 				\
-		-x "*/zgen/gnulocatedb" 			\
-		-x "*/.unison/[fa][pr][0-9a-z]*"		\
-		-x "*/zgen/collection/all_content.txt"		\
-		-x "*/zgen/collection/code_content.txt"		\
-		-x "*/zgen/collection/stdnote_content.txt"	\
-		-@ < "${fileList}" 2>&1				\
-	| sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'	\
-	|| echo "WARN: failed to pack some file, pls check"
-
-	if [ ! -e "${packFile}" ] ; then
-		func_die "ERROR: failed to zip files into ${packFile}"
-	fi
-
-	echo "INFO: bakcup command output, add to the backup zip"
-	mkdir -p "${tmpDir}"
-	df -h					> "${tmpDir}/cmd_output_df_h.txt"
-	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
-	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
-	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
-
-	pushd . &> /dev/null
-	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-
-	if [ -e "${ZBOX}" ] ; then
-		echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-	fi
-	if [ -e "${OUMISC}" ] ; then
-		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
-	else
-		echo "INFO: ${OUMISC} NOT exist, skip"
-	fi
-	if [ -e "${OUREPO}" ] ; then
-		echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${OUREPO}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
-	else
-		echo "INFO: ${OUREPO} NOT exist, skip"
-	fi
-
-	\cd "${HOME}/.vim/bundle" &> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle"
-	for f in * ; do 
-		[ ! -d "${f}" ] && continue
-		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle/${f}"
-		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
-	done
-
-	zip -rjq "${packFile}" "${tmpDir}"/*.txt
-	## gen exclude cmd part
-	#ex_fl="$(func_backup_dated_gen_exclude_list "${source}")"
-	#if [ -s  "${ex_fl}" ] ; then
-	#	#cmd_ex_part="-x@'${ex_fl}'"				# NO ' inside, otherwise will be part of password!
-	#	cmd_ex_part="-x@${ex_fl}" 
-	#fi
-	## TODO: delete: zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-
-	# passwd will be used if available
-	func_backup_dated "${packFile}"
-
-	local final_zip_list="$(mktemp)"
-	unzip -l "${packFile}" > "${final_zip_list}"
-	echo "INFO: final pack file list: ${final_zip_list}"
-
-	echo "INFO: delete tmp pack file"
-	rm "${packFile}"
-	popd &> /dev/null
 }
 
 func_backup_dated_gen_exclude_list() {
@@ -1795,8 +1715,8 @@ func_backup_dated_gen_exclude_list() {
 	ex_fl="$(mktemp)"
 
 	# for each exclude list: 1) add path prefix. 2) gather together
-	find "$1" -type f -name "${DCB_DATED_BACKUP_EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' ex_file; do
-		base="${ex_file%"${DCB_DATED_BACKUP_EX_FILENAME}"}"
+	find "$1" -type f -name "${DBACKUP_EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' ex_file; do
+		base="${ex_file%"${DBACKUP_EX_FILENAME}"}"
 		sed -e "s+^+${base}+" "${ex_file}" >> "${ex_fl}"
 	done
 	echo "${ex_fl}"
@@ -1807,8 +1727,8 @@ func_backup_dated_sel_target_base() {
 
 	# dcb for personal computer
 	local tags
-	if [ -d "${DCB_DATED_BACKUP}" ]; then
-		echo "${DCB_DATED_BACKUP}"
+	if [ -d "${DBACKUP_BASE_DCB}" ]; then
+		echo "${DBACKUP_BASE_DCB}"
 		return
 	# if dirs(tags) in dist, ask for selection
 	elif [ -d "${MY_ENV_DIST}" ] ; then
@@ -1826,47 +1746,41 @@ func_backup_dated_sel_target_base() {
 	echo "${dbdir}"
 }
 
-func_backup_dated_to_remote() {
-	local usage="Usage: ${FUNCNAME[0]} [remote-host] [file_path]" 
-	func_param_check 2 "$@"
-
-	func_complain_path_not_exist "${2}" && return
-
-	func_backup_dated "${2}"
-	#local bak_path="${DCB_DATED_BACKUP}/$(ls "${DCB_DATED_BACKUP}" | tail -1)"
-	local bak_path="${DCB_DATED_BACKUP}/$(find "${DCB_DATED_BACKUP}" -maxdepth 1 -type f | sort | tail -1)"
-	scp "${bak_path}" "${1}:~/Documents/${DCB_DATED_BACKUP##*Documents}"
-}
-
 func_backup_dated() {
 	local usage="Usage: ${FUNCNAME[0]} <source>"
 	local desc="Desc: Currently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local src_path src_name tmp_base tmp_fl ex_fl
+	local src_path src_basename tmp_base tmp_fl ex_fl src_dirname
 	if [[ "${1}" == "./" ]] || [[ "${1}" == "." ]] ; then				# in case <source> is ".", we need its name
 		src_path="$(readlink -f "${1}")"
 	else
 		src_path="${1}"
 	fi
-	src_name="$(basename "${src_path%.zip}")"					# .zip will be added later (de-dup here)
+	src_basename="$(basename "${src_path%.zip}")"					# .zip will be added later (just a simple de-dup here)
 	tmp_base="$(mktemp -d)" 
-	tmp_fl="${tmp_base}/${src_name}"
+	tmp_fl="${tmp_base}/${src_basename}"
 
 	# backup
 	if [ -d "${src_path}" ] ; then
-		#find "${src_path}" > "${tmp_fl}"					# WORKS. Also list empty dir and .* files
-		find "${src_path}" -print0 > "${tmp_fl}"				# WORKS. Also list empty dir and .* files
-		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
-		func_backup_dated_with_fl_PRIVATE "${tmp_fl}" "${ex_fl}"
+		# cd to base, makes path simpler in zip file. NOTE: will fail if NOT cd, not sure why (zip with filelist always use relative path?)
+		src_dirname="$(dirname "${src_path}")"
+		! \cd "${src_dirname}" && echo "ERROR: failed to cd ${src_dirname}" && return
+
+		#find "${src_basename}" > "${tmp_fl}"					# WORKS. Also list empty dir and .* files
+		find "${src_basename}" -print0 > "${tmp_fl}"				# WORKS. Also list empty dir and .* files
+		ex_fl="$(func_backup_dated_gen_exclude_list "${src_basename}")"
+		func_backup_dated_on_fl_PRIVATE  "${tmp_fl}" "${ex_fl}"
+
+		\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
 	else
 		# for single file, not need path in zip, and not need exlude filelist
 		echo "${src_path}" > "${tmp_fl}"
-		func_backup_dated_with_fl_PRIVATE "${tmp_fl}"
+		func_backup_dated_on_fl_PRIVATE  "${tmp_fl}"
 	fi
 }
 
-func_backup_dated_with_fl_PRIVATE() {
+func_backup_dated_on_fl_PRIVATE () {
 	local usage="Usage: ${FUNCNAME[0]} <file_list> <exclude_list>"
 	local desc="Desc: backup files in list and exclude those listed" 
 	func_param_check 1 "$@"
@@ -1903,62 +1817,16 @@ func_backup_dated_with_fl_PRIVATE() {
 	# 	last answer said "-@ - <" will works on all plf, while `man zip` said simply -@ will NOT work on mac
 	# note:	for the "-" in cmd, from zip manual: zip will also accept a single dash ("-") as the zip file name, 
 	#	in which case it will write the zip file to standard output, allowing the output to be piped to another program. 
+	# NOTE: src_fl如果用的是绝对路径，好像就会失败，相对路径则没问题。不确定原因，难道zip这种情况下一定会用相对路径。
+	#	验证版本: (mac) Zip 3.0 (July 5th 2008), by Info-ZIP。
+	# TODO: 是不是检查一下路径，如果是绝对路径就告警一下?
 	zip_cmd_log="$(mktemp)"
 	# shellcheck disable=2086 # cmd_opts must NOT embrace with "", since have spaces which need expansion
 	zip ${cmd_opts} -r -@ - < "${src_fl}" > "${tgt_path}" 2> "${zip_cmd_log}"
 
 	echo "INFO: cmd: zip ${cmd_opts} -r -@ - <  ${src_fl} > ${tgt_path} 2> ${zip_cmd_log}"
 	echo "INFO: check zip cmd out at: ${zip_cmd_log}"
-	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
-}
-
-func_backup_dated_OLD_VERSION() {
-	local usage="Usage: ${FUNCNAME[0]} <source>"
-	local desc="Desc: Currently only support backup up single target (file/dir)." 
-	func_param_check 1 "$@"
-
-	# check and prepare
-	func_validate_path_exist "${1}" 
-	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
-	src_path="$(readlink -f "$1")"
-	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
-	tgt_base="$(func_backup_dated_sel_target_base)"
-	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
-	mkdir -p "${tgt_base}"
-
-	# prepare password if available
-	if func_is_cmd_exist func_gen_zip_passwd ; then
-		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
-		if [ -n "${passwd_str}" ] ; then 
-			# NO ' inside "". WRONG: "--password '${passwd_str}'"
-			cmd_passwd_part="--password ${passwd_str}"
-		else
-			echo "WARN: failed to gen password"
-		fi
-	fi
-
-	# backup
-	if [ -d "${src_path}" ] ; then
-
-		# prepare exclude filelist
-		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
-		if [ -s  "${ex_fl}" ] ; then
-			# NO ' inside "". WRONG: x@'${ex_fl}'"				
-			cmd_ex_part="-x@${ex_fl}" 
-		fi
-
-		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
-		zip -r "${tgt_path}" "${src_path}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-		cmd_info="${cmd_passwd_part} ${cmd_ex_part}"
-	else
-		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
-		zip "${tgt_path}" "${src_path}" ${cmd_passwd_part} 
-		cmd_info="${cmd_passwd_part}"
-	fi
-
-	# echo result
-	func_is_str_blank "${cmd_info}" && echo "INFO: no password or exclude list used." || echo "INFO: cmd param: ${cmd_info}"
-	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
+	echo "INFO: ${DBACKUP_RESULT_STR} $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
 }
 
 func_run_file_c() {
@@ -3053,3 +2921,136 @@ func_mydata_sync_note() {
 
 # THIS MUST IN THE END OF SCRIPT
 MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script
+
+
+# Deprecated
+func_backup_dated_OLD_VERSION() {
+	local usage="Usage: ${FUNCNAME[0]} <source>"
+	local desc="Desc: Currently only support backup up single target (file/dir)." 
+	func_param_check 1 "$@"
+
+	# check and prepare
+	func_validate_path_exist "${1}" 
+	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
+	src_path="$(readlink -f "$1")"
+	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
+	tgt_base="$(func_backup_dated_sel_target_base)"
+	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
+	mkdir -p "${tgt_base}"
+
+	# prepare password if available
+	if func_is_cmd_exist func_gen_zip_passwd ; then
+		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
+		if [ -n "${passwd_str}" ] ; then 
+			# NO ' inside "". WRONG: "--password '${passwd_str}'"
+			cmd_passwd_part="--password ${passwd_str}"
+		else
+			echo "WARN: failed to gen password"
+		fi
+	fi
+
+	# backup
+	if [ -d "${src_path}" ] ; then
+
+		# prepare exclude filelist
+		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
+		if [ -s  "${ex_fl}" ] ; then
+			# NO ' inside "". WRONG: x@'${ex_fl}'"				
+			cmd_ex_part="-x@${ex_fl}" 
+		fi
+
+		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
+		zip -r "${tgt_path}" "${src_path}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+		cmd_info="${cmd_passwd_part} ${cmd_ex_part}"
+	else
+		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
+		zip "${tgt_path}" "${src_path}" ${cmd_passwd_part} 
+		cmd_info="${cmd_passwd_part}"
+	fi
+
+	# echo result
+	func_is_str_blank "${cmd_info}" && echo "INFO: no password or exclude list used." || echo "INFO: cmd param: ${cmd_info}"
+	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
+}
+
+func_backup_myenv_OLD_VERSION() { 
+	local tmpDir="$(mktemp -d)"
+	local packFile="${tmpDir}/myenv_backup.zip"
+	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
+
+	echo "INFO: create zip file based on filelist: ${fileList}"
+	func_collect_myenv "no_content"
+
+	# excludes: locate related db, ar.../fp... files in unison, duplicate collection
+	zip -r "${packFile}"					\
+		-x "*/zgen/mlocate.db" 				\
+		-x "*/zgen/gnulocatedb" 			\
+		-x "*/.unison/[fa][pr][0-9a-z]*"		\
+		-x "*/zgen/collection/all_content.txt"		\
+		-x "*/zgen/collection/code_content.txt"		\
+		-x "*/zgen/collection/stdnote_content.txt"	\
+		-@ < "${fileList}" 2>&1				\
+	| sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'	\
+	|| echo "WARN: failed to pack some file, pls check"
+
+	if [ ! -e "${packFile}" ] ; then
+		func_die "ERROR: failed to zip files into ${packFile}"
+	fi
+
+	echo "INFO: bakcup command output, add to the backup zip"
+	mkdir -p "${tmpDir}"
+	df -h					> "${tmpDir}/cmd_output_df_h.txt"
+	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
+	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
+	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
+
+	pushd . &> /dev/null
+	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+
+	if [ -e "${ZBOX}" ] ; then
+		echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+	fi
+	if [ -e "${OUMISC}" ] ; then
+		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
+	else
+		echo "INFO: ${OUMISC} NOT exist, skip"
+	fi
+	if [ -e "${OUREPO}" ] ; then
+		echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${OUREPO}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
+	else
+		echo "INFO: ${OUREPO} NOT exist, skip"
+	fi
+
+	\cd "${HOME}/.vim/bundle" &> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle"
+	for f in * ; do 
+		[ ! -d "${f}" ] && continue
+		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
+		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle/${f}"
+		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
+	done
+
+	zip -rjq "${packFile}" "${tmpDir}"/*.txt
+	## gen exclude cmd part
+	#ex_fl="$(func_backup_dated_gen_exclude_list "${source}")"
+	#if [ -s  "${ex_fl}" ] ; then
+	#	#cmd_ex_part="-x@'${ex_fl}'"				# NO ' inside, otherwise will be part of password!
+	#	cmd_ex_part="-x@${ex_fl}" 
+	#fi
+	## TODO: delete: zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+
+	# passwd will be used if available
+	func_backup_dated "${packFile}"
+
+	local final_zip_list="$(mktemp)"
+	unzip -l "${packFile}" > "${final_zip_list}"
+	echo "INFO: final pack file list: ${final_zip_list}"
+
+	echo "INFO: delete tmp pack file"
+	rm "${packFile}"
+	popd &> /dev/null
+}
+

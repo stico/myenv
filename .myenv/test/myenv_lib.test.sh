@@ -3,8 +3,8 @@
 # source libs
 MYENV_LIB="${HOME}/.myenv/myenv_lib.sh"
 TEST_LIB="${HOME}/.myenv/test/test_lib.sh"
-[[ ! -e"${TEST_LIB}" ]] && echo "ERROR: can NOT find lib: ${TEST_LIB}" && exit 1
-[[ ! -e"${MYENV_LIB}" ]] && echo "ERROR: can NOT find lib: ${MYENV_LIB}" && exit 1
+[[ ! -e "${TEST_LIB}" ]] && echo "ERROR: can NOT find lib: ${TEST_LIB}" && exit 1
+[[ ! -e "${MYENV_LIB}" ]] && echo "ERROR: can NOT find lib: ${MYENV_LIB}" && exit 1
 source "${TEST_LIB}"
 source "${MYENV_LIB}"
 
@@ -46,7 +46,7 @@ rm "${FILE_2_NOT_EXIST}" &> /dev/null
 # Test cases
 ################################################################################
 test_run_all() {
-	while read func; do
+	while IFS= read -r func; do
 		test_echo_start "${func}"
 		eval "${func}"
 		test_echo_end
@@ -170,6 +170,18 @@ test_func_is_valid_ipv6() {
 	func_is_valid_ipv6 1:2:3:4:5:6:7:9999999;	test_verify_rcode_failure
 }
 
+test_func_is_image_ext() {
+	func_is_file_ext_image "a/b/c.png";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.tif";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.gif";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.GIF";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.jpg";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.JPG";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.jpeg";		test_verify_rcode_success
+	func_is_file_ext_image "a/b/c.mp4" ;		test_verify_rcode_failure
+	func_is_file_ext_image "a/b/c.mkv" ;		test_verify_rcode_failure
+	func_is_file_ext_image "a/b/c.PDF" ;		test_verify_rcode_failure
+}
 ################################################################################
 # Deprecated
 ################################################################################
