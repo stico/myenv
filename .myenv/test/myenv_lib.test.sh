@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=1090,2034
 
 # source libs
 MYENV_LIB="${HOME}/.myenv/myenv_lib.sh"
@@ -45,18 +46,6 @@ rm "${FILE_2_NOT_EXIST}" &> /dev/null
 ################################################################################
 # Test cases
 ################################################################################
-test_run_all() {
-	while IFS= read -r func; do
-		test_echo_start "${func}"
-		eval "${func}"
-		test_echo_end
-	done < <(grep "^test_" "$(func_script_self)"			\
-		| func_del_pattern_lines "test_run_all" "test_echo_"	\
-		| sed -e 's/().*$//')
-	
-	test_echo_summary
-}
-
 test_func_complain_path_exist() {
 	func_complain_path_exist "/tmp" &> /dev/null;				test_verify_rcode_success
 	func_complain_path_exist "${FILE_1}" &> /dev/null;			test_verify_rcode_success
@@ -182,6 +171,9 @@ test_func_is_image_ext() {
 	func_is_file_ext_image "a/b/c.mkv" ;		test_verify_rcode_failure
 	func_is_file_ext_image "a/b/c.PDF" ;		test_verify_rcode_failure
 }
+
+test_run_all
+
 ################################################################################
 # Deprecated
 ################################################################################
@@ -219,5 +211,3 @@ test_func_is_image_ext() {
 #	test_verify_str_line_count "${result}" 1
 #	test_verify_str_contains "${result}" "${STR_1_EN_CHAR}"
 #}
-
-test_run_all

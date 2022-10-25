@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=1090
+# shellcheck disable=1090,1091
 
 # NOTE: many tool (e.g. unison) can not accept .bashrc have output in remote style 
 
@@ -16,33 +16,41 @@ stty -ixoff
 shopt -s histappend
 shopt -s histreedit
 shopt -s checkwinsize
-uname -s | grep -iq darwin && [ -d "${MACPORTS}" ] && export PATH="${MACPORTS}:${MACPORTS}/bin:${MACPORTS}/libexec/gnubin/:${PATH}:"	# OSX: macports path must be in the front 
 
-# shellcheck disable=2015
-SHELL="/bin/bash" [ -f ~/.dir_colors ] && eval "$(dircolors -b ~/.dir_colors)" || eval "$(dircolors -b /etc/DIR_COLORS)"		# must after PATH setting to compitable with OSX (/opt/local/libexec/gnubin//dircolors)
+# Step 1: set PATH for OSX/macports to use correct tool
+if uname -s | grep -iq darwin && [ -d "${MACPORTS}" ] ; then
+	export PATH="${MACPORTS}:${MACPORTS}/bin:${MACPORTS}/libexec/gnubin/:${PATH}:"	
+fi
 
-# Completion
-[ -f "${COMPLETION}" ] && source "${COMPLETION}"
-[ -f "${MACPORTS}/${COMPLETION}" ] && source "${MACPORTS}/${COMPLETION}"
+# Step 2: dircolors, must after PATH setting to compitable with OSX (/opt/local/libexec/gnubin/dircolors)
+if [[ -f "${HOME}/.dir_colors" ]] ; then
+	SHELL="/bin/bash" eval "$(dircolors -b ~/.dir_colors)"
+else
+	SHELL="/bin/bash" eval "$(dircolors -b /etc/DIR_COLORS)"		
+fi
+
+# Step 3: completion, sys and self-define cmd
+# NOTE: unison remote style can NOT accept .bashrc have output
+source "${COMPLETION}" >/dev/null 2>&1
+source "${MACPORTS}/${COMPLETION}" >/dev/null 2>&1
 complete -F _known_hosts scpx sshx ssht
 
-# Source files. NOTE: unison remote style can NOT accept .bashrc have output
-source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
+# Step 4: Source env
 source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
-source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1
+source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(hostname)" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
+#source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1
 
-# source dist tag env for internal and production machine 
+# Step 5: source dist tag env for internal and production machine 
 func_is_personal_machine || func_dist_source_env 
 
-# Tool update
+# Step 6: Tool update
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"				# make less more friendly for non-text input files, see lesspipe(1)
-# shellcheck disable=1091
-[ -e /etc/infinality-settings.sh ] && source /etc/infinality-settings.sh		# infinality font rendering config
+source /etc/infinality-settings.sh >/dev/null 2>&1					# infinality font rendering config
 
-# Settings for diff machine type
+# Step 7: Settings for diff machine type
 if func_is_personal_machine ; then
 	umask 077									# only set this for personal machie
 	func_ssh_agent_init &> /dev/null						# Init ssh agent

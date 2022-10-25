@@ -603,6 +603,7 @@ func_complain_path_exist() {
 	return 1
 }
 
+func_complain_path_inexist() { func_complain_path_not_exist "$@" ;}
 func_complain_path_not_exist() {
 	local usage="Usage: ${FUNCNAME[0]} <path> <msg>"
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
@@ -1565,7 +1566,9 @@ func_str_urldecode() {
 	# '$_' 意思是上一个命令的最后一个参数。利用 : (no-op操作符)，让后面的参数变成可以被下一行的 '$_' 来引用到
 	# 作者有点玩技巧了，原链接的评论里也有人给出了更易读的方案，直接用个变量承载就好了: urldecode() { local i="${*//+/ }"; echo -e "${i//%/\\x}"; }
 
-	# 注意: 针对有Unicode的情况，没有验证过
+	# 注意: 针对有Unicode的情况，没有验证过。下面FAQ链接有提到，url编码规范是在字节level的，所以针对Unicode，也是当作byte来处理的。
+	# 这个FAQ里有另外一个版本 (有urlencdoe和urldecode)，有很多关于unicode细节: http://mywiki.wooledge.org/BashFAQ/071
+	# 命令行工具: nkf can decode URLs: echo 'https://ja.wikipedia.org/wiki/%E9%87%8E%E8%89%AF%E7%8C%AB' | nkf --url-input
 
 	# ${*//+/ } will replace all + with space 
 	: "${*//+/ }";			

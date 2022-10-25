@@ -1,9 +1,24 @@
 #!/bin/bash
+# shellcheck disable=2034
 
 # source libs
 MYENV_LIB="${HOME}"/.myenv/myenv_lib.sh
-[[ ! -e"${MYENV_LIB}" ]] && echo "ERROR: can NOT find lib: ${MYENV_LIB}" && exit 1
+[[ ! -e "${MYENV_LIB}" ]] && echo "ERROR: can NOT find lib: ${MYENV_LIB}" && exit 1
+
+# shellcheck disable=1090
 source "${MYENV_LIB}"
+
+test_run_all() {
+	while IFS= read -r func; do
+		test_echo_start "${func}"
+		eval "${func}"
+		test_echo_end
+	done < <(grep "^test_" "$(func_script_self)"			\
+		| func_del_pattern_lines "test_run_all" "test_echo_"	\
+		| sed -e 's/().*$//')
+	
+	test_echo_summary
+}
 
 test_echo_error() {
 	local usage="Usage: ${FUNCNAME[0]} <msg> <expect> <result>" 

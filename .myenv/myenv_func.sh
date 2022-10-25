@@ -1746,6 +1746,8 @@ func_backup_dated_sel_target_base() {
 	echo "${dbdir}"
 }
 
+# TRICK: output to stdout and capture zip_file path in ouput (into var)
+# { zip_file="$( func_backup_dated "${src_path}" | tee /dev/fd/3 | sed -n -e "/${DBACKUP_RESULT_STR}/s+^[^/]*/+/+p" )" } 3>&1
 func_backup_dated() {
 	local usage="Usage: ${FUNCNAME[0]} <source>"
 	local desc="Desc: Currently only support backup up single target (file/dir)." 
