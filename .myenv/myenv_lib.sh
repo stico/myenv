@@ -1520,8 +1520,43 @@ func_is_str_blank() {
 	func_param_check 1 "$@"
 	
 	# remove all space and use -z to check
-	#[ -z "${1//[[:blank:]]}" ] && return 0 || return 1
 	[ -z "${1//[[:space:]]}" ] && return 0 || return 1
+}
+
+func_str_trim_right() { 
+	local usage="Usage: ${FUNCNAME[0]} <string>"
+	local desc="Desc: remove trailing space from string" 
+	func_param_check 1 "$@"
+	
+	local var="$*"
+	var="${var%"${var##*[![:space:]]}"}"		# remove trailing whitespace characters
+	printf '%s' "$var"
+}
+
+func_str_trim_left() { 
+	local usage="Usage: ${FUNCNAME[0]} <string>"
+	local desc="Desc: remove leading space from string" 
+	func_param_check 1 "$@"
+	
+	# FROM: https://stackoverflow.com/questions/369758/how-to-trim-whitespace-from-a-bash-variable
+	local var="$*"
+	var="${var#"${var%%[![:space:]]*}"}"		# remove leading whitespace characters
+	printf '%s' "$var"
+}
+
+func_str_trim() { 
+	local usage="Usage: ${FUNCNAME[0]} <string>"
+	local desc="Desc: remove leading & trailing space from string" 
+	func_param_check 1 "$@"
+	
+	# FROM: https://stackoverflow.com/questions/369758/how-to-trim-whitespace-from-a-bash-variable
+	local var="$*"
+	var="${var#"${var%%[![:space:]]*}"}"		# remove leading whitespace characters
+	var="${var%"${var##*[![:space:]]}"}"		# remove trailing whitespace characters
+	printf '%s' "$var"
+
+	# WORKS
+	#echo "${1}" | sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//;'
 }
 
 func_str_not_contains() {

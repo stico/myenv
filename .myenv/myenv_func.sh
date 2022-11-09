@@ -19,7 +19,7 @@ MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_SECU_PATH}" ] && source "${MYENV_SECU_PATH}"
 
 DBACKUP_EX_FILENAME=".db.exclude"
-DBACKUP_RESULT_STR="DBACKUP_RESULT: "
+DBACKUP_RESULT_STR="DBACKUP_RESULT:"
 DBACKUP_BASE_DCB="${HOME}/Documents/DCB/dbackup/latest"
 
 ################################################################################
@@ -1645,7 +1645,7 @@ func_backup_myenv_cmd_out() {
 	vim_dir="${HOME}/.vim/bundle"
 	dircolors="${MY_ENV}/conf/colors/dircolors-solarized"
 
-	echo "INFO: backup command output"
+	echo "INFO: backup output of cmds (df, links, git remote, etc) "
 	mkdir -p "${cmd_out_dir}"
 
 	# disk & links
@@ -1827,7 +1827,7 @@ func_backup_dated_on_fl_PRIVATE () {
 	zip ${cmd_opts} -r -@ - < "${src_fl}" > "${tgt_path}" 2> "${zip_cmd_log}"
 
 	echo "INFO: cmd: zip ${cmd_opts} -r -@ - <  ${src_fl} > ${tgt_path} 2> ${zip_cmd_log}"
-	echo "INFO: check zip cmd out at: ${zip_cmd_log}"
+	echo "INFO: log: ${zip_cmd_log}"
 	echo "INFO: ${DBACKUP_RESULT_STR} $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
 }
 
@@ -2638,7 +2638,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 	local user_input
 	if [[ ! -e "${DUP_SKIP_MD5}" ]] || [[ ! -e "${DUP_INFO_MD5}" ]] || [[ ! -e "${DUP_SKIP_PATH}" ]] ; then
 		echo "WARN: DUP CONFIG files NOT exist (WILL BE VERY SLOW), contiue (y/n)?"
-		read -e user_input
+		read -r -e user_input
 		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
 	fi
 
@@ -2666,14 +2666,15 @@ func_dup_find_CALL_GATHER_FIRST() {
 	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
 	cut -d' ' -f1 "${list_md5}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${list_dup_count}"
 
-	local dup_count="$(func_file_line_count "${list_dup_count}")"
+	local dup_count
+	dup_count="$(func_file_line_count "${list_dup_count}")"
 	if (( dup_count == 0 )) ; then
 		echo "INFO: no dup files found, tmp dir: ${dup_base}"
 		return 0
 	fi
 
 	local count md5
-	while IFS= read -r count md5 || [[ -n "${count}" ]] ; do
+	while read -r count md5 || [[ -n "${count}" ]] ; do
 		[[ "${count}" -eq 1 ]] && echo "ERROR: should NOT found count=1 md5 here" && continue
 		grep "${md5}" "${list_md5}" >> "${list_dup_detail}"
 		echo >> "${list_dup_detail}"
@@ -2703,6 +2704,7 @@ func_gen_filelist_with_size(){
 
 	echo "INFO: filelist at: ${out_path}"
 }
+
 
 func_mydata_sync(){
 	# CONFIG - Common

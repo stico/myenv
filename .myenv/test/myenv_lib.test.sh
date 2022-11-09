@@ -109,15 +109,30 @@ test_func_is_str_blank() {
 	func_is_str_blank "${STR_6_BLANK_ALL}";		test_verify_rcode_success
 }
 
+test_func_str_trim() {
+	local STR_A
+	STR_A="a b  c   d    e     f"
+
+	test_verify_str_equals "$(func_str_trim "${STR_4_BLANK_TAB}${STR_A}${STR_3_BLANK_SP}")" "${STR_A}"
+	test_verify_str_equals "$(func_str_trim "${STR_6_BLANK_ALL}${STR_A}${STR_6_BLANK_ALL}")" "${STR_A}"
+
+	test_verify_str_equals "$(func_str_trim_left "${STR_4_BLANK_TAB}${STR_A}${STR_3_BLANK_SP}")" "${STR_A}${STR_3_BLANK_SP}"
+	test_verify_str_equals "$(func_str_trim_left "${STR_6_BLANK_ALL}${STR_A}${STR_6_BLANK_ALL}")" "${STR_A}${STR_6_BLANK_ALL}"
+
+	test_verify_str_equals "$(func_str_trim_right "${STR_4_BLANK_TAB}${STR_A}${STR_3_BLANK_SP}")" "${STR_4_BLANK_TAB}${STR_A}"
+	test_verify_str_equals "$(func_str_trim_right "${STR_6_BLANK_ALL}${STR_A}${STR_6_BLANK_ALL}")" "${STR_6_BLANK_ALL}${STR_A}"
+}
+
 test_func_del_blank_lines() {
-	local out_file="$(mktemp)"
+	local out_file result
+
+	out_file="$(mktemp)"
 	func_del_blank_lines "${FILE_1}" > "${out_file}"
 
 	test_verify_file_line_count "${out_file}" 6
 	test_verify_file_contains "${out_file}" "${STR_1_EN_CHAR}"
 	test_verify_file_contains "${out_file}" "${STR_2_COMMENT}"
 
-	local result
 	result="$(echo "${STR_0_MULTI_LINE}" | func_del_blank_lines)"
 
 	test_verify_str_line_count "${result}" 6
@@ -126,13 +141,14 @@ test_func_del_blank_lines() {
 }
 
 test_func_del_blank_and_hash_lines() {
-	local out_file="$(mktemp)"
+	local out_file result
+
+	out_file="$(mktemp)"
 	func_del_blank_and_hash_lines "${FILE_1}" > "${out_file}"
 
 	test_verify_file_line_count "${out_file}" 3
 	test_verify_file_contains "${out_file}" "${STR_1_EN_CHAR}"
 
-	local result
 	result="$(echo "${STR_0_MULTI_LINE}" | func_del_blank_and_hash_lines)"
 
 	test_verify_str_line_count "${result}" 3
