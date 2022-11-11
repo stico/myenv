@@ -238,7 +238,7 @@ func_is_pid_running() {
 }
 
 ################################################################################
-# Pattern matching (regex / patterns)
+# Pattern_Matching (regex / patterns) (also see ~Text_Process )
 ################################################################################
 func_grepf() {
 	local usage="Usage: ${FUNCNAME[0]} [-param1] [-param2] ... [-paramN] [--] <pattern-file> [file]"
@@ -303,7 +303,7 @@ func_del_blank_and_hash_lines() {
 }
 
 ################################################################################
-# Text Process
+# Text_Process (also see ~Pattern_Matching )
 ################################################################################
 func_merge_lines() { func_combine_lines "$@"; }
 func_combine_lines() {
@@ -326,6 +326,7 @@ func_combine_lines() {
 	}' "$@"
 }
 
+# shellcheck disable=2120
 func_shrink_blank_lines() {
 	local usage="Usage: ${FUNCNAME[0]} [file]"
 	local desc="Desc: shrink blank lines, multiple consecutive blank lines into 1" 
@@ -922,7 +923,8 @@ func_script_base() {
 	local usage="Usage: ${FUNCNAME[0]} <suffix> (MUST invoke in script !!!)" 
 	local desc="Desc: get dir of current script, suffix will be directly added to the base dir" 
 
-	local script_dir="$(dirname ${0})"
+	local script_dir
+	script_dir="$(dirname "${0}")"
 	func_is_str_empty "${script_dir}" && func_die "ERROR: script dir MUST NOT empty, pls check"
 
 	readlink -f "${script_dir}/${*}"

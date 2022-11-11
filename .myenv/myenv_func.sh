@@ -2559,6 +2559,7 @@ func_dup_gather() {
 	done < <(func_del_blank_and_hash_lines "${del_list}")
 
 	echo "INFO: ==================================== SUMMARY ===================================="
+	touch "${log}" # incase do nothing
 	local fail="$(grep -c "MV_FAIL" "${log}")"
 	local skip="$(grep -c "MV_SKIP" "${log}")"
 	local success="$(grep -c "MV_DONE" "${log}")"
@@ -2574,12 +2575,13 @@ func_dup_find_gen_md5_PRIVATE() {
 		return
 	fi
 
-	# Skip path
-	#if echo "${1}" | grep -q -f "${dup_skip_path_patterns}" ; then
-	if echo "${1}" | func_grepf -q "${DUP_SKIP_PATH}" ; then
-		echo "DUP_SKIP_PATH: ${1}" >> "${dup_log}"
-		return
-	fi
+	#UPDATE: logic moved to func_dup_find, which gen and filter filelist
+	# # Skip path
+	# #if echo "${1}" | grep -q -f "${dup_skip_path_patterns}" ; then
+	# if echo "${1}" | func_grepf -q "${DUP_SKIP_PATH}" ; then
+	# 	echo "DUP_SKIP_PATH: ${1}" >> "${dup_log}"
+	# 	return
+	# fi
 
 	# Reuse md5 if possible. 
 	# - To make better match: always remove "./" prefix, and remove "backup_rsync/backup_unison" if have
@@ -2587,13 +2589,14 @@ func_dup_find_gen_md5_PRIVATE() {
 	local md5_out
 	local sname="${1}" 
 	[[ "${sname}" = ./* ]]             && sname="${sname#./}"
-	[[ "${sname}" = backup_rsync/* ]]  && sname="${sname#*backup_rsync/}"
-	[[ "${sname}" = backup_unison/* ]] && sname="${sname#*backup_unison/}"
+	[[ "${sname}" = backup_rsync/* ]]  && sname="${sname#backup_rsync/}"
+	[[ "${sname}" = backup_unison/* ]] && sname="${sname#backup_unison/}"
 	md5_out="$(grep -F "${sname}" "${DUP_INFO_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
 	if [[ -n "${md5_out}" ]] ; then
 		md5_out="${md5_out%% *} ${1}"
 	else
 		md5_out="$(md5sum "${1}")"
+		echo "${md5_out}" >> "${list_md5_new}"
 		echo "DUP_CALC_MD5: ${1}" >> "${dup_log}"
 	fi
 
@@ -2604,7 +2607,7 @@ func_dup_find_gen_md5_PRIVATE() {
 	fi
 
 	# Record md5
-	echo "${md5_out}" >> "${list_md5}"
+	echo "${md5_out}" >> "${list_md5_all}"
 }
 
 func_dup_gather_then_find() {
@@ -2628,7 +2631,8 @@ func_dup_find_CALL_GATHER_FIRST() {
 	local DUP_SKIP_PATH="${DUP_CONFIG}/skip_path"
 
 	local dup_base="/tmp/dup_$(func_dati)"
-	local list_md5="${dup_base}/list_md5.txt"
+	local list_md5_all="${dup_base}/list_md5.txt"
+	local list_md5_new="${dup_base}/list_md5.new"
 	local list_dup_count="${dup_base}/list_dup_count.txt"
 	local list_dup_detail="${dup_base}/list_dup_detail.txt"
 	local dup_log="${dup_base}/a.dup_log.txt"
@@ -2642,48 +2646,52 @@ func_dup_find_CALL_GATHER_FIRST() {
 		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
 	fi
 
-	# Pattern file must clean, empty line makes everything match
+	func_info "start to gen filelist at: ${dup_base}/"
+	local p f fl_raw fl_use
 	mkdir -p "${dup_base}"
-	#func_file_remove_blank_and_hash_lines "${DUP_SKIP_PATH}" > "${dup_skip_path_patterns}"
-
-	echo "INFO: ($(func_dati)) start to gen md5/file pair"
-	local p f
+	fl_raw="${dup_base}/filelist.raw"
+	fl_use="${dup_base}/filelist.use"
 	if [ $# -eq 0 ] ; then
-		find ./ -type f -print0 | while IFS= read -r -d $'\0' line; do 
-			func_dup_find_gen_md5_PRIVATE "${line}"
-		done
+		# WORKS (slower, output smaller): find ./ -type f ! -path '*/FCS/*' ! -path '*/FCZ/*' ! -path '*/DCD/mail/mail_*' ! -path '*/A_GATHER_DIR_20*'  
+		find ./ -type f >> "${fl_raw}"
 	else
 		for p in "$@" ; do
-			find "${p}" -type f -print0 | while IFS= read -r -d $'\0' line; do 
-				func_dup_find_gen_md5_PRIVATE "${line}"
-			done
+			find "${p}" -type f >> "${fl_raw}"
 		done
 	fi
+	func_grepf -v "${DUP_SKIP_PATH}" "${fl_raw}" > "${fl_use}"
 
-	echo "INFO: ($(func_dati)) start to gen dup report"
+	func_info "start to gen md5/file pair"
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
+		func_dup_find_gen_md5_PRIVATE "${line}"
+	done < "${fl_use}"
+
+	func_info "start to gen dup report"
 	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
 	# https://stackoverflow.com/questions/40134905/merge-values-for-same-key
 	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
-	cut -d' ' -f1 "${list_md5}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${list_dup_count}"
+	cut -d' ' -f1 "${list_md5_all}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${list_dup_count}"
 
 	local dup_count
 	dup_count="$(func_file_line_count "${list_dup_count}")"
 	if (( dup_count == 0 )) ; then
-		echo "INFO: no dup files found, tmp dir: ${dup_base}"
+		func_info "no dup files found, tmp dir: ${dup_base}"
 		return 0
 	fi
 
 	local count md5
 	while read -r count md5 || [[ -n "${count}" ]] ; do
 		[[ "${count}" -eq 1 ]] && echo "ERROR: should NOT found count=1 md5 here" && continue
-		grep "${md5}" "${list_md5}" >> "${list_dup_detail}"
+		grep "${md5}" "${list_md5_all}" >> "${list_dup_detail}"
 		echo >> "${list_dup_detail}"
 	done < "${list_dup_count}" 
 
 	if [ -e "${list_dup_detail}" ] ; then
-		echo "INFO: found $(func_file_line_count "${list_dup_detail}") files, check detail at: ${list_dup_detail}"
+		func_info "found $(func_file_line_count "${list_dup_detail}") files"
+		func_info "1) check new md5 at: ${list_md5_new}"
+		func_info "2) check detail at: ${list_dup_detail}"
 	else
-		echo "INFO: NO dup files found"
+		func_info "NO dup files found"
 	fi
 }
 
