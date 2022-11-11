@@ -276,6 +276,8 @@ func_del_pattern_lines() {
 	local desc="Desc: delete those lines which match patterns, NOTE: if against files the '--' MUST used as separator!" 
 	func_param_check 1 "$@"
 
+	# TODO: how to merge this with func_file_remove_lines
+
 	local p patterns
 	for p in "$@"; do 
 		[[ -z "${p}" ]] && shift && continue
@@ -300,6 +302,75 @@ func_del_blank_lines() {
 func_del_blank_and_hash_lines() {
 	# can run with pipe or file
 	func_del_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' -- "$@"
+}
+
+func_file_remove_lines() {
+
+	# USE CASE: func_file_remove_lines fhr.lst <quick_code_file.txt>
+	# TODO: how to merge this with func_del_pattern_lines
+
+	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
+	local desc="Desc: remove patterns listed in file, useful when pattern list a very long" 
+	func_param_check 2 "$@"
+
+	# Var & Check
+	local PATTERN_SPLIT_COUNT pattern_file input_file result_file pattern_count pattern_file_md5 tmp_p_dir input_lines result_lines
+	PATTERN_SPLIT_COUNT="1000"
+	pattern_file="${1}"
+	input_file="${2}"
+	#local target_file="${2}.removed.$(func_dati)"
+	func_complain_path_not_exist "${input_file}" && return 1
+	func_complain_path_not_exist "${pattern_file}" && return 1
+
+	# Remove
+	result_file="$(mktemp -d)/$(basename "${input_file}").REMOVED" 
+	pattern_count="$(func_file_line_count "${pattern_file}")"
+	if (( pattern_count <= PATTERN_SPLIT_COUNT )) ; then 
+		echo "INFO: pattern lines NOT need split ( $pattern_count <= $PATTERN_SPLIT_COUNT )"
+		func_file_remove_lines_simple "${pattern_file}" "${input_file}" > "${result_file}"
+	else
+		echo "INFO: too much pattern lines, need split ( $pattern_count > $PATTERN_SPLIT_COUNT )"
+
+		# split patterns
+		pattern_file_md5="$(md5sum "${pattern_file}" | cut -d' ' -f1)"
+		tmp_p_dir="/tmp/func_file_remove_lines-patterns-${PATTERN_SPLIT_COUNT}-${pattern_file_md5}"
+		if [ ! -d "${tmp_p_dir}" ] ; then
+			mkdir -p "${tmp_p_dir}" 
+			split -d -l "${PATTERN_SPLIT_COUNT}" "${pattern_file}" "${tmp_p_dir}/${pattern_file##*/}" 
+			echo "INFO: splited pattern files in: ${tmp_p_dir}/"
+		else
+			echo "INFO: reuse splited pattern files in: ${tmp_p_dir}/"
+		fi
+
+		# use splited pattern files one by one
+		local tmp_out
+		local tmp_in="${input_file}" 
+		for f in "${tmp_p_dir}"/* ; do
+			[[ -e "$f" ]] || continue
+			tmp_out="${result_file}.${f##*/}" 
+			func_file_remove_lines_simple "${f}" "${tmp_in}" > "${tmp_out}"
+			tmp_in="${tmp_out}"
+		done
+		result_file="${tmp_out}"
+	fi
+
+	# Show result
+	input_lines="$(func_file_line_count "${input_file}")"
+	result_lines="$(func_file_line_count "${result_file}")"
+	echo "INFO: result/input lines: ${result_lines}/${input_lines}, result file: ${result_file}"
+
+	# Old solution: works, but bak is in same dir
+	#local sed_cmd="$(func_sed_gen_d_cmd "$@")"
+	#sed --in-place=".bak-of-sed-cmd.$(func_dati)" -e "${sed_cmd}" "${file}"
+}
+
+func_file_remove_lines_simple() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
+	local desc="Desc: remove patterns listed in file, and output to stdout" 
+	func_param_check 2 "$@"
+
+	# remove lines with grep -v, $2 could be regex patterns
+	grep -ivf "${1}" "${2}"
 }
 
 ################################################################################
@@ -428,74 +499,6 @@ func_mkdir_cd() {
 
 	# to avoid the path have blank, any simpler solution?
 	#func_mkdir "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir or cd into it ($1)"
-}
-
-func_file_remove_lines() {
-
-	# USE CASE: func_file_remove_lines fhr.lst <quick_code_file.txt>
-	# TODO: how to merge this with func_del_pattern_lines
-
-	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
-	local desc="Desc: remove patterns listed in file, useful when pattern list a very long" 
-	func_param_check 2 "$@"
-
-	# Var & Check
-	local PATTERN_SPLIT_COUNT="1000"
-	local pattern_file="${1}"
-	local input_file="${2}"
-	#local target_file="${2}.removed.$(func_dati)"
-	func_complain_path_not_exist "${input_file}" && return 1
-	func_complain_path_not_exist "${pattern_file}" && return 1
-
-	# Remove
-	local result_file="$(mktemp -d)/$(basename "${input_file}").REMOVED" 
-	local pattern_count="$(func_file_line_count "${pattern_file}")"
-	if (( pattern_count <= PATTERN_SPLIT_COUNT )) ; then 
-		echo "INFO: pattern lines NOT need split ( $pattern_count <= $PATTERN_SPLIT_COUNT )"
-		func_file_remove_lines_simple "${pattern_file}" "${input_file}" > "${result_file}"
-	else
-		echo "INFO: too much pattern lines, need split ( $pattern_count > $PATTERN_SPLIT_COUNT )"
-
-		# split patterns
-		local pattern_file_md5="$(md5sum "${pattern_file}" | cut -d' ' -f1)"
-		local tmp_p_dir="/tmp/func_file_remove_lines-patterns-${PATTERN_SPLIT_COUNT}-${pattern_file_md5}"
-		if [ ! -d "${tmp_p_dir}" ] ; then
-			mkdir -p "${tmp_p_dir}" 
-			split -d -l "${PATTERN_SPLIT_COUNT}" "${pattern_file}" "${tmp_p_dir}/${pattern_file##*/}" 
-			echo "INFO: splited pattern files in: ${tmp_p_dir}/"
-		else
-			echo "INFO: reuse splited pattern files in: ${tmp_p_dir}/"
-		fi
-
-		# use splited pattern files one by one
-		local tmp_out
-		local tmp_in="${input_file}" 
-		for f in "${tmp_p_dir}"/* ; do
-			[[ -e "$f" ]] || continue
-			tmp_out="${result_file}.${f##*/}" 
-			func_file_remove_lines_simple "${f}" "${tmp_in}" > "${tmp_out}"
-			tmp_in="${tmp_out}"
-		done
-		result_file="${tmp_out}"
-	fi
-
-	# Show result
-	local input_lines="$(func_file_line_count "${input_file}")"
-	local result_lines="$(func_file_line_count "${result_file}")"
-	echo "INFO: result/input lines: ${result_lines}/${input_lines}, result file: ${result_file}"
-
-	# Old solution: works, but bak is in same dir
-	#local sed_cmd="$(func_sed_gen_d_cmd "$@")"
-	#sed --in-place=".bak-of-sed-cmd.$(func_dati)" -e "${sed_cmd}" "${file}"
-}
-
-func_file_remove_lines_simple() {
-	local usage="Usage: ${FUNCNAME[0]} <pattern_file> <input_file>"
-	local desc="Desc: remove patterns listed in file, and output to stdout" 
-	func_param_check 2 "$@"
-
-	# remove lines with grep -v, $2 could be regex patterns
-	grep -ivf "${1}" "${2}"
 }
 
 func_file_line_count() {

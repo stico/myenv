@@ -2675,7 +2675,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 	local dup_count
 	dup_count="$(func_file_line_count "${list_dup_count}")"
 	if (( dup_count == 0 )) ; then
-		func_info "no dup files found, tmp dir: ${dup_base}"
+		func_info "no dup files found, check new md5 at: ${list_md5_new}"
 		return 0
 	fi
 
@@ -2691,7 +2691,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 		func_info "1) check new md5 at: ${list_md5_new}"
 		func_info "2) check detail at: ${list_dup_detail}"
 	else
-		func_info "NO dup files found"
+		func_info "NO dup files found, check new md5 at: ${list_md5_new}"
 	fi
 }
 
