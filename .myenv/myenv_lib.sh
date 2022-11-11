@@ -242,7 +242,7 @@ func_is_pid_running() {
 ################################################################################
 func_grepf() {
 	local usage="Usage: ${FUNCNAME[0]} [-param1] [-param2] ... [-paramN] [--] <pattern-file> [file]"
-	local desc="Desc: grep patterns in file" 
+	local desc="Desc: grep patterns in file, filter blank/comment lines before grep which makes more stable (blank lines seems match everything!)"
 	func_param_check 1 "$@"
 
 	# Parse params
@@ -265,9 +265,9 @@ func_grepf() {
 	# NOTE: run with pipe or file, do NOT quote $params. TODO: split pattern_file if too big?
 	# shellcheck disable=2086
 	if [[ -z "${1}" ]] ; then
-		grep ${params} -f <(func_del_blank_lines "${pattern_file}")
+		grep ${params} -f <(func_del_blank_and_hash_lines "${pattern_file}")
 	else
-		grep ${params} -f <(func_del_blank_lines "${pattern_file}") "$@"
+		grep ${params} -f <(func_del_blank_and_hash_lines "${pattern_file}") "$@"
 	fi
 }
 
@@ -340,6 +340,7 @@ func_shrink_blank_lines() {
 
 }
 
+# shellcheck disable=2119,2120
 func_shrink_dup_lines() {
 	local usage="Usage: ${FUNCNAME[0]} [pattern-file]"
 	local desc="Desc: shrink duplicated lines (and merge blank lines), without sorting" 
@@ -358,6 +359,7 @@ func_shrink_dup_lines() {
 	fi
 }
 
+# shellcheck disable=2119
 func_shrink_pattern_lines() {
 	# TODO: seems this case NOT work. expect line2 removed, but NOT
 	# line1: AAA..BBB
@@ -370,8 +372,8 @@ func_shrink_pattern_lines() {
 	#	step 2) ls -lhtr $TMPDIR/ ; (vi the latest file, find lines than matches 'match-line-found.*\/$', which could be deleted
 	local usage="Usage: ${FUNCNAME[0]} <pattern-file>"
 	local desc="Desc: shrink pattern lines (and merge blank lines), e.g. if lineA is sub string of lineB, lineB will be removed" 
-	local note="Note 1: NOT support pipe, seems not needed" 
-	local note="Note 2: useful for shrinking pattern file used in func_grepf()" 
+	desc="$desc \nNote 1: NOT support pipe, seems not needed" 
+	desc="$desc \nNote 2: useful for shrinking pattern file used in func_grepf()" 
 	func_param_check 1 "$@"
 	local input_file lines_to_del tmp_grep line
 

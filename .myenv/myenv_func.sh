@@ -2531,9 +2531,9 @@ func_dup_gather() {
 	func_complain_path_not_exist "${del_list}" && return 1
 	
 	# Process each file
-	local line tpath tfile log
-	local dup_dir="A_GATHER_DIR_$(func_dati)"
-	local log="${dup_dir}/A.log"
+	local line tpath tfile log dup_dir
+	dup_dir="A_GATHER_DIR_$(func_dati)"
+	log="${dup_dir}/A.log"
 	mkdir "${dup_dir}"
 	while IFS= read -r line || [[ -n "${line}" ]] ; do
 		# normal case: file inexist. 
@@ -2619,7 +2619,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 	# - 02: for skip_md5: select 1 line from each block
 	#	cat -s del_list.to_merge2 | awk 'BEGIN{p=0;}/^$/ {p=0;};/.+/ {if(p==0) {print $0;p=1;}}' 
 
-	local usage="USAGE: ${FUNCNAME[0]} <function_name> <path> <...>" 
+	local usage="USAGE: ${FUNCNAME[0]} <path> <path> <...>" 
 	local desc="Desc: find duplicated files in paths (use md5)" 
 
 	local DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
@@ -2705,6 +2705,25 @@ func_gen_filelist_with_size(){
 	echo "INFO: filelist at: ${out_path}"
 }
 
+func_file_count_of_dir(){
+	local usage="USAGE: ${FUNCNAME[0]} <path> <path>" 
+	local desc="Desc: count files in dir" 
+	
+	local p count
+
+	if [[ "$#" -eq 0 ]] ; then
+		count="$(find ./ -type f | wc -l)"
+		echo -e "${count}\t./"
+		return
+	fi
+
+	for p in "$@" ; do
+		[[ -f "${p}" ]] && continue
+		[[ -h "${p}" ]] && echo -e "0\t(link) ${p}" && continue
+		count="$(find "${p}" -type f | wc -l)"
+		echo -e "${count}\t${p}"
+	done
+}
 
 func_mydata_sync(){
 	# CONFIG - Common
