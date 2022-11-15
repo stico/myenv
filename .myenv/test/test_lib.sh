@@ -36,7 +36,7 @@ test_echo_start() {
 test_echo_end() {
 	return
 	# TODO
-	echo -e "\tI: time cost: ${1}"
+	#echo -e "\tI: time cost: ${1}"
 }
 
 test_echo_summary() {
@@ -59,6 +59,13 @@ test_verify_rcode_failure() {
 
 test_verify_str_equals() {  
 	[[ "${1}" == "${2}" ]] || test_echo_error "str NOT equal: '${1}' != '${2}' (expect)"
+}
+
+test_verify_str_not_contains() { 
+	local expect="${2}"
+	if echo "${1}" | grep -qF "${expect}" ; then
+		test_echo_error "Found str: '${expect}' (NOT expect) in: ${1}"
+	fi
 }
 
 test_verify_str_contains() { 

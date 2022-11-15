@@ -22,6 +22,11 @@ DBACKUP_EX_FILENAME=".db.exclude"
 DBACKUP_RESULT_STR="DBACKUP_RESULT:"
 DBACKUP_BASE_DCB="${HOME}/Documents/DCB/dbackup/latest"
 
+DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
+DUP_LIST_MD5="${DUP_CONFIG}/list_md5"
+DUP_SKIP_MD5="${DUP_CONFIG}/skip_md5"
+DUP_SKIP_PATH="${DUP_CONFIG}/skip_path"
+
 ################################################################################
 # Constants
 ################################################################################
@@ -1128,10 +1133,8 @@ func_unison_fs_lapmac_all() {
 
 	unison fs_lapmac_all
 
-	local answer
-	echo "Do you want to umount disk? [Y/n]"
-	read -r -e answer
-	echo "${answer}" | grep -q "[nN]" || sudo umount "${mount_path}"
+	func_ask_yes_or_no "Do you want to umount disk? [y/n]" || return
+	sudo umount "${mount_path}"
 }
 
 func_ssh_agent_init() {
@@ -2517,18 +2520,14 @@ func_dup_gather() {
 	local DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
 	local DUP_DEL_LIST="${DUP_CONFIG}/del_list"
 
-	# Pre-check
-	local del_list user_input
-	if [[ -z "${1}" ]] && [[ -e "${DUP_DEL_LIST}" ]] ; then
-		echo "INFO: default del_list: ${DUP_DEL_LIST}"
-		echo "WARN: NO del_list provided, use default list? (y/n)"
-		read -r -e user_input
-		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
-		del_list="${DUP_DEL_LIST}"
+	local del_list
+	if func_is_str_blank "${1}" ; then
+		func_ask_yes_or_no "WARN: NO param (del_list) provided, use default list (${DUP_DEL_LIST})? (y/n)" \
+		&& del_list="${DUP_DEL_LIST}"
 	else
 		del_list="${1}"
 	fi
-	func_complain_path_not_exist "${del_list}" && return 1
+	func_validate_path_exist "${del_list}"
 	
 	# Process each file
 	local line tpath tfile log dup_dir
@@ -2591,7 +2590,7 @@ func_dup_find_gen_md5_PRIVATE() {
 	[[ "${sname}" = ./* ]]             && sname="${sname#./}"
 	[[ "${sname}" = backup_rsync/* ]]  && sname="${sname#backup_rsync/}"
 	[[ "${sname}" = backup_unison/* ]] && sname="${sname#backup_unison/}"
-	md5_out="$(grep -F "${sname}" "${DUP_INFO_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
+	md5_out="$(grep -F "${sname}" "${DUP_LIST_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
 	if [[ -n "${md5_out}" ]] ; then
 		md5_out="${md5_out%% *} ${1}"
 	else
@@ -2615,6 +2614,7 @@ func_dup_gather_then_find() {
 	func_dup_find_CALL_GATHER_FIRST
 }
 
+# shellcheck disable=2120
 func_dup_find_CALL_GATHER_FIRST() {
 	# TOOL SCRIPT
 	# - 01: split result file by lines of dup
@@ -2625,11 +2625,6 @@ func_dup_find_CALL_GATHER_FIRST() {
 	local usage="USAGE: ${FUNCNAME[0]} <path> <path> <...>" 
 	local desc="Desc: find duplicated files in paths (use md5)" 
 
-	local DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
-	local DUP_INFO_MD5="${DUP_CONFIG}/info_md5"
-	local DUP_SKIP_MD5="${DUP_CONFIG}/skip_md5"
-	local DUP_SKIP_PATH="${DUP_CONFIG}/skip_path"
-
 	local dup_base="/tmp/dup_$(func_dati)"
 	local list_md5_all="${dup_base}/list_md5.txt"
 	local list_md5_new="${dup_base}/list_md5.new"
@@ -2639,11 +2634,8 @@ func_dup_find_CALL_GATHER_FIRST() {
 	#local dup_skip_path_patterns="${dup_base}/dup_skip_path_patterns"
 
 	# Pre-check
-	local user_input
-	if [[ ! -e "${DUP_SKIP_MD5}" ]] || [[ ! -e "${DUP_INFO_MD5}" ]] || [[ ! -e "${DUP_SKIP_PATH}" ]] ; then
-		echo "WARN: DUP CONFIG files NOT exist (WILL BE VERY SLOW), contiue (y/n)?"
-		read -r -e user_input
-		[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return
+	if [[ ! -e "${DUP_SKIP_MD5}" ]] || [[ ! -e "${DUP_LIST_MD5}" ]] || [[ ! -e "${DUP_SKIP_PATH}" ]] ; then
+		func_ask_yes_or_no "WARN: DUP CONFIG files NOT exist (WILL BE VERY SLOW), contiue (y/n)?" || return 1
 	fi
 
 	func_info "start to gen filelist at: ${dup_base}/"
@@ -2659,6 +2651,8 @@ func_dup_find_CALL_GATHER_FIRST() {
 			find "${p}" -type f >> "${fl_raw}"
 		done
 	fi
+
+	# TODO: use func_remove_lines
 	func_grepf -v "${DUP_SKIP_PATH}" "${fl_raw}" > "${fl_use}"
 
 	func_info "start to gen md5/file pair"
