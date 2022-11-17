@@ -2779,7 +2779,7 @@ func_mydata_sync_v2(){
 	bdta_path="${mnt_path}/bdta"		# 3.5" disk
 
 	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8"
-	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi"		# todo: zz dudu video
+	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
 
 	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}"
 	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" 
