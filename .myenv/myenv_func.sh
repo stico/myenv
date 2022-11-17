@@ -2780,12 +2780,19 @@ func_mydata_sync_v2(){
 
 	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8"
 	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi"		# todo: zz dudu video
+
+	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}"
+	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" 
 }
 
 func_mydata_bi_sync() {
 	func_param_check 3 "$@"
 
 	local path1 path2 sync_item
+	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
+		func_info "pair NOT exist, skip: ${1} <-> ${2}"
+		return
+	fi
 
 	# sync cares the last "/", should be the same
 	[[ "${1}" = */ ]] && path1="${1}" || path1="${1}/" 
@@ -2800,8 +2807,6 @@ func_mydata_bi_sync() {
 		func_rsync_ask_then_run "${path1}/${sync_item}/" "${path2}/${sync_item}/"
 		func_rsync_ask_then_run "${path2}/${sync_item}/" "${path1}/${sync_item}/"
 	done
-
-	[ "${1}" == "-nofl" ] || func_mydata_gen_fl_and_upload_v2
 }
 
 func_mydata_sync(){
@@ -2838,35 +2843,33 @@ func_mydata_sync(){
 }
 
 func_mydata_gen_fl_and_upload_v2(){
-	local fl_dir fl
-	for d in "${btca_path}" "${bdta_path}" ; do
+	local base fl_dir fl
 
-		func_complain_path_not_exist "${d}" "skip ${d}, since not mount" && continue
-		echo "INFO: start to gen filelist for: ${d}"
+	func_info "start to gen filelist for: ${base}"
+	func_complain_path_not_exist "${base}" && return
 
-		# prepare dir
-		fl_dir="${d}/alone/fl_record"
-		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
+	# prepare dir
+	fl_dir="${base}/alone/fl_record"
+	[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
 
-		# gen file
-		fl="/tmp/fl_$(basename "${d}")_$(func_dati).txt"
-		func_gen_filelist_with_size "${d}" "${fl}"
+	# gen file
+	fl="/tmp/fl_$(basename "${base}")_$(func_dati).txt"
+	func_gen_filelist_with_size "${base}" "${fl}"
 
-		# remove useless lines
-		sed -i -e "
-			/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
-			/\/FCS\//d;
-			/\/DCD\/mail\//d;
-			/\/DCM-to-\//d;
-			/\/DCM\/Inbox\//d;
-			/\/DCM_[-0-9_]*\//d;
-			/\/DCC\/coding\/leetcode\//d;
-			" "${fl}"
+	# remove useless lines
+	sed -i -e "
+		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
+		/\/FCS\//d;
+		/\/DCD\/mail\//d;
+		/\/DCM-to-\//d;
+		/\/DCM\/Inbox\//d;
+		/\/DCM_[-0-9_]*\//d;
+		/\/DCC\/coding\/leetcode\//d;
+		" "${fl}"
 
-		# mv to disk and upload
-		func_scp_to_awsvm "${fl}"
-		mv "${fl}" "${fl_dir}" 
-	done
+	# mv to disk and upload
+	func_scp_to_awsvm "${fl}"
+	mv "${fl}" "${fl_dir}" 
 }
 
 func_mydata_gen_fl_and_upload(){
