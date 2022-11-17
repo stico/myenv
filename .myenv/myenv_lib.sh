@@ -870,14 +870,14 @@ func_rsync_ask_then_run() {
 	local tmp_file_1
 	tmp_file_1="$(mktemp)"
 	
-	func_rsync_simple --stats --dry-run --delete "$@" | tee -a "${tmp_file_1}" | func_rsync_out_filter_dry_run
+	func_rsync_simple "$@" --stats --dry-run --delete | tee -a "${tmp_file_1}" | func_rsync_out_filter_dry_run
 	echo "INFO: see detail info at: ${tmp_file_1}"
 
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
 	if [[ "$*" = *--delete* ]] ; then
 		func_rsync_simple "$@"
 	else
-		func_rsync_simple --delete "$@"
+		func_rsync_simple "$@" --delete
 	fi
 }
 
@@ -887,15 +887,15 @@ func_rsync_simple() {
 	local desc="Desc: rsync between source and target" 
 	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local src tgt opts opts_default
+	local src tgt opts_default
 	src="${1}"
 	tgt="${2}"
-	opts="${3}"
+	shift; shift;
 	func_validate_path_exist "${src}" "${tgt}"
 	func_str_contains "--dry-run" && opts_default="-av" || opts_default="-avP"
 
-	func_techo DEBUG "run cmd: rsync ${opts_default} ${opts} ${src} ${tgt} 2>&1"
-	rsync ${opts_default} ${opts} "${src}" "${tgt}" 2>&1
+	func_techo DEBUG "run cmd: rsync ${opts_default} $* ${src} ${tgt} 2>&1"
+	rsync ${opts_default} "$@" "${src}" "${tgt}" 2>&1
 }
 
 func_rsync_del_detect() {
