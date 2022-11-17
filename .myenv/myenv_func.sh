@@ -2785,15 +2785,14 @@ func_mydata_sync_v2(){
 func_mydata_bi_sync() {
 	func_param_check 3 "$@"
 
-	local path1 path2 sync_list sync_item
+	local path1 path2 sync_item
 
 	# sync cares the last "/", should be the same
 	[[ "${1}" = */ ]] && path1="${1}" || path1="${1}/" 
 	[[ "${2}" = */ ]] && path2="${2}" || path2="${2}/" 
-	sync_list="${3}"
-	func_validate_path_exist "${path1}" "${path2}"
+	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
 	
-	for sync_item in ${sync_list} ; do 
+	for sync_item in ${3} ; do 
 		func_complain_path_not_exist "${path1}/${sync_item}/" && continue
 		func_complain_path_not_exist "${path2}/${sync_item}/" && continue
 
