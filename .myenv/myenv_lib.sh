@@ -502,6 +502,7 @@ func_mkdir() {
 	local desc="Desc: (fail fast) create dirs if NOT exist, exit whole process if fail"
 	func_param_check 1 "$@"
 	
+	local p
 	for p in "$@" ; do
 		[ -e "${p}" ] && continue
 		mkdir -p "${p}" || func_die "ERROR: failed to create dir ${p}"
@@ -602,6 +603,7 @@ func_validate_dir_not_empty() {
 	local desc="Desc: the directory must exist and NOT empty, otherwise will exit" 
 	func_param_check 1 "$@"
 	
+	local p
 	for p in "$@" ; do
 		# only redirect stderr, otherwise the test will always false
 		func_is_dir_empty "${p}" && func_die "ERROR: ${p} is empty!"
@@ -613,6 +615,7 @@ func_validate_dir_empty() {
 	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
 	func_param_check 1 "$@"
 	
+	local p
 	for p in "$@" ; do
 		# only redirect stderr, otherwise the test will always false
 		func_is_dir_empty "${p}" || func_die "ERROR: ${p} not empty!"
@@ -643,6 +646,7 @@ func_validate_path_exist() {
 	local desc="Desc: the path must be exist, otherwise will exit" 
 	func_param_check 1 "$@"
 	
+	local p
 	for p in "$@" ; do
 		[ ! -e "${p}" ] && func_die "ERROR: ${p} NOT exist!"
 	done
@@ -654,6 +658,7 @@ func_validate_path_inexist() {
 	local desc="Desc: the path must be NOT exist, otherwise will exit" 
 	func_param_check 1 "$@"
 	
+	local p
 	for p in "$@" ; do
 		[ -e "${p}" ] && func_die "ERROR: ${p} already exist!"
 	done
@@ -856,19 +861,41 @@ func_uncompress() {
 	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
 }
 
-func_rsync_v1() {
+# shellcheck disable=2086
+func_rsync_ask_then_run() {
+	local usage="Usage: ${FUNCNAME[0]} <src> <tgt> <add_options>" 
+	local desc="Desc: rsync between source and target (including --delete), ask before run: --dry-run > show result > run" 
+	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	local tmp_file_1
+	tmp_file_1="$(mktemp)"
+	
+	func_rsync_simple --stats --dry-run --delete "$@" | tee -a "${tmp_file_1}" | func_rsync_out_filter_dry_run
+	echo "INFO: see detail info at: ${tmp_file_1}"
+
+	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
+	if [[ "$*" = *--delete* ]] ; then
+		func_rsync_simple "$@"
+	else
+		func_rsync_simple --delete "$@"
+	fi
+}
+
+# shellcheck disable=2086
+func_rsync_simple() {
 	local usage="Usage: ${FUNCNAME[0]} <src> <tgt> <add_options>" 
 	local desc="Desc: rsync between source and target" 
 	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local src="${1}"
-	local tgt="${2}"
-	local opts="${3}"
-	func_complain_path_not_exist "${src}" && return 1
-	func_complain_path_not_exist "${tgt}" && return 1
+	local src tgt opts opts_default
+	src="${1}"
+	tgt="${2}"
+	opts="${3}"
+	func_validate_path_exist "${src}" "${tgt}"
+	func_str_contains "--dry-run" && opts_default="-av" || opts_default="-avP"
 
-	func_techo DEBUG "run cmd: rsync -avP ${opts} ${src} ${tgt} 2>&1"
-	rsync -avP ${opts} "${src}" "${tgt}" 2>&1
+	func_techo DEBUG "run cmd: rsync ${opts_default} ${opts} ${src} ${tgt} 2>&1"
+	rsync ${opts_default} ${opts} "${src}" "${tgt}" 2>&1
 }
 
 func_rsync_del_detect() {
@@ -881,6 +908,30 @@ func_rsync_del_detect() {
 		| grep '^deleting '			\
 		| sed -e 's+/[^/]*$+/+'			\
 		| sort -u
+}
+
+func_rsync_out_filter_dry_run() {
+	awk '	/\/$/ { next ;}				# remove dirs in output, which not really will change
+		/^File list / { next; }
+		/^Total bytes / { next; }
+		/^Literal data:/ { next; }
+		/^Matched data:/ { next; }
+		/^Number of files:/ { next; }
+		/^Total file size:/ { next; }
+		/^Total transferred file/ { next; }
+		/^sending incremental file/ { next; }
+
+		/^deleting / { print $0; next; }	# perserve all delete lines
+		/\// {
+			sub("[^/]*$", "", $0); 		# remove leaf files to reduce lines
+			print "updating " $0;
+			next;
+		}
+
+		{ print $0; }				# for other lines, just print out
+	'						\
+	| head --lines=-3				\
+	| func_shrink_dup_lines 
 }
 
 func_rsync_out_filter() {
@@ -997,6 +1048,7 @@ func_validate_cmd_exist() {
 	local desc="Desc: the cmd must be exist, otherwise will exit" 
 	func_param_check 1 "$@"
 
+	local p
 	for p in "$@" ; do
 		func_is_cmd_exist "${p}" || func_die "ERROR: cmd (${p}) NOT exist!"
 	done
@@ -1407,15 +1459,15 @@ func_find_idle_port() {
 	
 	local tmp_port port_end
 	local port_start="${1}"
-	[ -n "${2}" ] && port_end="${2}" || port_end="$((${port_start}+20))"
+	[ -n "${2}" ] && port_end="${2}" || port_end="$(( port_start + 20))"
 
 	func_is_int_in_range "${port_end}" 1025 65535 || func_die "ERROR: port_end (${port_end}) not in range 1025~65535!)"
 	func_is_int_in_range "${port_start}" 1025 65535 || func_die "ERROR: port_start (${port_start}) not in range 1025~65535!)"
 
-	for tmp_port in $(seq ${port_start} ${port_end}) ; do
+	for tmp_port in $(seq "${port_start}" "${port_end}") ; do
 		# support linux & osx: netstat on linux/osx use ":/." for port separator
 		netstat -an | head | awk '{print gensub(/.*[\.:]/, "", "g", $4)}' | grep -q "${tmp_port}" && continue
-		echo ${tmp_port} && return 0
+		echo "${tmp_port}" && return 0
 	done
 	return 1
 }

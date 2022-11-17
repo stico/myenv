@@ -2651,9 +2651,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 			find "${p}" -type f >> "${fl_raw}"
 		done
 	fi
-
-	# TODO: use func_remove_lines
-	func_grepf -v "${DUP_SKIP_PATH}" "${fl_raw}" > "${fl_use}"
+	func_del_pattern_lines_f "${DUP_SKIP_PATH}" "${fl_raw}" > "${fl_use}"
 
 	func_info "start to gen md5/file pair"
 	while IFS= read -r line || [[ -n "${line}" ]] ; do
@@ -2687,6 +2685,47 @@ func_dup_find_CALL_GATHER_FIRST() {
 	else
 		func_info "NO dup files found, check new md5 at: ${list_md5_new}"
 	fi
+}
+
+func_dup_shrink_md5_list() {
+	local hn
+	hn="$(hostname)"
+	if [[ "${hn}" = lapmac* ]] ; then
+		func_dup_shrink_md5_list_lapmac
+		return
+	fi
+
+	if [[ "${hn}" = laptp* ]] ; then
+		# TODO: 
+		#	for bdta
+		#	for btca
+		echo "WARN: NOT impl yet"
+		return
+	fi
+}
+
+func_dup_shrink_md5_list_lapmac() {
+	func_validate_path_exist "${MY_DCB}" "${MY_DCC}" "${MY_DCD}" "${MY_DCM}" "${MY_DCO}" "${MY_FCS}" "${MY_FCZ}"
+
+	local p todel sed_param
+	new="${DUP_LIST_MD5}.new"
+	todel="${DUP_LIST_MD5}.to.delete" 
+	sed_param='s+ \./+ +;s/^[^ ]* \+//;s+backup_rsync/++;s+backup_unison/++;'
+			     
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
+		p="${MY_DOC}/${line}" 
+		[[ -e "${p}" ]] || echo "${line}" >> "${todel}" 
+	done < <(func_del_blank_and_hash_lines "${DUP_LIST_MD5}" | sed -e "${sed_param}")
+
+	# remove skip files and remove inexist files
+	func_del_pattern_lines_f "${DUP_SKIP_PATH}" "${DUP_LIST_MD5}" \
+	| func_del_pattern_lines_f <(sed -e "${sed_param}" "${DUP_SKIP_MD5}" ) \
+	| func_del_pattern_lines_f -F "${todel}" > "${new}" 
+
+	echo "INFO: run this if want to use result, run command below:" 
+	echo "    # ddelete ${DUP_LIST_MD5} ${todel}; mv ${new} ${DUP_LIST_MD5};"
+	wc -l "${DUP_LIST_MD5}"
+	wc -l "${new}"
 }
 
 func_gen_filelist_with_size(){
@@ -2727,6 +2766,45 @@ func_file_count_of_dir(){
 	done
 }
 
+func_mydata_sync_v2(){
+
+	# TODO: merge func_mydata_sync_doc()
+
+	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path
+	[ "${HOSTNAME}" == "laptp" ] && mnt_path="/media/ouyzhu"
+	[ "${HOSTNAME}" == "lapmac2" ] && mnt_path="/Volumes"
+	tcz_path="/tmp/tcz"
+	dtz_path="${mnt_path}/DTZ"
+	btca_path="/tmp/btca"			# 3.5" disk
+	bdta_path="${mnt_path}/bdta"		# 3.5" disk
+
+	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8"
+	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi"		# todo: zz dudu video
+}
+
+func_mydata_bi_sync() {
+	func_param_check 3 "$@"
+
+	local path1 path2 sync_list sync_item
+
+	# sync cares the last "/", should be the same
+	[[ "${1}" = */ ]] && path1="${1}" || path1="${1}/" 
+	[[ "${2}" = */ ]] && path2="${2}" || path2="${2}/" 
+	sync_list="${3}"
+	func_validate_path_exist "${path1}" "${path2}"
+	
+	for sync_item in ${sync_list} ; do 
+		func_complain_path_not_exist "${path1}/${sync_item}/" && continue
+		func_complain_path_not_exist "${path2}/${sync_item}/" && continue
+
+		func_info "start to sync between: ${path1}/${sync_item}/ <-> ${path2}/${sync_item}/"
+		func_rsync_ask_then_run "${path1}/${sync_item}/" "${path2}/${sync_item}/"
+		func_rsync_ask_then_run "${path2}/${sync_item}/" "${path1}/${sync_item}/"
+	done
+
+	[ "${1}" == "-nofl" ] || func_mydata_gen_fl_and_upload_v2
+}
+
 func_mydata_sync(){
 	# CONFIG - Common
 	local TCA_BASE="/tmp/tca"
@@ -2760,12 +2838,46 @@ func_mydata_sync(){
 	fi
 }
 
+func_mydata_gen_fl_and_upload_v2(){
+	local fl_dir fl
+	for d in "${btca_path}" "${bdta_path}" ; do
+
+		func_complain_path_not_exist "${d}" "skip ${d}, since not mount" && continue
+		echo "INFO: start to gen filelist for: ${d}"
+
+		# prepare dir
+		fl_dir="${d}/alone/fl_record"
+		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
+
+		# gen file
+		fl="/tmp/fl_$(basename "${d}")_$(func_dati).txt"
+		func_gen_filelist_with_size "${d}" "${fl}"
+
+		# remove useless lines
+		sed -i -e "
+			/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
+			/\/FCS\//d;
+			/\/DCD\/mail\//d;
+			/\/DCM-to-\//d;
+			/\/DCM\/Inbox\//d;
+			/\/DCM_[-0-9_]*\//d;
+			/\/DCC\/coding\/leetcode\//d;
+			" "${fl}"
+
+		# mv to disk and upload
+		func_scp_to_awsvm "${fl}"
+		mv "${fl}" "${fl_dir}" 
+	done
+}
+
 func_mydata_gen_fl_and_upload(){
+
+	# TODO: delete this and use func_mydata_gen_fl_and_upload_v2
 	local fl_dir
 	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
 
 		# check existence
-		! df | grep -q "${d}" && func_techo info "skip ${d}, since not mount" && continue
+		! df | grep -q "${d}" && func_info "skip ${d}, since not mount" && continue
 
 		# prepare dir
 		fl_dir="${d}/alone/fl_record"
@@ -2786,9 +2898,6 @@ func_mydata_gen_fl_and_upload(){
 			/\/DCC\/zz_deprecated\//d;
 			/\/DCC\/coding\/leetcode\//d;
 			/\/DCD\/mail\//d;
-			/\/DCD\/zdep\/s1.yy.com\//d;
-			/\/DCD\/hp-proxy\/backup\//d;
-			/\/DCD\/zdep\/payplf\/doc\/Doc_3PP_易宝（Yeepay）\//d;
 			" "${fl}"
 
 			# more 
@@ -2851,7 +2960,7 @@ func_mydata_sync_doc() {
 }
 
 func_mydata_sync_doc_unison() {
-	[ ! -e "${HOME}/.unison" ] && func_techo info "${HOME}/.unison NOT exist, skip sync Documents" && return 0
+	[ ! -e "${HOME}/.unison" ] && func_info "${HOME}/.unison NOT exist, skip sync Documents" && return 0
 
 	unison fs_lapmac2_all
 }
@@ -2867,7 +2976,7 @@ func_mydata_sync_doc_rsync() {
 		#local opts="--dry-run --exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
 
 		func_techo INFO       "rsync: ${DOC_SRC_BASE}/${d} -> ${target}"
-		func_rsync_v1                "${DOC_SRC_BASE}/${d}"  "${target}" "${opts}"
+		func_rsync_simple            "${DOC_SRC_BASE}/${d}"  "${target}" "${opts}"
 		func_mydata_rsync_del_detect "${DOC_SRC_BASE}/${d}"  "${target}" 
 
 		# NOTE: compare size is NOT good, since ignored some file in rsync
@@ -2887,7 +2996,7 @@ func_mydata_rsync_with_list() {
 		func_complain_path_not_exist "${tgt_base}/${d}/" && return 1
 
 		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${tgt_base}/${d}/"
-		func_rsync_v1                "${src_base}/${d}/"  "${tgt_base}/${d}/"
+		func_rsync_simple            "${src_base}/${d}/"  "${tgt_base}/${d}/"
 		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${tgt_base}/${d}/" 
 	done
 }
