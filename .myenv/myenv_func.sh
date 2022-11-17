@@ -2787,25 +2787,25 @@ func_mydata_sync_v2(){
 
 func_mydata_bi_sync() {
 	func_param_check 3 "$@"
+	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
 
-	local path1 path2 sync_item
+	local sync_item a b
 	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
 		func_info "pair NOT exist, skip: ${1} <-> ${2}"
 		return
 	fi
-
-	# sync cares the last "/", should be the same
-	[[ "${1}" = */ ]] && path1="${1}" || path1="${1}/" 
-	[[ "${2}" = */ ]] && path2="${2}" || path2="${2}/" 
-	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
 	
 	for sync_item in ${3} ; do 
-		func_complain_path_not_exist "${path1}/${sync_item}/" && continue
-		func_complain_path_not_exist "${path2}/${sync_item}/" && continue
+		# sync cares the last "/", should be the same
+		[[ "${1}/${sync_item}" = */ ]] && a="${1}/${sync_item}" || a="${1}/${sync_item}/" 
+		[[ "${2}/${sync_item}" = */ ]] && b="${2}/${sync_item}" || b="${2}/${sync_item}/" 
 
-		func_info "start to sync between: ${path1}/${sync_item}/ <-> ${path2}/${sync_item}/"
-		func_rsync_ask_then_run "${path1}/${sync_item}/" "${path2}/${sync_item}/"
-		func_rsync_ask_then_run "${path2}/${sync_item}/" "${path1}/${sync_item}/"
+		func_complain_path_not_exist "${a}" && continue
+		func_complain_path_not_exist "${b}" && continue
+
+		func_info "start to sync between: ${a} <-> ${b}"
+		func_rsync_ask_then_run "${a}" "${b}"
+		func_rsync_ask_then_run "${b}" "${a}"
 	done
 }
 
