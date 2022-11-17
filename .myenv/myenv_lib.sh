@@ -892,7 +892,7 @@ func_rsync_simple() {
 	tgt="${2}"
 	shift; shift;
 	func_validate_path_exist "${src}" "${tgt}"
-	func_str_contains "--dry-run" && opts_default="-av" || opts_default="-avP"
+	func_str_contains "$*" "--dry-run" && opts_default="-av" || opts_default="-avP"
 
 	func_techo DEBUG "run cmd: rsync ${opts_default} $* ${src} ${tgt} 2>&1"
 	rsync ${opts_default} "$@" "${src}" "${tgt}" 2>&1
