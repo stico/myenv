@@ -2805,8 +2805,10 @@ func_mydata_dcm_hist_sync() {
 	tgt="${2}"
 	for dcm_part_path in "${src}"/DCM_* ; do
 		dcm_part_name="$(basename "${dcm_part_path}")"
-		func_info "DCM-RSYNC: ${src}/${dcm_part_name} <-> ${tgt}/${dcm_part_name}"
-		func_rsync_ask_then_run "${src}/${dcm_part_name}" "${tgt}/${dcm_part_name}" | sed -e 's/^/\t/;'
+
+		# sync cares the last "/", should be the same, better ending with "/"
+		func_info "DCM-RSYNC: ${src}/${dcm_part_name}/ --> ${tgt}/${dcm_part_name}/"
+		func_rsync_ask_then_run "${src}/${dcm_part_name}/" "${tgt}/${dcm_part_name}/" | sed -e 's/^/\t/;'
 	done
 }
 
@@ -2821,7 +2823,7 @@ func_mydata_bi_sync() {
 	fi
 	
 	for sync_item in ${3} ; do 
-		# sync cares the last "/", should be the same
+		# sync cares the last "/", should be the same, better ending with "/"
 		[[ "${1}/${sync_item}" = */ ]] && a="${1}/${sync_item}" || a="${1}/${sync_item}/" 
 		[[ "${2}/${sync_item}" = */ ]] && b="${2}/${sync_item}" || b="${2}/${sync_item}/" 
 
