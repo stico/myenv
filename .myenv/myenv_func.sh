@@ -2791,7 +2791,7 @@ func_mydata_sync_v2(){
 	fi
 
 	# only bdta need sync DCM_xxx
-	dcm_hist_base="${btca_path}/backup_rsync"
+	dcm_hist_base="${bdta_path}/backup_rsync"
 	if [[ -d "${dcm_hist_base}" ]] ; then
 		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison"
 		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync"
