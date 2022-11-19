@@ -2800,12 +2800,13 @@ func_mydata_sync_v2(){
 }
 
 func_mydata_dcm_hist_sync() {
-	local src tgt dcm_part
+	local src tgt dcm_part_path dcm_part_name
 	src="${1}"
 	tgt="${2}"
-	for dcm_part in "${src}"/DCM_* ; do
-		func_info "DCM-RSYNC: ${src}/${dcm_part} <-> ${tgt}/${dcm_part}"
-		func_rsync_ask_then_run "${src}/${dcm_part}" "${tgt}/${dcm_part}" | sed -e 's/^/\t/;'
+	for dcm_part_path in "${src}"/DCM_* ; do
+		dcm_part_name="$(basename "${dcm_part_path}")"
+		func_info "DCM-RSYNC: ${src}/${dcm_part_name} <-> ${tgt}/${dcm_part_name}"
+		func_rsync_ask_then_run "${src}/${dcm_part_name}" "${tgt}/${dcm_part_name}" | sed -e 's/^/\t/;'
 	done
 }
 
