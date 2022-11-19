@@ -2779,9 +2779,6 @@ func_mydata_sync_v2(){
 	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
 	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
 
-	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}"
-	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" 
-
 	# only lapmac2 need sync doc
 	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
 		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_sync_doc_unison 
@@ -2791,25 +2788,20 @@ func_mydata_sync_v2(){
 	fi
 
 	# only bdta need sync DCM_xxx
-	dcm_hist_base="${bdta_path}/backup_rsync"
+	dcm_hist_base="${bdta_path}/backup_rsync/DCM_HIST/"
 	if [[ -d "${dcm_hist_base}" ]] ; then
-		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison"
-		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync"
-		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync"
+		[[ -d "${dtz_path}/backup_unison/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison/DCM_HIST/"
+		[[ -d "${tcz_path}/backup_rsync/DCM_HIST/"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync/DCM_HIST/"
+		[[ -d "${btca_path}/backup_rsync/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync/DCM_HIST/"
 	fi
+
+	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}"
+	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" 
 }
 
 func_mydata_dcm_hist_sync() {
-	local src tgt dcm_part_path dcm_part_name
-	src="${1}"
-	tgt="${2}"
-	for dcm_part_path in "${src}"/DCM_* ; do
-		dcm_part_name="$(basename "${dcm_part_path}")"
-
-		# sync cares the last "/", should be the same, better ending with "/"
-		func_info "DCM-RSYNC: ${src}/${dcm_part_name}/ --> ${tgt}/${dcm_part_name}/"
-		func_rsync_ask_then_run "${src}/${dcm_part_name}/" "${tgt}/${dcm_part_name}/" | sed -e 's/^/\t/;'
-	done
+	func_info "DCM_HIST RSYNC: ${1} --> ${2}"
+	func_rsync_ask_then_run "${1}" "${2}" | sed -e 's/^/\t/;'
 }
 
 func_mydata_bi_sync() {
