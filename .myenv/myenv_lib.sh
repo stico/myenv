@@ -55,8 +55,8 @@ func_ask_yes_or_no() {
 	while 'true'; do
 		echo "${msg}" 1>&2
 		read -r -e user_input
-		{ [[ "${user_input}" = "y" ]] || [[ "${user_input}" = "Y" ]] ; } && return 1
-		{ [[ "${user_input}" = "n" ]] || [[ "${user_input}" = "N" ]] ; } && return 0
+		{ [[ "${user_input}" = "y" ]] || [[ "${user_input}" = "Y" ]] ; } && return 0
+		{ [[ "${user_input}" = "n" ]] || [[ "${user_input}" = "N" ]] ; } && return 1
 	done
 }
 
@@ -870,11 +870,20 @@ func_rsync_ask_then_run() {
 	local desc="Desc: rsync between source and target (including --delete), ask before run: --dry-run > show result > run" 
 	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local tmp_file_1 opt_del
+	local tmp_file_1 opt_del rsync_stat_str_1 rsync_stat_str_2 rsync_stat_str_3
 	tmp_file_1="$(mktemp)"
 	
 	func_rsync_simple "$@" --stats --dry-run --delete | tee -a "${tmp_file_1}" | func_rsync_out_filter_dry_run
 	echo "INFO: DETAIL LOG: ${tmp_file_1}"
+
+	# depends on options: --stats
+	rsync_stat_str_1='Number of created files: 0$'
+	rsync_stat_str_2='Number of deleted files: 0$'
+	rsync_stat_str_3='Number of regular files transferred: 0$'
+	if grep -q "${rsync_stat_str_1}" "${tmp_file_1}" &&  grep -q "${rsync_stat_str_2}" "${tmp_file_1}" &&  grep -q "${rsync_stat_str_3}" "${tmp_file_1}" ; then
+		echo "INFO: nothing need to update"
+		return 0
+	fi
 
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
 	[[ "$*" = *--delete* ]] || opt_del="--delete"
@@ -887,15 +896,14 @@ func_rsync_simple() {
 	local desc="Desc: rsync between source and target" 
 	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local src tgt opts_default
+	local src tgt
 	src="${1}"
 	tgt="${2}"
 	shift; shift;
 	func_validate_path_exist "${src}" "${tgt}"
-	func_str_contains "$*" "--dry-run" && opts_default="-av" || opts_default="-avP"
 
-	func_info "CMD: rsync ${opts_default} $* ${src} ${tgt} 2>&1"
-	rsync ${opts_default} "$@" "${src}" "${tgt}" 2>&1
+	func_info "CMD: rsync -avP $* ${src} ${tgt} 2>&1"
+	rsync -avP "$@" "${src}" "${tgt}" 2>&1
 }
 
 func_rsync_del_detect() {
