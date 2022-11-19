@@ -2768,9 +2768,7 @@ func_file_count_of_dir(){
 
 func_mydata_sync_v2(){
 
-	# TODO: merge func_mydata_sync_doc()
-
-	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path
+	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
 	[[ "${HOSTNAME}" == "laptp" ]] && mnt_path="/media/ouyzhu"
 	[[ "${HOSTNAME}" == "lapmac2" ]] && mnt_path="/Volumes"
 	tcz_path="/tmp/tcz"
@@ -2791,6 +2789,24 @@ func_mydata_sync_v2(){
 		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
 		[[ -d "${bdta_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
 	fi
+
+	# only bdta need sync DCM_xxx
+	dcm_hist_base="${btca_path}/backup_rsync"
+	if [[ -d "${dcm_hist_base}" ]] ; then
+		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison"
+		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync"
+		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync"
+	fi
+}
+
+func_mydata_dcm_hist_sync() {
+	local src tgt dcm_part
+	src="${1}"
+	tgt="${2}"
+	for dcm_part in "${src}"/DCM_* ; do
+		func_info "DCM-RSYNC: ${src}/${dcm_part} <-> ${tgt}/${dcm_part}"
+		func_rsync_ask_then_run "${src}/${dcm_part}" "${tgt}/${dcm_part}" | sed -e 's/^/\t/;'
+	done
 }
 
 func_mydata_bi_sync() {
@@ -2811,7 +2827,7 @@ func_mydata_bi_sync() {
 		func_complain_path_not_exist "${a}" && continue
 		func_complain_path_not_exist "${b}" && continue
 
-		func_info "RSYNC: ${a} <-> ${b}"
+		func_info "BI-RSYNC: ${a} <-> ${b}"
 		func_rsync_ask_then_run "${a}" "${b}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
 		func_rsync_ask_then_run "${b}" "${a}" | sed -e 's/^/\t/;'
 	done
@@ -2852,14 +2868,17 @@ func_mydata_sync_doc_unison() {
 func_mydata_sync_doc_rsync() {
 	func_complain_path_not_exist "${1}" && return 1
 
-	local d target doc_sync_list opts
-	target="${1}"
-	doc_sync_list="DCB DCC DCD DCM DCO DCZ FCS FCZ"
+	local d target opts doc_ex_base
+	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
+	func_validate_path_exist "${doc_ex_base}"
 	
-	for d in ${doc_sync_list} ; do
+	target="${1}"
+	for d in DCB DCC DCD DCM DCO DCZ FCS FCZ ; do
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
-		opts="--exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
-		func_rsync_ask_then_run "${MY_DOC}/${d}"  "${target}" "${opts}"
+		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
+
+		func_info "DOC-RSYNC: ${MY_DOC}/${d} <-> ${target}/${d}"
+		func_rsync_ask_then_run "${MY_DOC}/${d}" "${target}/${d}" "${opts}"
 	done
 }
 
