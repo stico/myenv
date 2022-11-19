@@ -873,10 +873,10 @@ func_rsync_ask_then_run() {
 	local tmp_file_1 opt_del rsync_stat_str_1 rsync_stat_str_2 rsync_stat_str_3
 	tmp_file_1="$(mktemp)"
 	
-	func_rsync_simple "$@" --stats --dry-run --delete | tee -a "${tmp_file_1}" | func_rsync_out_filter_dry_run
+	func_rsync_simple "$@" --stats --dry-run --delete > "${tmp_file_1}"
 	echo "INFO: DETAIL LOG: ${tmp_file_1}"
 
-	# depends on options: --stats
+	# check if need ask, depends on options: --stats
 	rsync_stat_str_1='Number of created files: 0$'
 	rsync_stat_str_2='Number of deleted files: 0$'
 	rsync_stat_str_3='Number of regular files transferred: 0$'
@@ -885,6 +885,8 @@ func_rsync_ask_then_run() {
 		return 0
 	fi
 
+	# show brief and ask
+	func_rsync_out_filter_dry_run < "${tmp_file_1}" 
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
 	[[ "$*" = *--delete* ]] || opt_del="--delete"
 	func_rsync_simple "$@" ${opt_del}
