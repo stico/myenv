@@ -51,11 +51,13 @@ func_ask_yes_or_no() {
 
 	local msg user_input
 	[[ "${1}" = *y/n* ]] && msg="${1}" || msg="${1}, pls answer y/n?" 
-	echo "${msg}" 1>&2
 
-	read -r -e user_input
-	[[ "${user_input}" != "y" ]] && [[ "${user_input}" != "Y" ]] && return 1
-	return 0
+	while 'true'; do
+		echo "${msg}" 1>&2
+		read -r -e user_input
+		{ [[ "${user_input}" = "y" ]] || [[ "${user_input}" = "Y" ]] ; } && return 1
+		{ [[ "${user_input}" = "n" ]] || [[ "${user_input}" = "N" ]] ; } && return 0
+	done
 }
 
 func_param_check() {
