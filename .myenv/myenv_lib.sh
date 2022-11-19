@@ -637,6 +637,7 @@ func_complain_path_not_exist() {
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
+	func_is_str_blank "${1}" && echo "ERROR: ${FUNCNAME[0]}: parameter is blank!" 1>&2 && return 0
 	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist}" 1>&2 && return 0
 	return 1
 }
@@ -867,18 +868,15 @@ func_rsync_ask_then_run() {
 	local desc="Desc: rsync between source and target (including --delete), ask before run: --dry-run > show result > run" 
 	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local tmp_file_1
+	local tmp_file_1 opt_del
 	tmp_file_1="$(mktemp)"
 	
 	func_rsync_simple "$@" --stats --dry-run --delete | tee -a "${tmp_file_1}" | func_rsync_out_filter_dry_run
-	echo "INFO: see detail info at: ${tmp_file_1}"
+	echo "INFO: DETAIL LOG: ${tmp_file_1}"
 
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
-	if [[ "$*" = *--delete* ]] ; then
-		func_rsync_simple "$@"
-	else
-		func_rsync_simple "$@" --delete
-	fi
+	[[ "$*" = *--delete* ]] || opt_del="--delete"
+	func_rsync_simple "$@" ${opt_del}
 }
 
 # shellcheck disable=2086
@@ -894,7 +892,7 @@ func_rsync_simple() {
 	func_validate_path_exist "${src}" "${tgt}"
 	func_str_contains "$*" "--dry-run" && opts_default="-av" || opts_default="-avP"
 
-	func_techo DEBUG "run cmd: rsync ${opts_default} $* ${src} ${tgt} 2>&1"
+	func_info "CMD: rsync ${opts_default} $* ${src} ${tgt} 2>&1"
 	rsync ${opts_default} "$@" "${src}" "${tgt}" 2>&1
 }
 
@@ -911,7 +909,9 @@ func_rsync_del_detect() {
 }
 
 func_rsync_out_filter_dry_run() {
-	awk '	/\/$/ { next ;}				# remove dirs in output, which not really will change
+	awk '	/DEBUG|INFO|WARN|ERROR/ {print;next;}	# reserve log lines
+
+		/\/$/ { next ;}				# remove dirs in output, which not really will change
 		/^File list / { next; }
 		/^Total bytes / { next; }
 		/^Literal data:/ { next; }
@@ -936,7 +936,7 @@ func_rsync_out_filter_dry_run() {
 
 func_rsync_out_filter() {
 	# shellcheck disable=2148
-	awk '	/DEBUG: |INFO: |WARN: |ERROR: |FATAL: |TRACE: / {print $0;next;}	# reserve log lines
+	awk '	/DEBUG|INFO|WARN|ERROR/ {print $0;next;}	# reserve log lines
 
 		/^$/ {			next;}	# skip empty lines
 		/\/$/ {			next;}	# skip dir lines
@@ -975,11 +975,8 @@ func_rsync_out_filter() {
 			next;
 		} 
 
-		# for other lines, just print out
-		!/\/$/ {
-			print $0;
-			next;
-		}'
+		!/\/$/ { print $0; }			# for other lines, just print out
+	'
 }
 
 ################################################################################

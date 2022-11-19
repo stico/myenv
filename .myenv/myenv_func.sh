@@ -2771,18 +2771,26 @@ func_mydata_sync_v2(){
 	# TODO: merge func_mydata_sync_doc()
 
 	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path
-	[ "${HOSTNAME}" == "laptp" ] && mnt_path="/media/ouyzhu"
-	[ "${HOSTNAME}" == "lapmac2" ] && mnt_path="/Volumes"
+	[[ "${HOSTNAME}" == "laptp" ]] && mnt_path="/media/ouyzhu"
+	[[ "${HOSTNAME}" == "lapmac2" ]] && mnt_path="/Volumes"
 	tcz_path="/tmp/tcz"
 	dtz_path="${mnt_path}/DTZ"
 	btca_path="/tmp/btca"			# 3.5" disk
 	bdta_path="${mnt_path}/bdta"		# 3.5" disk
 
-	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8"
+	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
 	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
 
 	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}"
 	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" 
+
+	# only lapmac2 need sync doc
+	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
+		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_sync_doc_unison 
+		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
+		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
+		[[ -d "${bdta_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
+	fi
 }
 
 func_mydata_bi_sync() {
@@ -2791,7 +2799,7 @@ func_mydata_bi_sync() {
 
 	local sync_item a b
 	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
-		func_info "pair NOT exist, skip: ${1} <-> ${2}"
+		func_info "SKIP: ${1} <-> ${2}"
 		return
 	fi
 	
@@ -2803,11 +2811,59 @@ func_mydata_bi_sync() {
 		func_complain_path_not_exist "${a}" && continue
 		func_complain_path_not_exist "${b}" && continue
 
-		func_info "start to sync between: ${a} <-> ${b}"
-		func_rsync_ask_then_run "${a}" "${b}"
-		func_rsync_ask_then_run "${b}" "${a}"
+		func_info "RSYNC: ${a} <-> ${b}"
+		func_rsync_ask_then_run "${a}" "${b}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
+		func_rsync_ask_then_run "${b}" "${a}" | sed -e 's/^/\t/;'
 	done
 }
+
+func_mydata_gen_fl_and_upload_v2(){
+	local base fl_dir fl
+	base="${1}"
+	func_info "gen filelist for: ${base}"
+	func_complain_path_not_exist "${base}" && return
+
+	# gen
+	fl_dir="${base}/alone/fl_record"
+	fl="${fl_dir}/fl_$(basename "${base}")_$(func_dati).txt"
+	[[ -e "${fl_dir}" ]] || mkdir -p "${fl_dir}"
+	func_gen_filelist_with_size "${base}" "${fl}"
+
+	# remove useless lines
+	sed -i -e "
+		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
+		/\/FCS\//d;
+		/\/DCD\/mail\//d;
+		/\/DCM-to-\//d;
+		/\/DCM\/Inbox\//d;
+		/\/DCM_[-0-9_]*\//d;
+		/\/DCC\/coding\/leetcode\//d;
+		" "${fl}"
+
+	func_scp_to_awsvm "${fl}"
+}
+
+func_mydata_sync_doc_unison() {
+	func_complain_path_not_exist "${HOME}/.unison" && return 1
+
+	unison fs_lapmac2_all
+}
+
+func_mydata_sync_doc_rsync() {
+	func_complain_path_not_exist "${1}" && return 1
+
+	local d target doc_sync_list opts
+	target="${1}"
+	doc_sync_list="DCB DCC DCD DCM DCO DCZ FCS FCZ"
+	
+	for d in ${doc_sync_list} ; do
+		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
+		opts="--exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
+		func_rsync_ask_then_run "${MY_DOC}/${d}"  "${target}" "${opts}"
+	done
+}
+
+################################################################################
 
 func_mydata_sync(){
 	# CONFIG - Common
@@ -2840,36 +2896,6 @@ func_mydata_sync(){
 	else
 		func_mydata_gen_fl_and_upload
 	fi
-}
-
-func_mydata_gen_fl_and_upload_v2(){
-	local base fl_dir fl
-
-	func_info "start to gen filelist for: ${base}"
-	func_complain_path_not_exist "${base}" && return
-
-	# prepare dir
-	fl_dir="${base}/alone/fl_record"
-	[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
-
-	# gen file
-	fl="/tmp/fl_$(basename "${base}")_$(func_dati).txt"
-	func_gen_filelist_with_size "${base}" "${fl}"
-
-	# remove useless lines
-	sed -i -e "
-		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
-		/\/FCS\//d;
-		/\/DCD\/mail\//d;
-		/\/DCM-to-\//d;
-		/\/DCM\/Inbox\//d;
-		/\/DCM_[-0-9_]*\//d;
-		/\/DCC\/coding\/leetcode\//d;
-		" "${fl}"
-
-	# mv to disk and upload
-	func_scp_to_awsvm "${fl}"
-	mv "${fl}" "${fl_dir}" 
 }
 
 func_mydata_gen_fl_and_upload(){
@@ -2952,37 +2978,16 @@ func_mydata_print_summary() {
 func_mydata_sync_doc() {
 	# use DOC_EX_BASE to indicate if need sync Documents
 	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
-	[ ! -e "${DOC_EX_BASE}" ] && func_techo info "doc_bak NOT exist, skip sync Documents" && return 0
+	func_complain_path_not_exist "${DOC_EX_BASE}" && return 0
 
+	# TODO: DCD/mail FCS/maven seems increase too much, e.g. 
+	#	bdta/backup_unison, size is: 89G / 257G
+	#	btca/backup_rsync,  size is: 14G / 23G	(Good)
 	local DOC_TGT_BASE_DTZ="${DTZ_BASE}/backup_unison"
 	[ -d "${DOC_TGT_BASE_DTZ}" ] && func_mydata_sync_doc_unison 
 
 	local DOC_TGT_BASE_TCZ="${TCZ_BASE}/backup_rsync"
 	[ -d "${DOC_TGT_BASE_TCZ}" ] && func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
-}
-
-func_mydata_sync_doc_unison() {
-	[ ! -e "${HOME}/.unison" ] && func_info "${HOME}/.unison NOT exist, skip sync Documents" && return 0
-
-	unison fs_lapmac2_all
-}
-
-func_mydata_sync_doc_rsync() {
-	local target="${1}"
-	local DOC_SRC_BASE="${HOME}/Documents"
-	local DOC_SYNC_LIST="DCB DCC DCD DCM DCO DCZ FCS FCZ"
-	
-	for d in ${DOC_SYNC_LIST} ; do
-	#for d in FCZ ; do
-		local opts="--exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
-		#local opts="--dry-run --exclude-from=${DOC_EX_BASE}/exclude_${d}.txt" 
-
-		func_techo INFO       "rsync: ${DOC_SRC_BASE}/${d} -> ${target}"
-		func_rsync_simple            "${DOC_SRC_BASE}/${d}"  "${target}" "${opts}"
-		func_mydata_rsync_del_detect "${DOC_SRC_BASE}/${d}"  "${target}" 
-
-		# NOTE: compare size is NOT good, since ignored some file in rsync
-	done
 }
 
 func_mydata_rsync_with_list() {
