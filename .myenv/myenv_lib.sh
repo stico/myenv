@@ -88,23 +88,25 @@ func_vcs_update() {
 	local desc="Desc: init or update vcs like hg/git/svn"
 	func_param_check 3 "$@"
 
-	local src_type="${1}"
-	local src_addr="${2}"
-	local target_dir="${3}"
+	local src_type src_addr target_dir cmd_update cmd_init cmd
+	src_type="${1}"
+	src_addr="${2}"
+	target_dir="${3}"
 	echo "INFO: init/update source, type: ${src_type}, addr: ${src_addr}, target: ${target_dir}"
 	case "${src_type}" in
-		hg)	local cmd="hg"  ; local cmd_init="hg clone"     ; local cmd_update="hg pull"	;;
-		git)	local cmd="git" ; local cmd_init="git clone"    ; local cmd_update="git pull"	;;
-		svn)	local cmd="svn" ; local cmd_init="svn checkout" ; local cmd_update="svn update"	;;
+		hg)	cmd="hg"  ; cmd_init="hg clone"     ; cmd_update="hg pull"	;;
+		git)	cmd="git" ; cmd_init="git clone"    ; cmd_update="git pull"	;;
+		svn)	cmd="svn" ; cmd_init="svn checkout" ; cmd_update="svn update"	;;
 		*)	func_die "ERROR: Can not handle src_type (${src_type})"	;;
 	esac
 
 	func_validate_cmd_exist ${cmd}
 	
-	if [ -e "${target_dir}" ] ; then
-		pushd "${target_dir}" &> /dev/null
-		${cmd_update} || func_die "ERROR: ${cmd_update} failed"
-		popd &> /dev/null
+	if [[ -e "${target_dir}" ]] ; then
+		pushd "${target_dir}" &> /dev/null	|| func_die "ERROR: cd failed (${target_dir})"
+		${cmd_update}				|| func_die "ERROR: ${cmd_update} failed"
+		# shellcheck disable=2164
+		popd &> /dev/null			
 	else
 		mkdir -p "$(dirname "${target_dir}")"
 		${cmd_init} "${src_addr}" "${target_dir}" || func_die "ERROR: ${cmd_init} failed"
@@ -569,7 +571,7 @@ func_is_file_ext_image() {
 
 	# for sed cmd: '/\.\(jpg\|jpeg\|gif\|png\|apng\|avif\|svg\|webp\|bmp\|ico\|tiff\|tif\)$/d;'
 
-	[[ "${1,,}" =~ .*\.(jpg|jpeg|gif|png|apng|avif|svg|webp|bmp|ico|tiff|tif) ]] && return 0	# ordinary ext
+	[[ "${1,,}" =~ .*\.(heic|jpg|jpeg|gif|png|apng|avif|svg|webp|bmp|ico|tiff|tif) ]] && return 0	# ordinary ext
 	[[ "${1,,}" =~ .*\.(raw|cr2|nef|orf|sr2) ]] && return 0						# raw ext
 	return 1
 }
@@ -1007,7 +1009,7 @@ func_script_base() {
 
 	local script_dir
 	script_dir="$(dirname "${0}")"
-	func_is_str_empty "${script_dir}" && func_die "ERROR: script dir MUST NOT empty, pls check"
+	func_is_str_empty "${script_dir}" && func_die "ERROR: failed to get script dir (empty), pls check"
 
 	readlink -f "${script_dir}/${*}"
 	#base="$(readlink -f $(dirname ${0}))"

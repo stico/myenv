@@ -2230,6 +2230,8 @@ func_rsync_tmp() {
 	# Run
 	echo "INFO: run cmd: rsync --daemon --port ${port} --config ${conf}"
 	rsync --daemon --port "${port}" --config "${conf}"
+
+	# shellcheck disable=2181
 	if [ "$?" -ne "0" ] ; then 
 		echo "ERROR: rysnc startup failed, exit code: $?"
 		return 1

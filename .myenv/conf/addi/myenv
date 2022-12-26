@@ -1,4 +1,5 @@
-# stores file/path which not in git, usually secure reason 
+# Stores file/path which not in git (for secure reason)
+# mebackup will backup files list here
 
 # system config. Skip files for permission problems: /etc/sudoers 
 /etc/fstab

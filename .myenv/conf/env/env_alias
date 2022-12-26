@@ -133,7 +133,7 @@ sshbdroot		"ssh ouyzhu_baidu"
 sshgcpvm		"ssh gcpvm"
 
 # use ~/.ssh/config
-sshawsvm		"echo 'Run it in myvm'"
+sshawsvm		"[[ \$(hostname) == myvm ]] && ssh awsvm || echo 'Run it in myvm'"
 scptoawsvm		func_scp_to_awsvm
 scpfromawsvm		func_scp_from_awsvm
 mebackupawsvm		func_mebackup_awsvm
