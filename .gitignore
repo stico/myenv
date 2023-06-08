@@ -4,6 +4,7 @@
 # IGNORE, for secure reason
 /.ssh/
 /.hgrc
+/.mitmproxy/
 /.subversion/
 /.smbcredentials
 

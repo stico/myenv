@@ -134,8 +134,10 @@ sshgcpvm		"ssh gcpvm"
 
 # use ~/.ssh/config
 sshawsvm		"[[ \$(hostname) == myvm ]] && ssh awsvm || echo 'Run it in myvm'"
-scptoawsvm		func_scp_to_awsvm
-scpfromawsvm		func_scp_from_awsvm
+scptoazvm		func_scp_to_cloud_vm   azvm
+scpfromazvm		func_scp_from_cloud_vm azvm
+scptoawsvm		func_scp_to_cloud_vm   awsvm
+scpfromawsvm		func_scp_from_cloud_vm awsvm
 mebackupawsvm		func_mebackup_awsvm
 
 # Alias - By Action (<action><obj/arg>)

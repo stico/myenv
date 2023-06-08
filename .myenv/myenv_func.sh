@@ -573,7 +573,7 @@ func_is_personal_machine() {
 }
 
 func_is_internal_machine() {
-	func_ip_list | grep -q '[^0-9\.]\(172\.\|192\.\|fc00::\|fe80::\)' 
+	func_ip_list | grep -q '[^0-9\.]\(10\.\|172\.\|192\.\|fc00::\|fe80::\)' 
 }
 
 func_cd_smart() {
@@ -1481,26 +1481,27 @@ func_mebackup_awsvm() {
 	fpath="$(ssh awsvm 'bash "$HOME/.myenv/secu/awsvm/script/z/func_backup_myenv.alone.sh"' | grep _awsvm_myenv_backup.zip | cut -d" " -f10)"
 	echo "INFO: remote backup generated, remote path: $fpath"
 
-	func_scp_from_awsvm "$fpath"
+	func_scp_from_cloud_vm awsvm "$fpath"
 	ls -l | tail -1
 	\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
 }
 
 # awsvm@aws
-func_scp_from_awsvm() {
-	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file from awsvm to current dir." 
+# azvm@microsoft
+func_scp_from_cloud_vm() {
+	local usage="Usage: ${FUNCNAME[0]} <vm_name> <file> \n scp file from <vm_name> to current dir." 
 	func_param_check 1 "$@"
 
-	scp "awsvm:${1}" ./
+	scp "${1}:${2}" ./
 	#scp -i "${HOME}/.ssh/ouyzhu_awsvm_hk.pem" "ubuntu@ec2-16-162-34-17.ap-east-1.compute.amazonaws.com:${1}" ./
 }
 
 # awsvm@aws
-func_scp_to_awsvm() {
-	local usage="Usage: ${FUNCNAME[0]} <file> \n scp file to awsvm ~/Downloads/" 
+func_scp_to_cloud_vm() {
+	local usage="Usage: ${FUNCNAME[0]} <vm_name> <file> \n scp file to <vm_name>:~/Downloads/" 
 	func_param_check 1 "$@"
 
-	scp "${1}" awsvm:~/amp/download/
+	scp "${2}" "${1}:~/amp/download/"
 	#scp -i "${HOME}/.ssh/ouyzhu_awsvm_hk.pem" "${1}" ubuntu@ec2-16-162-34-17.ap-east-1.compute.amazonaws.com:~/Downloads/
 }
 
@@ -2770,6 +2771,8 @@ func_file_count_of_dir(){
 
 func_mydata_sync_v2(){
 
+	# RULE are important
+
 	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
 	[[ "${HOSTNAME}" == "laptp" ]] && mnt_path="/media/ouyzhu"
 	[[ "${HOSTNAME}" == "lapmac2" ]] && mnt_path="/Volumes"
@@ -2789,7 +2792,7 @@ func_mydata_sync_v2(){
 		[[ -d "${bdta_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
 	fi
 
-	# only bdta need sync DCM_xxx
+	# RULE: DCM_HIST changes should happen in "${dcm_hist_base}" first! 
 	dcm_hist_base="${bdta_path}/backup_rsync/DCM_HIST/"
 	if [[ -d "${dcm_hist_base}" ]] ; then
 		[[ -d "${dtz_path}/backup_unison/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison/DCM_HIST/"
@@ -2817,7 +2820,7 @@ func_mydata_bi_sync() {
 	fi
 	
 	for sync_item in ${3} ; do 
-		# sync cares the last "/", should be the same, better ending with "/"
+		# rsync cares the last "/", should be the same, better ending with "/"
 		[[ "${1}/${sync_item}" = */ ]] && a="${1}/${sync_item}" || a="${1}/${sync_item}/" 
 		[[ "${2}/${sync_item}" = */ ]] && b="${2}/${sync_item}" || b="${2}/${sync_item}/" 
 
@@ -2853,7 +2856,7 @@ func_mydata_gen_fl_and_upload_v2(){
 		/\/DCC\/coding\/leetcode\//d;
 		" "${fl}"
 
-	func_scp_to_awsvm "${fl}"
+	func_scp_to_cloud_vm awsvm "${fl}"
 }
 
 func_mydata_sync_doc_unison() {
@@ -2948,7 +2951,7 @@ func_mydata_gen_fl_and_upload(){
 			#/\/FCS\/maven\/m2_repo\//d;	# included in /FCS?
 
 		# mv to disk and upload
-		func_scp_to_awsvm "${fl}"
+		func_scp_to_cloud_vm awsvm "${fl}"
 		mv "${fl}" "${fl_dir}" 
 	done
 }

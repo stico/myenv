@@ -64,14 +64,17 @@ py=$MY_DCC/python/python.txt
 db=$MY_DCC/database/database.txt
 mm=$MY_DCC/multimedia/multimedia.txt
 js=$MY_DCC/javascript/javascript.txt
+sodo=$MY_DCD/sodolive/sodolive.txt
 geo=$MY_DCC/geography/geography.txt
 k8s=$MY_DCC/kubernetes/kubernetes.txt
 ml=$MY_DCC/machinelearning/machinelearning.txt
 cs=$MY_DCC/computer_system/computer_system.txt
 ca=$MY_DCC/computer_architecture/computer_architecture.txt
 ds=$MY_DCC/dsaa/data_structure.txt
+shc=$MY_DCO/housing/店面_四海城/note.txt
 
 # DCC - notes
+win=$MY_DCC/windows/windows.txt
 calculus=$MY_DCC/math/calculus.txt
 geometry=$MY_DCC/math/geometry.txt
 linear_algebra=$MY_DCC/math/linear_algebra.txt

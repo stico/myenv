@@ -11,5 +11,8 @@ PATH		/opt/X11/bin
 PATH		/opt/local/bin
 PATH		/opt/local/sbin
 
+		# ~rvictl@osx
+#PATH		/Library/Apple/usr/bin/
+
 		# to use coreutils without prefix 'g', e.g. gawk
 PATH		/opt/local/libexec/gnubin/
