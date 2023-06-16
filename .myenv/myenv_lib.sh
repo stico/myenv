@@ -1003,9 +1003,21 @@ func_script_self() {
 	test -L "$0" && readlink "$0" || echo "$0"
 }
 
+func_script_origin_base() { 
+	local usage="Usage: ${FUNCNAME[0]} <suffix> (MUST invoke in script !!!)" 
+	local desc="Desc: get origin dir of current script (e.g. when script is a soft link, will get its original dir), suffix will be directly added to the base dir" 
+
+	local script_original_path script_dir
+	script_original_path="$(readlink -f "${0}")"
+	script_dir="$(dirname "${script_original_path}")"
+	func_is_str_empty "${script_dir}" && func_die "ERROR: failed to get script dir (empty), pls check"
+
+	readlink -f "${script_dir}/${*}"
+}
+
 func_script_base() { 
 	local usage="Usage: ${FUNCNAME[0]} <suffix> (MUST invoke in script !!!)" 
-	local desc="Desc: get dir of current script, suffix will be directly added to the base dir" 
+	local desc="Desc: get dir of current script (soft link script will NOT get its original dir), suffix will be directly added to the base dir" 
 
 	local script_dir
 	script_dir="$(dirname "${0}")"

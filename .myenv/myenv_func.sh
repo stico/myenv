@@ -1486,8 +1486,7 @@ func_mebackup_awsvm() {
 	\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
 }
 
-# awsvm@aws
-# azvm@microsoft
+# azvm@microsoft / awsvm@aws
 func_scp_from_cloud_vm() {
 	local usage="Usage: ${FUNCNAME[0]} <vm_name> <file> \n scp file from <vm_name> to current dir." 
 	func_param_check 1 "$@"
@@ -1496,7 +1495,7 @@ func_scp_from_cloud_vm() {
 	#scp -i "${HOME}/.ssh/ouyzhu_awsvm_hk.pem" "ubuntu@ec2-16-162-34-17.ap-east-1.compute.amazonaws.com:${1}" ./
 }
 
-# awsvm@aws
+# azvm@microsoft / awsvm@aws
 func_scp_to_cloud_vm() {
 	local usage="Usage: ${FUNCNAME[0]} <vm_name> <file> \n scp file to <vm_name>:~/Downloads/" 
 	func_param_check 1 "$@"
