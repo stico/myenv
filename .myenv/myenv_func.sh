@@ -533,11 +533,11 @@ func_best_hostname() {
 	local usage="Usage: ${FUNCNAME[0]}" 
 	local desc="Desc: try to get a more meaning fullname of host"
 	
-	local ip hostname bakname useless usefull
+	local ip hostname used bakname useless usefull
 
 	# case 1: always use hostname
 	hostname="$(hostname)" 
-	used="/baiduvm/awsvm/myvm/"
+	used="/baiduvm/awsvm/myvm/azvm"
 	if [ "$(func_os_name)" = "${OS_OSX}" ] || func_is_personal_machine ; then	# check if personal (assume osx also yes)
 		echo "${hostname}"
 		return
