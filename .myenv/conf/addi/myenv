@@ -8,6 +8,7 @@
 /etc/resolv.conf
 /etc/updatedb.conf
 /etc/xdg/autostart/
+/etc/nginx/conf.d/alone.conf
 
 # system config in var
 $LOC_HOSTS

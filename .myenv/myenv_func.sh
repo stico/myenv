@@ -2770,20 +2770,30 @@ func_file_count_of_dir(){
 
 func_mydata_sync_v2(){
 
-	# RULE are important
+	# STATUS_A: 2023-00 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
+	# TODO: tca/tcb/dta(G2TG)/dtb(MHD500) can be used for other thing?
 
 	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
-	[[ "${HOSTNAME}" == "laptp" ]] && mnt_path="/media/ouyzhu"
-	[[ "${HOSTNAME}" == "lapmac2" ]] && mnt_path="/Volumes"
+
 	tcz_path="/tmp/tcz"
-	dtz_path="${mnt_path}/DTZ"
-	btca_path="/tmp/btca"			# 3.5" disk
-	bdta_path="${mnt_path}/bdta"		# 3.5" disk
+	btca_path="/tmp/btca"	# 3.5" disk
+
+	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# TODO: wsl name to laptp
+		mnt_path="/mnt/"			# TODO: check if prefix correct
+		dtz_path="${mnt_path}/O"		# TODO: fix driver number?
+		bdta_path="${mnt_path}/P"		# 3.5" disk. TODO: fix driver number?
+	fi
+
+	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
+		mnt_path="/Volumes"
+		dtz_path="${mnt_path}/DTZ"
+		#bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~STATUS_A)
+	fi
 
 	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
 	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
 
-	# only lapmac2 need sync doc
+	# only lapmac2 need sync doc (see ~STATUS_A)
 	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
 		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_sync_doc_unison 
 		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
