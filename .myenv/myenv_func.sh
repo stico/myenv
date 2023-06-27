@@ -2775,12 +2775,12 @@ func_mydata_sync_v2(){
 
 	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
 
-	if [[ "${HOSTNAME}" == "laptp" ]] ; then
+	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# note: driver is in lowercase in wsl1
 		mnt_path="/mnt/"
-		btca_path="${mnt_path}/O"		# 3.5" disk
-		bdta_path="${mnt_path}/P"		# 3.5" disk
-		tcz_path="${mnt_path}/R"
-		dtz_path="${mnt_path}/S"
+		btca_path="${mnt_path}/o"		# 3.5" disk
+		bdta_path="${mnt_path}/p"		# 3.5" disk
+		tcz_path="${mnt_path}/r"
+		dtz_path="${mnt_path}/s"
 	fi
 
 	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
