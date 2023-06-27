@@ -2775,16 +2775,18 @@ func_mydata_sync_v2(){
 
 	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
 
-	tcz_path="/tmp/tcz"
-	btca_path="/tmp/btca"	# 3.5" disk
-
-	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# TODO: wsl name to laptp
-		mnt_path="/mnt/"			# TODO: check if prefix correct
-		dtz_path="${mnt_path}/O"		# TODO: fix driver number?
-		bdta_path="${mnt_path}/P"		# 3.5" disk. TODO: fix driver number?
+	if [[ "${HOSTNAME}" == "laptp" ]] ; then
+		mnt_path="/mnt/"
+		btca_path="${mnt_path}/O"		# 3.5" disk
+		bdta_path="${mnt_path}/P"		# 3.5" disk
+		tcz_path="${mnt_path}/R"
+		dtz_path="${mnt_path}/S"
 	fi
 
 	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
+		tcz_path="/tmp/tcz"
+		btca_path="/tmp/btca"	# 3.5" disk
+
 		mnt_path="/Volumes"
 		dtz_path="${mnt_path}/DTZ"
 		#bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~STATUS_A)
