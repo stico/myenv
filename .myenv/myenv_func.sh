@@ -2771,6 +2771,9 @@ func_file_count_of_dir(){
 func_mydata_sync_v2(){
 
 	# STATUS_A: 2023-00 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
+
+	# TODO: filter/summary rysnc result: func_rsync_out_filter_dry_run@lib
+	# TODO: wsl can NOT show utf-8
 	# TODO: tca/tcb/dta(G2TG)/dtb(MHD500) can be used for other thing?
 
 	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
@@ -2867,7 +2870,7 @@ func_mydata_gen_fl_and_upload_v2(){
 		/\/DCC\/coding\/leetcode\//d;
 		" "${fl}"
 
-	func_scp_to_cloud_vm awsvm "${fl}"
+	func_scp_to_cloud_vm azvm "${fl}"
 }
 
 func_mydata_sync_doc_unison() {
@@ -2895,38 +2898,38 @@ func_mydata_sync_doc_rsync() {
 
 ################################################################################
 
-func_mydata_sync(){
-	# CONFIG - Common
-	local TCA_BASE="/tmp/tca"
-	local TCB_BASE="/tmp/tcb"
-	local TCZ_BASE="/tmp/tcz"
-
-	# DTA have diff name on laptp/lapmac
-	local DTA_BASE="DTA"	# G2TG
-	local DTB_BASE="DTB"	# MHD500
-	local DTZ_BASE="DTZ"	# G5TG
-	local BASE_LAPTP="/media/ouyzhu"
-	local BASE_LAPMAC="/Volumes"
-	[ -d "${BASE_LAPTP}/${DTA_BASE}" ] && DTA_BASE="${BASE_LAPTP}/${DTA_BASE}" || DTA_BASE="${BASE_LAPMAC}/${DTA_BASE}" 
-	[ -d "${BASE_LAPTP}/${DTB_BASE}" ] && DTB_BASE="${BASE_LAPTP}/${DTB_BASE}" || DTB_BASE="${BASE_LAPMAC}/${DTB_BASE}" 
-	[ -d "${BASE_LAPTP}/${DTZ_BASE}" ] && DTZ_BASE="${BASE_LAPTP}/${DTZ_BASE}" || DTZ_BASE="${BASE_LAPMAC}/${DTZ_BASE}" 
-
-	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
-	func_techo INFO "detail log: ${tmp_log}" 
-	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_dtbtodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
-	func_mydata_print_summary "${tmp_log}" 
-
-	if [ "${1}" == "-nofl" ] ; then
-		:
-	else
-		func_mydata_gen_fl_and_upload
-	fi
-}
+#func_mydata_sync(){
+#	# CONFIG - Common
+#	local TCA_BASE="/tmp/tca"
+#	local TCB_BASE="/tmp/tcb"
+#	local TCZ_BASE="/tmp/tcz"
+#
+#	# DTA have diff name on laptp/lapmac
+#	local DTA_BASE="DTA"	# G2TG
+#	local DTB_BASE="DTB"	# MHD500
+#	local DTZ_BASE="DTZ"	# G5TG
+#	local BASE_LAPTP="/media/ouyzhu"
+#	local BASE_LAPMAC="/Volumes"
+#	[ -d "${BASE_LAPTP}/${DTA_BASE}" ] && DTA_BASE="${BASE_LAPTP}/${DTA_BASE}" || DTA_BASE="${BASE_LAPMAC}/${DTA_BASE}" 
+#	[ -d "${BASE_LAPTP}/${DTB_BASE}" ] && DTB_BASE="${BASE_LAPTP}/${DTB_BASE}" || DTB_BASE="${BASE_LAPMAC}/${DTB_BASE}" 
+#	[ -d "${BASE_LAPTP}/${DTZ_BASE}" ] && DTZ_BASE="${BASE_LAPTP}/${DTZ_BASE}" || DTZ_BASE="${BASE_LAPMAC}/${DTZ_BASE}" 
+#
+#	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
+#	func_techo INFO "detail log: ${tmp_log}" 
+#	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+#	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+#	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+#	func_mydata_sync_dtbtodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+#	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
+#	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
+#	func_mydata_print_summary "${tmp_log}" 
+#
+#	if [ "${1}" == "-nofl" ] ; then
+#		:
+#	else
+#		func_mydata_gen_fl_and_upload
+#	fi
+#}
 
 func_mydata_gen_fl_and_upload(){
 
@@ -2962,7 +2965,7 @@ func_mydata_gen_fl_and_upload(){
 			#/\/FCS\/maven\/m2_repo\//d;	# included in /FCS?
 
 		# mv to disk and upload
-		func_scp_to_cloud_vm awsvm "${fl}"
+		func_scp_to_cloud_vm azvm "${fl}"
 		mv "${fl}" "${fl_dir}" 
 	done
 }

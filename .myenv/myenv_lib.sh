@@ -876,7 +876,7 @@ func_rsync_ask_then_run() {
 	tmp_file_1="$(mktemp)"
 	
 	func_rsync_simple "$@" --stats --dry-run --delete > "${tmp_file_1}"
-	echo "INFO: DETAIL LOG: ${tmp_file_1}"
+	echo "INFO: DETAIL LOG FOR: ${1} -> ${2} : ${tmp_file_1}"
 
 	# check if need ask, depends on options: --stats
 	rsync_stat_str_1='Number of created files: 0$'
@@ -889,6 +889,7 @@ func_rsync_ask_then_run() {
 
 	# show brief and ask
 	func_rsync_out_filter_dry_run < "${tmp_file_1}" 
+	sleep 1
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
 	[[ "$*" = *--delete* ]] || opt_del="--delete"
 	func_rsync_simple "$@" ${opt_del}
