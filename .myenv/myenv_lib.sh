@@ -876,20 +876,20 @@ func_rsync_ask_then_run() {
 	tmp_file_1="$(mktemp)"
 	
 	func_rsync_simple "$@" --stats --dry-run --delete > "${tmp_file_1}"
-	echo "INFO: DETAIL LOG FOR: ${1} -> ${2} : ${tmp_file_1}"
 
 	# check if need ask, depends on options: --stats
 	rsync_stat_str_1='Number of created files: 0$'
 	rsync_stat_str_2='Number of deleted files: 0$'
 	rsync_stat_str_3='Number of regular files transferred: 0$'
 	if grep -q "${rsync_stat_str_1}" "${tmp_file_1}" &&  grep -q "${rsync_stat_str_2}" "${tmp_file_1}" &&  grep -q "${rsync_stat_str_3}" "${tmp_file_1}" ; then
-		echo "INFO: nothing need to update"
+		echo "INFO: nothing need to update for: ${1} -> ${2}, detail log: ${tmp_file_1}"
 		return 0
 	fi
 
 	# show brief and ask
 	func_rsync_out_filter_dry_run < "${tmp_file_1}" 
 	sleep 1
+	echo "INFO: there are changes for: ${1} -> ${2}, detail log: ${tmp_file_1}"
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
 	[[ "$*" = *--delete* ]] || opt_del="--delete"
 	func_rsync_simple "$@" ${opt_del}
@@ -938,7 +938,7 @@ func_rsync_out_filter_dry_run() {
 
 		/^deleting / { print $0; next; }	# perserve all delete lines
 		/\// {
-			sub("[^/]*$", "", $0); 		# remove leaf files to reduce lines
+			sub("[^/]*$", "", $0); 		# remove leaf files to reduce lines (by func_shrink_dup_lines later)
 			print "updating " $0;
 			next;
 		}

@@ -2814,8 +2814,8 @@ func_mydata_sync_v2(){
 		[[ -d "${btca_path}/backup_rsync/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync/DCM_HIST/"
 	fi
 
-	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}"
-	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" 
+	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}" "btca"
+	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" "bdta"
 }
 
 func_mydata_dcm_hist_sync() {
@@ -2848,14 +2848,17 @@ func_mydata_bi_sync() {
 }
 
 func_mydata_gen_fl_and_upload_v2(){
-	local base fl_dir fl
+	local base fl_dir fl real_name base_name
 	base="${1}"
+	real_name="${2}"
 	func_info "gen filelist for: ${base}"
 	func_complain_path_not_exist "${base}" && return
 
-	# gen
 	fl_dir="${base}/alone/fl_record"
-	fl="${fl_dir}/fl_$(basename "${base}")_$(func_dati).txt"
+	base_name="$(basename "${base}")"
+	fl="${fl_dir}/fl_${real_name:-${base_name}}_$(func_dati).txt"
+
+	# gen
 	[[ -e "${fl_dir}" ]] || mkdir -p "${fl_dir}"
 	func_gen_filelist_with_size "${base}" "${fl}"
 
