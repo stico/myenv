@@ -452,6 +452,29 @@ func_combine_lines() {
 	}' "$@"
 }
 
+func_shrink_pattern_lines() {
+	# USED_IN: secu/$HOSTNAME/telegram (shrink kword.title)
+	local usage="Usage: ${FUNCNAME[0]} <pattern-file>"
+	local desc="Desc: shrink lines (and remove blank lines), e.g. if lineA is sub string of lineB, lineB will be removed"
+	desc="$desc \nNote 1: NOT support pipe, seems not needed"
+	desc="$desc \nNote 2: useful for shrinking pattern file used in func_grepf()"
+	func_param_check 1 "$@"
+
+	# Collect: lines to delete. NOTE: '-F' is necessary, otherwise gets 'grep: Invalid range end' if have such sub str: '[9-1]'
+	local input_file lines_to_del tmp_grep line
+	input_file="${1}"
+	lines_to_del="$(mktemp)"
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
+		tmp_grep="$(grep -F "${line}" "${input_file}" | grep -v -x -F "${line}")"
+		func_is_str_blank "${tmp_grep}" && continue
+		echo -e "# match-line-found-with-this-line: ${line}\n${tmp_grep}" >> "${lines_to_del}"
+	done < <(func_del_blank_lines "${input_file}")
+	[[ ! -e "${lines_to_del}" ]] && echo "INFO: nothing to shrink, nothing performed" && return
+
+	# Shrink '-x' seems unnecessary here. NOTE, will also delete duplicated lines (and merge blank lines)
+	func_grepf -v -F "${lines_to_del}" "${input_file}" | func_del_blank_lines | func_shrink_dup_lines
+}
+
 # shellcheck disable=2120
 func_shrink_blank_lines() {
 	local usage="Usage: ${FUNCNAME[0]} [file]"
