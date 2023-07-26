@@ -690,7 +690,7 @@ func_backup_aside() {
 
 # NOTE: func_backup_dated is in myenv_func.sh
 func_backup_simple() {
-	local usage="Usage: ${FUNCNAME[0]} <path>"
+	local usage="Usage: ${FUNCNAME[0]} <src_path> [target_path]"
 	local desc="Desc: backup file" 
 	func_param_check 2 "$@"
 	func_validate_path_exist "${1}"
@@ -708,6 +708,12 @@ func_backup_simple() {
 	target_dir="$(dirname "${2}")"
 	[[ -e "${target_dir}" ]] || mkdir "${target_dir}"
 
+	# shellcheck disable=2181
+	if [ "$?" -ne "0" ] ; then 
+		func_error "failed to make target dir"
+		return 1
+	fi
+
 	# check size of available space
 	available_space="$(func_available_space_of_path "${target_dir}")"
 	if (( size + 500*1000*1000 > available_space )); then
@@ -716,7 +722,7 @@ func_backup_simple() {
 	fi
 
 	# check privilidge and cp
-	if [ -w "${p}" ] ; then
+	if [ -w "${target_dir}" ] ; then
 		cp -r "${1}" "${2}"
 	else
 		sudo cp -r "${1}" "${2}"
@@ -887,7 +893,7 @@ func_rsync_ask_then_run() {
 	fi
 
 	# show brief and ask
-	func_rsync_out_filter_dry_run < "${tmp_file_1}" 
+	func_rsync_out_brief "${tmp_file_1}" 
 	sleep 1
 	echo "INFO: there are changes for: ${1} -> ${2}, detail log: ${tmp_file_1}"
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
@@ -923,8 +929,19 @@ func_rsync_del_detect() {
 		| sort -u
 }
 
-func_rsync_out_filter_dry_run() {
-	awk '	/DEBUG|INFO|WARN|ERROR/ {print;next;}	# reserve log lines
+func_rsync_out_brief() {
+	local usage="Usage: ${FUNCNAME[0]} <log_file>" 
+	local desc="Desc: show brief of rsync out" 
+	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+
+	local log_file del_count
+	log_file="${1}"
+	func_complain_path_not_exist "${log_file}" && return 1
+	del_count="$(grep -c "^deleting " "${log_file}")"
+
+	awk -v del_count="${del_count}"			\
+	 '{
+		 /DEBUG|INFO|WARN|ERROR/ {print;next;}	# reserve log lines
 
 		/\/$/ { next ;}				# remove dirs in output, which not really will change
 		/^File list / { next; }
@@ -936,7 +953,16 @@ func_rsync_out_filter_dry_run() {
 		/^Total transferred file/ { next; }
 		/^sending incremental file/ { next; }
 
-		/^deleting / { print $0; next; }	# perserve all delete lines
+		/^deleting / {
+			if (del_count > 50) {		# need shrink lines if too much
+				sub("[^/]*$", "", $0); 	# remove leaf files to reduce lines (by func_shrink_dup_lines later)
+				print "updating " $0;
+			} else {
+				print $0;
+			}
+			next;
+		}
+
 		/\// {
 			sub("[^/]*$", "", $0); 		# remove leaf files to reduce lines (by func_shrink_dup_lines later)
 			print "updating " $0;
@@ -944,12 +970,16 @@ func_rsync_out_filter_dry_run() {
 		}
 
 		{ print $0; }				# for other lines, just print out
-	'						\
+	}
+	END {
+		print "======== NOTE: Lines Compacted, Check Detail ! ========"
+	}
+	' "${log_file}"					\
 	| head --lines=-3				\
 	| func_shrink_dup_lines 
 }
 
-func_rsync_out_filter() {
+func_rsync_out_filter_mydoc() {
 	# shellcheck disable=2148
 	awk '	/DEBUG|INFO|WARN|ERROR/ {print $0;next;}	# reserve log lines
 

@@ -60,6 +60,7 @@ dcz=$MY_DCZ
 fcs=$MY_FCS
 fcz=$MY_FCZ
 bd=$MY_DCC/baidu/baidu.txt
+ms=$MY_DCC/microsoft/microsoft.txt
 py=$MY_DCC/python/python.txt
 db=$MY_DCC/database/database.txt
 mm=$MY_DCC/multimedia/multimedia.txt

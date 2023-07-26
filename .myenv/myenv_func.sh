@@ -2776,7 +2776,7 @@ func_mydata_sync_v2(){
 	# TODO: wsl can NOT show utf-8
 	# TODO: tca/tcb/dta(G2TG)/dtb(MHD500) can be used for other thing?
 
-	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path dcm_hist_base
+	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path mhd500_path dcm_hist_base
 
 	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# note: driver is in lowercase in wsl1
 		mnt_path="/mnt/"
@@ -2784,15 +2784,16 @@ func_mydata_sync_v2(){
 		bdta_path="${mnt_path}/p"		# 3.5" disk
 		tcz_path="${mnt_path}/r"
 		dtz_path="${mnt_path}/s"
+		#mhd500_path 				# laptp not need this
 	fi
 
 	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
 		tcz_path="/tmp/tcz"
-		btca_path="/tmp/btca"	# 3.5" disk
-
+		btca_path="/tmp/btca"			# 3.5" disk
+		#bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~STATUS_A)
 		mnt_path="/Volumes"
 		dtz_path="${mnt_path}/DTZ"
-		#bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~STATUS_A)
+		mhd500_path="${mnt_path}/MHD500"
 	fi
 
 	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
@@ -2919,12 +2920,12 @@ func_mydata_sync_doc_rsync() {
 #
 #	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
 #	func_techo INFO "detail log: ${tmp_log}" 
-#	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-#	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-#	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-#	func_mydata_sync_dtbtodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-#	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter
-#	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter	# doc as the last, since migth use unison, which need interactive
+#	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
+#	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
+#	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
+#	func_mydata_sync_dtbtodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
+#	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
+#	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc		# doc as the last, since migth use unison, which need interactive
 #	func_mydata_print_summary "${tmp_log}" 
 #
 #	if [ "${1}" == "-nofl" ] ; then
