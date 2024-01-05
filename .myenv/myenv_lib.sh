@@ -714,7 +714,7 @@ func_backup_aside() {
 # NOTE: func_backup_dated is in myenv_func.sh
 func_backup_simple() {
 	local usage="Usage: ${FUNCNAME[0]} <src_path> [target_path]"
-	local desc="Desc: backup file" 
+	local desc="Desc: backup file, do safe check before backup, e.g.: size limit, space count"
 	func_param_check 2 "$@"
 	func_validate_path_exist "${1}"
 	func_validate_path_not_exist "${2}"
