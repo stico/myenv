@@ -18,7 +18,7 @@ func_init_myenv_local() {
 	mkdir "${MY_ENV_ZGEN}/collection" &> /dev/null
 
 	# local bashrc
-	local local_bashrc="${MY_ENV_CONF}/bash/bashrc.$(hostname)"
+	local local_bashrc="${MY_ENV_CONF}/bash/bashrc.$(hostname -s)"
 	if [ ! -e "${local_bashrc}" ] ; then
 		touch "${local_bashrc}"
 		echo "INFO: pls add local stuff (e.g. 'zbox use') in: ${local_bashrc}"

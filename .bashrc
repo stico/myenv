@@ -7,7 +7,8 @@
 [ -z "$PS1" ] && return		# If not running interactively, just return
 
 # Variables
-MACPORTS="/opt/local"
+MACPORTS_PATH="/opt/local"
+HOMEBREW_PATH="/opt/homebrew"
 COMPLETION="/etc/bash_completion"
 
 # Misc
@@ -17,12 +18,17 @@ shopt -s histappend
 shopt -s histreedit
 shopt -s checkwinsize
 
-# Step 1: set PATH for OSX/macports to use correct tool
-if uname -s | grep -iq darwin && [ -d "${MACPORTS}" ] ; then
-	export PATH="${MACPORTS}:${MACPORTS}/bin:${MACPORTS}/libexec/gnubin/:${PATH}:"	
+# Step 1: set PATH for OSX/{macports,homebrew} to use correct tool
+if uname -s | grep -iq darwin ; then
+	# note, need use the man dir, since lapmac3 (use homebrew) also have dir: /usr/local/bin 
+	if [ -d "${MACPORTS_PATH}/man" ] ; then		
+		export PATH="${MACPORTS_PATH}/bin:${MACPORTS_PATH}/sbin:${MACPORTS_PATH}/libexec/gnubin/:${PATH}:"	
+	elif [ -d "${HOMEBREW_PATH}" ] ; then
+		export PATH="${HOMEBREW_PATH}/bin:${HOMEBREW_PATH}/sbin:${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin:${PATH}:"	
+	fi
 fi
 
-# Step 2: dircolors, must after PATH setting to compitable with OSX (/opt/local/libexec/gnubin/dircolors)
+# Step 2: dircolors, must after PATH setting to compitable with OSX (macports or homebrew: libexec/gnubin/dircolors)
 if [[ -f "${HOME}/.dir_colors" ]] ; then
 	SHELL="/bin/bash" eval "$(dircolors -b ~/.dir_colors)"
 else
@@ -32,14 +38,15 @@ fi
 # Step 3: completion, sys and self-define cmd
 # NOTE: unison remote style can NOT accept .bashrc have output
 source "${COMPLETION}" >/dev/null 2>&1
-source "${MACPORTS}/${COMPLETION}" >/dev/null 2>&1
+source "${MACPORTS_PATH}/${COMPLETION}" >/dev/null 2>&1
+source "${HOMEBREW_PATH}/etc/profile.d/bash_completion.sh"
 complete -F _known_hosts scpx sshx ssht
 
 # Step 4: Source env
 source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
 source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
-source "${HOME}/.myenv/conf/bash/bashrc.$(hostname)" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/bash/bashrc.$(hostname -s)" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
 #source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1
 

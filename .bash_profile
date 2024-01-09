@@ -14,17 +14,3 @@ fi
 #fi
 
 #[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-
-##
-# Your previous /Users/ouyangzhu/.bash_profile file was backed up as /Users/ouyangzhu/.bash_profile.macports-saved_2019-06-29_at_11:54:10
-##
-
-# MacPorts Installer addition on 2019-06-29_at_11:54:10: adding an appropriate PATH variable for use with MacPorts.
-export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-# Finished adapting your PATH environment variable for use with MacPorts.
-
-
-# MacPorts Installer addition on 2020-12-25_at_14:46:01: adding an appropriate DISPLAY variable for use with MacPorts.
-export DISPLAY=:0
-# Finished adapting your DISPLAY environment variable for use with MacPorts.
-

@@ -536,7 +536,7 @@ func_best_hostname() {
 	local ip hostname used bakname useless usefull
 
 	# case 1: always use hostname
-	hostname="$(hostname)" 
+	hostname="$(hostname -s)" 
 	used="/baiduvm/awsvm/myvm/azvm/"
 	if [ "$(func_os_name)" = "${OS_OSX}" ] || func_is_personal_machine ; then	# check if personal (assume osx also yes)
 		echo "${hostname}"
@@ -643,7 +643,7 @@ func_check_cronlog() {
 
 	if [ -n "${errors}" ] ; then
 		echo "ERROR: Found error message in ${log}, sending notifications"
-		func_notify_mail "ERROR: [MYENV Notify] cronlog has ERROR ($(hostname))!" "$errors"
+		func_notify_mail "ERROR: [MYENV Notify] cronlog has ERROR ($(hostname -s))!" "$errors"
 	else
 		echo "INFO: No err found in ${log}, not notificaton needed"
 	fi
@@ -1066,7 +1066,7 @@ func_git_status() {
 
 func_git_commit_push() { 
 
-	[ -n "$*" ] && comment="$*" || comment="update from $(hostname)"
+	[ -n "$*" ] && comment="$*" || comment="update from $(hostname -s)"
 
 	# git add -A: in git 2.0, will add those even not in current dir (which is what we want), just wait the 2.0
 	git pull origin master			&&
@@ -1580,7 +1580,7 @@ func_translate_google() {
 	res_simple=$(echo "$res_raw" | awk -F"," '{printf "%s\n", $1}' | awk -F"\"" '{print $2}')
 	echo "$res_simple"
 	echo "$res_raw"
-	echo -e "$*\t$res_simple\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname)"
+	echo -e "$*\t$res_simple\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname -s)"
 }
 
 func_translate_microsoft() { 
@@ -1617,7 +1617,7 @@ func_translate_microsoft() {
 	[ -z "$res_raw" ] && return 1
 
 	echo "$res_raw"
-	echo -e "$*\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname)"
+	echo -e "$*\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname -s)"
 }
 
 func_delete_dated() { 
@@ -2691,7 +2691,7 @@ func_dup_find_CALL_GATHER_FIRST() {
 
 func_dup_shrink_md5_list() {
 	local hn
-	hn="$(hostname)"
+	hn="$(hostname -s)"
 	if [[ "${hn}" = lapmac* ]] ; then
 		func_dup_shrink_md5_list_lapmac
 		return
