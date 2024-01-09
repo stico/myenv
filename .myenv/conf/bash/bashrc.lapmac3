@@ -1,0 +1,47 @@
+# lapmac
+# 	HW	mac book pro (15")
+# 	OS	High Sierra (2018-05)
+# 	FOR	work
+
+bash_prompt_color=green
+
+# cmd `ls` need this to correctly show Chinese filename
+export LC_ALL="en_US.UTF-8"
+
+# homebrew
+
+# zbox
+#zbox_use_silent go		1.14.2
+#zbox_use_silent macvim		git
+#zbox_use_silent maven		3.1.1
+#zbox_use_silent mysql		5.6.23
+#zbox_use_silent ruby		2.2.0
+#zbox_use_silent gradle		4.0
+#zbox_use_silent chromedriver	2.19
+#zbox_use_silent fzf		git
+#zbox_use_silent shellcheck	git
+#zbox_use_silent unison		2.48.3
+#zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
+
+#zbox_use_silent nodejs		6.3.1		# default to use macports version
+#zbox_use_silent python		3.7.1		# default to use macports version
+#zbox_use_silent python		2.7.10		# YouCompleteMe@vim seems support python3 now
+
+#zbox_use_silent androidsdk	26.0.2		# use Android Studio buildin seems easier
+
+#zbox_use_silent kotlin		1.1.2.5		# NOT often used
+#zbox_use_silent mkvalidator	0.4.0		# NOT often used
+#zbox use php			5.5.10		# NOT often used
+#zbox use springloaded		1.2.0.RELEASE	# NOT often used
+
+#zbox use androidstudio		135.1339820	# Mac have its own way
+#zbox use idea			14.0.1		# Mac have its own way
+#zbox use eclipse		4.3.2 jee_x64	# Mac have its own way
+#zbox use oraclejdk				# Mac have its own way: installed via dmg
+#zbox use vim					# Mac have its own way: macvim (also in zbox)
+
+#zbox_use_silent neovim		0.3.1		# deprecated
+#zbox use fpp			git		# deprecated, by fzf
+#zbox use ant			1.9.4		# deprecated
+#zbox use adtbundle		20140702 x64	# deprecated
+
