@@ -12,6 +12,7 @@ oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 vimrc=$HOME/.vimrc
 jump=$MY_DCD/ops/jump
 biz=$MY_DCO/business/business.txt
+shc=$MY_DCB/note/dco/sihaichen.txt
 
 # DW
 dw=$MY_FCZ/dw
