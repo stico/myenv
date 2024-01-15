@@ -1078,14 +1078,23 @@ func_git_commit_push() {
 func_git_commit_check() { 
 	# TODO: check if myenv_lib and zbox_lib is same inode
 	for base in "$HOME" "$HOME/.zbox" "$HOME/Documents/FCS/oumisc/oumisc-git" "$HOME/.vim/bundle/vim-oumg" ; do 
-		pushd "$base" &> /dev/null 
+		pushd "$base" &> /dev/null || continue
 		git status | grep -q "nothing to commit, .* clean"	\
 		&& echo "NOT need update: $base"			\
 		|| echo "NEED update: $base" 
-		popd &> /dev/null 
+		popd &> /dev/null || continue
 	done
 }
 
+func_unison_cs_run() {
+	local profile_path="$HOME/.unison/cs_workpcII_$(hostname -s)_all.prf"
+
+	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+
+	unison "${profile_path##*/}"
+}
+
+# seems deprecated
 func_unison_fs_lapmac_all() {
 	local mount_path="/Volumes/Untitled"
 
@@ -1100,7 +1109,7 @@ func_unison_fs_lapmac_all() {
 	local disk_candidates="$("ls" -t /dev/disk*s1 --ignore "disk0s1")"
 	for disk_path in ${disk_candidates} ; do
 		if echo "${disk_status}" | grep -q "${disk_path}" ; then
-			echo "INFO: ${disk_path} alread mounted, try next"
+			echo "INFO: ${disk_path} already mounted, try next"
 			disk_path=""
 		else
 			echo "INFO: found: ${disk_path} is available"

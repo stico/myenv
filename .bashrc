@@ -39,7 +39,7 @@ fi
 # NOTE: unison remote style can NOT accept .bashrc have output
 source "${COMPLETION}" >/dev/null 2>&1
 source "${MACPORTS_PATH}/${COMPLETION}" >/dev/null 2>&1
-source "${HOMEBREW_PATH}/etc/profile.d/bash_completion.sh"
+source "${HOMEBREW_PATH}/etc/profile.d/bash_completion.sh" >/dev/null 2>&1
 complete -F _known_hosts scpx sshx ssht
 
 # Step 4: Source env

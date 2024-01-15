@@ -57,11 +57,12 @@ $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
 
 # rime on osx
-$HOME/Library/Rime/sync/
+$HOME/Library/Rime/installation.yaml
 $HOME/Library/Rime/weasel.custom.yaml
 $HOME/Library/Rime/default.custom.yaml
 $HOME/Library/Rime/squirrel.custom.yaml
 $HOME/Library/Rime/wubi_pinyin.custom.yaml
+#$HOME/Library/Rime/wubi86.userdb		# user words
 
 # eval: /ext structure
 `[ -e "$MY_EXT" ] && tree -L 2 $MY_EXT > $MY_ENV/zgen/tree_ext.txt && echo $MY_ENV/zgen/tree_ext.txt`
