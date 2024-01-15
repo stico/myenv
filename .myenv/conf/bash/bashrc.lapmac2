@@ -18,7 +18,7 @@ zbox_use_silent gradle		4.0
 zbox_use_silent chromedriver	2.19
 zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
-zbox_use_silent unison		2.48.3
+#zbox_use_silent unison		2.48.3		# use the port version
 zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
 
 #zbox_use_silent nodejs		6.3.1		# default to use macports version

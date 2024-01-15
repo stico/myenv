@@ -1086,12 +1086,21 @@ func_git_commit_check() {
 	done
 }
 
+func_unison_fs_run() {
+	local profile_path="$HOME/.unison/fs_$(hostname -s)_all.prf"
+
+	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+
+	unison -ui text "${profile_path##*/}"
+}
+
 func_unison_cs_run() {
 	local profile_path="$HOME/.unison/cs_workpcII_$(hostname -s)_all.prf"
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
 
-	unison "${profile_path##*/}"
+	# macports version of unison on lapmac2 need "-ui text"
+	unison -ui text "${profile_path##*/}"
 }
 
 # seems deprecated
