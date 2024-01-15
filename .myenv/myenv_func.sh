@@ -281,12 +281,12 @@ func_vi_conditional() {
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
 	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
 	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
-		# pre condition: '+clientserver', 
-		# -g mean use GUI version
+	local macvim_path="/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim"
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] && [ -e "${macvim_path}" ]; then
+		# pre condition: '+clientserver', "-g": use GUI version
 		# directly use "vim -g" behaves wired (mess up terminal)
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
-		/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
+		"${macvim_path}" -g --servername SINGLE_VIM --remote-tab "$@"
 
 		# Seems osx mojave not need this any more
 		# # Need wait for the 1st time. (Why open 2 vim for the 1st time) 
@@ -465,25 +465,23 @@ func_vi() {
 	# shortcut - open a new one
 	[ -z "$*" ] && func_vi_conditional && return 0
 
-	# shortcut - only one parameter
-	[ $# -eq 1 ] && [ -e "${1}" ] && func_vi_conditional "${1}" && return 0			# file exist
-	[ $# -eq 1 ] && [[ "${1}" == *.* ]] && func_vi_conditional "${1}" && return 0		# in form of x.y like abc.txt
-
-	# shortcut - only one tag, and exist
 	local base="$(func_tag_value "${1}")"
+
+	# 1 param: priority: file exist > tag exist > normal
 	if [ $# -eq 1 ] ; then
-		[ ! -e "${base}" ] && func_die "ERROR: ${base} not exist!"
-		func_vi_conditional "${base}"
-		return 0 
+		[ -e "${1}" ] && func_vi_conditional "${1}" && return 0
+		[ -e "${base}" ] && func_vi_conditional "${base}" && return 0
+		func_vi_conditional "${1}"
+		return 0
 	fi
 
-	# Version 2, use locate 
+	# 2+ param: v2: use locate 
 	[ -d "$base" ] && shift || base="./"
 	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" /)" ] && func_die "ERROR: base should NOT be root (/)"
 	[ "$(stat -c "%d:%i" ${base})" == "$(stat -c "%d:%i" "${HOME}")" ] && func_die "ERROR: base should NOT be \$HOME dir"
 	func_vi_conditional "$(func_locate "FILE" "${base}" "$@")"
 
-	# Version 1, old .fl_me.txt
+	# 2+ param: v1: old .fl_me.txt
 	# Find target, if cache version return error, try no-cache version
 	# func_find_dotcache result_target f $base $* || func_find result_target f $base $*
 	#[ -n "$result_target" ] && func_vi_conditional "$base/$result_target" || func_vi_conditional "$@"
