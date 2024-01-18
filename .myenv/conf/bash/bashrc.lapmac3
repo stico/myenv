@@ -29,7 +29,7 @@ export PATH="/opt/homebrew/opt/gawk/libexec/gnubin:$PATH"
 export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
 # zbox
-zbox_use_silent unison		2.51.5
+zbox_use_silent unison		2.51.5 ocaml_4.12.1
 #zbox_use_silent go		1.14.2
 #zbox_use_silent macvim		git
 #zbox_use_silent maven		3.1.1

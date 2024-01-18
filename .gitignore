@@ -54,6 +54,7 @@
 !/.xbindkeysrc.d/*
 !/.vim/
 !/.vim/coc-settings.json
+/.vim/pack/*
 /.vim/bundle/*
 /.vim/autoload/*
 #!/.vim/*

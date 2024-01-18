@@ -281,12 +281,16 @@ func_vi_conditional() {
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
 	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
 	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	local macvim_path="/Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim"
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] && [ -e "${macvim_path}" ]; then
+	local macvim_path="$HOME/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim"
+	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
 		# pre condition: '+clientserver', "-g": use GUI version
 		# directly use "vim -g" behaves wired (mess up terminal)
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
-		"${macvim_path}" -g --servername SINGLE_VIM --remote-tab "$@"
+		if [ -e "${macvim_path}" ] ; then
+			"${macvim_path}" -g --servername SINGLE_VIM --remote-tab "$@"
+		elif func_is_cmd_exist gvim ; then
+			gvim -g --servername SINGLE_VIM --remote-tab "$@"
+		fi
 
 		# Seems osx mojave not need this any more
 		# # Need wait for the 1st time. (Why open 2 vim for the 1st time) 
