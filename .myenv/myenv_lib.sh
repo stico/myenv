@@ -8,7 +8,8 @@
 # - use func_pkg_mgmt_ins instead of
 # 	sudo port install
 # 	sudo apt-get instal
-#
+# - lots tool need gnu, how to check?
+#	sort/find/sed/awk
 ################################################################################
 # Const
 ################################################################################
@@ -125,6 +126,14 @@ func_vcs_update() {
 	fi
 }
 
+func_ver_increase() {
+	local usage="Usage: ${FUNCNAME[0]} <v1> <v2>"
+	local desc="Desc: check if v1 > v2 is increased, also return true if equals"
+	func_param_check 2 "$@"
+	
+	# ref: https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
+	printf '%s\n' "$1" "$2" | sort -C -V
+}
 ################################################################################
 # Process
 ################################################################################
@@ -810,7 +819,8 @@ func_download_wget() {
 
 	# TODO: add control to unsecure options?
 
-	wget --progress=dot --no-check-certificate "${1}" 2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" 
+	# "dot:giga": each dot represents 1M retrieved
+	wget --progress=dot:giga --no-check-certificate "${1}" 2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" 
 
 	# Note, some awk version NOT works friendly
 	# Command line explain: [Showing File Download Progress Using Wget](http://fitnr.com/showing-file-download-progress-using-wget.html)
