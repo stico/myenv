@@ -977,18 +977,19 @@ func_rsync_del_detect() {
 func_rsync_out_brief() {
 	local usage="Usage: ${FUNCNAME[0]} <log_file>" 
 	local desc="Desc: show brief of rsync out" 
-	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
+	[ $# -lt 1 ] && echo -e "${desc}\n${usage} \n" && exit 1
 
 	local log_file del_count
 	log_file="${1}"
 	func_complain_path_not_exist "${log_file}" && return 1
 	del_count="$(grep -c "^deleting " "${log_file}")"
 
-	awk -v del_count="${del_count}"			\
-	 '{
-		 /DEBUG|INFO|WARN|ERROR/ {print;next;}	# reserve log lines
+	awk -v del_count="${del_count}" '
+	BEBIN {}
 
-		/\/$/ { next ;}				# remove dirs in output, which not really will change
+		/DEBUG|INFO|WARN|ERROR/ { print; next; }	# reserve log lines
+
+		/\/$/ { next; }					# remove dirs in output, which not really will change
 		/^File list / { next; }
 		/^Total bytes / { next; }
 		/^Literal data:/ { next; }
@@ -999,8 +1000,8 @@ func_rsync_out_brief() {
 		/^sending incremental file/ { next; }
 
 		/^deleting / {
-			if (del_count > 50) {		# need shrink lines if too much
-				sub("[^/]*$", "", $0); 	# remove leaf files to reduce lines (by func_shrink_dup_lines later)
+			if (del_count > 50) {			# need shrink lines if too much
+				sub("[^/]*$", "", $0); 		# remove leaf files to reduce lines (by func_shrink_dup_lines later)
 				print "updating " $0;
 			} else {
 				print $0;
@@ -1009,24 +1010,25 @@ func_rsync_out_brief() {
 		}
 
 		/\// {
-			sub("[^/]*$", "", $0); 		# remove leaf files to reduce lines (by func_shrink_dup_lines later)
+			sub("[^/]*$", "", $0); 			# remove leaf files to reduce lines (by func_shrink_dup_lines later)
 			print "updating " $0;
 			next;
 		}
 
-		{ print $0; }				# for other lines, just print out
-	}
+		// { print $0; }				# for other lines, just print out
+
 	END {
 		print "======== NOTE: Lines Compacted, Check Detail ! ========"
-	}
-	' "${log_file}"					\
-	| head --lines=-3				\
+	}' "${log_file}"					\
+	| head --lines=-3					\
 	| func_shrink_dup_lines 
 }
 
+# TODO: seems deprecated
 func_rsync_out_filter_mydoc() {
 	# shellcheck disable=2148
-	awk '	/DEBUG|INFO|WARN|ERROR/ {print $0;next;}	# reserve log lines
+	awk '
+		/DEBUG|INFO|WARN|ERROR/ { print;next; }	# reserve log lines
 
 		/^$/ {			next;}	# skip empty lines
 		/\/$/ {			next;}	# skip dir lines

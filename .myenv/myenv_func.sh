@@ -2790,7 +2790,8 @@ func_file_count_of_dir(){
 
 func_mydata_sync_v2(){
 
-	# STATUS_A: 2023-00 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
+	# NOTE_BDTA_1	2023-05 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
+	#		2024-01 use ~exfat-fuse@osx works
 
 	# TODO: filter/summary rysnc result: func_rsync_out_filter_dry_run@lib
 	# TODO: wsl can NOT show utf-8
@@ -2808,10 +2809,10 @@ func_mydata_sync_v2(){
 	fi
 
 	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
+		mnt_path="/Volumes"
 		tcz_path="/tmp/tcz"
 		btca_path="/tmp/btca"			# 3.5" disk
-		#bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~STATUS_A)
-		mnt_path="/Volumes"
+		bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~NOTE_BDTA_1)
 		dtz_path="${mnt_path}/DTZ"
 		mhd500_path="${mnt_path}/MHD500"
 	fi
@@ -2906,17 +2907,21 @@ func_mydata_sync_doc_unison() {
 func_mydata_sync_doc_rsync() {
 	func_complain_path_not_exist "${1}" && return 1
 
-	local d target opts doc_ex_base
+	local d target opts doc_ex_base src tgt
 	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
 	func_validate_path_exist "${doc_ex_base}"
 	
 	target="${1}"
 	for d in DCB DCC DCD DCM DCO DCZ FCS FCZ ; do
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
-		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
 
-		func_info "DOC-RSYNC: ${MY_DOC}/${d} <-> ${target}/${d}"
-		func_rsync_ask_then_run "${MY_DOC}/${d}" "${target}/${d}" "${opts}"
+		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
+		src="${MY_DOC}/${d}/"
+		tgt="${target}/${d}/"
+
+		# rsync cares the last "/", should be the same, better ending with "/"
+		func_info "DOC-RSYNC: ${src} -> ${tgt}"
+		func_rsync_ask_then_run "${src}" "${tgt}" "${opts}"
 	done
 }
 
