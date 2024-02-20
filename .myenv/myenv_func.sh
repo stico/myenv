@@ -151,7 +151,7 @@ func_fullpath() {
 	local fullpath="$(readlink -f "${path}")"
 
 	if func_is_personal_machine ; then
-		if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+		if func_is_os_osx ; then
 			echo "${fullpath}" | tr -d '\n' | pbcopy
 			echo "${fullpath}"
 			return
@@ -174,7 +174,7 @@ func_to_clipboard() {
 	# put data into clipboard, each line as an entry
 	while IFS= read -r line || [[ -n "${line}" ]]; do 
 		echo "$line"
-		if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+		if func_is_os_osx ; then
 			echo "${line}" | tr -d '\n' | pbcopy
 		else
 			echo "${line}" | tr -d '\n' | clipit -c &> /dev/null
@@ -281,8 +281,8 @@ func_vi_conditional() {
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
 	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
 	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	local macvim_path="$HOME/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim"
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+	local macvim_path="$HOME/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/mvim"
+	if func_is_os_osx ; then
 		# pre condition: '+clientserver', "-g": use GUI version
 		# directly use "vim -g" behaves wired (mess up terminal)
 		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
@@ -540,7 +540,7 @@ func_best_hostname() {
 	# case 1: always use hostname
 	hostname="$(hostname -s)" 
 	used="/baiduvm/awsvm/myvm/azvm/"
-	if [ "$(func_os_name)" = "${OS_OSX}" ] || func_is_personal_machine ; then	# check if personal (assume osx also yes)
+	if func_is_os_osx || func_is_personal_machine ; then	# check if personal (assume osx also yes)
 		echo "${hostname}"
 		return
 	fi
@@ -746,7 +746,7 @@ func_collect_all() {
 	echo "INFO: collecting miscnote"
 	local miscnote_content=${base}/miscnote_content.txt
 	local miscnote_filelist=${base}/miscnote_filelist.txt
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+	if func_is_os_osx ; then
 		mdfind -name NOTE | sed -e '/txt$/!d;/NOTE/!d;/\/amp\//d' >> "${miscnote_filelist}"
 	else
 		locate --regex "(/A_NOTE.*.txt|--NOTE.*txt)$" | sed -e "/\/amp\//d" >> "${miscnote_filelist}"
@@ -830,7 +830,7 @@ func_collect_all() {
 	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCS ; do				# v3, compacted docs
 		# shellcheck disable=2015
 		# TODO: use func_pipe_remove_lines instead
-		( [ "${MY_OS_NAME}" = "${OS_OSX}" ]			\
+		( func_is_os_osx					\
 		&& find "${MY_DOC}/${d}" -type f			\
 		|| locate "$(readlink -f "${MY_DOC}/${d}")" )		\
 		| sed							\
@@ -1112,7 +1112,7 @@ func_unison_fs_lapmac_all() {
 	local mount_path="/Volumes/Untitled"
 
 	# only works: 1) on osx, 2) in interactive mode
-	[ "${MY_OS_NAME}" = "${OS_OSX}" ] || func_die "ERROR: this function only works on OSX"
+	func_is_os_osx || func_die "ERROR: this function only works on OSX"
 	echo $- | grep -q "i" || func_die "ERROR: this function only works in interactive mode"
 
 	# TODO: use 'diskutil list' to correctly find disk
@@ -2332,7 +2332,7 @@ func_samba_umount() {
 	func_str_contains_blank "${mount_path}" && func_die "ERROR: critical config NOT set, pls check (mount_path)"
 
 	# umount
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+	if func_is_os_osx ; then
 		umount "${mount_path}"
 	else
 		func_die "ERROR: pls write code for current os: ${MY_OS_NAME}"
@@ -2362,7 +2362,7 @@ func_samba_mount() {
 
 	# mount
 	[ -d "${mount_path}" ] || mkdir -p "${mount_path}"
-	if [ "${MY_OS_NAME}" = "${OS_OSX}" ] ; then
+	if func_is_os_osx ; then
 		echo "INFO: cmd: mount_smbfs ${samba_path} ${mount_path}"
 		mount_smbfs "${samba_path}" "${mount_path}"
 	else

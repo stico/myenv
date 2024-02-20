@@ -1388,11 +1388,15 @@ func_os_info() {
 	echo "${os_name}_${os_ver}_${os_len}"
 }
 
+func_is_os_osx() {
+	[[ "$(func_os_name)" = "${OS_OSX}"* ]]
+}
+
 func_pkg_mgmt_cmd() {
 	local os_name="$(func_os_name)" 
 	[ "${os_name}" = "${OS_DEBIAN}" ] && echo "apt" && return
-	[ "${os_name}" = "${OS_OSX}" ] && [ -d "/opt/local/man" ] && echo "port" && return
-	[ "${os_name}" = "${OS_OSX}" ] && [ -d "/opt/homebrew/Cellar" ] && echo "brew" && return
+	func_is_os_osx && [ -d "/opt/local/man" ] && echo "port" && return
+	func_is_os_osx && [ -d "/opt/homebrew/Cellar" ] && echo "brew" && return
 	echo "UNKNOWN_PKG_CMD"
 }
 
@@ -1530,9 +1534,9 @@ func_ip_list() {
 	# NOTE: "tr -s ' '" compact space to single for better field identify
 	local os_name=${MY_OS_NAME:-$(func_os_name)}
 
-	if [ "${os_name}" = "${OS_CYGWIN}" ] ; then
+	if func_is_os_osx ; then
 		func_ip_list_via_ifconfig_cygwin
-	elif [ "${os_name}" = "${OS_OSX}" ] ; then
+	elif [ "${os_name}" = "${OS_CYGWIN}" ] ; then
 		func_ip_list_via_ifconfig_osx
 	elif [ "${os_name}" = "${OS_WIN}" ] ; then
 		func_ip_list_via_ipconfig_win
