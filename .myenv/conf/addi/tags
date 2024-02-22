@@ -11,6 +11,7 @@ oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 # Workspace
 ry=$MY_DCC/ruoyi/ruoyi.txt
 ryws=$MY_TMP/workspace/ruoyi
+rysc=$MY_TMP/workspace/ruoyi/script
 
 # DW
 dw=$MY_FCZ/dw

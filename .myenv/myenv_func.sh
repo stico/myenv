@@ -2475,7 +2475,7 @@ func_export_script() {
 		for f in $(type "${c}" | grep -o "func_[[:alnum:]_]*" | sort -u) ; do
 			count=$(( count + 1 ))
 
-			func_array_contans "${f}" "${fdone[@]}" "${ftodo[@]}" && continue
+			func_array_contains "${f}" "${fdone[@]}" "${ftodo[@]}" && continue
 			ftodo+=("${f}")
 			func_decho "found: ${f}"
 		done
