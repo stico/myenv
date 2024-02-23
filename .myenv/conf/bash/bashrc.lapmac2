@@ -8,6 +8,12 @@ bash_prompt_color=green
 # cmd `ls` need this to correctly show Chinese filename
 export LC_ALL="en_US.UTF-8"
 
+# MacPorts: before other path, but after(yeah, define before will appear after) zbox paths
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+
+# MacPorts Installer addition on 2020-12-25_at_14:46:01: adding an appropriate DISPLAY variable for use with MacPorts.
+export DISPLAY=:0
+
 # zbox
 zbox_use_silent go		1.14.2
 zbox_use_silent macvim		git
@@ -20,8 +26,8 @@ zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
 #zbox_use_silent unison		2.48.3		# use the port version
 zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
+zbox_use_silent nodejs		20.11.1
 
-#zbox_use_silent nodejs		6.3.1		# default to use macports version
 #zbox_use_silent python		3.7.1		# default to use macports version
 #zbox_use_silent python		2.7.10		# YouCompleteMe@vim seems support python3 now
 
@@ -47,13 +53,4 @@ zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
 ##
 # Your previous /Users/ouyangzhu/.bash_profile file was backed up as /Users/ouyangzhu/.bash_profile.macports-saved_2019-06-29_at_11:54:10
 ##
-
-# MacPorts Installer addition on 2019-06-29_at_11:54:10: adding an appropriate PATH variable for use with MacPorts.
-export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
-# Finished adapting your PATH environment variable for use with MacPorts.
-
-
-# MacPorts Installer addition on 2020-12-25_at_14:46:01: adding an appropriate DISPLAY variable for use with MacPorts.
-export DISPLAY=:0
-# Finished adapting your DISPLAY environment variable for use with MacPorts.
 
