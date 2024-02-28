@@ -28,8 +28,15 @@ export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
 export PATH="/opt/homebrew/opt/gawk/libexec/gnubin:$PATH"
 export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
+# homebrew misc
+export PATH="/opt/homebrew/opt/util-linux/bin:$PATH"
+export PATH="/opt/homebrew/opt/util-linux/sbin:$PATH"
+
 # zbox
 zbox_use_silent unison		2.51.5 ocaml_4.12.1
+zbox_use_silent oraclejdk	21.0.2 x64
+zbox_use_silent maven		3.9.6
+zbox_use_silent nodejs		20.11.1
 #zbox_use_silent go		1.14.2
 #zbox_use_silent macvim		git
 #zbox_use_silent maven		3.1.1

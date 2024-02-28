@@ -604,6 +604,10 @@
 	<integer>2</integer>
 	<key>MaxVertically</key>
 	<false/>
+	<key>NeverWarnAboutShortLivedSessions_3BB40051-9565-434A-9FAE-E8A850C601F2</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_3BB40051-9565-434A-9FAE-E8A850C601F2_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
