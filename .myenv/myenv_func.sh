@@ -1099,7 +1099,29 @@ func_unison_fs_run() {
 }
 
 func_unison_cs_run() {
-	local profile_path="$HOME/.unison/cs_workpcII_$(hostname -s)_all.prf"
+	local hn="$(hostname -s)"
+	if [[ "${hn}" == "lapmac2" ]] ; then
+		func_unison_cs_run_on_lapmac2
+		return
+	fi
+	if [[ "${hn}" == "lapmac3" ]] ; then
+		func_unison_cs_run_on_lapmac3
+		return
+	fi
+	echo "ERROR: can NOT match hostname (${hn}), pls check!"
+}
+
+func_unison_cs_run_on_lapmac3() {
+	local profile_path="$HOME/.unison/cs_workpcII_lapmac2_all.prf"
+
+	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+
+	# macports version of unison on lapmac2 need "-ui text"
+	unison -ui text "${profile_path##*/}"
+}
+
+func_unison_cs_run_on_lapmac2() {
+	local profile_path="$HOME/.unison/cs_lapmac2to3_run_on_3_all.prf"
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
 
@@ -2065,6 +2087,10 @@ func_apt_add_repo() {
 	sudo add-apt-repository -y "${apt_repo_name}" &> /dev/null
 }
 
+func_find_big_files() {
+	find . -type f -printf "%s\t%p\n" | sort -n | tail
+}
+
 func_find_space() {
 	echo -e "INFO: 1st check"
 	du -sh ~/amp				2>&1 | sed -e "/Permission denied/d"
@@ -2633,11 +2659,11 @@ func_dup_find_gen_md5_PRIVATE() {
 
 func_dup_gather_then_find() {
 	func_dup_gather
-	func_dup_find_CALL_GATHER_FIRST
+	func_dup_find
 }
 
 # shellcheck disable=2120
-func_dup_find_CALL_GATHER_FIRST() {
+func_dup_find() {
 	# TOOL SCRIPT
 	# - 01: split result file by lines of dup
 	#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'

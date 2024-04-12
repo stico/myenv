@@ -55,6 +55,7 @@ $HOME/.config/karabiner/assets/complex_modifications/
 $HOME/.config/fcitx/table/wbpy_LastAutoPhrase.tmp
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
 $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+$HOME/Library/Application Support/espanso/match/base.yml
 
 # rime on osx
 $HOME/Library/Rime/installation.yaml
