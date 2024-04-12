@@ -1111,22 +1111,23 @@ func_unison_cs_run() {
 	echo "ERROR: can NOT match hostname (${hn}), pls check!"
 }
 
-func_unison_cs_run_on_lapmac3() {
+func_unison_cs_run_on_lapmac2() {
 	local profile_path="$HOME/.unison/cs_workpcII_lapmac2_all.prf"
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
 
+	echo "Start to run with profile: ${profile_path##*/}"
 	# macports version of unison on lapmac2 need "-ui text"
 	unison -ui text "${profile_path##*/}"
 }
 
-func_unison_cs_run_on_lapmac2() {
+func_unison_cs_run_on_lapmac3() {
 	local profile_path="$HOME/.unison/cs_lapmac2to3_run_on_3_all.prf"
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
 
-	# macports version of unison on lapmac2 need "-ui text"
-	unison -ui text "${profile_path##*/}"
+	echo "Start to run with profile: ${profile_path##*/}"
+	unison "${profile_path##*/}"
 }
 
 # seems deprecated
