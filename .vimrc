@@ -314,6 +314,18 @@ inoremap <C-H> <C-Left>
 inoremap <C-L> <C-Right>
 " since original C-E (repeat char below) is useful, remap it to <C-T>
 inoremap <C-T> <C-E>
+" if no Karabiner used, need this, D means command key. NOTE: HJKL need in lowercase
+" D-l is occupied by gui menu, need unmap, see "gui_macvim" below
+" D-h is occupied by sys menu, need unmap: System Preferences > Keyboard > shortcut > Application Shortcut > All Application > (Add) "Hide MacVim" another key
+inoremap <D-k> <Up>
+inoremap <D-j> <Down>
+inoremap <D-h> <Left>
+inoremap <D-l> <Right>
+" Cancel some MacVim menu shortcut. Another way is to modify file: $VIMRUNTIME/menu.vim
+if has("gui_macvim")
+    "macmenu &File.Save key=<nop>
+    macmenu Tools.List\ Errors key=<nop>
+endif
 
 """""""""""""""""""""""""""""" H1 - Topic - Completion (also see 
 " NOTE: iskeyword MUST after the "set nocompatible"
@@ -881,7 +893,9 @@ endif
 "
 """""""""""""""""""""""""""""" H1 - Plugins
 """""""" pathogen@vim
-call pathogen#infect()
+if exists("g:loaded_pathogen") 
+	call pathogen#infect()
+endif
 
 """""""" solarized@vim
 let g:solarized_italic = 0				" 0 to set comment font NOT use italic
