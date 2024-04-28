@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # this file is used by login shell, so only show things you want to see in login, and other thiings in .bashrc
-if [ -f ~/.bashrc ]; then
-   source ~/.bashrc
+
+# do not load .bashrc If not running interactively
+if [ -n "$PS1" ] ; then		
+   if [ -f ~/.bashrc ]; then
+      source ~/.bashrc
+   fi
 fi
 
 # following is for key auth
