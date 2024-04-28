@@ -4,7 +4,7 @@
 # NOTE: many tool (e.g. unison) can not accept .bashrc have output in remote style 
 
 # Pre-Check
-[ -z "$PS1" ] && return		# If not running interactively, just return
+#[ -z "$PS1" ] && return		# (moved to ~/.bash_profile, since return only valid in function. If not running interactively, just return
 
 # Variables
 MACPORTS_PATH="/opt/local"
