@@ -893,8 +893,9 @@ endif
 "
 """""""""""""""""""""""""""""" H1 - Plugins
 """""""" pathogen@vim
-if exists("g:loaded_pathogen") 
-	call pathogen#infect()
+"if filereadable("~/.vim/autoload/pathogen.vim")	" NOT work
+if !empty(glob("~/.vim/autoload/pathogen.vim"))
+	execute pathogen#infect()
 endif
 
 """""""" solarized@vim

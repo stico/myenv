@@ -2089,7 +2089,7 @@ func_apt_add_repo() {
 }
 
 func_find_big_files() {
-	find . -type f -printf "%s\t%p\n" | sort -n | tail
+	find . -type f -printf "%s\t%p\n" | sort -n | tail -"${1}"
 }
 
 func_find_space() {
