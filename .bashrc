@@ -10,6 +10,7 @@
 MACPORTS_PATH="/opt/local"
 HOMEBREW_PATH="/opt/homebrew"
 COMPLETION="/etc/bash_completion"
+HOST_NAME="$(hostname -s)"
 
 # Misc
 stty -ixon			# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
@@ -46,7 +47,7 @@ complete -F _known_hosts scpx sshx ssht
 source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
 source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
-source "${HOME}/.myenv/conf/bash/bashrc.$(hostname -s)" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/bash/bashrc.${HOST_NAME}" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
 #source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1
 
@@ -61,8 +62,13 @@ source /etc/infinality-settings.sh >/dev/null 2>&1					# infinality font renderi
 if func_is_personal_machine ; then
 	umask 077									# only set this for personal machie
 	func_ssh_agent_init &> /dev/null						# Init ssh agent
-	export PS1="\[\e[32m\]\w\$\[\e[0m\]"						# Green line with $ in same line
-	#export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"				# Green line with $ in same line
+
+	if [[ "${HOST_NAME}" = lapmac2 ]] ; then
+		export PS1="\[\e[32m\]\w\$\[\e[0m\]"					# Green line with $ in same line
+		#export PS1="\[\e[32m\]\u@\h \[\e[32m\]\w\$\[\e[0m\]"			# Green line with $ in same line
+	else
+		export PS1="\[\e[36m\]\w\$\[\e[0m\]"					# Cyan
+	fi
 elif func_is_internal_machine ; then 
 	func_ssh_agent_init &> /dev/null						# Init ssh agent
 	LOCAL_IP=$(func_ip_list | sed -e 's/.*\s\+//;/^10\./d;/^\s*$/d' | head -1)	# alternative (NOT work on ubuntu 9.04): $(hostname -I|sed "s/ .*//")
