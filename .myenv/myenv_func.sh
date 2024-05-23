@@ -827,7 +827,7 @@ func_collect_all() {
 	local mydoc_filelist=${base}/mydoc_filelist.txt
 	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECS  ECZ  FCS  FCZ ; do	# v1, deprecated
 	#for d in DCB  DCC  DCD  DCM DCO  ECB  ECE  ECH  ECZ  ECS ; do			# v2, deprecated, put ECS in the end
-	for d in DCB DCC DCD DCH DCM DCO DCS DCZ FCS ; do				# v3, compacted docs
+	for d in DCB DCC DCD DCH DCM DCO DCS FCS ; do					# v3, compacted docs
 		# shellcheck disable=2015
 		# TODO: use func_pipe_remove_lines instead
 		( func_is_os_osx					\
@@ -2939,7 +2939,7 @@ func_mydata_sync_doc_rsync() {
 	func_validate_path_exist "${doc_ex_base}"
 	
 	target="${1}"
-	for d in DCB DCC DCD DCM DCO DCZ FCS FCZ ; do
+	for d in DCB DCC DCD DCM DCO FCS FCZ ; do
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
 
 		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
