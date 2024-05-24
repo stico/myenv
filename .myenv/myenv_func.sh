@@ -266,6 +266,24 @@ func_select_line() {
 	echo "${content}" | sed -n -e "${selection}p"
 }
 
+func_diff_localtolapmac2() {
+	! [[ "$(hostname -s)" = lapmac3 ]] && echo "ERROR: current host is NOT lapmac3, pls check!" && return
+	func_param_check 1 "$@"
+
+	local local_path remote_path
+	if [[ "$#" = 1 ]] ; then
+		local_path="${1}"
+		remote_path="${1}"
+	else
+		local_path="${1}"
+		remote_path="${2}"
+	fi
+
+	local remote_cmd="cat '${remote_path}'"
+	diff "${local_path}" <(ssh lapmac2 "${remote_cmd}")
+	
+}
+
 func_vi_conditional() {
 	# cygwin env: win style path + background job
 	if [ "${MY_OS_NAME}" = "${OS_CYGWIN}" ] ; then
