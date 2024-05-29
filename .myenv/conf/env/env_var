@@ -17,6 +17,7 @@ MY_DOC		%HOME%Documents
 MY_DCB		%HOME%Documents#DCB
 MY_DCC		%HOME%Documents#DCC
 MY_DCD		%HOME%Documents#DCD
+MY_DCJ		%HOME%Documents#DCJ
 MY_DCD_PROJ	%HOME%Documents#DCD#project
 MY_DCH		%HOME%Documents#DCH
 MY_DCM		%HOME%Documents#DCM

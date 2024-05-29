@@ -6,7 +6,6 @@ jump=$MY_DCD/ops/jump
 ws=$MY_TMP/workspace
 md=$MY_TMP/data/mydata
 mydata=$MY_TMP/data/mydata
-shc=$MY_DCB/note/dco/sihaichen.txt
 vimrc=$HOME/.vimrc
 oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 
@@ -48,6 +47,7 @@ dcb=$MY_DCB
 dcc=$MY_DCC/dcc.txt
 dcd=$MY_DCD/dcd.txt
 dco=$MY_DCO/dco.txt
+dcj=$MY_DCJ/dcj.txt
 dch=$MY_DCH
 dcm=$MY_DCM
 dcs=$MY_DCS
@@ -67,7 +67,6 @@ ml=$MY_DCC/machinelearning/machinelearning.txt
 cs=$MY_DCC/computer_system/computer_system.txt
 ca=$MY_DCC/computer_architecture/computer_architecture.txt
 ds=$MY_DCC/dsaa/data_structure.txt
-shc=$MY_DCO/housing/店面_四海城/note.txt
 
 # DCC - notes
 win=$MY_DCC/windows/windows.txt

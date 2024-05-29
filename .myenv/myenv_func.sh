@@ -1112,6 +1112,7 @@ func_unison_fs_run() {
 	local profile_path="$HOME/.unison/fs_$(hostname -s)_all.prf"
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+	func_backup_myenv_today
 
 	unison -ui text "${profile_path##*/}"
 }
@@ -1730,6 +1731,21 @@ func_backup_myenv_cmd_out() {
 		fi
 	done
 	popd &> /dev/null || return
+}
+
+func_backup_myenv_today() { 
+	local desc="Desc: backup myenv if not, skip if already done today" 
+	
+	local last_bak_dati curr_bak_dati
+	curr_bak_date="$(func_date)"
+	last_bak_date="$(find "${DBACKUP_BASE_DCB}" -name "*$(hostname -s)_myenv_backup.zip" -printf "%f\n" | tail -1 | cut -b1-10)"
+
+	if [[ "${curr_bak_date}" == "${last_bak_date}" ]] ; then 
+		echo "INFO: myenv already backup today, skip"
+		return
+	fi
+
+	func_backup_myenv
 }
 
 func_backup_myenv() { 
