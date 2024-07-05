@@ -3182,6 +3182,15 @@ func_mydata_sync_note() {
 	#	DTZ > TCZ	# ???
 }
 
+func_mute() {
+	osascript -e "set volume with output muted"
+
+	# Unmute volume
+	# osascript -e "set volume without output muted"
+
+	# check mute status
+	# osascript -e "output muted of (get volume settings)"
+}
 
 # THIS MUST IN THE END OF SCRIPT
 MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script
