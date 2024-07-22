@@ -2849,6 +2849,22 @@ func_file_count_of_dir(){
 	done
 }
 
+func_mydata_sync_v3(){
+	# NOTE
+	#	DISK
+	#		NAME	FS	DESC
+	#		----	----	----
+	#		DTZ	ExFAT	5T black
+	#		TCZ		5T grey
+	#	FLOW
+	#		doc	lapmac2 <-> lapmac3 -> DTZ -> 
+
+	local
+
+	[[ "${HOSTNAME}" != lapmac* ]] && echo "ERROR: only runs on lapmac* !" && return
+	echo "run run run"
+}
+
 func_mydata_sync_v2(){
 
 	# NOTE_BDTA_1	2023-05 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk

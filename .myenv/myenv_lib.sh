@@ -607,6 +607,10 @@ func_file_line_count() {
 	wc -l "${1}" | cut -d' ' -f1
 }
 
+func_file_size_human() {
+	func_num_to_human "$(func_file_size "$@")"
+}
+
 func_file_size() {
 	local usage="Usage: ${FUNCNAME[0]} <target>"
 	local desc="Desc: get file size, in Bytes" 
@@ -1685,6 +1689,19 @@ func_array_contains() {
 		[[ "$e" == "$1" ]] && return 0
 	done
 	return 1
+}
+
+func_array_join() {
+	local usage="USAGE: ${FUNCNAME[0]} <separator_str> <array-elements>" 
+	local desc="Desc: join items by separator (string)" 
+	func_param_check 2 "$@"
+	
+	local separator="${1-}"
+	local first_item="${2-}"
+	if shift 2; then
+		# '/#' means prepend "${separator}" string to each element
+		printf "%s" "${first_item}" "${@/#/${separator}}"
+	fi
 }
 
 ################################################################################
