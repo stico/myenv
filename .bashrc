@@ -30,6 +30,7 @@ if uname -s | grep -iq darwin ; then
 fi
 
 # Step 2: dircolors, must after PATH setting to compitable with OSX (macports or homebrew: libexec/gnubin/dircolors)
+# TODO: "set -x" show the cmd runs in sub-shell, is it really work?
 if [[ -f "${HOME}/.dir_colors" ]] ; then
 	SHELL="/bin/bash" eval "$(dircolors -b ~/.dir_colors)"
 else
@@ -43,10 +44,10 @@ source "${MACPORTS_PATH}/${COMPLETION}" >/dev/null 2>&1
 source "${HOMEBREW_PATH}/etc/profile.d/bash_completion.sh" >/dev/null 2>&1
 complete -F _known_hosts scpx sshx ssht
 
-# Step 4: Source env
-source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
-source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
+# Step 4: Source env (zb before me, since zb/me_lib.sh might out of sync)
 source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
+source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
+source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.${HOST_NAME}" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
 #source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1

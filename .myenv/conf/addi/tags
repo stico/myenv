@@ -8,6 +8,7 @@ md=$MY_TMP/data/mydata
 mydata=$MY_TMP/data/mydata
 vimrc=$HOME/.vimrc
 oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
+icloud=$HOME/Library/Mobile\ Documents/com~apple~CloudDocs/PERSONAL/
 
 # Workspace
 ry=$MY_DCC/ruoyi/ruoyi.txt
@@ -17,10 +18,11 @@ rysc=$MY_TMP/workspace/ruoyi/script
 # DW
 dw=$MY_FCZ/dw
 dwdoc=$MY_FCZ/dw/doc/update.sh
-dwdocconf=$HOME/Documents/DCD/vcs/doc_dw_update.sh
+dwdocconf=$MY_DCD/vcs/doc_dw_update.sh
 dwcode=$MY_FCZ/dw/code/update.sh
-dwcodeconf=$HOME/Documents/DCD/note/dwcodeaddr.sh
+dwcodeconf=$MY_DCD/note/dwcodeaddr.sh
 parkes=$MY_FCZ/dw/code/misc/parkes-framework/
+luoxi=$MY_DCD/aimr/aimr.txt
 
 # ZBOX
 zb=$ZBOX
@@ -48,6 +50,7 @@ dcc=$MY_DCC/dcc.txt
 dcd=$MY_DCD/dcd.txt
 dco=$MY_DCO/dco.txt
 dcj=$MY_DCJ/dcj.txt
+shc=$MY_DCJ/dcj.txt
 dch=$MY_DCH
 dcm=$MY_DCM
 dcs=$MY_DCS

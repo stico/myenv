@@ -110,7 +110,7 @@ dbackuptoremote		"func_backup_dated_to_remote test.163"
 			# Head: e - myenv 
 megf			"func_grep_myenv"
 mebackup		"func_backup_myenv"
-meload			"pushd ~ >> /dev/null; echo 'old pid: '$$', load time: '$(a='$'; eval echo '${a}MYENV_LOAD_TIME'); source %HOME%/.bashrc; echo 'new pid: '$$', load time: '$(a='$'; eval echo '${a}MYENV_LOAD_TIME'); popd >> /dev/null"
+meload			"pushd ~ >> /dev/null; echo 'old pid: '$$', load time: '$(a='$'; eval echo '${a}MYENV_LOAD_TIME'); source %HOME%/.bashrc; echo 'new pid: '$$', load time: '$(a='$'; eval echo '${a}MYENV_LOAD_TIME'); popd >> /dev/null ; diff ${ZBOX}/zbox_lib.sh ${MY_ENV}/myenv_lib.sh &> /dev/null || echo 'WARN: !!!!!!!! me/zb_lib.sh out of sync, pls check !!!!!!!!'"
 mehostsupdate		"sudo -E bash hosts_append.sh"
 #eremount		"sudo mount /ext/doc_win -o remount; sudo mount /ext/amp_win -o remount"
 

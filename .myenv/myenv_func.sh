@@ -865,7 +865,8 @@ func_collect_all() {
 		-e "/\/DCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
 		-e "/\/FCS\/[^\/]*\/[^\/]*\//d" `# only 2 sub layer`	\
 		-e "/\/target\//d" `# maven project target`		\
-		-e "/\.\(gif\|jpg\|png\|tif\)$/Id" `# for DCM`		>> "${mydoc_filelist}"
+		-e "/\.\(gif\|jpg\|jpeg\|svg\|webp\|bmp\|png\|tiff\|tif\|heic\|aae\|mp4\|mov\|m4a\)$/Id" `# for DCM`	>> "${mydoc_filelist}"
+
 
 		#-e "/\/zbase-yyworld\//d" `# have client_zbase`	\
 		#-e "/\/vendor\/ZF2\//d"				\
@@ -1109,12 +1110,23 @@ func_git_commit_check() {
 }
 
 func_unison_fs_run() {
-	local profile_path="$HOME/.unison/fs_$(hostname -s)_all.prf"
+	local hn profile_path
+	hn="$(hostname -s)"
+	profile_path="$HOME/.unison/fs_$(hostname -s)_all.prf"
 
-	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
-	func_backup_myenv_today
+	if [[ "${hn}" == "lapmac2" ]] ; then
+		echo "WARN: should only run on lapmac3"
+		return
+	fi
 
-	unison -ui text "${profile_path##*/}"
+	if [[ "${hn}" == "lapmac3" ]] ; then
+		func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+		func_backup_myenv_today
+		unison -ui text "${profile_path##*/}"
+		return
+	fi
+
+	echo "ERROR: can NOT match hostname (${hn}), pls check!"
 }
 
 func_unison_cs_run() {
@@ -2693,7 +2705,8 @@ func_dup_find_gen_md5_PRIVATE() {
 }
 
 func_dup_gather_then_find() {
-	func_dup_gather
+	# pass a empty str to avoid editor error report 
+	func_dup_gather ""
 	func_dup_find
 }
 
@@ -2824,7 +2837,24 @@ func_gen_filelist_with_size(){
 		out_path="/tmp/fl_${name}_$(func_dati).txt"
 	fi
 
-	find "${src_path}" -type f -printf '%s\t%P\n' | numfmt --field=1 --to=si --format="%-6f" > "${out_path}"
+	# V1, NOT work on UTF-8
+	# TODO: file encoding break after numfmt cmd (UTF-8 -> Non-ISO extended-ASCII)
+	#	cmd to prove: echo "8888 资格" | numfmt --to=si		# gets: "8.9K 资??"
+	#find "${src_path}" -type f -printf '%s\t%P\n' | numfmt --field=1 --to=si --format="%-6f" > "${out_path}"
+
+	# V2, work on UTF-8, cut file to 2 part, numfmt only handle the file size part
+	# TODO: how to check cut/paste correct? 1. compare func_file_line_count 2. ???
+	local tmpdir f_origin
+	tmpdir="$(mktemp -d)"
+	f_origin="${tmpdir}/a.size_file.by_find"
+	f_1st_col="${tmpdir}/b.1st.column"
+	f_2nd_col="${tmpdir}/c.2nd.column"
+	f_1st_col_numfmt="${tmpdir}/d.1st.column.numfmt"
+	find "${src_path}" -type f -printf '%s\t%P\n' > "${f_origin}"
+	cut -f1  "${f_origin}" > "${f_1st_col}"
+	cut -f2-  "${f_origin}" > "${f_2nd_col}"
+	numfmt --field=1 --to=si --format="%-6f" < "${f_1st_col}" > "${f_1st_col_numfmt}"
+	paste -d '\t' "${f_1st_col_numfmt}" "${f_2nd_col}" > "${out_path}"
 
 	echo "INFO: filelist at: ${out_path}"
 }
@@ -2852,69 +2882,93 @@ func_file_count_of_dir(){
 func_mydata_sync_v3(){
 	# NOTE
 	#	DISK
-	#		NAME	FS	DESC
-	#		----	----	----
-	#		DTZ	ExFAT	5T black
-	#		TCZ		5T grey
+	#		DISK	VOL	FS	NOTE-1		NOTE-2
+	#		----	----	----	----		----
+	#		tcz	tcz	ExFAT	5T grey
+	#		dtz	dtz	ExFAT	5T black
+	#		dtb	dtb	HSF+	2T black	FS Detail: with long data line
+	#		(3.5")	bdta	HSF+			FS Detail: MacOS entended (journaled) / case-insensitive / formatted by lapmac3 on 2024-07 
+	#		(3.5")	btca	HSF+			FS Detail: MacOS entended (journaled) / case-insensitive / formatted by lapmac3 on 2024-07
+	#		mhd500	mhd500		500G blue	(2024-07) all movie, not sync
+	#
 	#	FLOW
-	#		doc	lapmac2 <-> lapmac3 -> DTZ -> 
+	#		doc	lapmac2 <-> lapmac3	-> DTZ (via unison)
+	#						-> BDTA/tcz/btca (via rsync)
+	#		misc	DTZ -> BDTA
+	#			TCZ -> BTCA
 
-	local
+	# Var
+	local mnt_path tcz_path dtz_path btca_path bdta_path base tmp
+	mnt_path="/Volumes"
+	tcz_path="/tmp/tcz"
+	btca_path="/tmp/btca"
+	dtz_path="${mnt_path}/DTZ"
+	bdta_path="${mnt_path}/bdta"
 
+	# Pre-Check
 	[[ "${HOSTNAME}" != lapmac* ]] && echo "ERROR: only runs on lapmac* !" && return
-	echo "run run run"
+
+	# Clean up
+	for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
+		func_mydata_clean_up "${base}"
+	done
+
+	# Sync - misc
+	func_mydata_bi_sync "${tcz_path}" "${btca_path}" "h8"
+	func_mydata_bi_sync "${dtz_path}" "${bdta_path}" "gigi zz dudu video"
+
+	# Sync - doc
+	if [[ "$(hostname -s)" == "lapmac2" ]] || [[ "$(hostname -s)" == "lapmac3" ]] ; then
+		[[ -d "${dtz_path}/backup_unison" ]] && func_unison_fs_run
+		func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
+		func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
+		func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
+	fi
+
+	# Sync - XXX_HIST & XXX_TODO (try possible combination, assume 1st update dtz)
+	for tmp in "DCB_HIST" "DCJ_HIST" "DCM_HIST" "DCM_TODO" "DCS_HIST" ; do
+		func_mydata_bi_sync "${btca_path}/backup_rsync/" "${tcz_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${tcz_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${bdta_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${btca_path}/backup_rsync/" "${tmp}"
+	done
+
+	# Gen filelist
+	if [[ "${1}" != "-nofl" ]] ; then
+		for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
+			func_mydata_gen_fl "${base}"
+		done
+	fi
 }
 
-func_mydata_sync_v2(){
+func_mydata_clean_up() {
+	local f src tgt base trash line fl_del_alone fl_del_computer
+	base="${1}"
+	trash="${base}/alone/trash_for_clean_up"
+	fl_del_computer="${HOME}/amp/data/mydata/fl_delete"
 
-	# NOTE_BDTA_1	2023-05 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
-	#		2024-01 use ~exfat-fuse@osx works
+	[[ -d "${base}" ]] || return 0
+	func_complain_path_not_exist "${fl_del_computer}" "INFO: skip, since fl_del not found." && return 0
+	mkdir -p "${trash}"
 
-	# TODO: filter/summary rysnc result: func_rsync_out_filter_dry_run@lib
-	# TODO: wsl can NOT show utf-8
-	# TODO: tca/tcb/dta(G2TG)/dtb(MHD500) can be used for other thing?
+	# 2 location: computer or locally on disk (${base}/alone/fl_delete/20*.txt)
+	for f in "${fl_del_computer}"/20*.txt "${base}"/alone/fl_delete/20*.txt ; do
+		echo "INFO: start to clean up ${base}, according to: ${f##*/}"
+		while IFS= read -r line || [[ -n "${line}" ]] ; do
+			src="${base}/${line}"
+			tgt="${trash}/$(func_dati)_$(basename "${line}")"
+			[[ -e "${src}" ]] || continue
 
-	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path mhd500_path dcm_hist_base
-
-	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# note: driver is in lowercase in wsl1
-		mnt_path="/mnt/"
-		btca_path="${mnt_path}/o"		# 3.5" disk
-		bdta_path="${mnt_path}/p"		# 3.5" disk
-		tcz_path="${mnt_path}/r"
-		dtz_path="${mnt_path}/s"
-		#mhd500_path 				# laptp not need this
-	fi
-
-	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
-		mnt_path="/Volumes"
-		tcz_path="/tmp/tcz"
-		btca_path="/tmp/btca"			# 3.5" disk
-		bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~NOTE_BDTA_1)
-		dtz_path="${mnt_path}/DTZ"
-		mhd500_path="${mnt_path}/MHD500"
-	fi
-
-	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
-	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
-
-	# only lapmac2 need sync doc (see ~STATUS_A)
-	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
-		[[ -d "${dtz_path}/backup_unison" ]] && func_mydata_sync_doc_unison 
-		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
-		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
-		[[ -d "${bdta_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
-	fi
-
-	# RULE: DCM_HIST changes should happen in "${dcm_hist_base}" first! 
-	dcm_hist_base="${bdta_path}/backup_rsync/DCM_HIST/"
-	if [[ -d "${dcm_hist_base}" ]] ; then
-		[[ -d "${dtz_path}/backup_unison/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison/DCM_HIST/"
-		[[ -d "${tcz_path}/backup_rsync/DCM_HIST/"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync/DCM_HIST/"
-		[[ -d "${btca_path}/backup_rsync/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync/DCM_HIST/"
-	fi
-
-	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${btca_path}" "btca"
-	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl_and_upload_v2 "${bdta_path}" "bdta"
+			echo "INFO: --> mv ${src} ${tgt}"
+			if func_str_contains "${src}" "*" ; then
+				# $src need support wildcard, no quote
+				# shellcheck disable=2086
+				mv ${src} "${tgt}"
+			else
+				mv "${src}" "${tgt}"
+			fi
+		done < <(func_del_blank_and_hash_lines "${f}")
+	done
 }
 
 func_mydata_dcm_hist_sync() {
@@ -2946,50 +3000,16 @@ func_mydata_bi_sync() {
 	done
 }
 
-func_mydata_gen_fl_and_upload_v2(){
-	local base fl_dir fl real_name base_name
-	base="${1}"
-	real_name="${2}"
-	func_info "gen filelist for: ${base}"
-	func_complain_path_not_exist "${base}" && return
-
-	fl_dir="${base}/alone/fl_record"
-	base_name="$(basename "${base}")"
-	fl="${fl_dir}/fl_${real_name:-${base_name}}_$(func_dati).txt"
-
-	# gen
-	[[ -e "${fl_dir}" ]] || mkdir -p "${fl_dir}"
-	func_gen_filelist_with_size "${base}" "${fl}"
-
-	# remove useless lines
-	sed -i -e "
-		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
-		/\/FCS\//d;
-		/\/DCD\/mail\//d;
-		/\/DCM-to-\//d;
-		/\/DCM\/Inbox\//d;
-		/\/DCM_[-0-9_]*\//d;
-		/\/DCC\/coding\/leetcode\//d;
-		" "${fl}"
-
-	func_scp_to_cloud_vm azvm "${fl}"
-}
-
-func_mydata_sync_doc_unison() {
-	func_complain_path_not_exist "${HOME}/.unison" && return 1
-
-	unison fs_lapmac2_all
-}
-
 func_mydata_sync_doc_rsync() {
-	func_complain_path_not_exist "${1}" && return 1
-
 	local d target opts doc_ex_base src tgt
 	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
-	func_validate_path_exist "${doc_ex_base}"
-	
+
 	target="${1}"
-	for d in DCB DCC DCD DCM DCO FCS FCZ ; do
+	func_complain_path_not_exist "${target}" && return 1
+	func_complain_path_not_exist "${doc_ex_base}" && return 1
+	
+	# NOT in list: XXX_HIST & DCM_TODO
+	for d in DCB DCC DCD DCJ DCM DCO FCS FCZ ; do
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
 
 		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
@@ -3002,79 +3022,36 @@ func_mydata_sync_doc_rsync() {
 	done
 }
 
-################################################################################
+func_mydata_gen_fl(){
+	local base fl_file fl_record fl_latest specified_name base_name
+	base="${1}"
+	specified_name="${2}"
+	fl_record="${base}/alone/fl_record"
+	fl_latest="${HOME}/amp/data/mydata/fl_latest"
 
-#func_mydata_sync(){
-#	# CONFIG - Common
-#	local TCA_BASE="/tmp/tca"
-#	local TCB_BASE="/tmp/tcb"
-#	local TCZ_BASE="/tmp/tcz"
-#
-#	# DTA have diff name on laptp/lapmac
-#	local DTA_BASE="DTA"	# G2TG
-#	local DTB_BASE="DTB"	# MHD500
-#	local DTZ_BASE="DTZ"	# G5TG
-#	local BASE_LAPTP="/media/ouyzhu"
-#	local BASE_LAPMAC="/Volumes"
-#	[ -d "${BASE_LAPTP}/${DTA_BASE}" ] && DTA_BASE="${BASE_LAPTP}/${DTA_BASE}" || DTA_BASE="${BASE_LAPMAC}/${DTA_BASE}" 
-#	[ -d "${BASE_LAPTP}/${DTB_BASE}" ] && DTB_BASE="${BASE_LAPTP}/${DTB_BASE}" || DTB_BASE="${BASE_LAPMAC}/${DTB_BASE}" 
-#	[ -d "${BASE_LAPTP}/${DTZ_BASE}" ] && DTZ_BASE="${BASE_LAPTP}/${DTZ_BASE}" || DTZ_BASE="${BASE_LAPMAC}/${DTZ_BASE}" 
-#
-#	local tmp_log="/tmp/mydata_sync_$(func_dati).log"
-#	func_techo INFO "detail log: ${tmp_log}" 
-#	func_mydata_sync_tcatotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
-#	func_mydata_sync_tcbtotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
-#	func_mydata_sync_dtatodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
-#	func_mydata_sync_dtbtodtz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
-#	func_mydata_sync_dtztotcz | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc
-#	func_mydata_sync_doc      | tee -a "${tmp_log}" | sed -e '/^20[-:0-9 ]* DEBUG:/d' | func_rsync_out_filter_mydoc		# doc as the last, since migth use unison, which need interactive
-#	func_mydata_print_summary "${tmp_log}" 
-#
-#	if [ "${1}" == "-nofl" ] ; then
-#		:
-#	else
-#		func_mydata_gen_fl_and_upload
-#	fi
-#}
+	func_info "gen filelist for: ${base}"
+	func_complain_path_not_exist "${base}" && return
 
-func_mydata_gen_fl_and_upload(){
+	base_name="$(basename "${base}")"
+	fl_file="${fl_record}/fl_${specified_name:-${base_name}}_$(func_dati).txt"
 
-	# TODO: delete this and use func_mydata_gen_fl_and_upload_v2
-	local fl_dir
-	for d in "${TCZ_BASE}" "${TCA_BASE}" "${TCB_BASE}" "${DTZ_BASE}" "${DTA_BASE}" "${DTB_BASE}" ; do
+	# gen filelist
+	[[ -e "${fl_record}" ]] || mkdir -p "${fl_record}"
+	func_gen_filelist_with_size "${base}" "${fl_file}"
 
-		# check existence
-		! df | grep -q "${d}" && func_info "skip ${d}, since not mount" && continue
+	# remove useless lines
+	sed -i -e "
+		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
+		/\/FCS\//d;
+		/\/DCD\/mail\//d;
+		/\/DCC\/coding\/leetcode\//d;
+		/\/DCM.*\.\(gif\|jpg\|jpeg\|svg\|webp\|bmp\|png\|tiff\|tif\|heic\|aae\|mp4\|mov\|m4a\)/Id;
+		" "${fl_file}"
 
-		# prepare dir
-		fl_dir="${d}/alone/fl_record"
-		[ -e "${fl_dir}" ] || mkdir -p "${fl_dir}"
-
-		# gen file
-		func_techo info "start to gen filelist for: ${d}"
-		local fl="$(func_gen_filelist_with_size "${d}" | sed -e 's+^.*/tmp/+/tmp/+')"
-
-		# remove useless lines
-		sed -i -e "
-			/\.Trashes\//d;
-			/\.fseventsd\//d;
-			/\.Spotlight-V100\//d;
-			/\/FCS\//d;
-			/\/DCM\/Inbox\//d;
-			/\/DCM_[-0-9_]*\//d;
-			/\/DCC\/zz_deprecated\//d;
-			/\/DCC\/coding\/leetcode\//d;
-			/\/DCD\/mail\//d;
-			" "${fl}"
-
-			# more 
-			#/\/FCS\/maven\/m2_repo\//d;	# included in /FCS?
-
-		# mv to disk and upload
-		func_scp_to_cloud_vm azvm "${fl}"
-		mv "${fl}" "${fl_dir}" 
-	done
+	cp "${fl_file}" "${fl_latest}"
 }
+
+################################################################################
 
 func_mydata_out_filter_del() {
 
@@ -3112,21 +3089,6 @@ func_mydata_print_summary() {
 	sed -n -e '/ ERROR: /Ip;/ WARN: /Ip;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
 
 	echo -e "\nINFO: detail log: ${tmp_log_file}"
-}
-
-func_mydata_sync_doc() {
-	# use DOC_EX_BASE to indicate if need sync Documents
-	local DOC_EX_BASE="${HOME}/Documents/DCC/rsync/script/doc_bak"
-	func_complain_path_not_exist "${DOC_EX_BASE}" && return 0
-
-	# TODO: DCD/mail FCS/maven seems increase too much, e.g. 
-	#	bdta/backup_unison, size is: 89G / 257G
-	#	btca/backup_rsync,  size is: 14G / 23G	(Good)
-	local DOC_TGT_BASE_DTZ="${DTZ_BASE}/backup_unison"
-	[ -d "${DOC_TGT_BASE_DTZ}" ] && func_mydata_sync_doc_unison 
-
-	local DOC_TGT_BASE_TCZ="${TCZ_BASE}/backup_rsync"
-	[ -d "${DOC_TGT_BASE_TCZ}" ] && func_mydata_sync_doc_rsync "${DOC_TGT_BASE_TCZ}" 
 }
 
 func_mydata_rsync_with_list() {
@@ -3342,4 +3304,56 @@ func_backup_myenv_OLD_VERSION() {
 	rm "${packFile}"
 	popd &> /dev/null
 }
+
+#func_mydata_sync_v2(){
+#
+#	# NOTE_BDTA_1	2023-05 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
+#	#		2024-01 use ~exfat-fuse@osx works
+#
+#	# TODO: filter/summary rysnc result: func_rsync_out_filter_dry_run@lib
+#	# TODO: wsl can NOT show utf-8
+#	# TODO: tca/tcb/dta(G2TG)/dtb(MHD500) can be used for other thing?
+#
+#	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path mhd500_path dcm_hist_base
+#
+#	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# note: driver is in lowercase in wsl1
+#		mnt_path="/mnt/"
+#		btca_path="${mnt_path}/o"		# 3.5" disk
+#		bdta_path="${mnt_path}/p"		# 3.5" disk
+#		tcz_path="${mnt_path}/r"
+#		dtz_path="${mnt_path}/s"
+#		#mhd500_path 				# laptp not need this
+#	fi
+#
+#	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
+#		mnt_path="/Volumes"
+#		tcz_path="/tmp/tcz"
+#		btca_path="/tmp/btca"			# 3.5" disk
+#		bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~NOTE_BDTA_1)
+#		dtz_path="${mnt_path}/DTZ"
+#		mhd500_path="${mnt_path}/MHD500"
+#	fi
+#
+#	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
+#	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
+#
+#	# only lapmac2 need sync doc (see ~STATUS_A)
+#	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
+#		[[ -d "${dtz_path}/backup_unison" ]] && func_unison_fs_run
+#		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
+#		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
+#		[[ -d "${bdta_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
+#	fi
+#
+#	# RULE: DCM_HIST changes should happen in "${dcm_hist_base}" first! 
+#	dcm_hist_base="${bdta_path}/backup_rsync/DCM_HIST/"
+#	if [[ -d "${dcm_hist_base}" ]] ; then
+#		[[ -d "${dtz_path}/backup_unison/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison/DCM_HIST/"
+#		[[ -d "${tcz_path}/backup_rsync/DCM_HIST/"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync/DCM_HIST/"
+#		[[ -d "${btca_path}/backup_rsync/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync/DCM_HIST/"
+#	fi
+#
+#	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl "${btca_path}" "btca"
+#	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl "${bdta_path}" "bdta"
+#}
 
