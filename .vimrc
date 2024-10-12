@@ -282,6 +282,20 @@ set whichwrap+=<,>,[,]					" make the left/right could go cross line in Normal/V
 set whichwrap+=h,l					" make the h/l also
 set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /next line
 
+"""""""""""""""""""""""""""""" H1 - Settings/Mapping - Terminal Mode
+tnoremap <Esc> <C-W>N
+tnoremap <C-S-H> <C-w>h
+tnoremap <C-S-J> <C-w>j
+tnoremap <C-S-K> <C-w>k
+tnoremap <C-S-L> <C-w>l
+
+" Works, any better solution?
+let g:terminal_ansi_colors = [
+  \'#282828', '#CC241D', '#98971A', '#D79921',
+  \'#458588', '#B16286', '#689D6A', '#D65D0E',
+  \'#fb4934', '#b8bb26', '#fabd2f', '#83a598',
+  \'#d3869b', '#8ec07c', '#fe8019', '#FBF1C7' ]
+highlight Terminal guibg='#282828' guifg='#ebdbb2'
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 inoremap jj <ESC>
@@ -408,12 +422,13 @@ if !has("unix")
 endif
 
 " Use CTRL-Q to do what CTRL-V used to do, since CTRL-V has been used or paste
-" Use CTRL-S for saving, also in Insert mode
 " NOTE: C-S, C-Q in many system is Stop/resume session! (which makes screen froozen!)
 noremap <C-Q>		<C-V>
-noremap <C-S>		:update<CR>
-vnoremap <C-S>		<C-C>:update<CR>
-inoremap <C-S>		<C-O>:update<CR>
+
+" Deprecated since not really used. Use CTRL-S for saving.
+"noremap <C-S>		:update<CR>
+"vnoremap <C-S>		<C-C>:update<CR>
+"inoremap <C-S>		<C-O>:update<CR>
 
 " NOT REALLY UNDERSTAND 
 " Pasting blockwise/linewise selections is not possible in Insert/Visual mode without +virtualedit feature. 
@@ -892,6 +907,12 @@ endif
 "
 "
 """""""""""""""""""""""""""""" H1 - Plugins
+"""""""" vim-surround@vim
+" 'v(118)/V(86)' (like B for {}) to surround word into shell var with/out quote
+"autocmd FileType sh let b:surround_118 = "\"${\r}\""
+let g:surround_86 = "${\r}"
+let g:surround_118 = "\"${\r}\""
+
 """""""" pathogen@vim
 "if filereadable("~/.vim/autoload/pathogen.vim")	" NOT work
 if !empty(glob("~/.vim/autoload/pathogen.vim"))

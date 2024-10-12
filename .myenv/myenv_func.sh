@@ -2856,7 +2856,7 @@ func_gen_filelist_with_size(){
 	numfmt --field=1 --to=si --format="%-6f" < "${f_1st_col}" > "${f_1st_col_numfmt}"
 	paste -d '\t' "${f_1st_col_numfmt}" "${f_2nd_col}" > "${out_path}"
 
-	echo "INFO: filelist at: ${out_path}"
+	echo "INFO: filelist at: ${out_path} (size: $(func_file_size_human "${out_path}") )"
 }
 
 func_file_count_of_dir(){
@@ -2927,10 +2927,10 @@ func_mydata_sync_v3(){
 
 	# Sync - XXX_HIST & XXX_TODO (try possible combination, assume 1st update dtz)
 	for tmp in "DCB_HIST" "DCJ_HIST" "DCM_HIST" "DCM_TODO" "DCS_HIST" ; do
-		func_mydata_bi_sync "${btca_path}/backup_rsync/" "${tcz_path}/backup_rsync/" "${tmp}"
-		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${tcz_path}/backup_rsync/" "${tmp}"
 		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${bdta_path}/backup_rsync/" "${tmp}"
 		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${btca_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${tcz_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${btca_path}/backup_rsync/" "${tcz_path}/backup_rsync/" "${tmp}"
 	done
 
 	# Gen filelist
@@ -3007,7 +3007,7 @@ func_mydata_sync_doc_rsync() {
 	target="${1}"
 	func_complain_path_not_exist "${target}" && return 1
 	func_complain_path_not_exist "${doc_ex_base}" && return 1
-	
+
 	# NOT in list: XXX_HIST & DCM_TODO
 	for d in DCB DCC DCD DCJ DCM DCO FCS FCZ ; do
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue

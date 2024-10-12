@@ -971,8 +971,8 @@ func_rsync_ask_then_run() {
 	rsync_stat_str_2='Number of deleted files: 0$'
 	rsync_stat_str_3='Number of regular files transferred: 0$'
 	if grep -q "${rsync_stat_str_1}" "${tmp_file_1}" &&  grep -q "${rsync_stat_str_2}" "${tmp_file_1}" &&  grep -q "${rsync_stat_str_3}" "${tmp_file_1}" ; then
-		echo "INFO: nothing need to update for: ${1} -> ${2}"
-		echo "INFO: detail log: ${tmp_file_1}"
+		echo "INFO: ${1} -> ${2}: nothing need to update"
+		echo "INFO: ${1} -> ${2}: detail log: ${tmp_file_1}"
 		return 0
 	fi
 
