@@ -546,6 +546,43 @@ if !exists(":DiffOrig")
   	\ | wincmd p | diffthis
 endif
 
+""" OuLineJoin: better line join
+nnoremap <silent> J :call OuLineJoin()<CR>
+
+function! OuLineJoin()
+	let l:curr_line_num = line('.')
+
+	" Check: is last line
+	if l:curr_line_num == line('$')
+		return
+	endif
+
+	" Check: is next line empty
+	let l:next_line = getline(l:curr_line_num + 1)
+	if match(l:next_line, '^\s*$') >= 0
+		" minimize reg effection (better than 'norm! dd')
+		silent exec l:curr_line_num+1 "delete _"
+		norm! ``
+		return
+	endif
+
+	" Check: is join str used
+	let l:join_str = "\t"
+	if match(@., '\s*/\s*') >= 0
+		let l:join_str = " / "
+	elseif match(@., '\s*,\s*') >= 0
+		let l:join_str = ", "
+	endif
+
+	" Perform: change content, set cursor pos
+	let l:curr_line = getline(l:curr_line_num)
+	let l:new_curr_line = trim(l:curr_line, "\t ", 2) . l:join_str . trim(l:next_line)
+	norm! $
+	call setline(l:curr_line_num, l:new_curr_line)
+	silent exec l:curr_line_num+1 "delete _"
+	norm! ``l
+endfunction
+
 """ OuToggleWinMaxRestore: Toggle window size between maximize/restore state
 "nnoremap <C-m> :call OuToggleWinMaxRestore()<CR>	" can not use C-m, which also effects the <enter> key
 nnoremap <C-w>m :call OuToggleWinMaxRestore()<CR>
