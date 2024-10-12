@@ -282,20 +282,12 @@ set whichwrap+=<,>,[,]					" make the left/right could go cross line in Normal/V
 set whichwrap+=h,l					" make the h/l also
 set backspace=indent,eol,start				" backspace and cursor keys wrap to previous /next line
 
-"""""""""""""""""""""""""""""" H1 - Settings/Mapping - Terminal Mode
+"""""""""""""""""""""""""""""" H1 - Mapping - Terminal Mode
 tnoremap <Esc> <C-W>N
 tnoremap <C-S-H> <C-w>h
 tnoremap <C-S-J> <C-w>j
 tnoremap <C-S-K> <C-w>k
 tnoremap <C-S-L> <C-w>l
-
-" Works, any better solution?
-let g:terminal_ansi_colors = [
-  \'#282828', '#CC241D', '#98971A', '#D79921',
-  \'#458588', '#B16286', '#689D6A', '#D65D0E',
-  \'#fb4934', '#b8bb26', '#fabd2f', '#83a598',
-  \'#d3869b', '#8ec07c', '#fe8019', '#FBF1C7' ]
-highlight Terminal guibg='#282828' guifg='#ebdbb2'
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
 inoremap jj <ESC>
@@ -959,6 +951,15 @@ endif
 """""""" solarized@vim
 let g:solarized_italic = 0				" 0 to set comment font NOT use italic
 colorscheme solarized
+
+"""""""""""""""""""""""""""""" H1 - Color - Terminal Mode (NEED after colorscheme)
+" Works, any better solution?
+let g:terminal_ansi_colors = [
+  \'#282828', '#CC241D', '#98971A', '#D79921',
+  \'#458588', '#B16286', '#689D6A', '#D65D0E',
+  \'#fb4934', '#b8bb26', '#fabd2f', '#83a598',
+  \'#d3869b', '#8ec07c', '#fe8019', '#FBF1C7' ]
+highlight Terminal guibg='#282828' guifg='#ebdbb2'
 
 """""""" NERDCommenter@vim
 let NERDSpaceDelims = 1					" add space for comment
