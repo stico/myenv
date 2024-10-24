@@ -290,7 +290,7 @@ tnoremap <C-S-K> <C-w>k
 tnoremap <C-S-L> <C-w>l
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
-inoremap jj <ESC>
+"inoremap jj <ESC>					" not really used
 "nnoremap <C-6> <C-^>					" (NOT WORK) when update to macvim 8.1, C-6 NOT work any more, need to use C-S-6
 
 """""""""""""""""""""""""""""" H1 - Mapping - Disable Useless keys
@@ -936,6 +936,15 @@ endif
 "
 "
 """""""""""""""""""""""""""""" H1 - Plugins
+"""""""" netrw
+" seems xdg-open/open is already the default
+"let g:netrw_browsex_viewer= "open"
+
+"""""""" vim-islime2@vim
+let g:islime2_29_mode=1
+nnoremap <silent> <D-CR> :ISlime2CurrentLine<CR>
+vnoremap <silent> <D-CR> :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+
 """""""" vim-surround@vim
 " 'v(118)/V(86)' (like B for {}) to surround word into shell var with/out quote
 "autocmd FileType sh let b:surround_118 = "\"${\r}\""
