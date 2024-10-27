@@ -1761,7 +1761,7 @@ func_backup_myenv_today() {
 }
 
 func_backup_myenv() { 
-	local tmp_dir ex_fl bak_fl myenv_fl tmp_ex_fl tmp_str
+	local tmp_dir ex_fl bak_fl_tmp bak_fl myenv_fl tmp_str
 
 	tmp_dir="$(mktemp -d)"
 	cmd_out="${tmp_dir}/cmd_out"
@@ -1777,40 +1777,51 @@ func_backup_myenv() {
 	# prepare filelist
 	for tmp_str in "${cmd_out}" "${ex_fl}" "${bak_fl}" ; do
 		# not using cmd "basename", in case not in tmp_dir
-		echo "${tmp_str#"${tmp_dir}/"}" >>  "${bak_fl}"
+		echo "${tmp_str#"${tmp_dir}/"}" >> "${bak_fl}"
 	done
-	#(echo "${cmd_out}"; echo "${ex_fl}"; echo "${bak_fl}") >>  "${bak_fl}"
 	cat "${myenv_fl}" >>  "${bak_fl}"
 
 	# prepare exclude filelist
-	tmp_ex_fl="$(func_backup_dated_gen_exclude_list "${MY_ENV}")"
-	mv "${tmp_ex_fl}" "${ex_fl}"
-	cat >> "${ex_fl}" <<-'EOF'
-		*/zgen/mlocate.db
-		*/zgen/gnulocatedb
-		*/.unison/[fa][pr][0-9a-z]*
-		*/zgen/collection/all_content.txt
-		*/zgen/collection/code_content.txt
-		*/zgen/collection/stdnote_content.txt
-	EOF
+	ex_fl_tmp="$(func_backup_dated_gen_exclude_list "${MY_ENV}" "*/.unison/[fa][pr][0-9a-z]*")"
+	mv "${bak_fl_tmp}" "${bak_fl}"
 
 	! \cd "${tmp_dir}" && echo "ERROR: failed to cd to ${tmp_dir}, give up!" && return
-	func_backup_dated_on_fl_PRIVATE  "${bak_fl}" "${ex_fl}"
+	func_backup_dated_on_fl_PRIVATE "${bak_fl}" "${ex_fl}"
 	\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
 }
 
 func_backup_dated_gen_exclude_list() {
-	local usage="Usage: ${FUNCNAME[0]} <source>\n\tGenerate exclude list for func_backup_dated()" 
+	local usage="Usage: ${FUNCNAME[0]} <source> [more_patterns ...]" 
+	local desc="Desc: Generate exclude list for func_backup_dated()" 
 	func_param_check 1 "$@"
 
-	local base ex_fl ex_file
+	local base ex_fl ex_file tmp_pattern
 	ex_fl="$(mktemp)"
 
-	# for each exclude list: 1) add path prefix. 2) gather together
-	find "$1" -type f -name "${DBACKUP_EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' ex_file; do
+	# TODO: 有些情况未确认是否生效
+	#	1) 输入($1)如果是全路径的情况。不过这个方式，脚本中目前只有 func_backup_myenv 用。当然，命令指定全路径也是会这样用的。
+	#	2) $base有最后的/，如果路径已经有/ (不应该这样写)，'//'在路径中，是否仍旧有效? 
+
+	# example	~/.myenv/.db.exclude
+	# pattern	func_backup_myenv 
+
+	find "${1}" -type f -name "${DBACKUP_EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' ex_file; do
+		# for each exclude list: 1) add path prefix. 2) gather together
 		base="${ex_file%"${DBACKUP_EX_FILENAME}"}"
-		sed -e "s+^+${base}+" "${ex_file}" >> "${ex_fl}"
+		func_del_blank_and_hash_lines "${ex_file}" | sed -e "s+^+${base}+" >> "${ex_fl}"
 	done
+
+	# check if more pattern provided (which not need $base prefix)
+	shift
+	if [ $# -ge 1 ] ; then
+		for tmp_pattern in "$@" ; do
+			echo "${tmp_pattern}" >> "${ex_fl}" 
+		done
+	fi
+
+	# always exclude
+	grep -q ".DS_Store" "${ex_fl}" || echo "*/.DS_Store" >> "${ex_fl}" 
+
 	echo "${ex_fl}"
 }
 
@@ -1838,14 +1849,14 @@ func_backup_dated_sel_target_base() {
 	echo "${dbdir}"
 }
 
-# TRICK: output to stdout and capture zip_file path in ouput (into var)
-# { zip_file="$( func_backup_dated "${src_path}" | tee /dev/fd/3 | sed -n -e "/${DBACKUP_RESULT_STR}/s+^[^/]*/+/+p" )" } 3>&1
 func_backup_dated() {
+	# TODO: see BUG-1
+
 	local usage="Usage: ${FUNCNAME[0]} <source>"
 	local desc="Desc: Currently only support backup up single target (file/dir)." 
 	func_param_check 1 "$@"
 
-	local src_path src_basename tmp_base tmp_fl ex_fl src_dirname
+	local src_path src_basename tmp_base src_fl ex_fl src_dirname
 	if [[ "${1}" == "./" ]] || [[ "${1}" == "." ]] ; then				# in case <source> is ".", we need its name
 		src_path="$(readlink -f "${1}")"
 	else
@@ -1853,7 +1864,7 @@ func_backup_dated() {
 	fi
 	src_basename="$(basename "${src_path%.zip}")"					# .zip will be added later (just a simple de-dup here)
 	tmp_base="$(mktemp -d)" 
-	tmp_fl="${tmp_base}/${src_basename}"
+	src_fl="${tmp_base}/${src_basename}"
 
 	# backup
 	if [ -d "${src_path}" ] ; then
@@ -1861,20 +1872,24 @@ func_backup_dated() {
 		src_dirname="$(dirname "${src_path}")"
 		! \cd "${src_dirname}" && echo "ERROR: failed to cd ${src_dirname}" && return
 
-		#find "${src_basename}" > "${tmp_fl}"					# WORKS. Also list empty dir and .* files
-		find "${src_basename}" -print0 > "${tmp_fl}"				# WORKS. Also list empty dir and .* files
+		#find "${src_basename}" > "${src_fl}"					# WORKS. Also list empty dir and .* files
+		find "${src_basename}" -print0 > "${src_fl}"				# WORKS. Also list empty dir and .* files
 		ex_fl="$(func_backup_dated_gen_exclude_list "${src_basename}")"
-		func_backup_dated_on_fl_PRIVATE  "${tmp_fl}" "${ex_fl}"
+		func_backup_dated_on_fl_PRIVATE  "${src_fl}" "${ex_fl}" "${src_basename}" 
 
 		\cd - &> /dev/null || echo "ERROR: failed to cd back to original dir" 
 	else
 		# for single file, not need path in zip, and not need exlude filelist
-		echo "${src_path}" > "${tmp_fl}"
-		func_backup_dated_on_fl_PRIVATE  "${tmp_fl}"
+		echo "${src_path}" > "${src_fl}"
+		func_backup_dated_on_fl_PRIVATE  "${src_fl}"
 	fi
 }
 
 func_backup_dated_on_fl_PRIVATE () {
+
+	# 总体感觉搞复杂了，为了让mebackup和dbackup共用，不得不使用zip filelist方式。
+	# 如果即mebackup用filelist方式(这样不用考虑FL在mac上超9000的问题)。dbackup用简单的zip -r，整体代码会简单些。
+
 	local usage="Usage: ${FUNCNAME[0]} <file_list> <exclude_list>"
 	local desc="Desc: backup files in list and exclude those listed" 
 	func_param_check 1 "$@"
@@ -1883,7 +1898,7 @@ func_backup_dated_on_fl_PRIVATE () {
 
 	# check and prepare
 	func_validate_path_exist "${1}" 
-	local tgt_path tgt_base src_fl src_name passwd_str cmd_opts zip_cmd_log
+	local tgt_path tgt_base src_fl src_name passwd_str cmd_opts 
 	src_fl="${1}"
 	src_name="$(basename "${src_fl%.zip}")"					# .zip will be added later (de-dup here)
 	tgt_base="$(func_backup_dated_sel_target_base)"
@@ -1891,36 +1906,94 @@ func_backup_dated_on_fl_PRIVATE () {
 	mkdir -p "${tgt_base}"
 
 	# prepare password option if available
+	cmd_opts="-r"
 	if func_is_cmd_exist func_gen_zip_passwd ; then
 		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
 		if [ -n "${passwd_str}" ] ; then 
 			# NO ' inside "". WRONG: "--password '${passwd_str}'"
-			cmd_opts="--password ${passwd_str}"
+			cmd_opts="${cmd_opts} --password ${passwd_str}"
 		else
 			echo "WARN: failed to gen password"
 		fi
 	fi
 
 	# prepare exclude option if available
+	local zip_cmd_log src_basename
 	if [[ -n "${2}" ]] && [[ -s "${2}" ]] ; then
 		# NO ' inside "". WRONG: x@'${ex_fl}'"				
 		cmd_opts="${cmd_opts} -x@${2}" 
 	fi
-
-	# ref:	https://serverfault.com/questions/652892/create-zip-based-on-contents-of-a-file-list
-	# 	last answer said "-@ - <" will works on all plf, while `man zip` said simply -@ will NOT work on mac
-	# note:	for the "-" in cmd, from zip manual: zip will also accept a single dash ("-") as the zip file name, 
-	#	in which case it will write the zip file to standard output, allowing the output to be piped to another program. 
-	# NOTE: src_fl如果用的是绝对路径，好像就会失败，相对路径则没问题。不确定原因，难道zip这种情况下一定会用相对路径。
-	#	验证版本: (mac) Zip 3.0 (July 5th 2008), by Info-ZIP。
-	# TODO: 是不是检查一下路径，如果是绝对路径就告警一下?
 	zip_cmd_log="$(mktemp)"
-	# shellcheck disable=2086 # cmd_opts must NOT embrace with "", since have spaces which need expansion
-	zip ${cmd_opts} -r -@ - < "${src_fl}" > "${tgt_path}" 2> "${zip_cmd_log}"
+	src_basename="${3}"
 
-	echo "INFO: cmd: zip ${cmd_opts} -r -@ - <  ${src_fl} > ${tgt_path} 2> ${zip_cmd_log}"
+	# TRICK: output to stdout and capture zip_file path in ouput (into var)
+	# { zip_file="$( func_backup_dated "${src_path}" | tee /dev/fd/3 | sed -n -e "/${DBACKUP_RESULT_STR}/s+^[^/]*/+/+p" )" } 3>&1
+	func_backup_dated_zip_cmd "${cmd_opts}" "${src_fl}" "${tgt_path}" "${zip_cmd_log}" "${src_basename}"
+
 	echo "INFO: log: ${zip_cmd_log}"
 	echo "INFO: ${DBACKUP_RESULT_STR} $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
+}
+
+func_backup_dated_zip_cmd() {
+	# 用文件列表方式: 因为有些文件需要排除，用整体copy一份的方式效率会很低。
+	# 把exclude fl直接从include fl里去掉，则命令中不需要exclude fl，但注意exclude fl是支持pattern的
+
+	local src_fl_size 
+	src_fl_size="$(func_file_size "${2}")"
+
+	# mac上，文件列表的size超过9000，会报错，生成大小为0的zip文件。这种情况只能用v2 (它主要是不支持文件名中有\n)
+	if (( src_fl_size < 9000 )) ; then
+		func_backup_dated_zip_cmd_v1 "${1}" "${2}" "${3}" "${4}"
+	else
+		func_backup_dated_zip_cmd_v2 "${1}" "${2}" "${3}" "${4}" "${5}"
+	fi
+}
+
+func_backup_dated_zip_cmd_v1() {
+
+	# "-@" Way	文件列表中的文件名是 '\0' 分隔
+	#   -- Note 1	它的好处是兼容文件名里有回车符等(特殊字符的)情况。但它的问题是(至少mac上)，Filetest不能长(见 ~BUG-1 )
+	#   -- Note 2	src_fl里如果用的是绝对路径，会失败，相对路径则没问题 (why?)。验证版本: (mac) Zip 3.0 (July 5th 2008), by Info-ZIP。
+	#		--- TODO: 是不是检查一下路径，如果是绝对路径就告警一下?
+	#   -- Ref 1	https://serverfault.com/questions/652892/create-zip-based-on-contents-of-a-file-list
+	#		--- last answer said "-@ - <" will works on all plf, while `man zip` said simply -@ will NOT work on mac
+	#   -- Ref 2	https://superuser.com/questions/575326/osx-selectively-zip-large-number-of-files-option-ok
+	#		--- 因为zip是linux平台的，但linux和osx换行符不同 ( ~default@info )，若文件名中有这些特殊字符时，"-@" 会有问题。
+	#		--- 这里使用了'\0'作为分隔符，所以没有这个问题
+	#   -- BUG-1	要备份的目录下，有时会报错，备份的zip大小为0。一开始以为是: 如果有size为0的文件，就有问题，但后来发现不是的。
+	#		--- (在lapmac2上) 生成的Filelist太大导致的问题。Filelist文件: size为9001时有问题，为9000时没问题。
+	#		--- TODO 0	没有修复前，检查大小，直接报错
+	#		--- TODO 1	用hard link方式是不是可以?
+	#		--- TODO 2	APFS好像copy效率是十分高的，实际也可以用?
+
+	# zip ${cmd_opts} -@ - < "${src_fl}" > "${tgt_path}" 2> "${zip_cmd_log}"
+	# 命令中的 "-": (man zip) 当用它作为输出的文件名时，生成的zip文件内容会写到stdout，方便重定向压缩后的内容
+	echo "INFO: func_backup_dated_zip_cmd_v1: zip ${1} -r -@ - <  ${2} > ${3} 2> ${4}" | tee -a "${4}"
+	# shellcheck disable=2086 # cmd_opts must NOT embrace with "", since have spaces which need expansion
+	zip ${1} -@ - < "${2}" > "${3}" 2>> "${4}"
+}
+
+func_backup_dated_zip_cmd_v2() {
+
+	# check if file contains \n (0a) or \r (0d), which will cause some file failed to compress
+	if hexdump "${2}" | grep -q ' \(0a\|0d\)' ; then
+		echo "ERROR: filename contains <newline/carriage> (0x0a/0x0d), can NOT use func_backup_dated_zip_cmd_v2, pls check!"
+		echo "ERROR: check cmd: hexdump ${2} | grep ' \(0a\|0d\)'"
+		return 1
+	fi
+
+	# "-i@" Way: 文件不能用 '\0' 分隔
+	local tmp_fl
+	tmp_fl="$(mktemp)"
+	< "${2}" tr '\0' '\n' > "${tmp_fl}"
+
+	# 和func_backup_dated_zip_cmd_v1不同，v2这里要指定base。对于无法指定base的情况(如myenv的bak)，不能用它
+	func_is_str_blank "${5}" && echo "ERROR: var src_basename MUST NOT empty for func_backup_dated_zip_cmd_v2" && return 1
+	func_complain_path_inexist "${5}" && return 1
+
+	echo "INFO: func_backup_dated_zip_cmd_v2: zip ${1} -r -i@${tmp_fl} ${3} ${5} &> ${4}" | tee -a "${4}"
+	# shellcheck disable=2086 # cmd_opts must NOT embrace with "", since have spaces which need expansion
+	zip ${1} -i@"${tmp_fl}" "${3}" "${5}" &>> "${4}"
 }
 
 func_run_file_c() {

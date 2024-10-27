@@ -1,0 +1,9 @@
+# 这样的"相对路径"不生效。只能额外加，见 ~func_backup_myenv@~/.myenv/myenv_func.sh
+#../.unison/[fa][pr][0-9a-z]*
+
+# 以下5个，再次确认是生效的 (2024-10-27)
+zgen/mlocate.db
+zgen/gnulocatedb
+zgen/collection/all_content.txt
+zgen/collection/code_content.txt
+zgen/collection/stdnote_content.txt
