@@ -936,10 +936,6 @@ endif
 "
 "
 """""""""""""""""""""""""""""" H1 - Plugins
-"""""""" netrw
-" seems xdg-open/open is already the default
-"let g:netrw_browsex_viewer= "open"
-
 """""""" vim-islime2@vim
 let g:islime2_29_mode=1
 nnoremap <silent> <D-CR> :ISlime2CurrentLine<CR>

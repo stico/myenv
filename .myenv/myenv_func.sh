@@ -41,9 +41,14 @@ DUP_SKIP_PATH="${DUP_CONFIG}/skip_path"
 [ -z "$MY_TAGS_CODE" ]		&& MY_TAGS_CODE=$MY_ENV/zgen/tags_code
 [ -z "$MY_TAGS_ADDI" ]		&& MY_TAGS_ADDI=$MY_ENV/conf/addi/tags
 [ -z "$MY_TAGS_LOCAL" ]		&& MY_TAGS_LOCAL=$MY_ENV/conf/addi/tags_local
-[ -z "$MY_ROOTS_NOTE" ]		&& MY_ROOTS_NOTE=("$MY_DCC" "$MY_DCO" "$MY_DCD")
 [ -z "$MY_ROOTS_CODE" ]		&& MY_ROOTS_CODE=("$OUMISC" "$OUREPO")
 [ -z "$MY_NOTIFY_MAIL" ]	&& MY_NOTIFY_MAIL=focits@gmail.com
+
+if [ -z "$MY_ROOTS_NOTE" ] && [[ "$(hostname -s)" = lapmac2 ]] ; then
+	MY_ROOTS_NOTE=("$MY_DCC" "$MY_DCD")
+else
+	MY_ROOTS_NOTE=("$MY_DCC" "$MY_DCO" "$MY_DCD")
+fi
 
 # OS
 [ -z "$MY_OS_VER" ]		&& MY_OS_VER="$(func_os_ver)"
@@ -1761,7 +1766,7 @@ func_backup_myenv_today() {
 }
 
 func_backup_myenv() { 
-	local tmp_dir ex_fl bak_fl_tmp bak_fl myenv_fl tmp_str
+	local tmp_dir ex_fl ex_fl_tmp bak_fl myenv_fl tmp_str
 
 	tmp_dir="$(mktemp -d)"
 	cmd_out="${tmp_dir}/cmd_out"
@@ -1783,7 +1788,7 @@ func_backup_myenv() {
 
 	# prepare exclude filelist
 	ex_fl_tmp="$(func_backup_dated_gen_exclude_list "${MY_ENV}" "*/.unison/[fa][pr][0-9a-z]*")"
-	mv "${bak_fl_tmp}" "${bak_fl}"
+	mv "${ex_fl_tmp}" "${ex_fl}"
 
 	! \cd "${tmp_dir}" && echo "ERROR: failed to cd to ${tmp_dir}, give up!" && return
 	func_backup_dated_on_fl_PRIVATE "${bak_fl}" "${ex_fl}"
