@@ -36,7 +36,7 @@ command! -nargs=0 FontReset :let &guifont = substitute(&guifont, '\zs\d\+', '\=1
 set noimdisable		" default value on macvim/vim is imdisable/noimdisable, so unify it here.
 set noimcmdline		" makes the default cmd line input is EN
 set imsearch=0		" makes the default search input is EN
-set iminsert=0		" NOT sure what for? seems NO effection
+set iminsert=0		" 设成0的的时候，在Normal Mode用f时，会有Insert Mode的输入法，很不方便。设置成1时，则f/t会用英文，但Insert Mode的输入法又被置成英文了，也不方便。
 
 " Squirrel_v3 (@rime), improve Squirrel_v2 
 " req: 1) cmd defaults/osascrpit. 2) disable shift for squirrel to switch between en/cn mode. 3) enable accessiblity for osascript (in /System/Library/CoreServices/RemoteManagement/ARDAgent.app)
@@ -936,6 +936,10 @@ endif
 "
 "
 """""""""""""""""""""""""""""" H1 - Plugins
+"""""""" vim-easymotion@vim
+let g:EasyMotion_smartcase = 1
+nmap e <Plug>(easymotion-s)
+
 """""""" vim-islime2@vim
 let g:islime2_29_mode=1
 nnoremap <silent> <D-CR> :ISlime2CurrentLine<CR>
