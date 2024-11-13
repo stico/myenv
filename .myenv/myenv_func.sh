@@ -1807,13 +1807,16 @@ func_backup_dated_gen_exclude_list() {
 	#	1) 输入($1)如果是全路径的情况。不过这个方式，脚本中目前只有 func_backup_myenv 用。当然，命令指定全路径也是会这样用的。
 	#	2) $base有最后的/，如果路径已经有/ (不应该这样写)，'//'在路径中，是否仍旧有效? 
 
-	# example	~/.myenv/.db.exclude
+	# example	~/.myenv/.db.exclude	
+	#		~/.vim/.db.exclude
 	# pattern	func_backup_myenv 
 
 	find "${1}" -type f -name "${DBACKUP_EX_FILENAME}" -print0 | while IFS= read -r -d $'\0' ex_file; do
 		# for each exclude list: 1) add path prefix. 2) gather together
 		base="${ex_file%"${DBACKUP_EX_FILENAME}"}"
-		func_del_blank_and_hash_lines "${ex_file}" | sed -e "s+^+${base}+" >> "${ex_fl}"
+
+		# 如果是*开头的，就不加base前缀，因为要匹配各级路径
+		func_del_blank_and_hash_lines "${ex_file}" | sed -e "s+^\([^\*]\)+${base}\1+" >> "${ex_fl}"
 	done
 
 	# check if more pattern provided (which not need $base prefix)
