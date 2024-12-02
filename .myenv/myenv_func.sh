@@ -1957,6 +1957,7 @@ func_backup_dated_zip_cmd() {
 	fi
 }
 
+# 从STDIN输入文件列表。但mac上，文件列表的size超过9000，会报错，生成大小为0的zip文件。
 func_backup_dated_zip_cmd_v1() {
 
 	# "-@" Way	文件列表中的文件名是 '\0' 分隔
@@ -1981,6 +1982,7 @@ func_backup_dated_zip_cmd_v1() {
 	zip ${1} -@ - < "${2}" > "${3}" 2>> "${4}"
 }
 
+# 用-i@方式，对文件列表长度没有限制，但这种情况不支持文件名中有\n的情况
 func_backup_dated_zip_cmd_v2() {
 
 	# check if file contains \n (0a) or \r (0d), which will cause some file failed to compress
