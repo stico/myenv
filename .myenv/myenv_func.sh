@@ -18,6 +18,8 @@ MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
 [ -f "${MYENV_SECU_PATH}" ] && source "${MYENV_SECU_PATH}"
 
+FIND_BIG_FILES_EX_FILENAME=".fb.exclude"
+
 DBACKUP_EX_FILENAME=".db.exclude"
 DBACKUP_RESULT_STR="DBACKUP_RESULT:"
 DBACKUP_BASE_DCB="${HOME}/Documents/DCB/dbackup/latest"
@@ -70,7 +72,38 @@ LOCATE_USE_FIND='true'		# seems tuned find is always a good choice (faster than 
 LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find, which usually enough
 
 ################################################################################
-# Functions
+# Topic - Find Utils
+################################################################################
+func_find_big_files() {
+	func_gen_filesize_list
+	func_grepf -v "${FIND_BIG_FILES_EX_FILENAME}" "${FIND_UTIL_FILESIZE_LIST}" | head -"${1:-10}"
+}
+
+func_find_non_utf8_in_content() {
+	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
+	func_param_check 1 "$@"
+
+	local tmp_filelist=$(mktemp)
+	echo "INFO: grep filelist into: ${tmp_filelist}"
+	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > "${tmp_filelist}"
+
+	local tmp_suspect=$(mktemp)
+	echo "INFO: grep suspected files into: ${tmp_suspect}"
+
+	# TODO: use func_pipe_remove_lines instead
+	xargs -a "${tmp_filelist}" -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > "${tmp_suspect}"
+
+	echo "INFO: suspected files are:"
+	cat "${tmp_suspect}"
+}
+
+func_find_dup() {
+	# TODO
+	:
+}
+
+################################################################################
+# Misc
 ################################################################################
 func_validate_user_name() {
 	func_param_check 1 "$@"
@@ -2217,24 +2250,27 @@ func_apt_add_repo() {
 	sudo add-apt-repository -y "${apt_repo_name}" &> /dev/null
 }
 
-func_find_big_files() {
-	find . -type f -printf "%s\t%p\n" | sort -n | tail -"${1}"
-}
+func_show_space_used() {
 
-func_find_space() {
-	echo -e "INFO: 1st check"
-	du -sh ~/amp				2>&1 | sed -e "/Permission denied/d"
-	du -sh ~/.zbox				2>&1 | sed -e "/Permission denied/d"
-	du -sh ~/.myenv				2>&1 | sed -e "/Permission denied/d"
-	du -sh ~/.android			2>&1 | sed -e "/Permission denied/d"
-	du -sh ~/.Genymobile			2>&1 | sed -e "/Permission denied/d"
-	du -sh ~/.local/share/Trash		2>&1 | sed -e "/Permission denied/d"
+	local d t
 
-	echo -e "\n\n\nINFO: 2nd check"
-	du -sh /data				2>&1 | sed -e "/Permission denied/d"
+	# show overall
+	if [ $# -eq 0 ] ; then
+		t="$(mktemp)"
+		for d in ~/amp ~/.zbox ~/.myenv ~/Downloads /data ~/Documents/{D,E,F}C* ; do
+			[ -d "${d}" ] || continue
+			du -sh "${d}" 2>&1 | sed -e "/Permission denied/d;/du: cannot access/d;s+/Users/ouyangzhu+~+;" >> "${t}"
+		done
+		echo  "${t}"
+		sort -rh "${t}"
 
-	echo -e "\n\n\nINFO: 3rd check"
-	du -sh ~/Documents/{D,E,F}C*		2>&1 | sed -e "/Permission denied/d"
+		return
+	fi
+
+	# show specifiy path
+	d="${1}"
+	func_complain_path_not_exist "${d}"
+	du -sh "${d}"/* 2>&1 | sed -e "/Permission denied/d;/du: cannot access/d;s+/Users/ouyangzhu+~+;" | sort -rh
 }
 
 func_op_compressed_file() {
@@ -2335,24 +2371,6 @@ func_monitor_fs() {
 		# output to stderr, in case cause "false alarm" to invoker
 		echo "ERROR: both fswatch and inotifywait NOT exist, pls install them first" 1>&2
 	fi
-}
-
-func_find_non_utf8_in_content() {
-	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
-	func_param_check 1 "$@"
-
-	local tmp_filelist=$(mktemp)
-	echo "INFO: grep filelist into: ${tmp_filelist}"
-	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > "${tmp_filelist}"
-
-	local tmp_suspect=$(mktemp)
-	echo "INFO: grep suspected files into: ${tmp_suspect}"
-
-	# TODO: use func_pipe_remove_lines instead
-	xargs -a "${tmp_filelist}" -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > "${tmp_suspect}"
-
-	echo "INFO: suspected files are:"
-	cat "${tmp_suspect}"
 }
 
 # shellcheck disable=2009
@@ -3054,11 +3072,6 @@ func_mydata_clean_up() {
 	done
 }
 
-func_mydata_dcm_hist_sync() {
-	func_info "DCM_HIST RSYNC: ${1} --> ${2}"
-	func_rsync_ask_then_run "${1}" "${2}" | sed -e 's/^/\t/;'
-}
-
 func_mydata_bi_sync() {
 	func_param_check 3 "$@"
 	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
@@ -3134,259 +3147,142 @@ func_mydata_gen_fl(){
 	cp "${fl_file}" "${fl_latest}"
 }
 
-################################################################################
-
-func_mydata_out_filter_del() {
-
-	# TODO: use func_pipe_remove_lines instead
-	sed -e  '
-		# ignore whole dir
-		/FCZ\/backup_DCS\//d;
-
-		# not all dbackup should ignore, so need 3 lines
-		/deleting FCZ\/backup_dbackup\/$/d;
-		/deleting FCZ\/backup_dbackup\/2020/d;
-		/deleting FCZ\/backup_dbackup\/201[0-9]/d;
-		'
-}
-
-func_mydata_rsync_del_detect() {
-	local del_list="$(func_rsync_del_detect "$@" | func_mydata_out_filter_del)"
-
-	if [ -z "${del_list}" ] ; then 
-		func_techo INFO "nothing need to delete manually"
-	else
-		func_techo WARN "Might NEED TO DELETE MANUALLY IN ${2}"
-		echo "${del_list}" 
-	fi
-}
-
-func_mydata_print_summary() {
-	local tmp_log_file="${1}"
-
-	echo -e "\nINFO: ======== FILE NEED MANUAL DELETE ========"
-	#grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del	# not need, since already filtered
-	grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del
-
-	echo -e "\nINFO: ======== ERROR/WARN NEED HANDLE ========"
-	sed -n -e '/ ERROR: /Ip;/ WARN: /Ip;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
-
-	echo -e "\nINFO: detail log: ${tmp_log_file}"
-}
-
-func_mydata_rsync_with_list() {
-	local src_base="${1}"
-	local tgt_base="${2}"
-	local sync_list="${3}"
-
-	! df | grep -q "${tgt_base}" && func_techo info "skip ${tgt_base}, since not mount" && return 1
-	! df | grep -q "${src_base}" && func_techo info "skip ${src_base}, since not mount" && return 1
-
-	for d in ${sync_list} ; do
-		func_complain_path_not_exist "${src_base}/${d}/" && return 1
-		func_complain_path_not_exist "${tgt_base}/${d}/" && return 1
-
-		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${tgt_base}/${d}/"
-		func_rsync_simple            "${src_base}/${d}/"  "${tgt_base}/${d}/"
-		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${tgt_base}/${d}/" 
-	done
-}
-
-func_mydata_sync_extra() {
-	# alone is common extra dir
-
-	# only for dir record
-	local TCZ_EXTRA_LIST="backup_rsync" 
-	local DTZ_EXTRA_LIST="backup_unison" 
-}
-
-func_mydata_sync_tcatotcz() {
-	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCA_BASE}" && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2" && return 1
-
-	local TCA_SYNC_LIST="h8/actor h8/magzine h8/zptp dudu/course dudu/tv video/tv" 
-	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
-}
-
-func_mydata_sync_tcbtotcz() {
-	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCB_BASE}" && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2" && return 1
-
-	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
-	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
-}
-
-func_mydata_sync_dtatodtz() {
-	local DTA_SYNC_LIST="dudu/xiaoxue dudu/chuzhong dudu/gaozhong dudu/english"
-	func_mydata_rsync_with_list "${DTA_BASE}" "${DTZ_BASE}" "${DTA_SYNC_LIST}" 
-}
-
-func_mydata_sync_dtbtodtz() { 
-	echo "TODO TODO TODO TODO TODO: DTB无法放这么多子目录，后面也装不下"
-	return 1
-	local DTB_SYNC_LIST="" 
-	func_mydata_rsync_with_list "${DTB_BASE}" "${DTZ_BASE}" "${DTB_SYNC_LIST}" 
-}
-
-func_mydata_sync_dtztotcz() {
-	local DTZ_SKIP_LIST="video/documentary"
-	func_techo info "SKIP: ${DTZ_SKIP_LIST}"
-
-	local DTZ_SYNC_LIST="gigi video/course dudu/audio dudu/book dudu/documentary dudu/knowledge dudu/movie zz/talk zz/computer zz/outing"
-	func_mydata_rsync_with_list "${DTZ_BASE}" "${TCZ_BASE}" "${DTZ_SYNC_LIST}" 
-}
-
-func_mydata_sync_note() {
-	echo "ERROR: this function is ONLY for notes"
-	return 1
-	# Chain:
-	#	TCA/TCB > TCZ	# h8 / alone
-	#	DTA/DTB > DTZ	# dudu/(k12: xx,cz,gz,en)
-	#	DTZ > TCZ	# ???
-}
-
-func_mute() {
-	osascript -e "set volume with output muted"
-
-	# Unmute volume
-	# osascript -e "set volume without output muted"
-
-	# check mute status
-	# osascript -e "output muted of (get volume settings)"
-}
-
 # THIS MUST IN THE END OF SCRIPT
 MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script
 
 
+################################################################################
 # Deprecated
-func_backup_dated_OLD_VERSION() {
-	local usage="Usage: ${FUNCNAME[0]} <source>"
-	local desc="Desc: Currently only support backup up single target (file/dir)." 
-	func_param_check 1 "$@"
+################################################################################
+#func_backup_dated_OLD_VERSION() {
+#	local usage="Usage: ${FUNCNAME[0]} <source>"
+#	local desc="Desc: Currently only support backup up single target (file/dir)." 
+#	func_param_check 1 "$@"
+#
+#	# check and prepare
+#	func_validate_path_exist "${1}" 
+#	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
+#	src_path="$(readlink -f "$1")"
+#	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
+#	tgt_base="$(func_backup_dated_sel_target_base)"
+#	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
+#	mkdir -p "${tgt_base}"
+#
+#	# prepare password if available
+#	if func_is_cmd_exist func_gen_zip_passwd ; then
+#		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
+#		if [ -n "${passwd_str}" ] ; then 
+#			# NO ' inside "". WRONG: "--password '${passwd_str}'"
+#			cmd_passwd_part="--password ${passwd_str}"
+#		else
+#			echo "WARN: failed to gen password"
+#		fi
+#	fi
+#
+#	# backup
+#	if [ -d "${src_path}" ] ; then
+#
+#		# prepare exclude filelist
+#		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
+#		if [ -s  "${ex_fl}" ] ; then
+#			# NO ' inside "". WRONG: x@'${ex_fl}'"				
+#			cmd_ex_part="-x@${ex_fl}" 
+#		fi
+#
+#		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
+#		zip -r "${tgt_path}" "${src_path}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+#		cmd_info="${cmd_passwd_part} ${cmd_ex_part}"
+#	else
+#		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
+#		zip "${tgt_path}" "${src_path}" ${cmd_passwd_part} 
+#		cmd_info="${cmd_passwd_part}"
+#	fi
+#
+#	# echo result
+#	func_is_str_blank "${cmd_info}" && echo "INFO: no password or exclude list used." || echo "INFO: cmd param: ${cmd_info}"
+#	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
+#}
 
-	# check and prepare
-	func_validate_path_exist "${1}" 
-	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
-	src_path="$(readlink -f "$1")"
-	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
-	tgt_base="$(func_backup_dated_sel_target_base)"
-	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
-	mkdir -p "${tgt_base}"
-
-	# prepare password if available
-	if func_is_cmd_exist func_gen_zip_passwd ; then
-		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
-		if [ -n "${passwd_str}" ] ; then 
-			# NO ' inside "". WRONG: "--password '${passwd_str}'"
-			cmd_passwd_part="--password ${passwd_str}"
-		else
-			echo "WARN: failed to gen password"
-		fi
-	fi
-
-	# backup
-	if [ -d "${src_path}" ] ; then
-
-		# prepare exclude filelist
-		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
-		if [ -s  "${ex_fl}" ] ; then
-			# NO ' inside "". WRONG: x@'${ex_fl}'"				
-			cmd_ex_part="-x@${ex_fl}" 
-		fi
-
-		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
-		zip -r "${tgt_path}" "${src_path}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-		cmd_info="${cmd_passwd_part} ${cmd_ex_part}"
-	else
-		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
-		zip "${tgt_path}" "${src_path}" ${cmd_passwd_part} 
-		cmd_info="${cmd_passwd_part}"
-	fi
-
-	# echo result
-	func_is_str_blank "${cmd_info}" && echo "INFO: no password or exclude list used." || echo "INFO: cmd param: ${cmd_info}"
-	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
-}
-
-func_backup_myenv_OLD_VERSION() { 
-	local tmpDir="$(mktemp -d)"
-	local packFile="${tmpDir}/myenv_backup.zip"
-	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
-
-	echo "INFO: create zip file based on filelist: ${fileList}"
-	func_collect_myenv "no_content"
-
-	# excludes: locate related db, ar.../fp... files in unison, duplicate collection
-	zip -r "${packFile}"					\
-		-x "*/zgen/mlocate.db" 				\
-		-x "*/zgen/gnulocatedb" 			\
-		-x "*/.unison/[fa][pr][0-9a-z]*"		\
-		-x "*/zgen/collection/all_content.txt"		\
-		-x "*/zgen/collection/code_content.txt"		\
-		-x "*/zgen/collection/stdnote_content.txt"	\
-		-@ < "${fileList}" 2>&1				\
-	| sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'	\
-	|| echo "WARN: failed to pack some file, pls check"
-
-	if [ ! -e "${packFile}" ] ; then
-		func_die "ERROR: failed to zip files into ${packFile}"
-	fi
-
-	echo "INFO: bakcup command output, add to the backup zip"
-	mkdir -p "${tmpDir}"
-	df -h					> "${tmpDir}/cmd_output_df_h.txt"
-	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
-	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
-	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
-
-	pushd . &> /dev/null
-	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-
-	if [ -e "${ZBOX}" ] ; then
-		echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-	fi
-	if [ -e "${OUMISC}" ] ; then
-		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
-	else
-		echo "INFO: ${OUMISC} NOT exist, skip"
-	fi
-	if [ -e "${OUREPO}" ] ; then
-		echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${OUREPO}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
-	else
-		echo "INFO: ${OUREPO} NOT exist, skip"
-	fi
-
-	\cd "${HOME}/.vim/bundle" &> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle"
-	for f in * ; do 
-		[ ! -d "${f}" ] && continue
-		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
-		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle/${f}"
-		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
-	done
-
-	zip -rjq "${packFile}" "${tmpDir}"/*.txt
-	## gen exclude cmd part
-	#ex_fl="$(func_backup_dated_gen_exclude_list "${source}")"
-	#if [ -s  "${ex_fl}" ] ; then
-	#	#cmd_ex_part="-x@'${ex_fl}'"				# NO ' inside, otherwise will be part of password!
-	#	cmd_ex_part="-x@${ex_fl}" 
-	#fi
-	## TODO: delete: zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-
-	# passwd will be used if available
-	func_backup_dated "${packFile}"
-
-	local final_zip_list="$(mktemp)"
-	unzip -l "${packFile}" > "${final_zip_list}"
-	echo "INFO: final pack file list: ${final_zip_list}"
-
-	echo "INFO: delete tmp pack file"
-	rm "${packFile}"
-	popd &> /dev/null
-}
+#func_backup_myenv_OLD_VERSION() { 
+#	local tmpDir="$(mktemp -d)"
+#	local packFile="${tmpDir}/myenv_backup.zip"
+#	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
+#
+#	echo "INFO: create zip file based on filelist: ${fileList}"
+#	func_collect_myenv "no_content"
+#
+#	# excludes: locate related db, ar.../fp... files in unison, duplicate collection
+#	zip -r "${packFile}"					\
+#		-x "*/zgen/mlocate.db" 				\
+#		-x "*/zgen/gnulocatedb" 			\
+#		-x "*/.unison/[fa][pr][0-9a-z]*"		\
+#		-x "*/zgen/collection/all_content.txt"		\
+#		-x "*/zgen/collection/code_content.txt"		\
+#		-x "*/zgen/collection/stdnote_content.txt"	\
+#		-@ < "${fileList}" 2>&1				\
+#	| sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'	\
+#	|| echo "WARN: failed to pack some file, pls check"
+#
+#	if [ ! -e "${packFile}" ] ; then
+#		func_die "ERROR: failed to zip files into ${packFile}"
+#	fi
+#
+#	echo "INFO: bakcup command output, add to the backup zip"
+#	mkdir -p "${tmpDir}"
+#	df -h					> "${tmpDir}/cmd_output_df_h.txt"
+#	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
+#	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
+#	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
+#
+#	pushd . &> /dev/null
+#	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+#	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+#
+#	if [ -e "${ZBOX}" ] ; then
+#		echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+#		\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
+#	fi
+#	if [ -e "${OUMISC}" ] ; then
+#		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+#		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
+#	else
+#		echo "INFO: ${OUMISC} NOT exist, skip"
+#	fi
+#	if [ -e "${OUREPO}" ] ; then
+#		echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
+#		\cd "${OUREPO}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
+#	else
+#		echo "INFO: ${OUREPO} NOT exist, skip"
+#	fi
+#
+#	\cd "${HOME}/.vim/bundle" &> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle"
+#	for f in * ; do 
+#		[ ! -d "${f}" ] && continue
+#		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
+#		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle/${f}"
+#		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
+#	done
+#
+#	zip -rjq "${packFile}" "${tmpDir}"/*.txt
+#	## gen exclude cmd part
+#	#ex_fl="$(func_backup_dated_gen_exclude_list "${source}")"
+#	#if [ -s  "${ex_fl}" ] ; then
+#	#	#cmd_ex_part="-x@'${ex_fl}'"				# NO ' inside, otherwise will be part of password!
+#	#	cmd_ex_part="-x@${ex_fl}" 
+#	#fi
+#	## TODO: delete: zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
+#
+#	# passwd will be used if available
+#	func_backup_dated "${packFile}"
+#
+#	local final_zip_list="$(mktemp)"
+#	unzip -l "${packFile}" > "${final_zip_list}"
+#	echo "INFO: final pack file list: ${final_zip_list}"
+#
+#	echo "INFO: delete tmp pack file"
+#	rm "${packFile}"
+#	popd &> /dev/null
+#}
 
 #func_mydata_sync_v2(){
 #
@@ -3440,3 +3336,115 @@ func_backup_myenv_OLD_VERSION() {
 #	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl "${bdta_path}" "bdta"
 #}
 
+#func_mydata_sync_extra() {
+#	# alone is common extra dir
+#
+#	# only for dir record
+#	local TCZ_EXTRA_LIST="backup_rsync" 
+#	local DTZ_EXTRA_LIST="backup_unison" 
+#}
+#
+#func_mydata_sync_tcatotcz() {
+#	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCA_BASE}" && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2" && return 1
+#
+#	local TCA_SYNC_LIST="h8/actor h8/magzine h8/zptp dudu/course dudu/tv video/tv" 
+#	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
+#}
+#
+#func_mydata_sync_tcbtotcz() {
+#	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCB_BASE}" && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2" && return 1
+#
+#	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
+#	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
+#}
+#
+#func_mydata_sync_dtatodtz() {
+#	local DTA_SYNC_LIST="dudu/xiaoxue dudu/chuzhong dudu/gaozhong dudu/english"
+#	func_mydata_rsync_with_list "${DTA_BASE}" "${DTZ_BASE}" "${DTA_SYNC_LIST}" 
+#}
+#
+#func_mydata_sync_dtbtodtz() { 
+#	return 1
+#	local DTB_SYNC_LIST="" 
+#	func_mydata_rsync_with_list "${DTB_BASE}" "${DTZ_BASE}" "${DTB_SYNC_LIST}" 
+#}
+#
+#func_mydata_sync_dtztotcz() {
+#	local DTZ_SKIP_LIST="video/documentary"
+#	func_techo info "SKIP: ${DTZ_SKIP_LIST}"
+#
+#	local DTZ_SYNC_LIST="gigi video/course dudu/audio dudu/book dudu/documentary dudu/knowledge dudu/movie zz/talk zz/computer zz/outing"
+#	func_mydata_rsync_with_list "${DTZ_BASE}" "${TCZ_BASE}" "${DTZ_SYNC_LIST}" 
+#}
+#
+#func_mute() {
+#	osascript -e "set volume with output muted"
+#
+#	# Unmute volume
+#	# osascript -e "set volume without output muted"
+#
+#	# check mute status
+#	# osascript -e "output muted of (get volume settings)"
+#}
+#
+#func_mydata_rsync_with_list() {
+#	local src_base="${1}"
+#	local tgt_base="${2}"
+#	local sync_list="${3}"
+#
+#	! df | grep -q "${tgt_base}" && func_techo info "skip ${tgt_base}, since not mount" && return 1
+#	! df | grep -q "${src_base}" && func_techo info "skip ${src_base}, since not mount" && return 1
+#
+#	for d in ${sync_list} ; do
+#		func_complain_path_not_exist "${src_base}/${d}/" && return 1
+#		func_complain_path_not_exist "${tgt_base}/${d}/" && return 1
+#
+#		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${tgt_base}/${d}/"
+#		func_rsync_simple            "${src_base}/${d}/"  "${tgt_base}/${d}/"
+#		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${tgt_base}/${d}/" 
+#	done
+#}
+#
+#func_mydata_out_filter_del() {
+#
+#	# TODO: use func_pipe_remove_lines instead
+#	sed -e  '
+#		# ignore whole dir
+#		/FCZ\/backup_DCS\//d;
+#
+#		# not all dbackup should ignore, so need 3 lines
+#		/deleting FCZ\/backup_dbackup\/$/d;
+#		/deleting FCZ\/backup_dbackup\/2020/d;
+#		/deleting FCZ\/backup_dbackup\/201[0-9]/d;
+#		'
+#}
+#
+#func_mydata_rsync_del_detect() {
+#	local del_list="$(func_rsync_del_detect "$@" | func_mydata_out_filter_del)"
+#
+#	if [ -z "${del_list}" ] ; then 
+#		func_techo INFO "nothing need to delete manually"
+#	else
+#		func_techo WARN "Might NEED TO DELETE MANUALLY IN ${2}"
+#		echo "${del_list}" 
+#	fi
+#}
+#
+#func_mydata_print_summary() {
+#	local tmp_log_file="${1}"
+#
+#	echo -e "\nINFO: ======== FILE NEED MANUAL DELETE ========"
+#	#grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del	# not need, since already filtered
+#	grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del
+#
+#	echo -e "\nINFO: ======== ERROR/WARN NEED HANDLE ========"
+#	sed -n -e '/ ERROR: /Ip;/ WARN: /Ip;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
+#
+#	echo -e "\nINFO: detail log: ${tmp_log_file}"
+#}
+#
+#func_mydata_dcm_hist_sync() {
+#	func_info "DCM_HIST RSYNC: ${1} --> ${2}"
+#	func_rsync_ask_then_run "${1}" "${2}" | sed -e 's/^/\t/;'
+#}
+#

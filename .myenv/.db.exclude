@@ -1,3 +1,7 @@
+# FileInfo
+# - used by func_backup_dated@~/.myenv/myenv_func.sh
+# - exclude files (patterns) for cmd: dbackup
+
 # 这样的"相对路径"不生效。只能额外Hard Code加
 # 见 ~func_backup_myenv@~/.myenv/myenv_func.sh
 #../.unison/[fa][pr][0-9a-z]*

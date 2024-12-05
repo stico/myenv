@@ -16,6 +16,9 @@
 ################################################################################
 PARAM_NON_INTERACTIVE_MODE="param_non_interactive_mode"
 DEFAULT_TIME_ZONE="Asia/Shanghai"
+UNCOMFIRMED_YM="0000-00"
+FIND_UTIL_EXCLUDE_PATH=".fu.exclude"
+FIND_UTIL_FILESIZE_LIST=".fu.filesize"
 
 ################################################################################
 # Time
@@ -305,6 +308,43 @@ func_is_pid_running() {
 }
 
 ################################################################################
+# MultiMedia
+################################################################################
+func_media_time_ym() {
+	local usage="Usage: ${FUNCNAME[0]} <file>"
+	local desc="Desc: extract year/month info from media (format: YYYY-mm), return ${UNCOMFIRMED_YM} if failed"
+	func_param_check 1 "$@"
+
+	func_complain_cmd_not_exist exiftool "exiftool NOT installed, pls check (zbox have it)" && return 1		# zbox / homebrew / apt install exiftool
+
+	local dm f tag
+	f="${1}"
+	for tag in DateTimeOriginal CreateDate ModifyDate GPSDateStamp; do
+		# GPSDateStamp ALWAYS output in "%Y:%m:%d" format, so use this format to unify the following process
+		dm="$(exiftool -s -"${tag}" -d "%Y:%m:%d" "${f}" | sed -e 's/^.*: \+//;s/:/-/g;s/-..$//;')"
+		if func_is_std_format_ym "${dm}" ; then
+			#echo "INFO: get Date-Month ${STR_SUCCESS}: ${dm} (${tag}, ${f##*"${BASENAME}"/})" >> "${log_file}"
+			echo "${dm}" 
+			return 0
+		fi
+	done
+
+	echo "${UNCOMFIRMED_YM}"
+	return 1
+}
+
+func_is_std_format_ym() {
+	local usage="Usage: ${FUNCNAME[0]} <str>"
+	local desc="Desc: check if time in 'YYYY-mm' format"
+	func_param_check 1 "$@"
+
+	func_is_str_blank "${1}" && return 1
+
+	# ${UNCOMFIRMED_YM} is NOT valid, so invoker of func_media_time_ym can do more logic for it
+	[[ "${1}" == 20[0-9][0-9]-[0-9][0-9] ]] && return 0 || return 1
+}
+
+################################################################################
 # Pattern_Matching (regex / patterns) (also see ~Text_Process )
 ################################################################################
 func_grepf() {
@@ -340,6 +380,7 @@ func_grepf() {
 		if [[ "${pipe_mode}" = 'true' ]] ; then
 			grep ${params} -f <(func_del_blank_and_hash_lines "${pattern_file}")
 		else
+			func_debug_stderr "grep ${params} -f <(func_del_blank_and_hash_lines ${pattern_file}) $*"
 			grep ${params} -f <(func_del_blank_and_hash_lines "${pattern_file}") "$@"
 		fi
 	else
@@ -359,21 +400,50 @@ func_grepf() {
 		# Use splited pattern files one by one
 		local tmp_name_prefix tmp_in tmp_out f 
 		tmp_name_prefix="$(mktemp -d)/func_grepf.tmp" 
-		func_debug_stderr "use pattern files one by one, check tmp file at: ${tmp_name_prefix%/*}/"
-		for f in "${tmp_split_dir}"/* ; do
-			[[ -s "${f}" ]] || continue
+		func_debug_stderr "use pattern files one by one, check tmp files at: ${tmp_name_prefix%/*}/"
 
-			# 1st round need check mode, then all based on file
-			tmp_out="${tmp_name_prefix}-${f##*/}" 
-			if [[ ! -e "${tmp_in}" ]] && [[ "${pipe_mode}" = 'true' ]] ; then	grep ${params} -f "${f}" > "${tmp_out}"
-			elif [[ ! -e "${tmp_in}" ]] && [[ "${pipe_mode}" = 'false' ]] ; then	grep ${params} -f "${f}" "$@" > "${tmp_out}"
-			else									grep ${params} -f "${f}" "${tmp_in}" > "${tmp_out}"
+		# 注意: 有和没有参数 "-v" 方式是不一样的，所以需要分开不同的逻辑。
+		if func_str_contains "${params}" " -v" ; then
+
+			# 逻辑: 针对输入一个个pattern文件过滤即可，最后一个过滤出的文件即为结果
+			for f in "${tmp_split_dir}"/* ; do
+				[[ -s "${f}" ]] || continue
+
+				# 1st round need check mode, then all based on file
+				tmp_out="${tmp_name_prefix}-OUTPUT-${f##*/}" 
+				if [[ ! -e "${tmp_in}" ]] && [[ "${pipe_mode}" = 'true' ]] ; then	grep ${params} -f "${f}" > "${tmp_out}"
+				elif [[ ! -e "${tmp_in}" ]] && [[ "${pipe_mode}" = 'false' ]] ; then	grep ${params} -f "${f}" "$@" > "${tmp_out}"
+				else									grep ${params} -f "${f}" "${tmp_in}" > "${tmp_out}"
+				fi
+				tmp_in="${tmp_out}"
+
+			done
+		else
+			# 注意: 这个部分仅写了逻辑，没有验证过
+			
+			local tmp_in_0 tmp_in_1
+			tmp_in_0="${tmp_name_prefix}-INPUT-ALL" 
+			tmp_out="${tmp_name_prefix}-OUTPUT-ALL" 
+
+			# 输入要先全部保留下来
+			if [[ "${pipe_mode}" = 'true' ]] ; then
+				grep "" > "${tmp_in_0}"
+			else
+				grep "" "$@" > "${tmp_in_0}"
 			fi
-			tmp_in="${tmp_out}"
 
-		done
+			# 逻辑: 针对输入一个个pattern扫描，累积到结果文件。为避免行重复 (即匹配过的行被后续pattern文件再次匹配)。需用 "-v" 过滤掉这些已经匹配的行。
+			for f in "${tmp_split_dir}"/* ; do
+				[[ -s "${f}" ]] || continue
+
+				tmp_in_1="${tmp_name_prefix}-INPUT-${f##*/}" 
+				grep ${params} -f "${f}" "${tmp_in_0}" >> "${tmp_out}"
+				grep ${params} -v -f "${f}" "${tmp_in_0}" > "${tmp_in_1}"
+				tmp_in_0="${tmp_in_1}"
+			done
+		fi
+
 		cat "${tmp_out}"
-
 		# TODO: delete tmp files: rm -r "${tmp_name_prefix%/*}/"
 	fi
 }
@@ -560,7 +630,7 @@ func_shrink_dup_lines() {
 }
 
 ################################################################################
-# File System
+# File System: basic
 ################################################################################
 func_cd() {
 	local usage="Usage: ${FUNCNAME[0]} <path>" 
@@ -596,6 +666,29 @@ func_mkdir_cd() {
 
 	# to avoid the path have blank, any simpler solution?
 	#func_mkdir "$1" && OLDPWD="$PWD" && eval \\cd "\"$1\"" || func_die "ERROR: failed to mkdir or cd into it ($1)"
+}
+
+func_mv_structurally() { 
+	local usage="Usage: ${FUNCNAME[0]} <src_base> <tgt_base> <fd_path>"
+	local desc="Desc: mv <fd_path> from <src_base> to <tgt_base>, and perserve its dir hierarchy"
+	func_param_check 3 "$@"
+
+	local src_base tgt_base src_path rel_path
+	src_base="$(readlink -f "${1}")"
+ 	tgt_base="$(readlink -f "${2}")"
+	src_path="$(readlink -f "${3}")"
+	rel_path="${src_path##*"${src_base}"}"
+	tgt_dir="$(dirname "${tgt_base}/${rel_path}")"
+
+	# make sure the rel_path is correct
+	if [[ "${src_path}" == "${rel_path}" ]] ; then
+		func_error "mv failed: can NOT get relative path, src_base (${src_base}) / src_path (${src_path})"
+		return 1
+	fi
+
+	func_debug mv "${src_path}" "${tgt_dir}"
+	mkdir -p "${tgt_dir}" &> /dev/null
+	mv "${src_path}" "${tgt_dir}" 
 }
 
 func_file_lines() {
@@ -822,6 +915,47 @@ func_available_space_of_path() {
 	
 	# unit: bytes. '-B1' == "--block-size=1"
 	\df "${1}" -B1 | tail -1 | awk '{print $4}'
+}
+
+################################################################################
+# File System: Find Utils
+################################################################################
+func_gen_filesize_list() {
+
+	# check if reuse
+	[[ "${FU_GEN_FSL}" == 'false' ]] && [[ -e "${FIND_UTIL_FILESIZE_LIST}" ]] && return
+
+	# 注意1: find后的 "." 不能改，因为exclude里用它，改了则excllude的规则均无效了
+	# 注意2: 逆序(即大文件在前面)，这个点不要随便改
+	# REF: https://stackoverflow.com/questions/4210042/how-do-i-exclude-a-directory-when-using-find#answer-16595367
+
+	# assemble exclude params
+	local ex_params
+	if [[ -e "${FIND_UTIL_EXCLUDE_PATH}" ]] ; then
+		# 用作命令行时，需要有"\"，放在脚本中则不需要
+		#ex_params=" -not \( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE_PATH}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
+		ex_params=" -not ( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE_PATH}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
+		echo "# NOTE: exclude param used: ${ex_params}" > "${FIND_UTIL_FILESIZE_LIST}"
+	fi
+
+	# shellcheck disable=2086
+	find . ${ex_params} -type f -printf "%s\t%p\n" | sort -rn >> "${FIND_UTIL_FILESIZE_LIST}"
+}
+
+func_find_loop_f() {
+	local usage="Usage: ${FUNCNAME[0]} <path> <function_name>"
+	local desc="Desc: run <function_name> for each file (xargs or -exec NOT support <function_name>)"
+	func_param_check 2 "$@"
+
+	local path file func
+	path="${1}"
+	func="${2}"
+	func_complain_path_inexist "${path}" && return 1
+	func_complain_func_inexist "${func}" && return 1
+
+	while IFS= read -r -d '' file ; do
+		 "${func}" "${file}"
+	done < <(find "${path}" -type f -print0)
 }
 
 ################################################################################
@@ -1210,6 +1344,7 @@ func_validate_function_exist() {
 	func_die "ERROR: ${1} NOT exist or NOT a function!"
 }
 
+func_is_funcn_exist() { func_is_function_exist "$@" ; }
 func_is_function_exist() {
 	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
 	local desc="Desc: check if <function-name> exist as a function, return 0 if exist and a function, otherwise 1" 
@@ -1219,6 +1354,7 @@ func_is_function_exist() {
 	return 1
 }
 
+func_complain_func_inexist() { func_complain_function_not_exist "$@" ; }
 func_complain_function_not_exist() {
 	local usage="USAGE: ${FUNCNAME[0]} <function-name>" 
 	local desc="Desc: complain if <function-name> NOT exist as a function, return 1 if not exist or not a function, otherwise 1" 
