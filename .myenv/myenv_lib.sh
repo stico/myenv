@@ -17,8 +17,8 @@
 PARAM_NON_INTERACTIVE_MODE="param_non_interactive_mode"
 DEFAULT_TIME_ZONE="Asia/Shanghai"
 UNCOMFIRMED_YM="0000-00"
-FIND_UTIL_EXCLUDE_PATH=".fu.exclude"
-FIND_UTIL_FILESIZE_LIST=".fu.filesize"
+FIND_UTIL_EXCLUDE=".fu.exclude"
+FIND_UTIL_FILESIZE=".fu.filesize"
 
 ################################################################################
 # Time
@@ -62,6 +62,7 @@ func_date_in_dati() {
 func_info() { func_techo "INFO" "$@" ; }
 func_warn() { func_techo "WARN" "$@" ; }
 func_error() { func_techo "ERROR" "$@" ; }
+func_error_stderr() { func_error "$@" 1>&2 ; }
 func_debug() { [ "${ME_DEBUG}" = 'true' ] && func_techo "DEBUG" "$@" ; }
 func_debug_stderr() { func_debug "$@" 1>&2 ; }
 
@@ -385,7 +386,8 @@ func_grepf() {
 		fi
 	else
 		local pattern_file_md5 tmp_split_dir
-		pattern_file_md5="$(md5sum "${pattern_file}" | cut -d' ' -f1)"
+		#pattern_file_md5="$(md5sum "${pattern_file}" | cut -d' ' -f1)"
+		pattern_file_md5="$(func_file_md5sum "${pattern_file}")"
 		tmp_split_dir="/tmp/func_grepf-pattern-split-${FUNC_GREPF_MAX_PATTERN_LINE}-${pattern_file_md5}"
 		func_debug_stderr "Split pattern file (${pattern_file_line_count} > ${FUNC_GREPF_MAX_PATTERN_LINE}) into: ${tmp_split_dir}"
 
@@ -722,6 +724,18 @@ func_file_size() {
 	fi
 }
 
+func_file_md5sum() { 
+	local usage="Usage: ${FUNCNAME[0]} <file>"
+	local desc="Desc: get file size, in Bytes" 
+	func_param_check 1 "$@"
+
+	[[ ! -e "${1}" ]] && func_error_stderr "file not found, skip gen md5: ${1}" && return 1
+
+	# TODO: cache for big files???
+	
+	md5sum "${1}" | cut -d' ' -f1
+}
+
 func_ln_soft() {
 	local usage="Usage: ${FUNCNAME[0]} <source> <target>"
 	local desc="Desc: the directory must be empty or NOT exist, otherwise will exit" 
@@ -816,8 +830,8 @@ func_complain_path_not_exist() {
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
-	func_is_str_blank "${1}" && echo "ERROR: ${FUNCNAME[0]}: parameter is blank!" 1>&2 && return 0
-	[ ! -e "${1}" ] && echo "${2:-WARN: path ${1} NOT exist}" 1>&2 && return 0
+	func_is_str_blank "${1}" && func_error_stderr "ERROR: ${FUNCNAME[0]}: parameter is blank!" && return 0
+	[ ! -e "${1}" ] && func_error_stderr "${2:-WARN: path ${1} NOT exist}" && return 0
 	return 1
 }
 
@@ -921,25 +935,45 @@ func_available_space_of_path() {
 # File System: Find Utils
 ################################################################################
 func_gen_filesize_list() {
+	local usage="Usage: ${FUNCNAME[0]} [path] ..."
+	local desc="Desc: gen 'size\tfile' list for paths, support exclude paths in ${FIND_UTIL_FILESIZE}"
 
+	# default is current dir
+	[[ "$#" -eq 0 ]] && func_gen_filesize_list_single && return
+
+	# gen for each dir
+	local d err_msg
+	for d in "$@" ; do
+		err_msg="skip gen file-size list for path: ${d}"
+		func_complain_path_inexist "${d}" "path NOT exist, ${err_msg}" && continue
+		(
+			\cd "${d}" || func_die "Failed to cd, ${err_msg}"
+			func_gen_filesize_list_single
+		)
+	done
+}
+
+func_gen_filesize_list_single() {
 	# check if reuse
-	[[ "${FU_GEN_FSL}" == 'false' ]] && [[ -e "${FIND_UTIL_FILESIZE_LIST}" ]] && return
+	[[ "${FU_GEN_FSL}" == 'false' ]] && [[ -e "${FIND_UTIL_FILESIZE}" ]] && return
 
-	# 注意1: find后的 "." 不能改，因为exclude里用它，改了则excllude的规则均无效了
-	# 注意2: 逆序(即大文件在前面)，这个点不要随便改
-	# REF: https://stackoverflow.com/questions/4210042/how-do-i-exclude-a-directory-when-using-find#answer-16595367
+	# make sure file is empty
+	rm "${FIND_UTIL_FILESIZE}" &> /dev/null
 
 	# assemble exclude params
 	local ex_params
-	if [[ -e "${FIND_UTIL_EXCLUDE_PATH}" ]] ; then
+	if [[ -e "${FIND_UTIL_EXCLUDE}" ]] ; then
 		# 用作命令行时，需要有"\"，放在脚本中则不需要
-		#ex_params=" -not \( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE_PATH}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
-		ex_params=" -not ( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE_PATH}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
-		echo "# NOTE: exclude param used: ${ex_params}" > "${FIND_UTIL_FILESIZE_LIST}"
+		#ex_params=" -not \( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
+		ex_params=" -not ( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
+		echo "# NOTE: exclude param used: ${ex_params}" > "${FIND_UTIL_FILESIZE}"
 	fi
 
+	# 注意1: (必须) 保持用"."，因为exclude里用它，改了则excllude的规则均无效了
+	# 注意2: (建议) 保持逆序，即大文件在前面 (目前没有地方强依赖这个)
+	# REF: (很好的解释了-prune的用法) https://stackoverflow.com/questions/4210042/how-do-i-exclude-a-directory-when-using-find#answer-16595367
 	# shellcheck disable=2086
-	find . ${ex_params} -type f -printf "%s\t%p\n" | sort -rn >> "${FIND_UTIL_FILESIZE_LIST}"
+	find . ${ex_params} -type f -printf "%s\t%p\n" | sort -rn >> "${FIND_UTIL_FILESIZE}"
 }
 
 func_find_loop_f() {

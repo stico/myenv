@@ -76,7 +76,50 @@ LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find
 ################################################################################
 func_find_big_files() {
 	func_gen_filesize_list
-	func_grepf -v "${FIND_BIG_FILES_EX_FILENAME}" "${FIND_UTIL_FILESIZE_LIST}" | head -"${1:-10}"
+	func_grepf -v "${FIND_BIG_FILES_EX_FILENAME}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}"
+}
+
+func_find_dup() {
+	local work_base find_base fl_all fl_md5 fl_to_gen tmpf md5_cur md5_pre
+
+	# var init
+	work_base="$(mktemp -d)"
+	fl_all="${work_base}/fl_all"
+	fl_md5="${work_base}/fl_md5"
+	fl_to_gen="${work_base}/fl_to_gen"
+
+	# pre-check
+	[[ "$#" -gt 0 ]] && func_validate_path_exist "$@"
+
+	# gather filelist
+	func_gen_filesize_list "$@"
+	if [[ "$#" -gt 0 ]] ; then
+		for find_base in "$@" ; do
+			# update file path with base, otherwise file path is incorrect
+			func_del_blank_and_hash_lines "${find_base}/${FIND_UTIL_FILESIZE}" | sed -e "s+\t\./+\t${find_base}/+" >> "${fl_all}"
+		done
+	else
+		cp "${FIND_UTIL_FILESIZE}" "${fl_all}"
+	fi
+
+	# find same size file, trick: input file used twice (ref: FNR@awk)
+	awk 'FNR == NR { seen[$1]++; next } seen[$1] > 1' "${fl_all}" "${fl_all}" | sort -rn > "${fl_to_gen}"
+
+	# gen md5 and output
+	while IFS= read -r line || [[ -n "${line}" ]] ; do 
+		tmpf="${line#*	}"
+
+		# skip useless file
+		echo "${tmpf}" | grep -q "\(.DS_Store\|${FIND_UTIL_EXCLUDE}\|${FIND_UTIL_FILESIZE}\)" && continue
+
+		md5_pre="${md5_cur}"
+		md5_cur="$(func_file_md5sum "${tmpf}")"
+		[[ "${md5_cur}" != "${md5_pre}" ]] && echo >> "${fl_md5}"
+		echo -e "${md5_cur}\t${line}" >> "${fl_md5}"
+	done < "${fl_to_gen}"
+	
+	# print summary
+	echo "Check tmp files at: ${work_base}"
 }
 
 func_find_non_utf8_in_content() {
@@ -95,11 +138,6 @@ func_find_non_utf8_in_content() {
 
 	echo "INFO: suspected files are:"
 	cat "${tmp_suspect}"
-}
-
-func_find_dup() {
-	# TODO
-	:
 }
 
 ################################################################################
@@ -2685,6 +2723,234 @@ func_export_script() {
 	fi
 }
 
+func_gen_filelist_with_size(){
+	local usage="USAGE: ${FUNCNAME[0]} <path> <output_path>" 
+	local desc="Desc: gen file list with human readable size" 
+	func_param_check 1 "$@"
+
+	local src_path="${1}"
+	local out_path="${2}"
+	if [ -z "${out_path}" ] ; then
+		local fpath="$(readlink -f "${src_path}")"
+		local name="$(basename "${fpath}")"
+		out_path="/tmp/fl_${name}_$(func_dati).txt"
+	fi
+
+	# V1, NOT work on UTF-8
+	# TODO: file encoding break after numfmt cmd (UTF-8 -> Non-ISO extended-ASCII)
+	#	cmd to prove: echo "8888 资格" | numfmt --to=si		# gets: "8.9K 资??"
+	#find "${src_path}" -type f -printf '%s\t%P\n' | numfmt --field=1 --to=si --format="%-6f" > "${out_path}"
+
+	# V2, work on UTF-8, cut file to 2 part, numfmt only handle the file size part
+	# TODO: how to check cut/paste correct? 1. compare func_file_line_count 2. ???
+	local tmpdir f_origin
+	tmpdir="$(mktemp -d)"
+	f_origin="${tmpdir}/a.size_file.by_find"
+	f_1st_col="${tmpdir}/b.1st.column"
+	f_2nd_col="${tmpdir}/c.2nd.column"
+	f_1st_col_numfmt="${tmpdir}/d.1st.column.numfmt"
+	find "${src_path}" -type f -printf '%s\t%P\n' > "${f_origin}"
+	cut -f1  "${f_origin}" > "${f_1st_col}"
+	cut -f2-  "${f_origin}" > "${f_2nd_col}"
+	numfmt --field=1 --to=si --format="%-6f" < "${f_1st_col}" > "${f_1st_col_numfmt}"
+	paste -d '\t' "${f_1st_col_numfmt}" "${f_2nd_col}" > "${out_path}"
+
+	echo "INFO: filelist at: ${out_path} (size: $(func_file_size_human "${out_path}") )"
+}
+
+func_file_count_of_dir(){
+	local usage="USAGE: ${FUNCNAME[0]} <path> <path>" 
+	local desc="Desc: count files in dir" 
+	
+	local p count
+
+	if [[ "$#" -eq 0 ]] ; then
+		count="$(find ./ -type f | wc -l)"
+		echo -e "${count}\t./"
+		return
+	fi
+
+	for p in "$@" ; do
+		[[ -f "${p}" ]] && continue
+		[[ -h "${p}" ]] && echo -e "0\t(link) ${p}" && continue
+		count="$(find "${p}" -type f | wc -l)"
+		echo -e "${count}\t${p}"
+	done
+}
+
+func_mydata_sync_v3(){
+	# NOTE
+	#	DISK
+	#		DISK	VOL	FS	NOTE-1		NOTE-2
+	#		----	----	----	----		----
+	#		tcz	tcz	ExFAT	5T grey
+	#		dtz	dtz	ExFAT	5T black
+	#		dtb	dtb	HSF+	2T black	FS Detail: with long data line
+	#		(3.5")	bdta	HSF+			FS Detail: MacOS entended (journaled) / case-insensitive / formatted by lapmac3 on 2024-07 
+	#		(3.5")	btca	HSF+			FS Detail: MacOS entended (journaled) / case-insensitive / formatted by lapmac3 on 2024-07
+	#		mhd500	mhd500		500G blue	(2024-07) all movie, not sync
+	#
+	#	FLOW
+	#		doc	lapmac2 <-> lapmac3	-> DTZ (via unison)
+	#						-> BDTA/tcz/btca (via rsync)
+	#		misc	DTZ -> BDTA
+	#			TCZ -> BTCA
+
+	# Var
+	local mnt_path tcz_path dtz_path btca_path bdta_path base tmp
+	mnt_path="/Volumes"
+	tcz_path="/tmp/tcz"
+	btca_path="/tmp/btca"
+	dtz_path="${mnt_path}/DTZ"
+	bdta_path="${mnt_path}/bdta"
+
+	# Pre-Check
+	[[ "${HOSTNAME}" != lapmac* ]] && echo "ERROR: only runs on lapmac* !" && return
+
+	# Clean up
+	for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
+		func_mydata_clean_up "${base}"
+	done
+
+	# Sync - misc
+	func_mydata_bi_sync "${tcz_path}" "${btca_path}" "h8"
+	func_mydata_bi_sync "${dtz_path}" "${bdta_path}" "gigi zz dudu video"
+
+	# Sync - doc
+	if [[ "$(hostname -s)" == "lapmac2" ]] || [[ "$(hostname -s)" == "lapmac3" ]] ; then
+		[[ -d "${dtz_path}/backup_unison" ]] && func_unison_fs_run
+		func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
+		func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
+		func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
+	fi
+
+	# Sync - XXX_HIST & XXX_TODO (try possible combination, assume 1st update dtz)
+	for tmp in "DCB_HIST" "DCJ_HIST" "DCM_HIST" "DCM_TODO" "DCS_HIST" ; do
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${bdta_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${btca_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${tcz_path}/backup_rsync/" "${tmp}"
+		func_mydata_bi_sync "${btca_path}/backup_rsync/" "${tcz_path}/backup_rsync/" "${tmp}"
+	done
+
+	# Gen filelist
+	if [[ "${1}" != "-nofl" ]] ; then
+		for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
+			func_mydata_gen_fl "${base}"
+		done
+	fi
+}
+
+func_mydata_clean_up() {
+	local f src tgt base trash line fl_del_alone fl_del_computer
+	base="${1}"
+	trash="${base}/alone/trash_for_clean_up"
+	fl_del_computer="${HOME}/amp/data/mydata/fl_delete"
+
+	[[ -d "${base}" ]] || return 0
+	func_complain_path_not_exist "${fl_del_computer}" "INFO: skip, since fl_del not found." && return 0
+	mkdir -p "${trash}"
+
+	# 2 location: computer or locally on disk (${base}/alone/fl_delete/20*.txt)
+	for f in "${fl_del_computer}"/20*.txt "${base}"/alone/fl_delete/20*.txt ; do
+		echo "INFO: start to clean up ${base}, according to: ${f##*/}"
+		while IFS= read -r line || [[ -n "${line}" ]] ; do
+			src="${base}/${line}"
+			tgt="${trash}/$(func_dati)_$(basename "${line}")"
+			[[ -e "${src}" ]] || continue
+
+			echo "INFO: --> mv ${src} ${tgt}"
+			if func_str_contains "${src}" "*" ; then
+				# $src need support wildcard, no quote
+				# shellcheck disable=2086
+				mv ${src} "${tgt}"
+			else
+				mv "${src}" "${tgt}"
+			fi
+		done < <(func_del_blank_and_hash_lines "${f}")
+	done
+}
+
+func_mydata_bi_sync() {
+	func_param_check 3 "$@"
+	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
+
+	local sync_item a b
+	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
+		func_info "SKIP: ${1} <-> ${2}"
+		return
+	fi
+	
+	for sync_item in ${3} ; do 
+		# rsync cares the last "/", should be the same, better ending with "/"
+		[[ "${1}/${sync_item}" = */ ]] && a="${1}/${sync_item}" || a="${1}/${sync_item}/" 
+		[[ "${2}/${sync_item}" = */ ]] && b="${2}/${sync_item}" || b="${2}/${sync_item}/" 
+
+		func_complain_path_not_exist "${a}" && continue
+		func_complain_path_not_exist "${b}" && continue
+
+		func_info "BI-RSYNC: ${a} <-> ${b}"
+		func_rsync_ask_then_run "${a}" "${b}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
+		func_rsync_ask_then_run "${b}" "${a}" | sed -e 's/^/\t/;'
+	done
+}
+
+func_mydata_sync_doc_rsync() {
+	local d target opts doc_ex_base src tgt
+	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
+
+	target="${1}"
+	func_complain_path_not_exist "${target}" && return 1
+	func_complain_path_not_exist "${doc_ex_base}" && return 1
+
+	# NOT in list: XXX_HIST & DCM_TODO
+	for d in DCB DCC DCD DCJ DCM DCO FCS FCZ ; do
+		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
+
+		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
+		src="${MY_DOC}/${d}/"
+		tgt="${target}/${d}/"
+
+		# rsync cares the last "/", should be the same, better ending with "/"
+		func_info "DOC-RSYNC: ${src} -> ${tgt}"
+		func_rsync_ask_then_run "${src}" "${tgt}" "${opts}"
+	done
+}
+
+func_mydata_gen_fl(){
+	local base fl_file fl_record fl_latest specified_name base_name
+	base="${1}"
+	specified_name="${2}"
+	fl_record="${base}/alone/fl_record"
+	fl_latest="${HOME}/amp/data/mydata/fl_latest"
+
+	func_info "gen filelist for: ${base}"
+	func_complain_path_not_exist "${base}" && return
+
+	base_name="$(basename "${base}")"
+	fl_file="${fl_record}/fl_${specified_name:-${base_name}}_$(func_dati).txt"
+
+	# gen filelist
+	[[ -e "${fl_record}" ]] || mkdir -p "${fl_record}"
+	func_gen_filelist_with_size "${base}" "${fl_file}"
+
+	# remove useless lines
+	sed -i -e "
+		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
+		/\/FCS\//d;
+		/\/DCD\/mail\//d;
+		/\/DCC\/coding\/leetcode\//d;
+		/\/DCM.*\.\(gif\|jpg\|jpeg\|svg\|webp\|bmp\|png\|tiff\|tif\|heic\|aae\|mp4\|mov\|m4a\)/Id;
+		" "${fl_file}"
+
+	cp "${fl_file}" "${fl_latest}"
+}
+
+# THIS MUST IN THE END OF SCRIPT
+MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script
+
+################################################################################
+# Deprecated - dup find
+################################################################################
 func_dup_gather_try_bakpath_PRIVATE() {
 	local usage="USAGE: ${FUNCNAME[0]} <filepath>" 
 	local desc="Desc: if path is doc backup, try diff path for DTZ/TCZ/lap" 
@@ -2925,234 +3191,9 @@ func_dup_shrink_md5_list_lapmac() {
 	wc -l "${new}"
 }
 
-func_gen_filelist_with_size(){
-	local usage="USAGE: ${FUNCNAME[0]} <path> <output_path>" 
-	local desc="Desc: gen file list with human readable size" 
-	func_param_check 1 "$@"
-
-	local src_path="${1}"
-	local out_path="${2}"
-	if [ -z "${out_path}" ] ; then
-		local fpath="$(readlink -f "${src_path}")"
-		local name="$(basename "${fpath}")"
-		out_path="/tmp/fl_${name}_$(func_dati).txt"
-	fi
-
-	# V1, NOT work on UTF-8
-	# TODO: file encoding break after numfmt cmd (UTF-8 -> Non-ISO extended-ASCII)
-	#	cmd to prove: echo "8888 资格" | numfmt --to=si		# gets: "8.9K 资??"
-	#find "${src_path}" -type f -printf '%s\t%P\n' | numfmt --field=1 --to=si --format="%-6f" > "${out_path}"
-
-	# V2, work on UTF-8, cut file to 2 part, numfmt only handle the file size part
-	# TODO: how to check cut/paste correct? 1. compare func_file_line_count 2. ???
-	local tmpdir f_origin
-	tmpdir="$(mktemp -d)"
-	f_origin="${tmpdir}/a.size_file.by_find"
-	f_1st_col="${tmpdir}/b.1st.column"
-	f_2nd_col="${tmpdir}/c.2nd.column"
-	f_1st_col_numfmt="${tmpdir}/d.1st.column.numfmt"
-	find "${src_path}" -type f -printf '%s\t%P\n' > "${f_origin}"
-	cut -f1  "${f_origin}" > "${f_1st_col}"
-	cut -f2-  "${f_origin}" > "${f_2nd_col}"
-	numfmt --field=1 --to=si --format="%-6f" < "${f_1st_col}" > "${f_1st_col_numfmt}"
-	paste -d '\t' "${f_1st_col_numfmt}" "${f_2nd_col}" > "${out_path}"
-
-	echo "INFO: filelist at: ${out_path} (size: $(func_file_size_human "${out_path}") )"
-}
-
-func_file_count_of_dir(){
-	local usage="USAGE: ${FUNCNAME[0]} <path> <path>" 
-	local desc="Desc: count files in dir" 
-	
-	local p count
-
-	if [[ "$#" -eq 0 ]] ; then
-		count="$(find ./ -type f | wc -l)"
-		echo -e "${count}\t./"
-		return
-	fi
-
-	for p in "$@" ; do
-		[[ -f "${p}" ]] && continue
-		[[ -h "${p}" ]] && echo -e "0\t(link) ${p}" && continue
-		count="$(find "${p}" -type f | wc -l)"
-		echo -e "${count}\t${p}"
-	done
-}
-
-func_mydata_sync_v3(){
-	# NOTE
-	#	DISK
-	#		DISK	VOL	FS	NOTE-1		NOTE-2
-	#		----	----	----	----		----
-	#		tcz	tcz	ExFAT	5T grey
-	#		dtz	dtz	ExFAT	5T black
-	#		dtb	dtb	HSF+	2T black	FS Detail: with long data line
-	#		(3.5")	bdta	HSF+			FS Detail: MacOS entended (journaled) / case-insensitive / formatted by lapmac3 on 2024-07 
-	#		(3.5")	btca	HSF+			FS Detail: MacOS entended (journaled) / case-insensitive / formatted by lapmac3 on 2024-07
-	#		mhd500	mhd500		500G blue	(2024-07) all movie, not sync
-	#
-	#	FLOW
-	#		doc	lapmac2 <-> lapmac3	-> DTZ (via unison)
-	#						-> BDTA/tcz/btca (via rsync)
-	#		misc	DTZ -> BDTA
-	#			TCZ -> BTCA
-
-	# Var
-	local mnt_path tcz_path dtz_path btca_path bdta_path base tmp
-	mnt_path="/Volumes"
-	tcz_path="/tmp/tcz"
-	btca_path="/tmp/btca"
-	dtz_path="${mnt_path}/DTZ"
-	bdta_path="${mnt_path}/bdta"
-
-	# Pre-Check
-	[[ "${HOSTNAME}" != lapmac* ]] && echo "ERROR: only runs on lapmac* !" && return
-
-	# Clean up
-	for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
-		func_mydata_clean_up "${base}"
-	done
-
-	# Sync - misc
-	func_mydata_bi_sync "${tcz_path}" "${btca_path}" "h8"
-	func_mydata_bi_sync "${dtz_path}" "${bdta_path}" "gigi zz dudu video"
-
-	# Sync - doc
-	if [[ "$(hostname -s)" == "lapmac2" ]] || [[ "$(hostname -s)" == "lapmac3" ]] ; then
-		[[ -d "${dtz_path}/backup_unison" ]] && func_unison_fs_run
-		func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
-		func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
-		func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
-	fi
-
-	# Sync - XXX_HIST & XXX_TODO (try possible combination, assume 1st update dtz)
-	for tmp in "DCB_HIST" "DCJ_HIST" "DCM_HIST" "DCM_TODO" "DCS_HIST" ; do
-		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${bdta_path}/backup_rsync/" "${tmp}"
-		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${btca_path}/backup_rsync/" "${tmp}"
-		func_mydata_bi_sync "${dtz_path}/backup_unison/" "${tcz_path}/backup_rsync/" "${tmp}"
-		func_mydata_bi_sync "${btca_path}/backup_rsync/" "${tcz_path}/backup_rsync/" "${tmp}"
-	done
-
-	# Gen filelist
-	if [[ "${1}" != "-nofl" ]] ; then
-		for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
-			func_mydata_gen_fl "${base}"
-		done
-	fi
-}
-
-func_mydata_clean_up() {
-	local f src tgt base trash line fl_del_alone fl_del_computer
-	base="${1}"
-	trash="${base}/alone/trash_for_clean_up"
-	fl_del_computer="${HOME}/amp/data/mydata/fl_delete"
-
-	[[ -d "${base}" ]] || return 0
-	func_complain_path_not_exist "${fl_del_computer}" "INFO: skip, since fl_del not found." && return 0
-	mkdir -p "${trash}"
-
-	# 2 location: computer or locally on disk (${base}/alone/fl_delete/20*.txt)
-	for f in "${fl_del_computer}"/20*.txt "${base}"/alone/fl_delete/20*.txt ; do
-		echo "INFO: start to clean up ${base}, according to: ${f##*/}"
-		while IFS= read -r line || [[ -n "${line}" ]] ; do
-			src="${base}/${line}"
-			tgt="${trash}/$(func_dati)_$(basename "${line}")"
-			[[ -e "${src}" ]] || continue
-
-			echo "INFO: --> mv ${src} ${tgt}"
-			if func_str_contains "${src}" "*" ; then
-				# $src need support wildcard, no quote
-				# shellcheck disable=2086
-				mv ${src} "${tgt}"
-			else
-				mv "${src}" "${tgt}"
-			fi
-		done < <(func_del_blank_and_hash_lines "${f}")
-	done
-}
-
-func_mydata_bi_sync() {
-	func_param_check 3 "$@"
-	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
-
-	local sync_item a b
-	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
-		func_info "SKIP: ${1} <-> ${2}"
-		return
-	fi
-	
-	for sync_item in ${3} ; do 
-		# rsync cares the last "/", should be the same, better ending with "/"
-		[[ "${1}/${sync_item}" = */ ]] && a="${1}/${sync_item}" || a="${1}/${sync_item}/" 
-		[[ "${2}/${sync_item}" = */ ]] && b="${2}/${sync_item}" || b="${2}/${sync_item}/" 
-
-		func_complain_path_not_exist "${a}" && continue
-		func_complain_path_not_exist "${b}" && continue
-
-		func_info "BI-RSYNC: ${a} <-> ${b}"
-		func_rsync_ask_then_run "${a}" "${b}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
-		func_rsync_ask_then_run "${b}" "${a}" | sed -e 's/^/\t/;'
-	done
-}
-
-func_mydata_sync_doc_rsync() {
-	local d target opts doc_ex_base src tgt
-	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
-
-	target="${1}"
-	func_complain_path_not_exist "${target}" && return 1
-	func_complain_path_not_exist "${doc_ex_base}" && return 1
-
-	# NOT in list: XXX_HIST & DCM_TODO
-	for d in DCB DCC DCD DCJ DCM DCO FCS FCZ ; do
-		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
-
-		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
-		src="${MY_DOC}/${d}/"
-		tgt="${target}/${d}/"
-
-		# rsync cares the last "/", should be the same, better ending with "/"
-		func_info "DOC-RSYNC: ${src} -> ${tgt}"
-		func_rsync_ask_then_run "${src}" "${tgt}" "${opts}"
-	done
-}
-
-func_mydata_gen_fl(){
-	local base fl_file fl_record fl_latest specified_name base_name
-	base="${1}"
-	specified_name="${2}"
-	fl_record="${base}/alone/fl_record"
-	fl_latest="${HOME}/amp/data/mydata/fl_latest"
-
-	func_info "gen filelist for: ${base}"
-	func_complain_path_not_exist "${base}" && return
-
-	base_name="$(basename "${base}")"
-	fl_file="${fl_record}/fl_${specified_name:-${base_name}}_$(func_dati).txt"
-
-	# gen filelist
-	[[ -e "${fl_record}" ]] || mkdir -p "${fl_record}"
-	func_gen_filelist_with_size "${base}" "${fl_file}"
-
-	# remove useless lines
-	sed -i -e "
-		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
-		/\/FCS\//d;
-		/\/DCD\/mail\//d;
-		/\/DCC\/coding\/leetcode\//d;
-		/\/DCM.*\.\(gif\|jpg\|jpeg\|svg\|webp\|bmp\|png\|tiff\|tif\|heic\|aae\|mp4\|mov\|m4a\)/Id;
-		" "${fl_file}"
-
-	cp "${fl_file}" "${fl_latest}"
-}
-
-# THIS MUST IN THE END OF SCRIPT
-MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script
-
 
 ################################################################################
-# Deprecated
+# Deprecated - backup dated/myenv
 ################################################################################
 #func_backup_dated_OLD_VERSION() {
 #	local usage="Usage: ${FUNCNAME[0]} <source>"
@@ -3284,6 +3325,9 @@ MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the sc
 #	popd &> /dev/null
 #}
 
+################################################################################
+# Deprecated - mydata sync
+################################################################################
 #func_mydata_sync_v2(){
 #
 #	# NOTE_BDTA_1	2023-05 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
