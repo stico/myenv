@@ -270,7 +270,6 @@ test_func_path_common_base() {
 	test_verify_str_contains "${result_str}" "${STR_EN_CHAR_1%/*}/"
 }
 
-
 test_func_combine_lines () {
 	local result_str input_1 input_2 expect_1 expect_2 expect_3
 	input_1='\n1\n2\n3\n4\n5\n#comment\n'
@@ -281,23 +280,25 @@ test_func_combine_lines () {
 	expect_4="-not ( -path ./A -prune ) -not ( -path ./B -prune ) -not ( -path ./C -prune ) "	# 最后需要加了一个空格才能equal，不影响函数效果
 
 	# pipe mode
-	result_str="$( echo -e "${input_1}" | func_combine_lines B E S )"
+	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E -s S )"
 	test_verify_str_equals "${result_str}" "${expect_1}"
 
-	result_str="$( echo -e "${input_1}" | func_combine_lines B E )"
+	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E )"
 	test_verify_str_equals "${result_str}" "${expect_2}"
 
-	result_str="$( echo -e "${input_1}" | func_combine_lines B E S 2)"
+	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E -s S -n 2)"
 	test_verify_str_equals "${result_str}" "$( echo -e "${expect_3}" )"
 	test_verify_str_line_count "${result_str}" 3
 
 	# pipe mode - a real case used by: func_gen_filesize_list_single
-	result_str="$( echo -e "${input_2}" | func_combine_lines "-not ( -path " " -prune ) ")"
+	result_str="$( echo -e "${input_2}" | func_combine_lines -b "-not ( -path " -e " -prune ) ")"
 	test_verify_str_equals "${result_str}" "${expect_4}"
 
+	# file mode, 注意: count为1时，实际-s是不生效的
+	result_str="$( func_combine_lines -b B -e E -s S -n 1 <(sed -e "s+^/.*+X+;" "${FILE_STR_LIST}") )"
+	test_verify_str_line_count "${result_str}" 5
+	test_verify_str_equals "$( echo "${result_str}" | uniq )" "BXE"
 }
-#func_combine_lines B E S 2
-#
 
 test_run_all
 clean_up

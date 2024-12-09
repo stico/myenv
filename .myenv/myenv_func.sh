@@ -106,7 +106,7 @@ func_find_big_dir() {
 }
 
 func_find_dup() {
-	local work_base find_base fl_all fl_dup fl_to_check tmpf md5_cur md5_pre single_md5
+	local work_base find_base fl_all fl_dup fl_to_check tmpf md5_cur md5_pre single_md5 sed_del_cmd
 
 	# var init
 	work_base="$(mktemp -d)"
@@ -145,12 +145,15 @@ func_find_dup() {
 		echo -e "${md5_cur}\t${line}" >> "${fl_dup}"
 	done < "${fl_to_check}"
 	
-	# TODO: 结果文件中会有单行的情况 (文件大小相同，但md5不同)，看起来没有很方便的剔除方法: 要么检查单行情况(注意首/尾行)，要么统计md5出现1次的情况
-	# find single occurence md5
-	single_md5="$(func_del_blank_and_hash_lines "${fl_dup}"  | cut -d'      ' -f1 | uniq -c | sed -n 's/^[[:blank:]]*1 \(.*\)$/\1/p')"
+	# find single occurence md5。结果文件中会有单行的情况 (文件大小相同，但md5不同)，这里构造sed命令，删除这些行
+	single_md5="$(func_del_blank_and_hash_lines "${fl_dup}"  | cut -d'	' -f1 | uniq -c | sed -n 's/^[[:blank:]]*1 \(.*\)$/\1/p' )"
+	if func_is_str_not_blank "${single_md5}" ; then
+		sed_del_cmd="$( echo "${single_md5}" | func_combine_lines -b "/" -e "/d;")"
+		sed -i -e "${sed_del_cmd}" "${fl_dup}"
+	fi
 
 	# print summary
-	echo "$(grep -c '^$' "${fl_dup}") dup found: ${fl_dup}"
+	echo "$(func_shrink_blank_lines "${fl_dup}" | grep -c '^$' ) dup found: ${fl_dup}"
 	echo "commands might useful:"
 	echo "# vi ${fl_dup}"
 	echo "# func_delete_dup ${fl_dup}"

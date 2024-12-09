@@ -62,11 +62,12 @@ func_date_in_dati() {
 ################################################################################
 # Misc
 ################################################################################
-func_info() { func_techo "INFO" "$@" ; }
-func_warn() { func_techo "WARN" "$@" ; }
-func_error() { func_techo "ERROR" "$@" ; }
+func_info()         { func_techo "INFO"  "$@" ; }
+func_warn()         { func_techo "WARN"  "$@" ; }
+func_error()        { func_techo "ERROR" "$@" ; }
+func_debug()        { [ "${ME_DEBUG}" = 'true' ] && func_techo "DEBUG" "$@" ; }
+func_warn_stderr()  { func_warn  "$@" 1>&2 ; }
 func_error_stderr() { func_error "$@" 1>&2 ; }
-func_debug() { [ "${ME_DEBUG}" = 'true' ] && func_techo "DEBUG" "$@" ; }
 func_debug_stderr() { func_debug "$@" 1>&2 ; }
 
 # for backward compitability
@@ -549,15 +550,29 @@ func_del_pattern_lines() {
 ################################################################################
 func_merge_lines() { func_combine_lines "$@"; }
 func_combine_lines() {
-	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} <begin_str> <end_str> <sep_str> [n] [file]"
+	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} -b <begin_str> -e <end_str> -s <sep_str> -n <n> [file]"
 	local desc="Desc: combine [n] (default is all) not-blank-or-hash lines into 1 line: <begin_str><LINE-CONTENT><end_str><sep_str>..."
 
-	local begin end sep count
-	begin="${1}" 
-	end="${2}"
-	sep="${3}"
-	count="${4:-99999}"
-	shift; shift; shift; shift;
+	# check getopt verison (need 
+	getopt --test
+	[[ "$?" != 4 ]] && func_warn_stderr "getopt is NOT util-linux version, pls check"
+
+	# parse argument, note the quotes around "$TEMP": they are essential!
+	local TEMP begin end sep count
+	TEMP=$(getopt -o 'b:e:s:n:' --long 'begin:,end:,sep:,count:' -n "${FUNCNAME[0]}" -- "$@")
+	eval set -- "$TEMP"
+	unset TEMP
+	count=99999
+	while true; do
+		case "${1}" in
+			'-n'|'--count')	count="${2}"; shift 2; continue ;;
+			'-b'|'--begin')	begin="${2}"; shift 2; continue ;;
+			'-e'|'--end')	end="${2}"; shift 2; continue ;;
+			'-s'|'--sep')	sep="${2}"; shift 2; continue ;;
+			'--')		shift; break ;;
+			*)		func_warn_stderr "parse arguments failed: $*" ; exit 1 ;;
+		esac
+	done
 
 	# PIPE_CONTENT_GOES_HERE. Old: 'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
 	func_del_blank_and_hash_lines "$@" \
@@ -997,7 +1012,8 @@ func_gen_filesize_list_single() {
 	if [[ -e "${FIND_UTIL_EXCLUDE}" ]] ; then
 		# 用作命令行时，需要有"\"，放在脚本中则不需要
 		#ex_params=" -not \( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
-		ex_params=" -not ( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
+		#ex_params=" -not ( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
+		ex_params="$( func_combine_lines -b "-not ( -path " -e " -prune ) " "${FIND_UTIL_EXCLUDE}" )"
 		echo "# NOTE: exclude param used: ${ex_params}" > "${FIND_UTIL_FILESIZE}"
 	fi
 
@@ -2033,6 +2049,10 @@ func_is_str_digit() {
 	func_param_check 1 "$@"
 
 	[[ "${1}" =~ ^[0-9]+$ ]] && return 0 || return 1
+}
+
+func_is_str_not_blank() {
+	func_is_str_blank "$@" && return 1 || return 0
 }
 
 func_is_str_blank() {
