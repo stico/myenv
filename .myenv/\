@@ -77,36 +77,11 @@ fi
 ################################################################################
 func_find_big_files() {
 	func_gen_filesize_list
-	#func_grepf -v "${FIND_BIG_FILE_EXCLUDE}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}"
-	func_del_pattern_lines_f "${FIND_BIG_FILE_EXCLUDE}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}" 
-}
-
-func_find_big_dir() {
-	# 说明: 这个函数主要是记录一下可能不经常查看，但可能很占用空间的目录
-	local i p size size_hm not_found
-	declare -A paths_to_check
-
-	# 注意: 微信聊天记录备份，目前中有版本号，可能经常要改
-	paths_to_check['VMWARE虚拟机']="${HOME}/Virtual Machines.localized/"
-	paths_to_check['Iphone全量备份']="${HOME}/Library/Application Support/MobileSync/Backup"
-	paths_to_check['WX聊天记录备份']="${HOME}/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/Backup/"
-
-	for i in "${!paths_to_check[@]}"; do
-		p="${paths_to_check[$i]}" 
-		[[ ! -e "${p}" ]] && not_found="${not_found}, ${i}" && continue
-
-		size="$(func_path_size "${p}")"
-		(( size < 1000000000 )) && continue	# < 1G
-
-		echo -e "$(func_num_to_human_IEC "${size}")\t${i}\t${p}"
-	done
-
-	echo -e "---\t部分目录未找到\t${not_found#, }"
-	echo -e "---\t部分目录未检查\t~/Documents/*, ~/amp/*, ~/download"
+	func_grepf -v "${FIND_BIG_FILE_EXCLUDE}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}"
 }
 
 func_find_dup() {
-	local work_base find_base fl_all fl_dup fl_to_check tmpf md5_cur md5_pre single_md5
+	local work_base find_base fl_all fl_dup fl_to_check tmpf md5_cur md5_pre
 
 	# var init
 	work_base="$(mktemp -d)"
@@ -132,7 +107,6 @@ func_find_dup() {
 	awk 'FNR == NR { seen[$1]++; next } seen[$1] > 1' "${fl_all}" "${fl_all}" | sort -rn > "${fl_to_check}"
 
 	# gen md5 and output
-	echo "# Current dir: ${PWD}" >> "${fl_dup}"
 	while IFS= read -r line || [[ -n "${line}" ]] ; do 
 		tmpf="${line#*	}"
 
@@ -145,15 +119,9 @@ func_find_dup() {
 		echo -e "${md5_cur}\t${line}" >> "${fl_dup}"
 	done < "${fl_to_check}"
 	
-	# TODO: 结果文件中会有单行的情况 (文件大小相同，但md5不同)，看起来没有很方便的剔除方法: 要么检查单行情况(注意首/尾行)，要么统计md5出现1次的情况
-	# find single occurence md5
-	single_md5="$(func_del_blank_and_hash_lines "${fl_dup}"  | cut -d'      ' -f1 | uniq -c | sed -n 's/^[[:blank:]]*1 \(.*\)$/\1/p')"
-
 	# print summary
 	echo "$(grep -c '^$' "${fl_dup}") dup found: ${fl_dup}"
-	echo "commands might useful:"
-	echo "# vi ${fl_dup}"
-	echo "# func_delete_dup ${fl_dup}"
+	echo "Use cmd: func_delete_dup to delete dup"
 }
 
 func_find_non_utf8_in_content() {
@@ -1806,57 +1774,27 @@ func_translate_microsoft() {
 
 func_delete_dup() {
 	local usage="Usage: ${FUNCNAME[0]} <fl_dup>" 
-	local desc="Desc: delete(gather) files list in fl_dup (gen by func_find_dup)"
-	func_param_complain 1 "$@" && return 1
+	func_param_check 1 "$@" 
 
-	local fl_dup fl_to_check to_del_cnt to_check_cnt tgt_mnt_path tgt_dir common_base cnt_y cnt_n tmpf
+	local fl_dup fl_to_check to_del_cnt to_check_cnt
 	fl_dup="${1}"
 	fl_to_check="${fl_dup%/*}/${FIND_DUP_TO_CHECK}"
 
-	# Check: 1) func_find_dup相关的output文件是否存在。
+	# Check: file name 
 	func_complain_path_inexist "${fl_dup}" && return 1
 	func_complain_path_inexist "${fl_to_check}" && return 1
 	[[ "${fl_dup##*/}" != "${FIND_DUP_RESULT}" ]] && func_error "filename incorrect, expect: ${FIND_DUP_RESULT}" && return 1
 
-	# Check: 2) FIND_DUP_RESULT中的相对路径是否可访问。TODO: "${fl_dup}" 第1行有当前目录信息(见func_find_dup)，这里可以做一下提示
-	tmpf="$(func_del_blank_and_hash_lines "${fl_dup}" | sed -e 's/^.*\t\([^\t]*\)$/\1/' | head -1)"
-	func_complain_path_inexist "${tmpf}" "ERROR: 无法访问要移除的文件(例如: ${tmpf})，很可能是相对路径不对 (需要在执行func_find_dup的路径执行此命令)" && return 1
-
-	# Check: 3) 重复的文件应该要保留一个，不能都删除了。这里做法是检查要移除的文件数量不能多于待检查文件数量的2/3
+	# Check: dup should perserve at least one copy (重复的文件应该要保留一个，不能都删除了)
 	to_del_cnt="$(func_del_blank_and_hash_lines "${fl_dup}" | wc -l )"
 	to_check_cnt="$(func_del_blank_and_hash_lines "${fl_to_check}" | wc -l )"
-	(( to_del_cnt >= (to_check_cnt*2)/3 )) && func_error "seems delete TOO MUCH: to_del_cnt >= (to_check_cnt*2)/3 " && return 1
-
-	# Prepare: 1) Find common base (先处理掉路径前面的md5和size的部分)
-	common_base="$(sed -e 's/^[0-9a-fA-F\t]*\t//' "${fl_dup}" | func_path_common_base)"
-	func_complain_path_inexist "${common_base}" "ERROR: can NOT find commom base of dup files (get: ${common_base})" && return 1
-	
-	# Prepare: 2) Decide where to mv
-	tgt_mnt_path="$(func_disk_mount_point "${common_base}")"
-	if [[ -d "${tgt_mnt_path}/alone" ]] ; then
-		tgt_dir="${tgt_mnt_path}/alone/DUP_DELETE_$(func_dati)"
-	else
-		tgt_dir="${MY_TMP}/delete/$(func_daty)/DUP_DELETE_$(func_dati)"
-		[ -d "${tgt_dir}" ] || mkdir -p "${tgt_dir}"
-	fi
-
-	# Perform: delete(mv)
-	func_debug "start to delete(mv): tgt_dir=${tgt_dir} / common_base=${common_base}"
-	while IFS= read -r line || [[ -n "${line}" ]] ; do
-		func_mv_structurally "${line##*	}" "${tgt_dir}" "${common_base}" && (( cnt_y++ )) && continue
-		func_error "failed to move: ${line##*	} to ${tgt_dir}"
-		(( cnt_n++ ))
-	done < <(func_del_blank_and_hash_lines "${fl_dup}")
-
-	# Print summary
-	echo "(${cnt_y} success, ${cnt_n} failed) dup files moved to: ${tgt_dir}"
 }
 
 func_delete_dated() { 
 	local usage="Usage: ${FUNCNAME[0]} <path> <path> ..." 
 	func_param_check 1 "$@" 
 
-	local targetDir="${MY_TMP}/delete/$(func_date)"
+	local targetDir=$MY_TMP/delete/$(func_date)
 	[ -e "${targetDir}" ] || mkdir -p "${targetDir}"
 
 	local t_name=""

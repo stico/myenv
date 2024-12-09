@@ -91,9 +91,9 @@ noteall=$MY_ENV/zgen/collection/all_content.txt
 
 # Function, note tt is inside 'delete' dir
 tt=`dir=$MY_TMP/delete/$(date '+%Y-%m-%d');mkdir -p $dir;echo $dir`
-td=`dir=$MY_TMP/$(date '+%Y-%m-%d');mkdir -p $dir;echo $dir`
-tm=`dir=$MY_TMP/$(date '+%Y-%m');mkdir -p $dir;echo $dir`
-ty=`dir=$MY_TMP/$(date '+%Y');mkdir -p $dir;echo $dir`
+td=`dir=$MY_TMP/delete/$(date '+%Y-%m-%d');mkdir -p $dir;echo $dir`
+tm=`dir=$MY_TMP/delete/$(date '+%Y-%m');mkdir -p $dir;echo $dir`
+ty=`dir=$MY_TMP/delete/$(date '+%Y');mkdir -p $dir;echo $dir`
 
 # Deprecated
 #ampdl=$MY_TMP/download
