@@ -547,38 +547,31 @@ func_del_pattern_lines() {
 ################################################################################
 # Text_Process (also see ~Pattern_Matching )
 ################################################################################
-func_assemble_param() {
-	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} <start_str> <end_str> [file]"
-	local desc="Desc: combine <n> lines into 1 line" 
-	func_param_check 2 "$@"
-
-	local start_str end_str file
-	start_str="${1}"
-	end_str="${2}"
-	file="${3}"
-	
-	# TODO
-}
-
 func_merge_lines() { func_combine_lines "$@"; }
 func_combine_lines() {
-	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} <n> <separator> <start_str> <end_str> [file]"
-	local desc="Desc: combine <n> lines into 1 line" 
-	func_param_check 2 "$@"
+	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} <begin_str> <end_str> <sep_str> [n] [file]"
+	local desc="Desc: combine [n] (default is all) not-blank-or-hash lines into 1 line: <begin_str><LINE-CONTENT><end_str><sep_str>..."
 
-	local count="${1}" 
-	local separator="${2}"
-	shift; shift;
+	local begin end sep count
+	begin="${1}" 
+	end="${2}"
+	sep="${3}"
+	count="${4:-99999}"
+	shift; shift; shift; shift;
 
-	#'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
-	awk -v count="${count}" -v separator="${separator}" \
-	'NR%count {
-		printf "%s%s", $0, separator;
-		next;
-	}
-	{
-		print $0
-	}' "$@"
+	# PIPE_CONTENT_GOES_HERE. Old: 'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
+	func_del_blank_and_hash_lines "$@" \
+	| awk -v begin="${begin}" -v end="${end}" -v sep="${sep}" -v count="${count}" \
+		'NR%count {
+			# (count-1)th lines goes here
+			printf "%s%s%s%s", begin, $0, end, sep;
+			next;
+		}
+		{
+			# (count)th line goes here
+			printf "%s%s%s\n", begin, $0, end ;
+		}' \
+	| sed -e "s/${sep}$//"
 }
 
 func_shrink_pattern_lines() {

@@ -270,6 +270,35 @@ test_func_path_common_base() {
 	test_verify_str_contains "${result_str}" "${STR_EN_CHAR_1%/*}/"
 }
 
+
+test_func_combine_lines () {
+	local result_str input_1 input_2 expect_1 expect_2 expect_3
+	input_1='\n1\n2\n3\n4\n5\n#comment\n'
+	input_2='\n./A\n\n./B\n\n\n#comment\n./C\n\n'
+	expect_1='B1ESB2ESB3ESB4ESB5E'
+	expect_2='B1EB2EB3EB4EB5E'
+	expect_3='B1ESB2E\nB3ESB4E\nB5E'
+	expect_4="-not ( -path ./A -prune ) -not ( -path ./B -prune ) -not ( -path ./C -prune ) "	# 最后需要加了一个空格才能equal，不影响函数效果
+
+	# pipe mode
+	result_str="$( echo -e "${input_1}" | func_combine_lines B E S )"
+	test_verify_str_equals "${result_str}" "${expect_1}"
+
+	result_str="$( echo -e "${input_1}" | func_combine_lines B E )"
+	test_verify_str_equals "${result_str}" "${expect_2}"
+
+	result_str="$( echo -e "${input_1}" | func_combine_lines B E S 2)"
+	test_verify_str_equals "${result_str}" "$( echo -e "${expect_3}" )"
+	test_verify_str_line_count "${result_str}" 3
+
+	# pipe mode - a real case used by: func_gen_filesize_list_single
+	result_str="$( echo -e "${input_2}" | func_combine_lines "-not ( -path " " -prune ) ")"
+	test_verify_str_equals "${result_str}" "${expect_4}"
+
+}
+#func_combine_lines B E S 2
+#
+
 test_run_all
 clean_up
 
