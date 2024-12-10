@@ -159,16 +159,16 @@ test_func_del_blank_lines() {
 	test_verify_str_contains "${result}" "${STR_HASH_COMMENT}"
 }
 
-test_func_del_blank_and_hash_lines() {
+test_func_del_blank_hash_lines() {
 	local out_file result
 
 	out_file="$(mktemp)"
-	func_del_blank_and_hash_lines "${FILE_STR_LIST}" > "${out_file}"
+	func_del_blank_hash_lines "${FILE_STR_LIST}" > "${out_file}"
 
 	test_verify_file_line_count "${out_file}" 5
 	test_verify_file_contains "${out_file}" "${STR_EN_CHAR_1}"
 
-	result="$(echo "${STR_MULTI_STR_LINE}" | func_del_blank_and_hash_lines)"
+	result="$(echo "${STR_MULTI_STR_LINE}" | func_del_blank_hash_lines)"
 
 	test_verify_str_line_count "${result}" 5
 	test_verify_str_contains "${result}" "${STR_EN_CHAR_1}"
@@ -252,7 +252,7 @@ test_func_grepf_long_list_with_pipe() {
 
 test_func_str_common_prefix() {
 	local result_str
-	result_str="$( echo "${STR_MULTI_STR_LINE}" | func_del_blank_and_hash_lines | func_str_common_prefix )"
+	result_str="$( echo "${STR_MULTI_STR_LINE}" | func_del_blank_hash_lines | func_str_common_prefix )"
 
 	# "${STR_EN_CHAR_1::-1}" means: remove last char
 	test_verify_str_contains "${result_str}" "${STR_EN_CHAR_1::-1}"
@@ -298,6 +298,20 @@ test_func_combine_lines () {
 	result_str="$( func_combine_lines -b B -e E -s S -n 1 <(sed -e "s+^/.*+X+;" "${FILE_STR_LIST}") )"
 	test_verify_str_line_count "${result_str}" 5
 	test_verify_str_equals "$( echo "${result_str}" | uniq )" "BXE"
+}
+
+test_func_file_line_count () {
+	local result_str
+
+	# 注意: STR_BLANK_ALL_CHAR 里面有一个 '\n' 
+	result_str="$( func_file_line_count "${FILE_STR_LIST}" )"
+	test_verify_str_equals "${result_str}" 13
+
+	result_str="$( func_file_line_count <(func_del_blank_lines "${FILE_STR_LIST}") )"
+	test_verify_str_equals "${result_str}" 8
+
+	result_str="$( func_file_line_count <(func_del_blank_hash_lines "${FILE_STR_LIST}") )"
+	test_verify_str_equals "${result_str}" 5
 }
 
 test_run_all

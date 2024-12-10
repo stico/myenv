@@ -113,7 +113,8 @@ func_ask_yes_or_no() {
 func_param_complain() {
 	PARAM_COMPLAIN=true func_param_check "$@"
 }
-alias func_param_validate='func_param_check'
+
+func_param_validate() { func_param_check "$@" ; }
 func_param_check() {
 	# Self param check. use -lt, so the exit status will not changed in legal condition
 	# NOT use desc/usage var name, so invoker could call 'func_param_check 2 "$@"' instead of 'func_param_check 2 "${desc}\n${usage}\n" "$@"'
@@ -383,7 +384,7 @@ func_grepf() {
 	pattern_file="${1}"
 	shift
 	func_validate_path_exist "${pattern_file}"
-	pattern_file_line_count="$(func_del_blank_and_hash_lines "${pattern_file}" | wc -l)"
+	pattern_file_line_count="$(func_del_blank_hash_lines "${pattern_file}" | wc -l)"
 
 	# Check mode
 	#[[ -n "${1}" ]] && pipe_mode='false' || pipe_mode='true'
@@ -392,10 +393,10 @@ func_grepf() {
 	# NOTE: 1) SHOULD support both pipe and file. 2) do NOT quote $params. 
 	if (( pattern_file_line_count <= FUNC_GREPF_MAX_PATTERN_LINE )) ; then
 		func_debug_stderr "Not need to split pattern file: ${pattern_file_line_count} <= ${FUNC_GREPF_MAX_PATTERN_LINE}"
-		func_debug_stderr "CMD: grep ${params} -f <(func_del_blank_and_hash_lines ${pattern_file}) $*"
+		func_debug_stderr "CMD: grep ${params} -f <(func_del_blank_hash_lines ${pattern_file}) $*"
 
 		# PIPE_CONTENT_GOES_HERE
-		grep ${params} -f <(func_del_blank_and_hash_lines "${pattern_file}") "$@"
+		grep ${params} -f <(func_del_blank_hash_lines "${pattern_file}") "$@"
 	else
 		local tmp_split_dir tmp_split_f_prefix tmp_in tmp_out f 
 		tmp_split_f_prefix="$(mktemp -d)/func_grepf.tmp" 
@@ -404,7 +405,7 @@ func_grepf() {
 		func_debug_stderr "Split/Reuse pattern file (${pattern_file_line_count} > ${FUNC_GREPF_MAX_PATTERN_LINE}) at: ${tmp_split_f_prefix%/*}/"
 		if [ ! -d "${tmp_split_dir}" ] ; then
 			mkdir -p "${tmp_split_dir}" 
-			split -d -l "${FUNC_GREPF_MAX_PATTERN_LINE}" <(func_del_blank_and_hash_lines "${pattern_file}") "${tmp_split_dir}/${pattern_file##*/}-" 
+			split -d -l "${FUNC_GREPF_MAX_PATTERN_LINE}" <(func_del_blank_hash_lines "${pattern_file}") "${tmp_split_dir}/${pattern_file##*/}-" 
 		fi
 
 		# 注意: 有和没有参数 "-v" 方式是不一样的，所以需要分开不同的逻辑。
@@ -453,6 +454,7 @@ func_del_blank_lines() {
 	func_del_pattern_lines '^[[:space:]]*$' -- "$@"
 }
 
+func_del_blank_hash_lines() { func_del_blank_and_hash_lines "$@" ; }
 func_del_blank_and_hash_lines() {
 	# PIPE_CONTENT_GOES_HERE 
 	func_del_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' -- "$@"
@@ -575,7 +577,7 @@ func_combine_lines() {
 	done
 
 	# PIPE_CONTENT_GOES_HERE. Old: 'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
-	func_del_blank_and_hash_lines "$@" \
+	func_del_blank_hash_lines "$@" \
 	| awk -v begin="${begin}" -v end="${end}" -v sep="${sep}" -v count="${count}" \
 		'NR%count {
 			# (count-1)th lines goes here
@@ -697,7 +699,7 @@ func_mv_structurally() {
 	if [[ -z "${3}" ]] ; then
 		tgt_dir="${tgt_base}"
 	else
-		src_base="$(readlink -f "${3}")"
+		src_base="$(readlink -f "${3}")/"
 		rel_path="${src_path##*"${src_base}"}"
 		tgt_dir="$(dirname "${tgt_base}/${rel_path}")"
 
@@ -709,6 +711,7 @@ func_mv_structurally() {
 	fi
 
 	# Perform
+	#func_debug "src_path=${src_path}, tgt_dir=${tgt_dir}, src_base=${src_base}, rel_path=${rel_path}, tgt_base=${tgt_base}"
 	func_debug mv "${src_path}" "${tgt_dir}"
 	mkdir -p "${tgt_dir}" &> /dev/null
 	mv "${src_path}" "${tgt_dir}" 
@@ -721,16 +724,16 @@ func_file_line_count() {
 	func_param_check 1 "$@"
 
 	func_complain_path_not_exist "${1}" && return 1
-	wc -l "${1}" | cut -d' ' -f1
+	wc -l "${1}" | awk '{print $1}'
 }
 
-alias func_path_size_human='func_file_size_human'
+func_path_size_human() { func_file_size_human "$@"; }
 func_file_size_human() {
 	#func_num_to_human "$(func_file_size "$@")"
 	func_num_to_human_IEC "$(func_file_size "$@")"
 }
 
-alias func_path_size='func_file_size'
+func_path_size() { func_file_size "$@"; }
 func_file_size() {
 	local usage="Usage: ${FUNCNAME[0]} <target>"
 	local desc="Desc: get file size, in Bytes" 
@@ -751,7 +754,7 @@ func_path_common_base() {
 	local result
 
 	# 处理空行，注释行，前缀空格
-	result="$(cat "$@" | func_del_blank_and_hash_lines | func_str_common_prefix | sed -e 's+[^/]*$++')"
+	result="$(cat "$@" | func_del_blank_hash_lines | func_str_common_prefix | sed -e 's+[^/]*$++')"
 
 	# "/"为保底路径
 	echo "${result:-/}"
@@ -764,9 +767,8 @@ func_file_md5sum() {
 
 	[[ ! -e "${1}" ]] && func_error_stderr "file not found, skip gen md5: ${1}" && return 1
 
-	# TODO: cache for big files???
-	
-	md5sum "${1}" | cut -d' ' -f1
+	# 用head相比cut/awk，好处是没有结尾的'\n'，不过有它似乎很多场景下也没问题
+	md5sum "${1}" | head -c 32
 }
 
 func_ln_soft() {
@@ -1011,8 +1013,8 @@ func_gen_filesize_list_single() {
 	local ex_params
 	if [[ -e "${FIND_UTIL_EXCLUDE}" ]] ; then
 		# 用作命令行时，需要有"\"，放在脚本中则不需要
-		#ex_params=" -not \( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
-		#ex_params=" -not ( -path $(func_del_blank_and_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
+		#ex_params=" -not \( -path $(func_del_blank_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
+		#ex_params=" -not ( -path $(func_del_blank_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
 		ex_params="$( func_combine_lines -b "-not ( -path " -e " -prune ) " "${FIND_UTIL_EXCLUDE}" )"
 		echo "# NOTE: exclude param used: ${ex_params}" > "${FIND_UTIL_FILESIZE}"
 	fi
@@ -1480,7 +1482,7 @@ func_gen_local_vars() {
 	# TODO:	embrace value with "/', otherwise bash eval complains on chars like &/, which always in path
 	# v1: works but not efficient (used in zbox_gen_stg_cnf_vars) : s/^\([^=[:blank:]]*\)[[:blank:]]*=[[:blank:]]*/\1=/;
 	cat "${exist_files[@]}"			| \
-	func_del_blank_and_hash_lines		| \
+	func_del_blank_hash_lines		| \
 	sed -e "s/[[:blank:]]*=[[:blank:]]*/=/;
 		s/^/local /"
 }

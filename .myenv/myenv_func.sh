@@ -23,6 +23,7 @@ LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find
 
 FIND_DUP_RESULT="fl_dup"
 FIND_DUP_TO_CHECK="fl_to_check"
+FIND_DUP_FILE_EXCLUDE=".fd.exclude"
 FIND_BIG_FILE_EXCLUDE=".fb.exclude"
 
 DBACKUP_EX_FILENAME=".db.exclude"
@@ -122,7 +123,7 @@ func_find_dup() {
 	if [[ "$#" -gt 0 ]] ; then
 		for find_base in "$@" ; do
 			# update file path with base, otherwise file path is incorrect
-			func_del_blank_and_hash_lines "${find_base}/${FIND_UTIL_FILESIZE}" | sed -e "s+\t\./+\t${find_base}/+" >> "${fl_all}"
+			func_del_blank_hash_lines "${find_base}/${FIND_UTIL_FILESIZE}" | sed -e "s+\t\./+\t${find_base}/+" >> "${fl_all}"
 		done
 	else
 		cp "${FIND_UTIL_FILESIZE}" "${fl_all}"
@@ -140,23 +141,55 @@ func_find_dup() {
 		echo "${tmpf}" | grep -q "\(.DS_Store\|${FIND_UTIL_EXCLUDE}\|${FIND_UTIL_FILESIZE}\)" && continue
 
 		md5_pre="${md5_cur}"
-		md5_cur="$(func_file_md5sum "${tmpf}")"
+		md5_cur="$(func_find_dup_md5cache "${line}")"
+		#md5_cur="$(func_file_md5sum "${tmpf}")"
 		[[ "${md5_cur}" != "${md5_pre}" ]] && echo >> "${fl_dup}"
+
 		echo -e "${md5_cur}\t${line}" >> "${fl_dup}"
 	done < "${fl_to_check}"
 	
 	# find single occurence md5。结果文件中会有单行的情况 (文件大小相同，但md5不同)，这里构造sed命令，删除这些行
-	single_md5="$(func_del_blank_and_hash_lines "${fl_dup}"  | cut -d'	' -f1 | uniq -c | sed -n 's/^[[:blank:]]*1 \(.*\)$/\1/p' )"
-	if func_is_str_not_blank "${single_md5}" ; then
-		sed_del_cmd="$( echo "${single_md5}" | func_combine_lines -b "/" -e "/d;")"
+	sed_del_cmd="$(func_del_blank_hash_lines "${fl_dup}" | awk '{print $1}' | uniq -u | func_combine_lines -b "/" -e "/d;" )"
+	if func_is_str_not_blank "${sed_del_cmd}" ; then
+		func_debug "found single line md5 occurence, delete using sed cmd: ${sed_del_cmd}"
 		sed -i -e "${sed_del_cmd}" "${fl_dup}"
 	fi
+
+	# TODO: 是否需要提前处理长度为0的文件? 它们的md5都是一样的: d41d8cd98f00b204e9800998ecf8427e
 
 	# print summary
 	echo "$(func_shrink_blank_lines "${fl_dup}" | grep -c '^$' ) dup found: ${fl_dup}"
 	echo "commands might useful:"
 	echo "# vi ${fl_dup}"
 	echo "# func_delete_dup ${fl_dup}"
+}
+
+func_find_dup_md5cache() {
+	local file size fullpath cache_file cache_key md5
+	read -r size file <<<"${1}"
+
+	# NO cache for small file (<50M)
+	(( size < 50000000 )) && func_file_md5sum "${file}" && return
+
+	# cache init, note: need use fullpath
+	fullpath="$(readlink -f "${file}")"
+	cache_key="$( echo -e "${size}\t${fullpath}" )"
+	cache_file="${HOME}/amp/data/myenv/md5cache"
+	mkdir -p "$(dirname "${cache_file}")" &> /dev/null
+	touch "${cache_file}"
+
+	# return if already in cache
+	md5="$(grep -F "${cache_key}" "${cache_file}" | head -c 32 )"
+	if [[ -n "${md5}" ]] ; then
+		func_debug_stderr "md5cache hit: ${md5}: ${cache_key}"
+		echo "${md5}"
+		return
+	fi
+
+	# gen md5 and store
+	md5="$(func_file_md5sum "${file}")"
+	echo -e "${md5}\t${cache_key}" >> "${cache_file}" 
+	echo "${md5}"
 }
 
 func_find_non_utf8_in_content() {
@@ -572,7 +605,7 @@ func_locate_via_locate() {
 }
 
 func_clean_less() {
-	cat "$@" | func_del_blank_and_hash_lines | less
+	cat "$@" | func_del_blank_hash_lines | less
 }
 
 func_clean_grep() {
@@ -584,16 +617,16 @@ func_clean_grep() {
 
 	# grep in pipe end, to reserve highlights of match part
 	if [[ "$#" -eq 1 ]] ; then
-		cat "$@" | func_del_blank_and_hash_lines | grep "${grep_str}"
+		cat "$@" | func_del_blank_hash_lines | grep "${grep_str}"
 	else
 		# need heading filename for multiple file grep
-		grep '' "$@" | func_del_blank_and_hash_lines | grep "${grep_str}"
+		grep '' "$@" | func_del_blank_hash_lines | grep "${grep_str}"
 	fi
 }
 
 # keep here just for backward compitability, should use func inside directly
 func_clean_cat() {
-	func_del_blank_and_hash_lines "$@"
+	func_del_blank_hash_lines "$@"
 }
 
 func_vi() {
@@ -1665,7 +1698,7 @@ func_mebackup_awsvm() {
 		return 1
 	fi
 
-	fpath="$(ssh awsvm 'bash "$HOME/.myenv/secu/awsvm/script/z/func_backup_myenv.alone.sh"' | grep _awsvm_myenv_backup.zip | cut -d" " -f10)"
+	fpath="$(ssh awsvm 'bash "$HOME/.myenv/secu/awsvm/script/z/func_backup_myenv.alone.sh"' | grep _awsvm_myenv_backup.zip | awk '{print $10}' )"
 	echo "INFO: remote backup generated, remote path: $fpath"
 
 	func_scp_from_cloud_vm awsvm "$fpath"
@@ -1812,7 +1845,7 @@ func_delete_dup() {
 	local desc="Desc: delete(gather) files list in fl_dup (gen by func_find_dup)"
 	func_param_complain 1 "$@" && return 1
 
-	local fl_dup fl_to_check to_del_cnt to_check_cnt tgt_mnt_path tgt_dir common_base cnt_y cnt_n tmpf
+	local fl_dup fl_to_check to_del_cnt to_check_cnt tgt_mnt_path tgt_base common_base cnt_y cnt_n tmpf dpath
 	fl_dup="${1}"
 	fl_to_check="${fl_dup%/*}/${FIND_DUP_TO_CHECK}"
 
@@ -1822,37 +1855,41 @@ func_delete_dup() {
 	[[ "${fl_dup##*/}" != "${FIND_DUP_RESULT}" ]] && func_error "filename incorrect, expect: ${FIND_DUP_RESULT}" && return 1
 
 	# Check: 2) FIND_DUP_RESULT中的相对路径是否可访问。TODO: "${fl_dup}" 第1行有当前目录信息(见func_find_dup)，这里可以做一下提示
-	tmpf="$(func_del_blank_and_hash_lines "${fl_dup}" | sed -e 's/^.*\t\([^\t]*\)$/\1/' | head -1)"
-	func_complain_path_inexist "${tmpf}" "ERROR: 无法访问要移除的文件(例如: ${tmpf})，很可能是相对路径不对 (需要在执行func_find_dup的路径执行此命令)" && return 1
+	tmpf="$(func_del_blank_hash_lines "${fl_dup}" | sed -e 's/^.*\t\([^\t]*\)$/\1/' | head -1)"
+	func_complain_path_inexist "${tmpf}" "ERROR: 无法访问要移除的文件，很可能是相对路径不对，需要在执行func_find_dup的路径执行此命令): ${tmpf}" && return 1
 
 	# Check: 3) 重复的文件应该要保留一个，不能都删除了。这里做法是检查要移除的文件数量不能多于待检查文件数量的2/3
-	to_del_cnt="$(func_del_blank_and_hash_lines "${fl_dup}" | wc -l )"
-	to_check_cnt="$(func_del_blank_and_hash_lines "${fl_to_check}" | wc -l )"
-	(( to_del_cnt >= (to_check_cnt*2)/3 )) && func_error "seems delete TOO MUCH: to_del_cnt >= (to_check_cnt*2)/3 " && return 1
+	to_del_cnt="$(func_del_blank_hash_lines "${fl_dup}" | wc -l )"
+	to_check_cnt="$(func_del_blank_hash_lines "${fl_to_check}" | wc -l )"
+	(( to_del_cnt >= (to_check_cnt*2)/3 )) && func_error "delete TOO MUCH: to_del_cnt >= (to_check_cnt*2)/3 " && return 1
 
 	# Prepare: 1) Find common base (先处理掉路径前面的md5和size的部分)
 	common_base="$(sed -e 's/^[0-9a-fA-F\t]*\t//' "${fl_dup}" | func_path_common_base)"
-	func_complain_path_inexist "${common_base}" "ERROR: can NOT find commom base of dup files (get: ${common_base})" && return 1
+	func_complain_path_inexist "${common_base}" "ERROR: NO commom base found (${common_base} NOT exist!)" && return 1
 	
 	# Prepare: 2) Decide where to mv
 	tgt_mnt_path="$(func_disk_mount_point "${common_base}")"
 	if [[ -d "${tgt_mnt_path}/alone" ]] ; then
-		tgt_dir="${tgt_mnt_path}/alone/DUP_DELETE_$(func_dati)"
+		tgt_base="${tgt_mnt_path}/alone/FL_DELETE_$(func_dati)"
 	else
-		tgt_dir="${MY_TMP}/delete/$(func_daty)/DUP_DELETE_$(func_dati)"
-		[ -d "${tgt_dir}" ] || mkdir -p "${tgt_dir}"
+		tgt_base="${MY_TMP}/delete/$(func_daty)/FL_DELETE_$(func_dati)"
+		[ -d "${tgt_base}" ] || mkdir -p "${tgt_base}"
 	fi
 
 	# Perform: delete(mv)
-	func_debug "start to delete(mv): tgt_dir=${tgt_dir} / common_base=${common_base}"
-	while IFS= read -r line || [[ -n "${line}" ]] ; do
-		func_mv_structurally "${line##*	}" "${tgt_dir}" "${common_base}" && (( cnt_y++ )) && continue
-		func_error "failed to move: ${line##*	} to ${tgt_dir}"
-		(( cnt_n++ ))
-	done < <(func_del_blank_and_hash_lines "${fl_dup}")
+	func_debug "start to delete(mv): tgt_base=${tgt_base}, common_base=${common_base}"
+	while IFS= read -r dpath || [[ -n "${dpath}" ]] ; do
+		# 注意: 不能在(( )) 后面用 &&，因为它的返回码和普通命令是不一样的
+		if func_mv_structurally "${dpath}" "${tgt_base}" "${common_base}" ; then
+			(( cnt_y++ ))
+		else
+			(( cnt_n++ ))
+			func_error "failed to move: ${dpath} to ${tgt_base}"
+		fi
+	done < <(func_del_blank_hash_lines "${fl_dup}" | sed -e 's/^[0-9a-fA-F\t]*\t//' )
 
 	# Print summary
-	echo "(${cnt_y} success, ${cnt_n} failed) dup files moved to: ${tgt_dir}"
+	echo "(${cnt_y} success, ${cnt_n:-0} failed) dup files moved to: ${tgt_base}"
 }
 
 func_delete_dated() { 
@@ -1972,7 +2009,7 @@ func_backup_dated_gen_exclude_list() {
 		base="${ex_file%"${DBACKUP_EX_FILENAME}"}"
 
 		# 如果是*开头的，就不加base前缀，因为要匹配各级路径
-		func_del_blank_and_hash_lines "${ex_file}" | sed -e "s+^\([^\*]\)+${base}\1+" >> "${ex_fl}"
+		func_del_blank_hash_lines "${ex_file}" | sed -e "s+^\([^\*]\)+${base}\1+" >> "${ex_fl}"
 	done
 
 	# check if more pattern provided (which not need $base prefix)
@@ -2951,7 +2988,7 @@ func_mydata_clean_up() {
 			else
 				mv "${src}" "${tgt}"
 			fi
-		done < <(func_del_blank_and_hash_lines "${f}")
+		done < <(func_del_blank_hash_lines "${f}")
 	done
 }
 
@@ -3061,6 +3098,9 @@ func_dup_gather_try_bakpath_PRIVATE() {
 }
 
 func_dup_gather() {
+	echo "ERROR: this function is deprecated, use func_delete_dup instead"
+	return 1
+
 	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
 	local desc="Desc: gather files in <filelist> (use default list if not provided), preserve dir structure.\nNOTE: the filelist is output of func_dup_find"
 
@@ -3102,7 +3142,7 @@ func_dup_gather() {
 		[ ! -e "${tfile}" ] && echo "MV_FAIL: failed to move, file NOT in target: ${tfile}" >> "${log}" && continue
 		echo "MV_DONE: move file success: ${tfile}"                                         >> "${log}" && continue
 
-	done < <(func_del_blank_and_hash_lines "${del_list}")
+	done < <(func_del_blank_hash_lines "${del_list}")
 
 	echo "INFO: ==================================== SUMMARY ===================================="
 	touch "${log}" # incase do nothing
@@ -3164,6 +3204,9 @@ func_dup_gather_then_find() {
 
 # shellcheck disable=2120
 func_dup_find() {
+	echo "ERROR: this function is deprecated, use func_find_dup instead"
+	return 1
+
 	# TOOL SCRIPT
 	# - 01: split result file by lines of dup
 	#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
@@ -3268,7 +3311,7 @@ func_dup_shrink_md5_list_lapmac() {
 	while IFS= read -r line || [[ -n "${line}" ]] ; do
 		p="${MY_DOC}/${line}" 
 		[[ -e "${p}" ]] || echo "${line}" >> "${todel}" 
-	done < <(func_del_blank_and_hash_lines "${DUP_LIST_MD5}" | sed -e "${sed_param}")
+	done < <(func_del_blank_hash_lines "${DUP_LIST_MD5}" | sed -e "${sed_param}")
 
 	# remove skip files and remove inexist files
 	func_del_pattern_lines_f "${DUP_SKIP_PATH}" "${DUP_LIST_MD5}" \
