@@ -70,8 +70,17 @@ func_warn_stderr()  { func_warn  "$@" 1>&2 ; }
 func_error_stderr() { func_error "$@" 1>&2 ; }
 func_debug_stderr() { func_debug "$@" 1>&2 ; }
 
-# for backward compitability
-func_decho() { func_debug "$@" ; }
+func_var_to_str()    {
+	local usage="Usage: ${FUNCNAME[0]} <var-name> ..." 
+	local desc="Desc: concat var name-value pairs into str, simplify the code"
+	func_param_check 1 "$@"
+	
+	local v
+	for v in "$@" ; do 
+		printf "%s: '%q'" "${v}" "${!v}"
+	done
+	# TODO
+}
 
 func_techo() {
 	local usage="Usage: ${FUNCNAME[0]} <level> <msg>" 
@@ -460,12 +469,19 @@ func_del_blank_and_hash_lines() {
 	func_del_pattern_lines '^[[:space:]]*$' '^[[:space:]]*#' -- "$@"
 }
 
-func_del_pattern_lines_f() {
-	local usage="Usage: ${FUNCNAME[0]} <pattern_file> [input_file...]"
-	local desc="Desc: delete patterns listed in file" 
+func_del_string_lines_f() {
+	local usage="Usage: ${FUNCNAME[0]} <string_file> [input_file...]"
+	local desc="Desc: delete string (NOT pattern) listed in <string_file>" 
 	func_param_check 1 "$@"
 
-	#grep -ivf "${1}" "${2}"
+	func_grepf -v -F "$@"
+}
+
+func_del_pattern_lines_f() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern_file> [input_file...]"
+	local desc="Desc: delete patterns listed in <pattern_file>" 
+	func_param_check 1 "$@"
+
 	func_grepf -v "$@"
 }
 
@@ -685,36 +701,39 @@ func_mkdir_cd() {
 func_mv_structurally() { 
 	local usage="Usage: ${FUNCNAME[0]} <fd_path> <tgt_base> [src_base]"
 	local desc="Desc: mv <fd_path> from <tgt_base>, use <src_base> to determine what dir hierarchy to perserve (none if omit)"
-	func_param_check 3 "$@"
+	func_param_check 2 "$@"
 
 	local src_base tgt_base src_path rel_path
+
+	# PWD as src_base default value
 	src_path="$(readlink -f "${1}")"
  	tgt_base="$(readlink -f "${2}")"
+	[[ -n "${3}" ]] && src_base="$(readlink -f "${3}")/" || src_base="$(readlink -f "${PWD}")"
 
 	# Check
 	func_complain_path_inexist "${src_path}" && return 1
 	[[ ! -d "${tgt_base}" ]] && func_error "${tgt_base} should be a dir, pls check" && return 1
 
-	# Determine what dir hierarchy to perserve
-	if [[ -z "${3}" ]] ; then
-		tgt_dir="${tgt_base}"
-	else
-		src_base="$(readlink -f "${3}")/"
-		rel_path="${src_path##*"${src_base}"}"
-		tgt_dir="$(dirname "${tgt_base}/${rel_path}")"
-
-		# make sure the rel_path is correct
-		if [[ "${src_path}" == "${rel_path}" ]] ; then
-			func_error "mv failed: can NOT get relative path (is it a link file?), src_base (${src_base}) / src_path (${src_path})"
-			return 1
-		fi
+	# count rel_path
+	if func_str_not_contains "${src_path}" "${src_base}" ; then
+		func_error "src_base should be part of src_path (is src_path a link?), pls check: ${src_path} V.S. ${src_base}"
+		return 1
 	fi
+	rel_path="${src_path##*"${src_base}"}"
 
 	# Perform
-	#func_debug "src_path=${src_path}, tgt_dir=${tgt_dir}, src_base=${src_base}, rel_path=${rel_path}, tgt_base=${tgt_base}"
-	func_debug mv "${src_path}" "${tgt_dir}"
+	tgt_dir="$(dirname "${tgt_base}/${rel_path}")"
 	mkdir -p "${tgt_dir}" &> /dev/null
+	func_debug mv "${src_path}" "${tgt_dir}"
 	mv "${src_path}" "${tgt_dir}" 
+}
+
+func_file_line_count_clean() {
+	local usage="Usage: ${FUNCNAME[0]} <file>"
+	local desc="Desc: output only lines of file (exclude blank and hash lines)" 
+	func_param_check 1 "$@"
+
+	func_del_blank_hash_lines "${1}" | wc -l
 }
 
 func_file_lines() { func_file_line_count "$@"; }
