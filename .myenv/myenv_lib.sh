@@ -568,8 +568,8 @@ func_del_pattern_lines() {
 ################################################################################
 func_merge_lines() { func_combine_lines "$@"; }
 func_combine_lines() {
-	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} -b <begin_str> -e <end_str> -s <sep_str> -n <n> [file]"
-	local desc="Desc: combine [n] (default is all) not-blank-or-hash lines into 1 line: <begin_str><LINE-CONTENT><end_str><sep_str>..."
+	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} -b <begin_str> -e <end_str> -s <sep_str> -n <n, default: 2> [file]"
+	local desc="Desc: combine [n] (default is 2) not-blank-or-hash lines into 1 line: <begin_str><LINE-CONTENT><end_str><sep_str>..."
 
 	# check getopt verison (need 
 	getopt --test
@@ -580,7 +580,7 @@ func_combine_lines() {
 	TEMP=$(getopt -o 'b:e:s:n:' --long 'begin:,end:,sep:,count:' -n "${FUNCNAME[0]}" -- "$@")
 	eval set -- "$TEMP"
 	unset TEMP
-	count=99999
+	count=2
 	while true; do
 		case "${1}" in
 			'-n'|'--count')	count="${2}"; shift 2; continue ;;
@@ -592,8 +592,10 @@ func_combine_lines() {
 		esac
 	done
 
+	# CRLF line terminators need to convert
 	# PIPE_CONTENT_GOES_HERE. Old: 'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
 	func_del_blank_hash_lines "$@" \
+	| sed 's/$//' \
 	| awk -v begin="${begin}" -v end="${end}" -v sep="${sep}" -v count="${count}" \
 		'NR%count {
 			# (count-1)th lines goes here
@@ -1034,7 +1036,7 @@ func_gen_filesize_list_single() {
 		# 用作命令行时，需要有"\"，放在脚本中则不需要
 		#ex_params=" -not \( -path $(func_del_blank_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune \\) -not \\( -path "' | sed -e 's/-not .( -path $//')"
 		#ex_params=" -not ( -path $(func_del_blank_hash_lines "${FIND_UTIL_EXCLUDE}" | awk 'ORS=" -prune ) -not ( -path "' | sed -e 's/-not ( -path $//')"
-		ex_params="$( func_combine_lines -b "-not ( -path " -e " -prune ) " "${FIND_UTIL_EXCLUDE}" )"
+		ex_params="$( func_combine_lines -b "-not ( -path " -e " -prune ) " "${FIND_UTIL_EXCLUDE}" -n 99999 )"
 		echo "# NOTE: exclude param used: ${ex_params}" > "${FIND_UTIL_FILESIZE}"
 	fi
 

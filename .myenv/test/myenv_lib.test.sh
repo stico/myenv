@@ -280,10 +280,10 @@ test_func_combine_lines () {
 	expect_4="-not ( -path ./A -prune ) -not ( -path ./B -prune ) -not ( -path ./C -prune ) "	# 最后需要加了一个空格才能equal，不影响函数效果
 
 	# pipe mode
-	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E -s S )"
+	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E -s S -n 999 )"
 	test_verify_str_equals "${result_str}" "${expect_1}"
 
-	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E )"
+	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E -n 999 )"
 	test_verify_str_equals "${result_str}" "${expect_2}"
 
 	result_str="$( echo -e "${input_1}" | func_combine_lines -b B -e E -s S -n 2)"
@@ -291,7 +291,7 @@ test_func_combine_lines () {
 	test_verify_str_line_count "${result_str}" 3
 
 	# pipe mode - a real case used by: func_gen_filesize_list_single
-	result_str="$( echo -e "${input_2}" | func_combine_lines -b "-not ( -path " -e " -prune ) ")"
+	result_str="$( echo -e "${input_2}" | func_combine_lines -b "-not ( -path " -e " -prune ) " -n 999)"
 	test_verify_str_equals "${result_str}" "${expect_4}"
 
 	# file mode, 注意: count为1时，实际-s是不生效的

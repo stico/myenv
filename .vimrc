@@ -793,6 +793,7 @@ function! s:CopyToClipboard(str)
   "return a:str
 endfunction
 call MapAction('CopyToClipboard','my')
+call MapAction('CopyToClipboard','mm')
 
 """ copied from vimrc_example.vim, see comments there
 if has("autocmd") && !exists("autocommands_loaded")
@@ -942,7 +943,8 @@ nmap e <Plug>(easymotion-s)
 
 """""""" vim-islime2@vim
 let g:islime2_29_mode=1
-nnoremap <silent> <D-CR> :ISlime2CurrentLine<CR>
+"nnoremap <silent> <D-CR> :ISlime2CurrentLine<CR>	" 官方文档中提供的这个命令，会把开关的Tab也送过去，导致大量的tab输入给iTerm
+nnoremap <silent> <D-CR> :call islime2#iTermSendNext(substitute(trim(getline('.')),'\s*#.*$','',''))<CR>
 vnoremap <silent> <D-CR> :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
 
 """""""" vim-surround@vim
