@@ -5,5 +5,5 @@
 # Skip loading .bashrc for non-interactive mode 
 [ -n "$PS1" ] \
 && [ -f "${HOME}/.bashrc" ] \
-&& [ "$(ps -cp "$$" -o command="")" = "bash" ] \
+&& [ "$(ps -cp "$$" -o command="")" = "-bash" ] \
 && source "${HOME}/.bashrc"

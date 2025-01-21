@@ -22,9 +22,10 @@ LOCATE_USE_FIND='true'		# seems tuned find is always a good choice (faster than 
 LOCATE_USE_MLOCATE='false'	# BUT also note the limit of the func_locate_via_find, which usually enough
 
 FIND_DUP_RESULT="fl_dup"
-FIND_DUP_RESULT_END="######## FIND_DUP_RESULT_END ########"
-FIND_DUP_TO_DEL="fl_to_del"
-FIND_DUP_TO_CHECK="fl_to_check"
+FIND_DUP_FL_1ST="######## FIND_DUP_DIR"
+FIND_DUP_FL_END="######## FIND_DUP_RESULT_END ########"
+FIND_DUP_TO_CFM="fl_to_confirm"
+FIND_DUP_DEL_RCD=".fd.del.record"
 FIND_DUP_EXCLUDE=".fd.exclude"
 FIND_BIG_EXCLUDE=".fb.exclude"
 
@@ -81,8 +82,11 @@ fi
 ################################################################################
 func_find_big_files() {
 	func_gen_filesize_list
-	#func_grepf -v "${FIND_BIG_EXCLUDE}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}"
-	func_del_pattern_lines_f "${FIND_BIG_EXCLUDE}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}" 
+	if  [[ -e "${FIND_BIG_EXCLUDE}" ]] ; then
+		func_del_pattern_lines_f "${FIND_BIG_EXCLUDE}" "${FIND_UTIL_FILESIZE}" | head -"${1:-10}" 
+	else
+		head -"${1:-10}" "${FIND_UTIL_FILESIZE}"
+	fi
 }
 
 func_find_big_dir() {
@@ -109,14 +113,42 @@ func_find_big_dir() {
 	echo -e "---\t部分目录未检查\t~/Documents/*, ~/amp/*, ~/download"
 }
 
-func_find_dup() {
-	local work_base find_base fl_all fl_dup fl_to_check tmpf md5_cur md5_pre single_md5 sed_del_cmd
+func_find_non_utf8_in_content() {
+	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
+	func_param_check 1 "$@"
+
+	local tmp_filelist=$(mktemp)
+	echo "INFO: grep filelist into: ${tmp_filelist}"
+	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > "${tmp_filelist}"
+
+	local tmp_suspect=$(mktemp)
+	echo "INFO: grep suspected files into: ${tmp_suspect}"
+
+	# TODO: use func_pipe_remove_lines instead
+	xargs -a "${tmp_filelist}" -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > "${tmp_suspect}"
+
+	echo "INFO: suspected files are:"
+	cat "${tmp_suspect}"
+}
+
+################################################################################
+# Topic - dup
+################################################################################
+
+func_dup_find() {
+	local work_base find_base fl_all fl_dup_raw fl_dup single_md5_list fl_to_confirm tmpf md5_cur md5_pre single_md5 sed_del_cmd
+
+	# NOTE
+	# - 参数: 默认当前目录。可指定多个目录同时比较
+	# - 思路: 只有文件大小相同的才可能是重复文件，挑出文件大小有相同的情况，再去计算md5 (减少计算量)，再去比较
 
 	# var init
 	work_base="$(mktemp -d)"
 	fl_all="${work_base}/fl_all"
 	fl_dup="${work_base}/${FIND_DUP_RESULT}"
-	fl_to_check="${work_base}/${FIND_DUP_TO_CHECK}"
+	fl_raw="${work_base}/${FIND_DUP_RESULT}_raw"
+	single_md5_list="${work_base}/single_md5_list"
+	fl_to_confirm="${work_base}/${FIND_DUP_TO_CFM}"
 
 	# pre-check
 	[[ "$#" -gt 0 ]] && func_validate_path_exist "$@"
@@ -126,8 +158,11 @@ func_find_dup() {
 	touch "${FIND_DUP_EXCLUDE}" 
 	if [[ "$#" -gt 0 ]] ; then
 		for find_base in "$@" ; do
+			tmpf="${find_base}/${FIND_UTIL_FILESIZE}"
+			func_complain_path_inexist "${tmpf}" && continue
+
 			# update file path with base, otherwise file path is incorrect
-			func_del_blank_hash_lines "${find_base}/${FIND_UTIL_FILESIZE}" \
+			func_del_blank_hash_lines "${tmpf}" \
 			| func_del_string_lines_f "${FIND_DUP_EXCLUDE}" \
 			| sed -e "s+\t\./+\t${find_base}/+" \
 			>> "${fl_all}"
@@ -139,10 +174,10 @@ func_find_dup() {
 	fi
 
 	# find same size file, trick: input file used twice (ref: FNR@awk)
-	awk 'FNR == NR { seen[$1]++; next } seen[$1] > 1' "${fl_all}" "${fl_all}" | sort -rn > "${fl_to_check}"
+	awk 'FNR == NR { seen[$1]++; next } seen[$1] > 1' "${fl_all}" "${fl_all}" | sort -rn > "${fl_to_confirm}"
 
 	# gen md5 and output
-	echo "# Current dir: ${PWD}" >> "${fl_dup}"
+	echo "${FIND_DUP_FL_1ST}: ${PWD}" >> "${fl_dup}"
 	while IFS= read -r line || [[ -n "${line}" ]] ; do 
 		tmpf="${line#*	}"
 
@@ -150,37 +185,116 @@ func_find_dup() {
 		echo "${tmpf}" | grep -q "\(.DS_Store\|${FIND_UTIL_EXCLUDE}\|${FIND_UTIL_FILESIZE}\)" && continue
 
 		md5_pre="${md5_cur}"
-		md5_cur="$(func_find_dup_md5cache "${line}")"
-		#md5_cur="$(func_file_md5sum "${tmpf}")"
-		[[ "${md5_cur}" != "${md5_pre}" ]] && echo >> "${fl_dup}"
+		md5_cur="$(func_dup_md5cache "${line}")"
+		[[ "${md5_cur}" != "${md5_pre}" ]] && echo >> "${fl_raw}"
 
-		echo -e "${md5_cur}\t${line}" >> "${fl_dup}"
-	done < "${fl_to_check}"
+		echo -e "${md5_cur}\t${line}" >> "${fl_raw}"
+	done < "${fl_to_confirm}"
 	
-	# find single occurence md5。结果文件中会有单行的情况 (文件大小相同，但md5不同)，这里构造sed命令，删除这些行
-	sed_del_cmd="$(func_del_blank_hash_lines "${fl_dup}" | awk '{print $1}' | uniq -u | func_combine_lines -b "/" -e "/d;" )"
-	if func_is_str_not_blank "${sed_del_cmd}" ; then
-		func_debug "found single line md5 occurence, delete using sed cmd: ${sed_del_cmd}"
-		sed -i -e "${sed_del_cmd}" "${fl_dup}"
-	fi
-	echo "${FIND_DUP_RESULT_END}" >> "${fl_dup}"
+	# TODO: 有一种较复杂的情况没有好的办法处理: 4个文件大小相同，两两重复，但错开了。会变成4个独立的行被去掉了。
+	# 会有单行的情况 (文件大小相同，但md5不同)，需要删除这些行
+	func_del_blank_hash_lines "${fl_raw}" | awk '{print $1}' | uniq -u > "${single_md5_list}"
+	func_del_string_lines_f "${single_md5_list}" "${fl_raw}" | func_shrink_blank_lines >> "${fl_dup}" 
+	echo "${FIND_DUP_FL_END}" >> "${fl_dup}"
 
 	# TODO: 是否需要提前处理长度为0的文件? 它们的md5都是一样的: d41d8cd98f00b204e9800998ecf8427e
-
 	# print summary
-	echo "$(func_shrink_blank_lines "${fl_dup}" | grep -c '^$' ) dup found: ${fl_dup}"
-	echo "Commands might useful:"
-	echo "# vi ${fl_dup}"
-	echo "# func_delete_dup ${fl_dup}"
-	echo "Note: last line is a fence for stopping delete: ${FIND_DUP_RESULT_END}"
+	echo "$( grep -c '^$' "${fl_dup}" ) dup block found: ${fl_dup}"
+	echo "################################################################################"
+	echo "# NOTE "
+	echo "# - last line is a fence for stopping delete: ${FIND_DUP_FL_END}"
+	echo "# - CMD: vi ${fl_dup}"
+	echo "# - CMD: func_dup_delete ${fl_dup}"
+	echo "################################################################################"
 }
 
-func_find_dup_md5cache() {
-	local file size fullpath cache_file cache_key md5
+func_dup_delete() {
+	local usage="Usage: ${FUNCNAME[0]} <fl_dup>" 
+	local desc="Desc: delete(gather) files list in fl_dup (gen by func_find_dup)"
+	func_param_complain 1 "$@" && return 1
+
+	local exec_dir fl_dup fl_to_del fl_to_confirm to_del_cnt to_check_cnt tgt_name tgt_mnt_path tgt_base common_base cnt_y cnt_n tmpf dpath
+	fl_dup="$( readlink -f "${1}" )"
+	fl_to_del="${fl_dup%/*}/fl_to_del"
+	fl_to_confirm="${fl_dup%/*}/${FIND_DUP_TO_CFM}"
+
+	# Prepare: 1) run in correct dir
+	exec_dir="$( grep "${FIND_DUP_FL_1ST}" "${fl_dup}" | sed -e 's+^[^/]*++' )"
+	func_complain_path_inexist "${exec_dir}"
+	! pushd "${exec_dir}" &> /dev/null && func_error "cd failed (to dir: ${exec_dir})" && return 1
+
+	# Check: 1) func_find_dup相关的output文件是否存在。
+	func_complain_path_inexist "${fl_dup}" && return 1
+	func_complain_path_inexist "${fl_to_confirm}" && return 1
+
+	# Prepare: 2) filelist to delete
+	sed -n -e "1,/${FIND_DUP_FL_END}/p" "${fl_dup}" \
+	| sed -e 's/^[0-9a-fA-F\t]*\t//' \
+	| func_del_blank_hash_lines \
+	> "${fl_to_del}"
+	[[ ! -e "$(head -1 "${fl_to_del}" )" ]] && func_error "无法访问要移除的文件，很可能是相对路径不对" && return 1
+
+	# Check: 2) 重复的文件应该要保留一个，不能都删除了。这里做法是检查要移除的文件数量不能多于待检查文件数量的2/3
+	to_del_cnt="$(func_file_line_count "${fl_to_del}")"
+	to_check_cnt="$(func_file_line_count_clean "${fl_to_confirm}")"
+	(( to_del_cnt >= (to_check_cnt*2)/3 )) && func_error "delete TOO MUCH: to_del_cnt >= (to_check_cnt*2)/3 " && return 1
+
+	# Prepare: 3) Decide where to mv (to avoid mv file across disk)
+	tgt_name="DUP_DELETE_$(func_dati)"
+	tgt_mnt_path="$(func_disk_mount_point "${PWD}")"
+	[[ -d "${tgt_mnt_path}/alone" ]] && tgt_base="${tgt_mnt_path}/alone/${tgt_name}" || tgt_base="${MY_DEL}/$(func_daty)/${tgt_name}"
+
+	# Perform: delete(mv). 注意: 不能在(( )) 后面用 &&，因为它的返回码和普通命令是不一样的
+	mkdir -p "${tgt_base}"
+	func_debug "start to delete(mv): tgt_base=${tgt_base}"
+	while IFS= read -r dpath || [[ -n "${dpath}" ]] ; do
+		if func_mv_structurally "${dpath}" "${tgt_base}" ; then
+			(( cnt_y++ ))
+		else
+			(( cnt_n++ ))
+			func_error "failed to move: ${dpath} to ${tgt_base}"
+		fi
+	done < "${fl_to_del}"
+	sed -n -e "1,/${FIND_DUP_FL_END}/p" "${fl_dup}" > "${tgt_base}/${FIND_DUP_DEL_RCD}"
+
+	# Print summary
+	echo "(${cnt_y} success, ${cnt_n:-0} failed) dup files moved to: ${tgt_base}"
+
+	popd &> /dev/null || return 1
+}
+
+func_dup_fl_filter() {
+	local usage="Usage: ${FUNCNAME[0]} <pattern_str> [dup_file_list]"
+	local desc="Desc: extract dup block from [dup_file_list] (default: ${FIND_DUP_RESULT})"
+	func_param_complain 1 "$@" && return 1
+
+	# TOOL SCRIPT
+	# - 看哪些文件重复的最多。它按重复的次数生成文件对应的(文件名为重复次数)
+	#	<fl_dup awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
+	# - 打印每个重复块的第一行
+	#   -- copy	<fl_dup awk 'BEGIN{RS="\n\n"; print "mkdir s1";} { sub("\n.*", "", $0); print "cp \"" $3 "\" s1/ # " $2; }'
+	#   -- open	<fl_dup awk 'BEGIN{RS="\n\n"} { sub("\n.*", "", $0); print "open " $3 " # " $2; }'
+	#   -- plain	<fl_dup awk 'BEGIN{p=0;} /^$/ {p=0;}; /.+/ {if(p==0) {print $0;p=1;}}' 
+
+	local pstr file
+	pstr="${1}"
+	file="${2:-"${FIND_DUP_RESULT}"}"
+
+	func_shrink_blank_lines "${file}" | awk -v pstr="${pstr}" '
+		BEGIN		{ RS="\n\n"; } 
+		/^#/		{ print $0; print ""; }
+		$0 ~ pstr	{ print $0; print ""; }
+	'
+}
+
+func_dup_md5cache() {
+	local file size fullpath cache_file cache_key md5 THRESHOLD
+	THRESHOLD="$(( 5 * 1000 * 1000 ))"	# 5M
 	read -r size file <<<"${1}"
 
-	# NO cache for small file (<50M)
-	(( size < 50000000 )) && func_file_md5sum "${file}" && return
+	# NO cache for small file
+	#func_debug_stderr "md5cache: check size: ${size}: ${1}"
+	[[ "${size}" -lt "${THRESHOLD}" ]] && func_file_md5sum "${file}" && return
 
 	# cache init, note: need use fullpath
 	fullpath="$(readlink -f "${file}")"
@@ -204,22 +318,29 @@ func_find_dup_md5cache() {
 	echo "${md5}"
 }
 
-func_find_non_utf8_in_content() {
-	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
-	func_param_check 1 "$@"
+func_dup_shrink_md5_list_lapmac() {
+	# TODO: this is old version
+	func_validate_path_exist "${MY_DCB}" "${MY_DCC}" "${MY_DCD}" "${MY_DCM}" "${MY_DCO}" "${MY_FCS}" "${MY_FCZ}"
 
-	local tmp_filelist=$(mktemp)
-	echo "INFO: grep filelist into: ${tmp_filelist}"
-	grep '^@/\|^@\$' "${1}" | sed -e "s/^@//" > "${tmp_filelist}"
+	local p todel sed_param
+	new="${DUP_LIST_MD5}.new"
+	todel="${DUP_LIST_MD5}.to.delete" 
+	sed_param='s+ \./+ +;s/^[^ ]* \+//;s+backup_rsync/++;s+backup_unison/++;'
+			     
+	while IFS= read -r line || [[ -n "${line}" ]] ; do
+		p="${MY_DOC}/${line}" 
+		[[ -e "${p}" ]] || echo "${line}" >> "${todel}" 
+	done < <(func_del_blank_hash_lines "${DUP_LIST_MD5}" | sed -e "${sed_param}")
 
-	local tmp_suspect=$(mktemp)
-	echo "INFO: grep suspected files into: ${tmp_suspect}"
+	# remove skip files and remove inexist files
+	func_del_pattern_lines_f "${DUP_SKIP_PATH}" "${DUP_LIST_MD5}" \
+	| func_del_pattern_lines_f <(sed -e "${sed_param}" "${DUP_SKIP_MD5}" ) \
+	| func_del_pattern_lines_f -F "${todel}" > "${new}" 
 
-	# TODO: use func_pipe_remove_lines instead
-	xargs -a "${tmp_filelist}" -n 1 -I {} file {} | sed -e '/ASCII text/d;/UTF-8 Unicode/d;/: empty *$/d;/XML document text/d' > "${tmp_suspect}"
-
-	echo "INFO: suspected files are:"
-	cat "${tmp_suspect}"
+	echo "INFO: run this if want to use result, run command below:" 
+	echo "    # ddelete ${DUP_LIST_MD5} ${todel}; mv ${new} ${DUP_LIST_MD5};"
+	wc -l "${DUP_LIST_MD5}"
+	wc -l "${new}"
 }
 
 ################################################################################
@@ -382,9 +503,9 @@ func_std_gen_links() {
 			local note_filename="${note_file##*/}"
 			local topic_basepath="${d}/${note_filename%.txt}"
 			if [ -d "${topic_basepath}" ] && [ ! -f "${topic_basepath}/${note_filename}" ] ; then
-				pushd "${topic_basepath}" &> /dev/null
+				pushd "${topic_basepath}" &> /dev/null || continue
 				ln -s "../note/${note_filename}" .
-				popd &> /dev/null
+				popd &> /dev/null || continue
 			fi
 		done
 	done
@@ -1852,62 +1973,6 @@ func_translate_microsoft() {
 	echo -e "$*\n\t$res_raw" >> "${MY_DCO}/english/translate/translate_history_$(hostname -s)"
 }
 
-func_delete_dup() {
-	local usage="Usage: ${FUNCNAME[0]} <fl_dup>" 
-	local desc="Desc: delete(gather) files list in fl_dup (gen by func_find_dup)"
-	func_param_complain 1 "$@" && return 1
-
-	local fl_dup fl_to_del fl_to_check to_del_cnt to_check_cnt tgt_mnt_path tgt_base common_base cnt_y cnt_n tmpf dpath
-	fl_dup="${1}"
-	fl_to_del="${fl_dup%/*}/${FIND_DUP_TO_DEL}"
-	fl_to_check="${fl_dup%/*}/${FIND_DUP_TO_CHECK}"
-
-	# Check: 1) func_find_dup相关的output文件是否存在。
-	func_complain_path_inexist "${fl_dup}" && return 1
-	func_complain_path_inexist "${fl_to_check}" && return 1
-	[[ "${fl_dup##*/}" != "${FIND_DUP_RESULT}" ]] && func_error "filename incorrect, expect: ${FIND_DUP_RESULT}" && return 1
-
-	# Prepare: 1) filelist to delete
-	sed -n -e "1,/${FIND_DUP_RESULT_END}/p" "${fl_dup}" \
-	| sed -e 's/^[0-9a-fA-F\t]*\t//' \
-	| func_del_blank_hash_lines \
-	> "${fl_to_del}"
-
-	# Check: 2) FIND_DUP_RESULT中的相对路径是否可访问。
-	if [[ ! -e "$(head -1 "${fl_to_del}" )" ]] ; then
-		func_error "无法访问要移除的文件，很可能是相对路径不对，需要在执行func_find_dup的路径执行此命令。期待的当前路径为: $(head -1 "${fl_dup}" )"
-		return 1
-	fi
-
-	# Check: 3) 重复的文件应该要保留一个，不能都删除了。这里做法是检查要移除的文件数量不能多于待检查文件数量的2/3
-	to_del_cnt="$(func_file_line_count "${fl_to_del}")"
-	to_check_cnt="$(func_file_line_count_clean "${fl_to_check}")"
-	(( to_del_cnt >= (to_check_cnt*2)/3 )) && func_error "delete TOO MUCH: to_del_cnt >= (to_check_cnt*2)/3 " && return 1
-
-	# Prepare: 3) Decide where to mv (to avoid mv file across disk)
-	tgt_mnt_path="$(func_disk_mount_point "${PWD}")"
-	if [[ -d "${tgt_mnt_path}/alone" ]] ; then
-		tgt_base="${tgt_mnt_path}/alone/DUP_DELETE_$(func_dati)"
-	else
-		tgt_base="${MY_DEL}/$(func_daty)/DUP_DELETE_$(func_dati)"
-	fi
-	[ -d "${tgt_base}" ] || mkdir -p "${tgt_base}"
-
-	# Perform: delete(mv). 注意: 不能在(( )) 后面用 &&，因为它的返回码和普通命令是不一样的
-	func_debug "start to delete(mv): tgt_base=${tgt_base}"
-	while IFS= read -r dpath || [[ -n "${dpath}" ]] ; do
-		if func_mv_structurally "${dpath}" "${tgt_base}" ; then
-			(( cnt_y++ ))
-		else
-			(( cnt_n++ ))
-			func_error "failed to move: ${dpath} to ${tgt_base}"
-		fi
-	done < "${fl_to_del}"
-
-	# Print summary
-	echo "(${cnt_y} success, ${cnt_n:-0} failed) dup files moved to: ${tgt_base}"
-}
-
 func_delete_dated() { 
 	local usage="Usage: ${FUNCNAME[0]} <path> <path> ..." 
 	func_param_check 1 "$@" 
@@ -3085,559 +3150,3 @@ func_mydata_gen_fl(){
 
 # THIS MUST IN THE END OF SCRIPT
 MYENV_LOAD_TIME="$(func_dati)"	# use this to indicate the loading time of the script
-
-################################################################################
-# Deprecated - dup find
-################################################################################
-func_dup_gather_try_bakpath_PRIVATE() {
-	local usage="USAGE: ${FUNCNAME[0]} <filepath>" 
-	local desc="Desc: if path is doc backup, try diff path for DTZ/TCZ/lap" 
-	func_param_check 1 "$@"
-
-	local tline1 tline2
-	# NOTE: NO prefix chars for these 2 path !
-	if [[ "${1}" = backup_unison/* ]] ; then 
-		tline1="${1#backup_unison/}"
-		tline2="${1/backup_unison/backup_rsync/}"
-		[ -e "${tline1}" ] && echo "${tline1}" && return
-		[ -e "${tline2}" ] && echo "${tline2}" && return
-	fi
-
-	if [[ "${1}" = backup_rsync/* ]] ; then
-		tline1="${1#backup_rsync/}"
-		tline2="${1/backup_rsync/backup_unison/}"
-		[ -e "${tline1}" ] && echo "${tline1}" && return
-		[ -e "${tline2}" ] && echo "${tline2}" && return
-	fi
-
-	echo "${1}"
-}
-
-func_dup_gather() {
-	echo "ERROR: this function is deprecated, use func_delete_dup instead"
-	return 1
-
-	local usage="USAGE: ${FUNCNAME[0]} <filelist>" 
-	local desc="Desc: gather files in <filelist> (use default list if not provided), preserve dir structure.\nNOTE: the filelist is output of func_dup_find"
-
-	local DUP_CONFIG="${MY_ENV}/secu/personal/dup/"
-	local DUP_DEL_LIST="${DUP_CONFIG}/del_list"
-
-	local del_list
-	if func_is_str_blank "${1}" ; then
-		func_ask_yes_or_no "WARN: NO param (del_list) provided, use default list (${DUP_DEL_LIST})? (y/n)" \
-		&& del_list="${DUP_DEL_LIST}"
-	else
-		del_list="${1}"
-	fi
-	func_validate_path_exist "${del_list}"
-	
-	# Process each file
-	local line tpath tfile log dup_dir
-	dup_dir="A_GATHER_DIR_$(func_dati)"
-	log="${dup_dir}/A.log"
-	mkdir "${dup_dir}"
-	while IFS= read -r line || [[ -n "${line}" ]] ; do
-		# normal case: file inexist. 
-		if [ ! -e "${line}" ] ; then
-			# for doc backup path, try alternative paths
-			if [[ "${line}" = backup_unison/* ]] || [[ "${line}" = backup_rsync/* ]] ; then
-				line="$(func_dup_gather_try_bakpath_PRIVATE "${line}")"
-			fi
-		fi
-		[ ! -e "${line}" ] && echo "MV_SKIP: skip since inexist: ${line}" >> "${log}" && continue
-
-		# move (preserve path structure)
-		tpath="${dup_dir}/$(dirname "${line}")"
-		[ -d "${tpath}" ] || mkdir -p "${tpath}"
-		mv "$line" "${tpath}"
-
-		# verify
-		tfile="${tpath}/$(basename "${line}")"
-		[ -e "${line}" ] && echo "MV_FAIL: failed to move, file still there: ${line}"       >> "${log}" && continue
-		[ ! -e "${tfile}" ] && echo "MV_FAIL: failed to move, file NOT in target: ${tfile}" >> "${log}" && continue
-		echo "MV_DONE: move file success: ${tfile}"                                         >> "${log}" && continue
-
-	done < <(func_del_blank_hash_lines "${del_list}")
-
-	echo "INFO: ==================================== SUMMARY ===================================="
-	touch "${log}" # incase do nothing
-	local fail="$(grep -c "MV_FAIL" "${log}")"
-	local skip="$(grep -c "MV_SKIP" "${log}")"
-	local success="$(grep -c "MV_DONE" "${log}")"
-	echo "INFO: files moved to (size: $(du -sh "${dup_dir}" | cut -d' ' -f1) ): ${dup_dir}"
-	echo "INFO: ${fail} fail, ${success} success, ${skip} skip, see detail: ${log}"
-}
-
-func_dup_find_gen_md5_PRIVATE() {
-	# Skip symbolic link
-	if [ -h "${1}" ] ; then 
-		# TODO: NOT found such log, why?
-		echo "DUP_SKIP_LINK: ${1}" >> "${dup_log}"
-		return
-	fi
-
-	#UPDATE: logic moved to func_dup_find, which gen and filter filelist
-	# # Skip path
-	# #if echo "${1}" | grep -q -f "${dup_skip_path_patterns}" ; then
-	# if echo "${1}" | func_grepf -q "${DUP_SKIP_PATH}" ; then
-	# 	echo "DUP_SKIP_PATH: ${1}" >> "${dup_log}"
-	# 	return
-	# fi
-
-	# Reuse md5 if possible. 
-	# - To make better match: always remove "./" prefix, and remove "backup_rsync/backup_unison" if have
-	# - always ignore empty file md5 (reuse this might cause delete by mistake): d41d8cd98f00b204e9800998ecf8427e
-	local md5_out
-	local sname="${1}" 
-	[[ "${sname}" = ./* ]]             && sname="${sname#./}"
-	[[ "${sname}" = backup_rsync/* ]]  && sname="${sname#backup_rsync/}"
-	[[ "${sname}" = backup_unison/* ]] && sname="${sname#backup_unison/}"
-	md5_out="$(grep -F "${sname}" "${DUP_LIST_MD5}" | grep -v d41d8cd98f00b204e9800998ecf8427e | head -1)"
-	if [[ -n "${md5_out}" ]] ; then
-		md5_out="${md5_out%% *} ${1}"
-	else
-		md5_out="$(md5sum "${1}")"
-		echo "${md5_out}" >> "${list_md5_new}"
-		echo "DUP_CALC_MD5: ${1}" >> "${dup_log}"
-	fi
-
-	# Skip md5, only match md5, might ingore more but also safe
-	if grep -q "${md5_out%% *}" "${DUP_SKIP_MD5}" ; then
-		echo "DUP_SKIP_MD5: ${md5_out}" >> "${dup_log}"
-		return
-	fi
-
-	# Record md5
-	echo "${md5_out}" >> "${list_md5_all}"
-}
-
-func_dup_gather_then_find() {
-	# pass a empty str to avoid editor error report 
-	func_dup_gather ""
-	func_dup_find
-}
-
-# shellcheck disable=2120
-func_dup_find() {
-	echo "ERROR: this function is deprecated, use func_find_dup instead"
-	return 1
-
-	# TOOL SCRIPT
-	# - 01: split result file by lines of dup
-	#	awk 'BEGIN{c=0;}/^$/{for(i=0;i<c;i++){print arr[i] >> c};print "" >> c; c=0};/.+/{arr[c++]=$0;}'
-	# - 02: for skip_md5: select 1 line from each block
-	#	cat -s del_list.to_merge2 | awk 'BEGIN{p=0;}/^$/ {p=0;};/.+/ {if(p==0) {print $0;p=1;}}' 
-
-	if 'true' ; then
-		echo "WARN: deprecated, use func_find_dup instead"
-		return
-	fi
-
-	local usage="USAGE: ${FUNCNAME[0]} <path> <path> <...>" 
-	local desc="Desc: find duplicated files in paths (use md5)" 
-
-	local dup_base="/tmp/dup_$(func_dati)"
-	local list_md5_all="${dup_base}/list_md5.txt"
-	local list_md5_new="${dup_base}/list_md5.new"
-	local list_dup_count="${dup_base}/list_dup_count.txt"
-	local list_dup_detail="${dup_base}/list_dup_detail.txt"
-	local dup_log="${dup_base}/a.dup_log.txt"
-	#local dup_skip_path_patterns="${dup_base}/dup_skip_path_patterns"
-
-	# Pre-check
-	if [[ ! -e "${DUP_SKIP_MD5}" ]] || [[ ! -e "${DUP_LIST_MD5}" ]] || [[ ! -e "${DUP_SKIP_PATH}" ]] ; then
-		func_ask_yes_or_no "WARN: DUP CONFIG files NOT exist (WILL BE VERY SLOW), contiue (y/n)?" || return 1
-	fi
-
-	func_info "start to gen filelist at: ${dup_base}/"
-	local p f fl_raw fl_use
-	mkdir -p "${dup_base}"
-	fl_raw="${dup_base}/filelist.raw"
-	fl_use="${dup_base}/filelist.use"
-	if [ $# -eq 0 ] ; then
-		# WORKS (slower, output smaller): find ./ -type f ! -path '*/FCS/*' ! -path '*/FCZ/*' ! -path '*/DCD/mail/mail_*' ! -path '*/A_GATHER_DIR_20*'  
-		find ./ -type f >> "${fl_raw}"
-	else
-		for p in "$@" ; do
-			find "${p}" -type f >> "${fl_raw}"
-		done
-	fi
-	func_del_pattern_lines_f "${DUP_SKIP_PATH}" "${fl_raw}" > "${fl_use}"
-
-	func_info "start to gen md5/file pair"
-	while IFS= read -r line || [[ -n "${line}" ]] ; do
-		func_dup_find_gen_md5_PRIVATE "${line}"
-	done < "${fl_use}"
-
-	func_info "start to gen dup report"
-	# seems use sort -k1 better? since awk can NOT easily handle the "2nd to last field", and merge files in single line is NOT easy to read
-	# https://stackoverflow.com/questions/40134905/merge-values-for-same-key
-	#awk -F, '{a[$1] = a[$1] FS $2} END{for (i in a) print i a[i]}' $file
-	cut -d' ' -f1 "${list_md5_all}" | sort | uniq -c | sed -e '/^\s\+1\s\+/d' > "${list_dup_count}"
-
-	local dup_count
-	dup_count="$(func_file_line_count "${list_dup_count}")"
-	if (( dup_count == 0 )) ; then
-		func_info "no dup files found, check new md5 at: ${list_md5_new}"
-		return 0
-	fi
-
-	local count md5
-	while read -r count md5 || [[ -n "${count}" ]] ; do
-		[[ "${count}" -eq 1 ]] && echo "ERROR: should NOT found count=1 md5 here" && continue
-		grep "${md5}" "${list_md5_all}" >> "${list_dup_detail}"
-		echo >> "${list_dup_detail}"
-	done < "${list_dup_count}" 
-
-	if [ -e "${list_dup_detail}" ] ; then
-		func_info "found $(func_file_line_count "${list_dup_detail}") files"
-		func_info "1) check new md5 at: ${list_md5_new}"
-		func_info "2) check detail at: ${list_dup_detail}"
-	else
-		func_info "NO dup files found, check new md5 at: ${list_md5_new}"
-	fi
-}
-
-func_dup_shrink_md5_list() {
-	local hn
-	hn="$(hostname -s)"
-	if [[ "${hn}" = lapmac* ]] ; then
-		func_dup_shrink_md5_list_lapmac
-		return
-	fi
-
-	if [[ "${hn}" = laptp* ]] ; then
-		# TODO: 
-		#	for bdta
-		#	for btca
-		echo "WARN: NOT impl yet"
-		return
-	fi
-}
-
-func_dup_shrink_md5_list_lapmac() {
-	func_validate_path_exist "${MY_DCB}" "${MY_DCC}" "${MY_DCD}" "${MY_DCM}" "${MY_DCO}" "${MY_FCS}" "${MY_FCZ}"
-
-	local p todel sed_param
-	new="${DUP_LIST_MD5}.new"
-	todel="${DUP_LIST_MD5}.to.delete" 
-	sed_param='s+ \./+ +;s/^[^ ]* \+//;s+backup_rsync/++;s+backup_unison/++;'
-			     
-	while IFS= read -r line || [[ -n "${line}" ]] ; do
-		p="${MY_DOC}/${line}" 
-		[[ -e "${p}" ]] || echo "${line}" >> "${todel}" 
-	done < <(func_del_blank_hash_lines "${DUP_LIST_MD5}" | sed -e "${sed_param}")
-
-	# remove skip files and remove inexist files
-	func_del_pattern_lines_f "${DUP_SKIP_PATH}" "${DUP_LIST_MD5}" \
-	| func_del_pattern_lines_f <(sed -e "${sed_param}" "${DUP_SKIP_MD5}" ) \
-	| func_del_pattern_lines_f -F "${todel}" > "${new}" 
-
-	echo "INFO: run this if want to use result, run command below:" 
-	echo "    # ddelete ${DUP_LIST_MD5} ${todel}; mv ${new} ${DUP_LIST_MD5};"
-	wc -l "${DUP_LIST_MD5}"
-	wc -l "${new}"
-}
-
-
-################################################################################
-# Deprecated - backup dated/myenv
-################################################################################
-#func_backup_dated_OLD_VERSION() {
-#	local usage="Usage: ${FUNCNAME[0]} <source>"
-#	local desc="Desc: Currently only support backup up single target (file/dir)." 
-#	func_param_check 1 "$@"
-#
-#	# check and prepare
-#	func_validate_path_exist "${1}" 
-#	local src_name src_path tgt_path tgt_base ex_fl passwd_str cmd_passwd_part cmd_ex_part cmd_info
-#	src_path="$(readlink -f "$1")"
-#	src_name="$(basename "${src_path%.zip}")"				# .zip will be added later (de-dup here)
-#	tgt_base="$(func_backup_dated_sel_target_base)"
-#	tgt_path="${tgt_base}/$(func_dati)_$(func_best_hostname)_${src_name}.zip"
-#	mkdir -p "${tgt_base}"
-#
-#	# prepare password if available
-#	if func_is_cmd_exist func_gen_zip_passwd ; then
-#		passwd_str="$(func_gen_zip_passwd "${tgt_path}")"
-#		if [ -n "${passwd_str}" ] ; then 
-#			# NO ' inside "". WRONG: "--password '${passwd_str}'"
-#			cmd_passwd_part="--password ${passwd_str}"
-#		else
-#			echo "WARN: failed to gen password"
-#		fi
-#	fi
-#
-#	# backup
-#	if [ -d "${src_path}" ] ; then
-#
-#		# prepare exclude filelist
-#		ex_fl="$(func_backup_dated_gen_exclude_list "${src_path}")"
-#		if [ -s  "${ex_fl}" ] ; then
-#			# NO ' inside "". WRONG: x@'${ex_fl}'"				
-#			cmd_ex_part="-x@${ex_fl}" 
-#		fi
-#
-#		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
-#		zip -r "${tgt_path}" "${src_path}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-#		cmd_info="${cmd_passwd_part} ${cmd_ex_part}"
-#	else
-#		# shellcheck disable=2086 # cmd_passwd_part must NOT use ""
-#		zip "${tgt_path}" "${src_path}" ${cmd_passwd_part} 
-#		cmd_info="${cmd_passwd_part}"
-#	fi
-#
-#	# echo result
-#	func_is_str_blank "${cmd_info}" && echo "INFO: no password or exclude list used." || echo "INFO: cmd param: ${cmd_info}"
-#	echo "INFO: $(find "${tgt_path}" -printf '%s\t%p\n' | numfmt --field=1 --to=si)"
-#}
-
-#func_backup_myenv_OLD_VERSION() { 
-#	local tmpDir="$(mktemp -d)"
-#	local packFile="${tmpDir}/myenv_backup.zip"
-#	local fileList=${MY_ENV_ZGEN}/collection/myenv_filelist.txt
-#
-#	echo "INFO: create zip file based on filelist: ${fileList}"
-#	func_collect_myenv "no_content"
-#
-#	# excludes: locate related db, ar.../fp... files in unison, duplicate collection
-#	zip -r "${packFile}"					\
-#		-x "*/zgen/mlocate.db" 				\
-#		-x "*/zgen/gnulocatedb" 			\
-#		-x "*/.unison/[fa][pr][0-9a-z]*"		\
-#		-x "*/zgen/collection/all_content.txt"		\
-#		-x "*/zgen/collection/code_content.txt"		\
-#		-x "*/zgen/collection/stdnote_content.txt"	\
-#		-@ < "${fileList}" 2>&1				\
-#	| sed -e '/^updating: /d;/^[[:blank:]]*adding: /d'	\
-#	|| echo "WARN: failed to pack some file, pls check"
-#
-#	if [ ! -e "${packFile}" ] ; then
-#		func_die "ERROR: failed to zip files into ${packFile}"
-#	fi
-#
-#	echo "INFO: bakcup command output, add to the backup zip"
-#	mkdir -p "${tmpDir}"
-#	df -h					> "${tmpDir}/cmd_output_df_h.txt"
-#	find ~ -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_home.txt"
-#	find / -maxdepth 1 -type l -ls		> "${tmpDir}/cmd_output_links_in_root.txt"
-#	find ~/.zbox/ -maxdepth 1 -type l -ls	> "${tmpDir}/cmd_output_links_in_zbox.txt"
-#
-#	pushd . &> /dev/null
-#	echo -e "\n${HOME}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-#	\cd "${HOME}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-#
-#	if [ -e "${ZBOX}" ] ; then
-#		echo -e "\n${ZBOX}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-#		\cd "${ZBOX}" && git remote -v		>> "${tmpDir}/cmd_output_git_remote.txt"
-#	fi
-#	if [ -e "${OUMISC}" ] ; then
-#		echo -e "\n${OUMISC}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-#		\cd "${OUMISC}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
-#	else
-#		echo "INFO: ${OUMISC} NOT exist, skip"
-#	fi
-#	if [ -e "${OUREPO}" ] ; then
-#		echo -e "\n${OUREPO}"			>> "${tmpDir}/cmd_output_git_remote.txt"
-#		\cd "${OUREPO}" && git remote -v	>> "${tmpDir}/cmd_output_git_remote.txt"
-#	else
-#		echo "INFO: ${OUREPO} NOT exist, skip"
-#	fi
-#
-#	\cd "${HOME}/.vim/bundle" &> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle"
-#	for f in * ; do 
-#		[ ! -d "${f}" ] && continue
-#		echo -e "\n${f}"		>> "${tmpDir}/cmd_output_git_remote.txt"
-#		\cd "${HOME}/.vim/bundle/${f}"	&> /dev/null || echo "ERROR: failed to cd: ${HOME}/.vim/bundle/${f}"
-#		git remote -v			>> "${tmpDir}/cmd_output_git_remote.txt"
-#	done
-#
-#	zip -rjq "${packFile}" "${tmpDir}"/*.txt
-#	## gen exclude cmd part
-#	#ex_fl="$(func_backup_dated_gen_exclude_list "${source}")"
-#	#if [ -s  "${ex_fl}" ] ; then
-#	#	#cmd_ex_part="-x@'${ex_fl}'"				# NO ' inside, otherwise will be part of password!
-#	#	cmd_ex_part="-x@${ex_fl}" 
-#	#fi
-#	## TODO: delete: zip -r "${target}" "${source}" "${cmd_ex_part}" ${cmd_passwd_part} -x .DS_Store
-#
-#	# passwd will be used if available
-#	func_backup_dated "${packFile}"
-#
-#	local final_zip_list="$(mktemp)"
-#	unzip -l "${packFile}" > "${final_zip_list}"
-#	echo "INFO: final pack file list: ${final_zip_list}"
-#
-#	echo "INFO: delete tmp pack file"
-#	rm "${packFile}"
-#	popd &> /dev/null
-#}
-
-################################################################################
-# Deprecated - mydata sync
-################################################################################
-#func_mydata_sync_v2(){
-#
-#	# NOTE_BDTA_1	2023-05 new lapmac2 (the 2019 16 inch) can NOT recognize the 3.5" disk
-#	#		2024-01 use ~exfat-fuse@osx works
-#
-#	# TODO: filter/summary rysnc result: func_rsync_out_filter_dry_run@lib
-#	# TODO: wsl can NOT show utf-8
-#	# TODO: tca/tcb/dta(G2TG)/dtb(MHD500) can be used for other thing?
-#
-#	local mnt_path btca_path bdta_path btca_list bdta_list tcz_path dtz_path mhd500_path dcm_hist_base
-#
-#	if [[ "${HOSTNAME}" == "laptp" ]] ; then	# note: driver is in lowercase in wsl1
-#		mnt_path="/mnt/"
-#		btca_path="${mnt_path}/o"		# 3.5" disk
-#		bdta_path="${mnt_path}/p"		# 3.5" disk
-#		tcz_path="${mnt_path}/r"
-#		dtz_path="${mnt_path}/s"
-#		#mhd500_path 				# laptp not need this
-#	fi
-#
-#	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
-#		mnt_path="/Volumes"
-#		tcz_path="/tmp/tcz"
-#		btca_path="/tmp/btca"			# 3.5" disk
-#		bdta_path="${mnt_path}/bdta"		# 3.5" disk (see ~NOTE_BDTA_1)
-#		dtz_path="${mnt_path}/DTZ"
-#		mhd500_path="${mnt_path}/MHD500"
-#	fi
-#
-#	func_mydata_bi_sync "${btca_path}" "${tcz_path}" "h8 dudu-chuzhong dudu-gaozhong"
-#	func_mydata_bi_sync "${bdta_path}" "${dtz_path}" "gigi zz dudu video"
-#
-#	# only lapmac2 need sync doc (see ~STATUS_A)
-#	if [[ "${HOSTNAME}" == "lapmac2" ]] ; then
-#		[[ -d "${dtz_path}/backup_unison" ]] && func_unison_fs_run
-#		[[ -d "${tcz_path}/backup_rsync"  ]] && func_mydata_sync_doc_rsync "${tcz_path}/backup_rsync"
-#		[[ -d "${btca_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${btca_path}/backup_rsync"
-#		[[ -d "${bdta_path}/backup_rsync" ]] && func_mydata_sync_doc_rsync "${bdta_path}/backup_rsync"
-#	fi
-#
-#	# RULE: DCM_HIST changes should happen in "${dcm_hist_base}" first! 
-#	dcm_hist_base="${bdta_path}/backup_rsync/DCM_HIST/"
-#	if [[ -d "${dcm_hist_base}" ]] ; then
-#		[[ -d "${dtz_path}/backup_unison/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${dtz_path}/backup_unison/DCM_HIST/"
-#		[[ -d "${tcz_path}/backup_rsync/DCM_HIST/"  ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${tcz_path}/backup_rsync/DCM_HIST/"
-#		[[ -d "${btca_path}/backup_rsync/DCM_HIST/" ]] && func_mydata_dcm_hist_sync "${dcm_hist_base}" "${btca_path}/backup_rsync/DCM_HIST/"
-#	fi
-#
-#	[[ "${1}" != "-nofl" ]] && [[ -e "${btca_path}" ]] && func_mydata_gen_fl "${btca_path}" "btca"
-#	[[ "${1}" != "-nofl" ]] && [[ -e "${bdta_path}" ]] && func_mydata_gen_fl "${bdta_path}" "bdta"
-#}
-
-#func_mydata_sync_extra() {
-#	# alone is common extra dir
-#
-#	# only for dir record
-#	local TCZ_EXTRA_LIST="backup_rsync" 
-#	local DTZ_EXTRA_LIST="backup_unison" 
-#}
-#
-#func_mydata_sync_tcatotcz() {
-#	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCA_BASE}" && func_techo WARN "${TCA_BASE} should NOT mount on lapmac2" && return 1
-#
-#	local TCA_SYNC_LIST="h8/actor h8/magzine h8/zptp dudu/course dudu/tv video/tv" 
-#	func_mydata_rsync_with_list "${TCA_BASE}" "${TCZ_BASE}" "${TCA_SYNC_LIST}" 
-#}
-#
-#func_mydata_sync_tcbtotcz() {
-#	[ "${HOSTNAME}" == "lapmac2" ] && func_is_dir_not_empty "${TCB_BASE}" && func_techo WARN "${TCB_BASE} should NOT mount on lapmac2" && return 1
-#
-#	local TCB_SYNC_LIST="h8/t2hh h8/movieRtcb" 
-#	func_mydata_rsync_with_list "${TCB_BASE}" "${TCZ_BASE}" "${TCB_SYNC_LIST}" 
-#}
-#
-#func_mydata_sync_dtatodtz() {
-#	local DTA_SYNC_LIST="dudu/xiaoxue dudu/chuzhong dudu/gaozhong dudu/english"
-#	func_mydata_rsync_with_list "${DTA_BASE}" "${DTZ_BASE}" "${DTA_SYNC_LIST}" 
-#}
-#
-#func_mydata_sync_dtbtodtz() { 
-#	return 1
-#	local DTB_SYNC_LIST="" 
-#	func_mydata_rsync_with_list "${DTB_BASE}" "${DTZ_BASE}" "${DTB_SYNC_LIST}" 
-#}
-#
-#func_mydata_sync_dtztotcz() {
-#	local DTZ_SKIP_LIST="video/documentary"
-#	func_techo info "SKIP: ${DTZ_SKIP_LIST}"
-#
-#	local DTZ_SYNC_LIST="gigi video/course dudu/audio dudu/book dudu/documentary dudu/knowledge dudu/movie zz/talk zz/computer zz/outing"
-#	func_mydata_rsync_with_list "${DTZ_BASE}" "${TCZ_BASE}" "${DTZ_SYNC_LIST}" 
-#}
-#
-#func_mute() {
-#	osascript -e "set volume with output muted"
-#
-#	# Unmute volume
-#	# osascript -e "set volume without output muted"
-#
-#	# check mute status
-#	# osascript -e "output muted of (get volume settings)"
-#}
-#
-#func_mydata_rsync_with_list() {
-#	local src_base="${1}"
-#	local tgt_base="${2}"
-#	local sync_list="${3}"
-#
-#	! df | grep -q "${tgt_base}" && func_techo info "skip ${tgt_base}, since not mount" && return 1
-#	! df | grep -q "${src_base}" && func_techo info "skip ${src_base}, since not mount" && return 1
-#
-#	for d in ${sync_list} ; do
-#		func_complain_path_not_exist "${src_base}/${d}/" && return 1
-#		func_complain_path_not_exist "${tgt_base}/${d}/" && return 1
-#
-#		func_techo INFO       "rsync: ${src_base}/${d}/ -> ${tgt_base}/${d}/"
-#		func_rsync_simple            "${src_base}/${d}/"  "${tgt_base}/${d}/"
-#		func_mydata_rsync_del_detect "${src_base}/${d}/"  "${tgt_base}/${d}/" 
-#	done
-#}
-#
-#func_mydata_out_filter_del() {
-#
-#	# TODO: use func_pipe_remove_lines instead
-#	sed -e  '
-#		# ignore whole dir
-#		/FCZ\/backup_DCS\//d;
-#
-#		# not all dbackup should ignore, so need 3 lines
-#		/deleting FCZ\/backup_dbackup\/$/d;
-#		/deleting FCZ\/backup_dbackup\/2020/d;
-#		/deleting FCZ\/backup_dbackup\/201[0-9]/d;
-#		'
-#}
-#
-#func_mydata_rsync_del_detect() {
-#	local del_list="$(func_rsync_del_detect "$@" | func_mydata_out_filter_del)"
-#
-#	if [ -z "${del_list}" ] ; then 
-#		func_techo INFO "nothing need to delete manually"
-#	else
-#		func_techo WARN "Might NEED TO DELETE MANUALLY IN ${2}"
-#		echo "${del_list}" 
-#	fi
-#}
-#
-#func_mydata_print_summary() {
-#	local tmp_log_file="${1}"
-#
-#	echo -e "\nINFO: ======== FILE NEED MANUAL DELETE ========"
-#	#grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del	# not need, since already filtered
-#	grep '^deleting ' "${tmp_log_file}" | func_mydata_out_filter_del
-#
-#	echo -e "\nINFO: ======== ERROR/WARN NEED HANDLE ========"
-#	sed -n -e '/ ERROR: /Ip;/ WARN: /Ip;/^rsync: /p;/^rsync error: /p;' "${tmp_log_file}"
-#
-#	echo -e "\nINFO: detail log: ${tmp_log_file}"
-#}
-#
-#func_mydata_dcm_hist_sync() {
-#	func_info "DCM_HIST RSYNC: ${1} --> ${2}"
-#	func_rsync_ask_then_run "${1}" "${2}" | sed -e 's/^/\t/;'
-#}
-#

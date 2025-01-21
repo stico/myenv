@@ -65,7 +65,7 @@ func_date_in_dati() {
 func_info()         { func_techo "INFO"  "$@" ; }
 func_warn()         { func_techo "WARN"  "$@" ; }
 func_error()        { func_techo "ERROR" "$@" ; }
-func_debug()        { [ "${ME_DEBUG}" = 'true' ] && func_techo "DEBUG" "$@" ; }
+func_debug()        { [[ "${ME_DEBUG}" == 'true' ]] && func_techo "DEBUG" "$@" ; }
 func_warn_stderr()  { func_warn  "$@" 1>&2 ; }
 func_error_stderr() { func_error "$@" 1>&2 ; }
 func_debug_stderr() { func_debug "$@" 1>&2 ; }
@@ -132,23 +132,22 @@ func_param_check() {
 	local self_warn="Warn: (YOU SCRIPT HAS BUG) might be: \n\t1) NOT provide <count> or any <string> \n\t2) called ${FUNCNAME[0]} but actually not need to check" 
 	[ $# -lt 1 ] && func_die "${self_warn}\n${self_desc}\n${self_usage}\n"	
 	
-	local count=$1
+	local error_msg count
+	count="${1}"
 	shift
 
-	# shellcheck disable=2015
-	[[ "${count}" =~ ^[-]*[0-9]+$ ]] && (( count > 0 )) || func_die "ERROR: <count> of ${FUNCNAME[0]}, must be a positive number"
+	error_msg="${desc}\n${usage}\n"
+	#[[ "${count}" =~ ^[-]*[0-9]+$ ]] && (( count > 0 )) || func_die "ERROR: <count> of ${FUNCNAME[0]}, must be a positive number"
+	[[ "${count}" =~ ^[-]*[0-9]+$ ]] && (( count > 0 )) || error_msg="${error_msg}\nERROR: <count> of ${FUNCNAME[0]}, must be a positive number"
 
 	# do NOT call func_is_str_blank here, which cause infinite loop and "Segmentation fault: 11"
-	local error_msg="${desc}\n${usage}\n"
-	[ -z "${error_msg//[[:blank:]\\n]}" ] && error_msg="ERROR: parameter counts less than expected (expect ${count}), and desc/usage NOT defined."
+	[ -z "${error_msg//[[:blank:]\\n]}" ] && error_msg="ERROR: param counts < expected (${count}), and desc/usage NOT defined."
 
 	# real parameter check
 	if [ $# -lt "${count}" ] ; then
-		[[ "${PARAM_COMPLAIN}" != 'true' ]] && func_die "${error_msg}"
-
-		# complain instead of die, return 0 means complained/error (as other func_complain_xxx do)
 		echo -e "${error_msg}" 1>&2
-		return 0
+		[[ "${PARAM_COMPLAIN}" == 'true' ]] && return 0
+		exit 1
 	fi
 	return 1
 }
@@ -886,7 +885,7 @@ func_complain_path_not_exist() {
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
 	func_param_check 1 "$@"
 	
-	func_is_str_blank "${1}" && func_error_stderr "${FUNCNAME[0]}: parameter is blank!" && return 0
+	func_is_str_blank "${1}" && func_error_stderr "${FUNCNAME[0]}: path param blank!" && func_script_stacktrace && return 0
 	[ ! -e "${1}" ] && func_error_stderr "${2:-WARN: path ${1} NOT exist}" && return 0
 	return 1
 }
@@ -1395,6 +1394,13 @@ func_script_base_of_parent() {
 	local desc="Desc: get parent dir of current script" 
 
 	func_script_base "/../"
+}
+
+func_script_stacktrace() { 
+	local i=1 line file func 
+	while read -r line func file < <(caller "${i}"); do
+		echo "[$((++i))] ${file}:${line}:${func}(): $(sed -n "${line}"p "${file}")" >&2 
+	done
 }
 
 func_is_non_interactive() {
