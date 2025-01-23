@@ -74,6 +74,7 @@ elec=$MY_DCO/electronic/electronic.txt
 
 # DCC - notes
 win=$MY_DCC/windows/windows.txt
+dudu=$MY_DCM/personal/dudu/dudu.txt
 calculus=$MY_DCC/math/calculus.txt
 geometry=$MY_DCC/math/geometry.txt
 linear_algebra=$MY_DCC/math/linear_algebra.txt
