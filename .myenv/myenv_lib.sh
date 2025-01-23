@@ -591,10 +591,9 @@ func_combine_lines() {
 		esac
 	done
 
-	# CRLF line terminators need to convert
+	# DOS(CRLF结尾)格式会导致输出不正常，下面用sed预处理，注: 匹配中的^M，不会对linux/mac格式的文本文件产生影响，是安全的
 	# PIPE_CONTENT_GOES_HERE. Old: 'NR%3{printf "%s,",$0;next;}{print $0}' "${input}" > "${tmp_csv_merge}"
-	func_del_blank_hash_lines "$@" \
-	| sed 's/$//' \
+	func_del_blank_hash_lines "$@" | sed 's/$//' \
 	| awk -v begin="${begin}" -v end="${end}" -v sep="${sep}" -v count="${count}" \
 		'NR%count {
 			# (count-1)th lines goes here
