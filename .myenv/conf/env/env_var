@@ -30,6 +30,7 @@ MY_ENV		%HOME%.myenv
 MY_TMP		%HOME%amp
 MY_BLOG		%HOME%Documents#FCS#oublog#oublog-git#_posts
 MY_DEMO		%HOME%Documents#FCS#oumisc#oumisc-git#demo
+MY_ICLOUD	%HOME%/Library/Mobile\\ Documents/com~apple~CloudDocs/PERSONAL
 
 ZBOX		%HOME%#.zbox
 OUMISC		%HOME%#Documents#FCS#oumisc#oumisc-git

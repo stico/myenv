@@ -80,6 +80,8 @@ geometry=$MY_DCC/math/geometry.txt
 linear_algebra=$MY_DCC/math/linear_algebra.txt
 lc=$MY_DCC/coding/leetcode/README.txt
 leetcode=$MY_DCC/coding/leetcode/README.txt
+voc=$HOME/Library/Mobile\ Documents/com~apple~CloudDocs/PERSONAL/dudu/English/vocabulary
+vocabulary=$HOME/Library/Mobile\ Documents/com~apple~CloudDocs/PERSONAL/dudu/English/vocabulary
 
 # DCD
 rank=$MY_DCD/jury/jury_rank/rank.txt

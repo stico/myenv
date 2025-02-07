@@ -91,26 +91,31 @@ func_find_big_files() {
 
 func_find_big_dir() {
 	# 说明: 这个函数主要是记录一下可能不经常查看，但可能很占用空间的目录
-	local i p size size_hm not_found
+	local i p size size_hm not_found tmpf
 	declare -A paths_to_check
 
 	# 注意: 微信聊天记录备份，目前中有版本号，可能经常要改
+	paths_to_check['amp_data']="${HOME}/amp/data"
+	paths_to_check['amp_delete']="${HOME}/amp/delete"
+	paths_to_check['download']="${HOME}/amp/download"
 	paths_to_check['VMWARE虚拟机']="${HOME}/Virtual Machines.localized/"
 	paths_to_check['Iphone全量备份']="${HOME}/Library/Application Support/MobileSync/Backup"
 	paths_to_check['WX聊天记录备份']="${HOME}/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/Backup/"
 
+	tmpf="$(mktemp)"
 	for i in "${!paths_to_check[@]}"; do
 		p="${paths_to_check[$i]}" 
 		[[ ! -e "${p}" ]] && not_found="${not_found}, ${i}" && continue
 
 		size="$(func_path_size "${p}")"
-		(( size < 1000000000 )) && continue	# < 1G
+		[[ "${size}" -lt 1000000000 ]] && continue	# < 1G
 
-		echo -e "$(func_num_to_human_IEC "${size}")\t${i}\t${p}"
+		echo -e "$(func_num_to_human_IEC "${size}")\t${i}\t\t$(func_str_trunc "${p/${HOME}/\${HOME\}}" 28)" >> "${tmpf}"
 	done
 
-	echo -e "---\t部分目录未找到\t${not_found#, }"
-	echo -e "---\t部分目录未检查\t~/Documents/*, ~/amp/*, ~/download"
+	sort -hr "${tmpf}"
+	echo -e "---\t目录不存在 (list)\t${not_found#, }"
+	echo -e "---\t目录未检查 (list)\t~/Documents/*, ~/amp/, ~/download"
 }
 
 func_find_non_utf8_in_content() {
@@ -427,7 +432,7 @@ func_fullpath() {
 		path="${1}"
 	fi
 
-	local fullpath="$(readlink -f "${path}")"
+	local fullpath="$(readlink -f "${path}" | sed -e "s+${HOME}/Documents/DC+\$MY_DC+")"
 
 	if func_is_personal_machine ; then
 		if func_is_os_osx ; then

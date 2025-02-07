@@ -89,7 +89,11 @@ func_techo() {
 	
 	local level="${1}"
 	shift
-	echo -e "$(date "+%Y-%m-%d %H:%M:%S") ${level^^} $*"
+	if [[ "${ME_LOG_S}" = true ]] ; then
+		echo -e "${level^^} $*"
+	else
+		echo -e "$(date "+%Y-%m-%d %H:%M:%S") ${level^^} $*"
+	fi
 }
 
 func_die() {
@@ -565,12 +569,20 @@ func_del_pattern_lines() {
 ################################################################################
 # Text_Process (also see ~Pattern_Matching )
 ################################################################################
+func_count_dup_lines() {
+	local usage="Usage: ${FUNCNAME[0]} <file>"
+	local desc="Desc: count dup lines, output count (>1) and content"
+
+	# PIPE_CONTENT_GOES_HERE
+	sort "$@" | uniq -c | sed -e '/^\s*1\s/d;s/^\s*//' | sort -n
+}
+
 func_merge_lines() { func_combine_lines "$@"; }
 func_combine_lines() {
 	local usage="Usage: <OTHER_CMD> | ${FUNCNAME[0]} -b <begin_str> -e <end_str> -s <sep_str> -n <n, default: 2> [file]"
 	local desc="Desc: combine [n] (default is 2) not-blank-or-hash lines into 1 line: <begin_str><LINE-CONTENT><end_str><sep_str>..."
 
-	# check getopt verison (need 
+	# check getopt verison
 	getopt --test
 	[[ "$?" != 4 ]] && func_warn_stderr "getopt is NOT util-linux version, pls check"
 
@@ -2179,6 +2191,26 @@ func_str_contains_blank() {
 		func_is_str_blank "${str}" && return 0
 	done 
 	return 1
+}
+
+func_str_trunc() {
+	local usage="Usage: ${FUNCNAME[0]} <str> <max_len>"
+	local desc="Desc: if str len > max_len (range: 3-100, default: 18), change to xxx... style"
+	func_param_check 1 "$@"
+	
+	local str max_len
+	str="${1}"
+	max_len="${2:-18}"
+
+	# in case out of range, always out put 3 dot
+	! func_is_int_in_range "${max_len}" 3 500 && echo "..." && return 1
+
+	# truncate
+	if [[ "${str}" == "${str:0:${max_len}}" ]] ; then
+		echo "${str}" 
+	else
+		echo "${str:0:$((max_len - 3))}..."
+	fi
 }
 
 func_str_urldecode() { 

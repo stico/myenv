@@ -934,12 +934,12 @@ endif
 "onoremap <C-A> <C-C>gggH<C-O>G
 "snoremap <C-A> <C-C>gggH<C-O>G
 "xnoremap <C-A> <C-C>ggVG
-"
-"
+
 """""""""""""""""""""""""""""" H1 - Plugins
 """""""" vim-easymotion@vim
 let g:EasyMotion_smartcase = 1
-nmap e <Plug>(easymotion-s)
+nmap , <Plug>(easymotion-s)
+inoremap ,, <ESC><Plug>(easymotion-s)
 
 """""""" vim-islime2@vim
 let g:islime2_29_mode=1
