@@ -97,6 +97,7 @@ func_find_big_dir() {
 	# 注意: 微信聊天记录备份，目前中有版本号，可能经常要改
 	paths_to_check['amp_data']="${HOME}/amp/data"
 	paths_to_check['amp_delete']="${HOME}/amp/delete"
+	paths_to_check['VBOX虚拟机']="${HOME}/VirtualBox VMs/"
 	paths_to_check['VMWARE虚拟机']="${HOME}/Virtual Machines.localized/"
 
 	paths_to_check['(注意: TM会备份) Downloads']="${HOME}/Downloads"
