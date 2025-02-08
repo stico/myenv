@@ -97,10 +97,11 @@ func_find_big_dir() {
 	# 注意: 微信聊天记录备份，目前中有版本号，可能经常要改
 	paths_to_check['amp_data']="${HOME}/amp/data"
 	paths_to_check['amp_delete']="${HOME}/amp/delete"
-	paths_to_check['download']="${HOME}/amp/download"
 	paths_to_check['VMWARE虚拟机']="${HOME}/Virtual Machines.localized/"
-	paths_to_check['Iphone全量备份']="${HOME}/Library/Application Support/MobileSync/Backup"
-	paths_to_check['WX聊天记录备份']="${HOME}/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/Backup/"
+
+	paths_to_check['(注意: TM会备份) Downloads']="${HOME}/Downloads"
+	paths_to_check['(注意: TM会备份) Iphone全量备份']="${HOME}/Library/Application Support/MobileSync/Backup"
+	paths_to_check['(注意: TM会备份) WX聊天记录备份']="${HOME}/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/Backup/"
 
 	tmpf="$(mktemp)"
 	for i in "${!paths_to_check[@]}"; do
@@ -116,6 +117,11 @@ func_find_big_dir() {
 	sort -hr "${tmpf}"
 	echo -e "---\t目录不存在 (list)\t${not_found#, }"
 	echo -e "---\t目录未检查 (list)\t~/Documents/*, ~/amp/, ~/download"
+
+	# 附加检查，因为备份时 ~time_machine@osx 忽略了 ~/amp ，但它下面的一些目录又有必要备份，所以需要检查。
+	# 
+	! [[ -L "${HOME}/amp/download" ]] && echo "ERROR: !!! ${HOME}/amp/download !!! MUST BE a link !!!"
+	! [[ -L "${HOME}/amp/workspace" ]] && echo "ERROR: !!! ${HOME}/amp/workspace !!! MUST BE a link !!!"
 }
 
 func_find_non_utf8_in_content() {
@@ -3052,7 +3058,7 @@ func_mydata_clean_up() {
 	local f src tgt base trash line fl_del_alone fl_del_computer
 	base="${1}"
 	trash="${base}/alone/trash_for_clean_up"
-	fl_del_computer="${HOME}/amp/data/mydata/fl_delete"
+	fl_del_computer="${MY_ENV}/zgen/mydata/fl_delete"
 
 	[[ -d "${base}" ]] || return 0
 	func_complain_path_not_exist "${fl_del_computer}" "INFO: skip, since fl_del not found." && return 0
@@ -3129,7 +3135,7 @@ func_mydata_gen_fl(){
 	base="${1}"
 	specified_name="${2}"
 	fl_record="${base}/alone/fl_record"
-	fl_latest="${HOME}/amp/data/mydata/fl_latest"
+	fl_latest="${MY_ENV}/zgen/mydata/fl_latest"
 
 	func_info "gen filelist for: ${base}"
 	func_complain_path_not_exist "${base}" && return
