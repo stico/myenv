@@ -46,8 +46,6 @@
 # INCLUDE: DIR: need 2 line for each dir
 !/.fonts/
 !/.fonts/*
-!/.iterm2/
-!/.iterm2/*
 !/.screenlayout/
 !/.screenlayout/*
 !/.xbindkeysrc.d
@@ -60,6 +58,11 @@
 #!/.vim/*
 #!/vimfiles/
 #!/vimfiles/*
+
+# iterm config need exclude, other files need sync
+!/.iterm2/
+!/.iterm2/backup/*
+!/.iterm2/README.txt
 
 # INCLUDE: DIR: not all files inside
 !/.pip/
