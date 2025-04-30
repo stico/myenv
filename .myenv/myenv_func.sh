@@ -3051,6 +3051,12 @@ func_mydata_sync_v3(){
 	if [[ "${1}" != "-nofl" ]] ; then
 		for base in "${tcz_path}" "${dtz_path}" "${btca_path}" "${bdta_path}" ; do
 			func_mydata_gen_fl "${base}"
+
+			# TMP: for manual gen fl
+			#func_mydata_gen_fl "/tmp/btca"
+			#func_mydata_gen_fl "${mnt_path}/bdta"
+			#func_mydata_gen_fl "/tmp/tcz"
+			#func_mydata_gen_fl "${mnt_path}/DTZ"
 		done
 	fi
 }

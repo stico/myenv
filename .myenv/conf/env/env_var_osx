@@ -10,6 +10,7 @@ PATH		/usr/local/bin
 PATH		/opt/X11/bin
 PATH		/opt/local/bin
 PATH		/opt/local/sbin
+PATH		%HOME%.local/bin
 
 		# ~rvictl@osx
 #PATH		/Library/Apple/usr/bin/
