@@ -360,6 +360,7 @@ let g:rubycomplete_classes_in_global = 1
 
 
 """""""""""""""""""""""""""""" H1 - Mapping - Misc
+noremap <D-r> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
 noremap <F11> :!source $MY_ENV/myenv_func.sh; func_run_file %:p:gs?\\?/?<Enter>
 noremap <F12> :!source $MY_ENV/myenv_func.sh; func_run_file_format_output %:p:gs?\\?/?<Enter>
 

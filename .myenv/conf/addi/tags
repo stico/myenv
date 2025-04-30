@@ -3,7 +3,6 @@ amp=$MY_TMP
 tmp=$MY_TMP
 dl=$MY_TMP/download
 jump=$MY_DCD/ops/jump
-ws=$MY_TMP/workspace
 md=$MY_ENV/zgen/mydata/fl_latest
 mydata=$MY_ENV/zgen/mydata/fl_latest
 vimrc=$HOME/.vimrc
@@ -11,9 +10,10 @@ oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 icloud=$HOME/Library/Mobile\ Documents/com~apple~CloudDocs/PERSONAL/
 
 # Workspace
+ws=$HOME/workspace
 ry=$MY_DCC/ruoyi/ruoyi.txt
-ryws=$MY_TMP/workspace/ruoyi
-rysc=$MY_TMP/workspace/ruoyi/script
+ryws=$HOME/workspace/ruoyi
+rysc=$HOME/workspace/ruoyi/script
 
 # DW
 dw=$MY_FCZ/dw
@@ -23,6 +23,8 @@ dwcode=$MY_FCZ/dw/code/update.sh
 dwcodeconf=$MY_DCD/note/dwcodeaddr.sh
 parkes=$MY_FCZ/dw/code/misc/parkes-framework/
 luoxi=$MY_DCD/aimr/aimr.txt
+dr=$MY_DCD/yy/z/2025-03_数据重建/note.txt
+wsdr=$HOME/workspace/2025-03_数据重建-ws/
 
 # ZBOX
 zb=$ZBOX
