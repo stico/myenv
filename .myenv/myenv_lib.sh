@@ -1073,6 +1073,14 @@ func_find_loop_f() {
 	done < <(find "${path}" -type f -print0)
 }
 
+func_find_latest() {
+	local usage="Usage: ${FUNCNAME[0]} <find_opts>"
+	local desc="Desc: find result, (inc) sort by last-modify-time"
+	func_param_check 2 "$@"
+
+	find "$@" -printf "%T@ %p\n" | sort -n | cut -d' ' -f2-
+}
+
 ################################################################################
 # File transfer
 ################################################################################
