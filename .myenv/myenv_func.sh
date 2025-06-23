@@ -3091,11 +3091,25 @@ func_mydata_clean_up() {
 	done
 }
 
+func_mydata_sync_opts() {
+	local ex_file doc_ex_base
+
+	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
+	func_complain_path_not_exist "${doc_ex_base}" && return 1
+
+	ex_file="${doc_ex_base}/exclude_${1}.txt"
+	if [[ -r "${ex_file}" ]] ; then
+		echo "--exclude-from=${ex_file}"
+	else
+		echo "WARN: no exclude config found: ${ex_file}" 1>&2
+	fi
+}
+
 func_mydata_bi_sync() {
 	func_param_check 3 "$@"
 	func_is_str_blank "${3}" && func_die "NO sync list (sub dir) provided"
 
-	local sync_item a b
+	local sync_item a b opts
 	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
 		func_info "SKIP: ${1} <-> ${2}"
 		return
@@ -3110,24 +3124,24 @@ func_mydata_bi_sync() {
 		func_complain_path_not_exist "${b}" && continue
 
 		func_info "BI-RSYNC: ${a} <-> ${b}"
-		func_rsync_ask_then_run "${a}" "${b}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
-		func_rsync_ask_then_run "${b}" "${a}" | sed -e 's/^/\t/;'
+		opts="$(func_mydata_sync_opts "${d}")"
+		func_rsync_ask_then_run "${a}" "${b}" "${opts}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
+		func_rsync_ask_then_run "${b}" "${a}" "${opts}" | sed -e 's/^/\t/;'
 	done
 }
 
 func_mydata_sync_doc_rsync() {
-	local d target opts doc_ex_base src tgt
-	doc_ex_base="${MY_DCC}/rsync/script/doc_bak"
+	local d target opts src tgt
 
 	target="${1}"
 	func_complain_path_not_exist "${target}" && return 1
-	func_complain_path_not_exist "${doc_ex_base}" && return 1
 
 	# NOT in list: XXX_HIST & DCM_TODO
 	for d in DCB DCC DCD DCJ DCM DCO FCS FCZ ; do
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
 
-		opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
+		opts="$(func_mydata_sync_opts "${d}")"
+		#opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
 		src="${MY_DOC}/${d}/"
 		tgt="${target}/${d}/"
 
@@ -3155,12 +3169,13 @@ func_mydata_gen_fl(){
 	func_gen_filelist_with_size "${base}" "${fl_file}"
 
 	# remove useless lines
+	# TODO: DCM_HIST: better to have dir list
 	sed -i -e "
-		/\.\(Trashes\|fseventsd\|Spotlight-V100\)\//d;
+		/\.\(Trashes\|fseventsd\|Spotlight-V100\|.DS_Store\)\//d;
 		/\/FCS\//d;
 		/\/DCD\/mail\//d;
 		/\/DCC\/coding\/leetcode\//d;
-		/\/DCM.*\.\(gif\|jpg\|jpeg\|svg\|webp\|bmp\|png\|tiff\|tif\|heic\|aae\|mp4\|mov\|m4a\)/Id;
+		/\/DCM_HIST.*\.\(gif\|jpg\|jpeg\|svg\|webp\|bmp\|png\|tiff\|tif\|heic\|aae\|mp4\|mov\|m4a\|plist\)/Id;
 		" "${fl_file}"
 
 	cp "${fl_file}" "${fl_latest}"
