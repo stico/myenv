@@ -3124,9 +3124,9 @@ func_mydata_bi_sync() {
 		func_complain_path_not_exist "${b}" && continue
 
 		func_info "BI-RSYNC: ${a} <-> ${b}"
-		opts="$(func_mydata_sync_opts "${d}")"
-		func_rsync_ask_then_run "${a}" "${b}" "${opts}" | sed -e 's/^/\t/;'	# add leading tab to improve output readability
-		func_rsync_ask_then_run "${b}" "${a}" "${opts}" | sed -e 's/^/\t/;'
+		opts="$(func_mydata_sync_opts "${sync_item}")"
+		func_rsync_ask_then_run "${a}" "${b}" ${opts:+"${opts}"} | sed -e 's/^/\t/;'	# add leading tab to improve output readability
+		func_rsync_ask_then_run "${b}" "${a}" ${opts:+"${opts}"} | sed -e 's/^/\t/;'	# TIPS_not_pass_empty_param@bash
 	done
 }
 
@@ -3134,6 +3134,7 @@ func_mydata_sync_doc_rsync() {
 	local d target opts src tgt
 
 	target="${1}"
+	func_info "start doc sync, params: $*"
 	func_complain_path_not_exist "${target}" && return 1
 
 	# NOT in list: XXX_HIST & DCM_TODO
@@ -3141,13 +3142,12 @@ func_mydata_sync_doc_rsync() {
 		func_complain_path_not_exist "${MY_DOC}/${d}" && continue
 
 		opts="$(func_mydata_sync_opts "${d}")"
-		#opts="--exclude-from=${doc_ex_base}/exclude_${d}.txt" 
 		src="${MY_DOC}/${d}/"
 		tgt="${target}/${d}/"
 
 		# rsync cares the last "/", should be the same, better ending with "/"
 		func_info "DOC-RSYNC: ${src} -> ${tgt}"
-		func_rsync_ask_then_run "${src}" "${tgt}" "${opts}"
+		func_rsync_ask_then_run "${src}" "${tgt}" ${opts:+"${opts}"}			# TIPS_not_pass_empty_param@bash
 	done
 }
 

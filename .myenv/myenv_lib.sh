@@ -1126,6 +1126,27 @@ func_download_wget() {
 	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
 }
 
+func_download_curl() {
+	# TODO: NOT fully tested
+	
+	local usage="Usage: ${FUNCNAME[0]} <url> <target_file>"
+	local desc="Desc: download using curl: A) fail silently for 4xx/5xx. B) otherwise, store html to tmp file "
+	func_param_check 2 "$@"
+
+	local url target_file http_code exit_status
+	url="${1}"
+	[[ -n "${2}" ]] && target_file="${2}" || target_file="$(mktemp)"
+
+	# use -w to get http_code (content always go into file)
+	# -f: Fail silently (no output at all) on server errors (4xx/5xx)
+	http_code="$(curl -s -f -w '%{http_code}\n' -o "${target_file}" "${url}")"
+	exit_status="$?"
+
+	echo "DEBUG: ${FUNCNAME[0]}: http_code: ${http_code}, exit_status: ${exit_status}, url: ${url}" 1>&2
+	# explicitly return exit_status of curl
+	return "${exit_status}"
+}
+
 func_log() {
 	local usage="Usage: ${FUNCNAME[0]} <level> <prefix> <log_path> <str>" 
 	func_param_check 4 "$@"
@@ -1211,14 +1232,14 @@ func_uncompress() {
 
 	"cd" - &> /dev/null || func_die "ERROR: failed to cd back to previous dir"
 }
-
+	
 # shellcheck disable=2086
 func_rsync_ask_then_run() {
 	local usage="Usage: ${FUNCNAME[0]} <src> <tgt> <add_options>" 
 	local desc="Desc: rsync between source and target (including --delete), ask before run: --dry-run > show result > run" 
 	[ $# -lt 2 ] && echo -e "${desc} \n ${usage} \n" && exit 1
 
-	local tmp_file_1 opt_del rsync_stat_str_1 rsync_stat_str_2 rsync_stat_str_3
+	local tmp_file_1 rsync_stat_str_1 rsync_stat_str_2 rsync_stat_str_3
 	tmp_file_1="$(mktemp)"
 	
 	func_rsync_simple "$@" --stats --dry-run --delete > "${tmp_file_1}"
@@ -1236,11 +1257,14 @@ func_rsync_ask_then_run() {
 	# show brief and ask
 	func_rsync_out_brief "${tmp_file_1}" 
 	sleep 1
-	echo "INFO: there are changes for: ${1} -> ${2}"
-	echo "INFO: detail log: ${tmp_file_1} ( $(func_file_lines "${tmp_file_1}" lines ) )"
+	echo "INFO: changes found for: ${1} -> ${2}"
+	echo "INFO: detail log: ${tmp_file_1} ( $(func_file_lines "${tmp_file_1}" ) lines )"
 	func_ask_yes_or_no "Do you want to run (y/n)?" || return 1 
-	[[ "$*" = *--delete* ]] || opt_del="--delete"
-	func_rsync_simple "$@" ${opt_del}
+	if [[ "$*" = *--delete* ]] ;then
+		func_rsync_simple "$@" --delete
+	else
+		func_rsync_simple "$@"
+	fi
 }
 
 # shellcheck disable=2086
@@ -1290,6 +1314,7 @@ func_rsync_out_brief() {
 	awk -v del_count="${del_count}" '
 	BEBIN {}
 
+		/^rsync error:/ { print; next; }		# reserve rysnc error
 		/DEBUG|INFO|WARN|ERROR/ { print; next; }	# reserve log lines
 
 		/\/$/ { next; }					# remove dirs in output, which not really will change
@@ -2091,6 +2116,19 @@ func_is_str_empty() {
 	[ -z "${1}" ] && return 0 || return 1
 }
 
+func_is_str_single_printable() {
+	local usage="Usage: ${FUNCNAME[0]} <string>"
+	local desc="Desc: check if string is single char/unicode" 
+	func_param_check 1 "$@"
+	local input_string="$1"
+	
+	# check length, then check type: [[:graph:]] for printable (or use [[:alpha:]] / [[:punct:]] )
+	[[ "${#input_string}" -eq 1 ]] && [[ "${input_string}" =~ [[:graph:]] ]] && return 0
+
+	# otherwise
+	return 1
+}
+
 func_is_str_digit() {
 	local usage="Usage: ${FUNCNAME[0]} <string>"
 	local desc="Desc: check if string contains only digit, return 0 if yes, otherwise 1" 
@@ -2219,6 +2257,18 @@ func_str_trunc() {
 	else
 		echo "${str:0:$((max_len - 3))}..."
 	fi
+}
+
+func_str_to_unicode() {
+	local usage="Usage: ${FUNCNAME[0]} <str>"
+	local desc="Desc: convert str to unicode form, e.g. 'AB' to 'u41u42', '你好' to 'u4f60u597d'"
+	func_param_check 1 "$@"
+	
+	local char
+	for (( i=0; i<"${#1}"; i++ )); do
+		char="${1:${i}:1}"
+		printf "u%x" "'$char"
+	done
 }
 
 func_str_urldecode() { 

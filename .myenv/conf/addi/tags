@@ -70,6 +70,7 @@ mm=$MY_DCC/multimedia/multimedia.txt
 js=$MY_DCC/javascript/javascript.txt
 geo=$MY_DCC/geography/geography.txt
 k8s=$MY_DCC/kubernetes/kubernetes.txt
+pp=$MY_DCC/machinelearning/prompt/default.txt
 ml=$MY_DCC/machinelearning/machinelearning.txt
 cs=$MY_DCC/computer_system/computer_system.txt
 ca=$MY_DCC/computer_architecture/computer_architecture.txt
@@ -78,7 +79,7 @@ elec=$MY_DCO/electronic/electronic.txt
 
 # DCC - notes
 win=$MY_DCC/windows/windows.txt
-dudu=$MY_DCM/personal/dudu/dudu.txt
+dudu=$MY_DCM/Family/dudu/dudu.txt
 dudutmp=$HOME/amp/dudu/
 calculus=$MY_DCC/math/calculus.txt
 geometry=$MY_DCC/math/geometry.txt

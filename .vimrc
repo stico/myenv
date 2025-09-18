@@ -714,6 +714,53 @@ function! s:OuDimInactiveWindows()
 endfunction
 
 """ OuCopyToClipboard: copy to clipboard instead of register, support BOTH count and motion
+""" NOTE: 3myj get 2 lines, my3j get 4 lines, so just always use my<motion>
+if has('clipboard')
+  function! s:CopyToClipboard(str)
+    let @+ = a:str
+    "echo "COPY TO CLIPBOARD: " . a:str
+    "return a:str
+  endfunction
+  call MapAction('CopyToClipboard','my')
+endif
+
+" 自定义 mm 操作，(整行) 复制当前行（或多行），并去除行首空白，然后放入系统剪贴板
+if has('clipboard')
+  " 定义一个函数来处理文本并放入剪贴板
+  function! TrimAndYankToClipboard(motion, count) abort
+    let l:start_line = line('.')
+    let l:end_line = line('.') + a:count - 1
+    " 获取指定行的内容列表
+    let l:lines = getline(l:start_line, l:end_line)
+    " 对每一行进行处理：使用 substitute() 去除行首空白
+    let l:trimmed_lines = map(l:lines, 'substitute(v:val, "^\\s*", "", "")')
+    " 将处理后的内容连接成一个字符串，并放入系统剪贴板
+    " @+ 是系统剪贴板寄存器
+    let @+ = join(l:trimmed_lines, "\n") . "\n"
+    echomsg "Yanked " . a:count . " lines (trimmed) to system clipboard."
+  endfunction
+
+  " 映射 mm 操作
+  " <Plug>(TrimmedYank) 是一种特殊的映射，用于传递参数和执行函数
+  nnoremap <silent> mm :<C-u>call TrimAndYankToClipboard('y', v:count1)<CR>
+  " 如果需要带数字前缀，例如 5mm
+  onoremap <silent> mm <Plug>(TrimmedYank)
+  vnoremap <silent> mm <Plug>(TrimmedYank)
+  xnoremap <silent> mm <Plug>(TrimmedYank)
+endif
+
+""" copied from vimrc_example.vim, see comments there
+if has("autocmd") && !exists("autocommands_loaded")
+	let autocommands_loaded = 1
+	" add to a group, and clean the previous cmds
+	augroup vimrcEx							
+		au!
+		" goto the last position last edit before quit
+		autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+	augroup END
+endif
+
+
 """ TODO: sort following stuff
 " Copied from http://vim.wikia.com/wiki/Act_on_text_objects_with_custom_functions which adapted from unimpaired.vim by Tim Pope.
 function! s:DoAction(algorithm,type)
@@ -787,26 +834,6 @@ function! s:ComputeMD5(str)
   return out
 endfunction
 call MapAction('ComputeMD5','<leader>M')
-""" NOTE: 3myj get 2 lines, my3j get 4 lines, so just always use my<motion>
-function! s:CopyToClipboard(str)
-  let @+ = a:str
-  "echo "COPY TO CLIPBOARD: " . a:str
-  "return a:str
-endfunction
-call MapAction('CopyToClipboard','my')
-call MapAction('CopyToClipboard','mm')
-
-""" copied from vimrc_example.vim, see comments there
-if has("autocmd") && !exists("autocommands_loaded")
-	let autocommands_loaded = 1
-	" add to a group, and clean the previous cmds
-	augroup vimrcEx							
-		au!
-		" goto the last position last edit before quit
-		autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-	augroup END
-endif
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SETTING CANDIDATE "  
