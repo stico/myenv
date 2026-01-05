@@ -720,6 +720,7 @@ if has('clipboard')
     let @+ = a:str
     "echo "COPY TO CLIPBOARD: " . a:str
     "return a:str
+    echomsg "Yanked to system clipboard."
   endfunction
   call MapAction('CopyToClipboard','my')
 endif
