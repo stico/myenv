@@ -1231,6 +1231,23 @@ func_grep_cmd() {
 	eval "$@" | grep -i "$search_str"
 }
 
+func_wl() {
+	local desc="Desc: count lines of file or grep result" 
+	local usage="Usage: ${FUNCNAME[0]} [regex] <file>" 
+
+	# PIPE_CONTENT_GOES_HERE. Typical usage: <cmd> | wl
+	if [[ "$#" -eq 0 ]] ;then
+		wc -l
+		return
+	fi
+
+	if func_is_file_type_text "${1}" ; then
+		wc -l "$@"
+	else
+		grep -c "$@"
+	fi
+}
+
 func_head() {
 	local usage="Usage: ${FUNCNAME[0]} [show_lines] [text]" 
 	func_param_check 2 "$@"

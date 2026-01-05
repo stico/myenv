@@ -1058,19 +1058,22 @@ func_gen_filesize_list_single() {
 }
 
 func_find_loop_f() {
-	local usage="Usage: ${FUNCNAME[0]} <path> <function_name>"
+
+	# 注意: 参数顺序变过一次: 把<function_name>放在第一个，这样后面可以跟find的更多参数
+	local usage="Usage: ${FUNCNAME[0]} <function_name> <path> <more_find_cmd_param>"
 	local desc="Desc: run <function_name> for each file (xargs or -exec NOT support <function_name>)"
 	func_param_check 2 "$@"
 
 	local path file func
+	func="${1}"
+	shift
 	path="${1}"
-	func="${2}"
 	func_complain_path_inexist "${path}" && return 1
 	func_complain_func_inexist "${func}" && return 1
 
 	while IFS= read -r -d '' file ; do
 		 "${func}" "${file}"
-	done < <(find "${path}" -type f -print0)
+	done < <(find "$@" -type f -print0)
 }
 
 func_find_latest() {
