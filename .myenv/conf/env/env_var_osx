@@ -1,19 +1,29 @@
-		# NOTE: (deprecated, NOT work on Big Sur) if need specific version: "/usr/libexec/java_home -v 1.7"
-JAVA_HOME	$(/usr/libexec/java_home -V 2>&1 | sed -e '/ \/Lib/!d;/Internet Plug-Ins/d;s/[^\/]*//;' | grep 1.8)
-
-PATH		JAVA_HOME
-PATH		/bin
-PATH		/sbin
-PATH		/usr/bin
 PATH		/usr/sbin
 PATH		/usr/local/bin
-PATH		/opt/X11/bin
-PATH		/opt/local/bin
-PATH		/opt/local/sbin
 PATH		%HOME%.local/bin
 
-		# ~rvictl@osx
+# Already add in .bashrc for osx (which is too late here)
+#PATH		/bin
+#PATH		/usr/bin
+
+# unnecessary, only contains some useless cmd
+#PATH		/sbin
+
+#######################################################################
+# deprecated 
+#######################################################################
+
+# NOTE: (deprecated, NOT work on Big Sur) if need specific version: "/usr/libexec/java_home -v 1.7"
+#JAVA_HOME	$(/usr/libexec/java_home -V 2>&1 | sed -e '/ \/Lib/!d;/Internet Plug-Ins/d;s/[^\/]*//;' | grep 1.8)
+#PATH		JAVA_HOME
+
+# ~rvictl@osx
 #PATH		/Library/Apple/usr/bin/
 
+# macports@osx
+#PATH		/opt/X11/bin
+#PATH		/opt/local/bin
+#PATH		/opt/local/sbin
 		# to use coreutils without prefix 'g', e.g. gawk
-PATH		/opt/local/libexec/gnubin/
+#PATH		/opt/local/libexec/gnubin/
+

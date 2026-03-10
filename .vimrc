@@ -694,6 +694,14 @@ augroup OuDimInactiveWindows
   au WinEnter * set cursorline
   au WinLeave * set nocursorline
 augroup END
+function! MapAction(algorithm, key)
+  exe 'nnoremap <silent> <Plug>actions'    .a:algorithm.' :<C-U>call <SID>ActionSetup("'.a:algorithm.'")<CR>g@'
+  exe 'xnoremap <silent> <Plug>actions'    .a:algorithm.' :<C-U>call <SID>DoAction("'.a:algorithm.'",visualmode())<CR>'
+  exe 'nnoremap <silent> <Plug>actionsLine'.a:algorithm.' :<C-U>call <SID>DoAction("'.a:algorithm.'",v:count1)<CR>'
+  exe 'nmap '.a:key.'  <Plug>actions'.a:algorithm
+  exe 'xmap '.a:key.'  <Plug>actions'.a:algorithm
+  exe 'nmap '.a:key.a:key[strlen(a:key)-1].' <Plug>actionsLine'.a:algorithm
+endfunction
 function! s:OuDimInactiveWindows()
   for i in range(1, tabpagewinnr(tabpagenr(), '$'))
     let l:range = ""
@@ -807,14 +815,6 @@ endfunction
 function! s:ActionSetup(algorithm)
   let s:encode_algorithm = a:algorithm
   let &opfunc = matchstr(expand('<sfile>'), '<SNR>\d\+_').'ActionOpfunc'
-endfunction
-function! MapAction(algorithm, key)
-  exe 'nnoremap <silent> <Plug>actions'    .a:algorithm.' :<C-U>call <SID>ActionSetup("'.a:algorithm.'")<CR>g@'
-  exe 'xnoremap <silent> <Plug>actions'    .a:algorithm.' :<C-U>call <SID>DoAction("'.a:algorithm.'",visualmode())<CR>'
-  exe 'nnoremap <silent> <Plug>actionsLine'.a:algorithm.' :<C-U>call <SID>DoAction("'.a:algorithm.'",v:count1)<CR>'
-  exe 'nmap '.a:key.'  <Plug>actions'.a:algorithm
-  exe 'xmap '.a:key.'  <Plug>actions'.a:algorithm
-  exe 'nmap '.a:key.a:key[strlen(a:key)-1].' <Plug>actionsLine'.a:algorithm
 endfunction
 function! s:ReverseString(str)
   let out = join(reverse(split(a:str, '\zs')), '')

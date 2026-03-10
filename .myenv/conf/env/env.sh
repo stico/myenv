@@ -11,15 +11,18 @@ alias_secu="${penv}/alias_secu"
 alias_local="${HOME}/.myenv/conf/addi/alias_local"
 zgen_base="${HOME}/.myenv/zgen/lu_bash"
 zgen_var_all="${zgen_base}/envVarAll"
+zgen_var_path="${zgen_base}/envVarPath"
+zgen_var_others="${zgen_base}/envVarOthers"
 zgen_alias_all="${zgen_base}/envAliasAll"
 
 # Check
 ! [ -e "${base}" ] && echo "ERROR: ${base} NOT exist, can NOT init alias/var" && exit 1
 pushd "${base}" &> /dev/null
 
-# Prepare
+# Prepare, CMD_SED is prepared in ~/.bashrc
 mkdir -p "${zgen_base}" &> /dev/null
 rm "${zgen_base}"/* &> /dev/null
+[ -z "${CMD_SED}" ] && CMD_SED="sed"
 
 # Assemble
 if [[ "$(uname -s)" == CYGWIN* ]] || [[ "$(uname -s)" == MINGW* ]] ; then
@@ -38,38 +41,45 @@ for env_file in "${envVarSrc[@]}" ; do
 	[ -e "$env_file" ] || continue
 
 	# shellcheck disable=2016
-	sed -e '/^\s*#/d' \
-	    -e '/^\s*$/d' \
+	"${CMD_SED}" -e '/^[[:space:]]*#/d' \
+	    -e '/^[[:space:]]*$/d' \
 	    -e 's/%HOME%/${HOME}#/g' \
 	    -e 's/\([^A-Za-z0-9_]\)%/\1${/g' \
 	    -e 's/%\([^A-Za-z0-9_]\)/}\1/g' \
-	    -e 's/%\s*$/}/' \
+	    -e 's/%[[:space:]]*$/}/' \
 	    -e 's/\t\t*/=/' \
 	    -e 's/#/\//g' \
-	    -e 's/\s*$//' \
-	    -e 's/^PATH.*/&:${PATH}/' \
+	    -e 's/[[:space:]]*$//' \
 	    -e 's/^/export /' "$env_file" >> "$zgen_var_all"
 done
-sed -i -e "0,/:\${PATH}/s///" "$zgen_var_all"	# need PATH be clean, so first assignment should clean
+
+# Gen var PATH. TODO: 有些检查是不是这里做比较好: 1) 路径要以"/"结尾，否则有些系统(如OSX)不会作为路径来搜索。2) 重复路径处理。
+printf 'export PATH=${PATH}:' >> "$zgen_var_path"
+"${CMD_SED}" -e "/PATH=/!d;s/^.*PATH=//;" "$zgen_var_all" | func_shrink_dup_lines | func_combine_lines -s ':' -n 888 >> "$zgen_var_path"
+
+# Gen var others
+"${CMD_SED}" -e "/PATH=/d" "$zgen_var_all" >> "$zgen_var_others"
 
 # Gen alias
 for alias_file in "${envAliasSrc[@]}" ; do
 	[ -e "$alias_file" ] || continue
 
-	sed -e '/^\s*#/d' \
-	    -e '/^\s*$/d' \
+	"${CMD_SED}" -e '/^[[:space:]]*#/d' \
+	    -e '/^[[:space:]]*$/d' \
 	    -e 's/\([^A-Za-z0-9_]\)%/\1${/g' \
 	    -e 's/%\([^A-Za-z0-9_]\)/}\1/g' \
-	    -e 's/%\s*$/}/' \
+	    -e 's/%[[:space:]]*$/}/' \
 	    -e 's/\t\t*/=/' \
 	    -e 's/#/\//g' \
 	    -e 's/^/alias /' "$alias_file" >> "$zgen_alias_all"
 done
 
 # seems need new line in the end
-echo -e "\n" >> "$zgen_var_all"
+echo -e "\n" >> "$zgen_var_path"
+echo -e "\n" >> "$zgen_var_others"
 echo -e "\n" >> "$zgen_alias_all"
-source "$zgen_var_all"
+#source "$zgen_var_path"
+source "$zgen_var_others"
 source "$zgen_alias_all"
 
 popd &> /dev/null

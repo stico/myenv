@@ -6,9 +6,10 @@
 # Pre-Check
 #[ -z "$PS1" ] && return		# (moved to ~/.bash_profile, since return only valid in function. If not running interactively, just return
 
-# Variables
+# Variables. Note: homebrew has cmd: homebrew --prefix
 MACPORTS_PATH="/opt/local"
-HOMEBREW_PATH="/opt/homebrew"
+HOMEBREW_X86="/usr/local"
+HOMEBREW_ARM="/opt/homebrew"
 COMPLETION="/etc/bash_completion"
 HOST_NAME="$(hostname -s)"
 
@@ -19,32 +20,44 @@ shopt -s histappend
 shopt -s histreedit
 shopt -s checkwinsize
 
-# Step 1: set PATH for OSX/{macports,homebrew} to use correct tool
+# Step 1: set PATH for OSX/{macports,homebrew} to use correct/basic tool
 if uname -s | grep -iq darwin ; then
-	# note, need use the man dir, since lapmac3 (use homebrew) also have dir: /usr/local/bin 
+	# detect macports. Note, need use the man/ dir, since lapmac3@osx (use homebrew) also have dir: /usr/local/bin (some simple link)
 	if [ -d "${MACPORTS_PATH}/man" ] ; then		
-		export PATH="${MACPORTS_PATH}/bin:${MACPORTS_PATH}/sbin:${MACPORTS_PATH}/libexec/gnubin/:${PATH}:"	
-	elif [ -d "${HOMEBREW_PATH}" ] ; then
-		export PATH="${HOMEBREW_PATH}/bin:${HOMEBREW_PATH}/sbin:${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin:${PATH}:"	
+		export PATH="${MACPORTS_PATH}/bin:${MACPORTS_PATH}/sbin:${MACPORTS_PATH}/libexec/gnubin/:/usr/bin/:/bin/"
+	# detect intel serial mac (Note: sbin actually NOT need in path)
+	elif [ -d "${HOMEBREW_X86}/Cellar" ] ; then
+		export PATH="${HOMEBREW_X86}/bin:${HOMEBREW_X86}/opt/gnu-getopt/bin/:${HOMEBREW_X86}/opt/coreutils/libexec/gnubin/:/usr/bin/:/bin/"
+	# detect M (silicon) serial mac (Note: sbin actually NOT need in path)
+	elif [ -d "${HOMEBREW_ARM}/Cellar" ] ; then
+		export PATH="${HOMEBREW_ARM}/bin:${HOMEBREW_ARM}/opt/gnu-getopt/bin/:${HOMEBREW_ARM}/opt/coreutils/libexec/gnubin/:/usr/bin/:/bin/"
 	fi
 fi
 
-# Step 2: dircolors, must after PATH setting to compitable with OSX (macports or homebrew: libexec/gnubin/dircolors)
-# TODO: "set -x" show the cmd runs in sub-shell, is it really work?
+# Step 2: set CMDs
+CMD_BASH="$(command -v bash)"
+CMD_SED="$(command -v gsed)"
+[ -z "${CMD_SED}" ] && CMD_SED="sed"
+CMD_DIRCOLORS="$(command -v gdircolors)"
+[ -z "${CMD_DIRCOLORS}" ] && CMD_DIRCOLORS="dircolors"
+
+# Step 3: dircolors, run after PATH (macports: libexec/gnubin/dircolors, homebrew: /usr/{local,homebrew}/bin/gdircolors)
 if [[ -f "${HOME}/.dir_colors" ]] ; then
-	SHELL="/bin/bash" eval "$(dircolors -b ~/.dir_colors)"
+	SHELL="${CMD_BASH}" eval "$("${CMD_DIRCOLORS}" -b ~/.dir_colors)"
 else
-	SHELL="/bin/bash" eval "$(dircolors -b /etc/DIR_COLORS)"		
+	SHELL="${CMD_BASH}" eval "$("${CMD_DIRCOLORS}" -b /etc/DIR_COLORS)"
 fi
 
-# Step 3: completion, sys and self-define cmd
+# Step 4: completion, sys and self-define cmd
 # NOTE: unison remote style can NOT accept .bashrc have output
 source "${COMPLETION}" >/dev/null 2>&1
 source "${MACPORTS_PATH}/${COMPLETION}" >/dev/null 2>&1
-source "${HOMEBREW_PATH}/etc/profile.d/bash_completion.sh" >/dev/null 2>&1
+source "${HOMEBREW_X86}/etc/profile.d/bash_completion.sh" >/dev/null 2>&1
+source "${HOMEBREW_ARM}/etc/profile.d/bash_completion.sh" >/dev/null 2>&1
 complete -F _known_hosts scpx sshx ssht
 
-# Step 4: Source env (zb before me, since zb/me_lib.sh might out of sync)
+# Step 5: Source env (zb before me, since zb/me_lib.sh might out of sync)
+# TODO: detect source failure and echo ???
 source "${HOME}/.zbox/zbox_func.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/myenv_func.sh" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/env/env.sh" >/dev/null 2>&1
@@ -52,14 +65,14 @@ source "${HOME}/.myenv/conf/bash/bashrc.${HOST_NAME}" >/dev/null 2>&1
 source "${HOME}/.myenv/conf/bash/bashrc.$(cat /var/lib/dbus/machine-id 2> /dev/null)" >/dev/null 2>&1
 #source "${HOME}/.myenv/conf/addi/local_bashrc" >/dev/null 2>&1
 
-# Step 5: source dist tag env for internal and production machine 
+# Step 6: source dist tag env for internal and production machine 
 func_is_personal_machine || func_dist_source_env 
 
-# Step 6: Tool update
+# Step 7: Tool update
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"				# make less more friendly for non-text input files, see lesspipe(1)
 source /etc/infinality-settings.sh >/dev/null 2>&1					# infinality font rendering config
 
-# Step 7: Settings for diff machine type
+# Step 8: Settings for diff machine type
 if func_is_personal_machine ; then
 	umask 077									# only set this for personal machie
 	func_ssh_agent_init &> /dev/null						# Init ssh agent

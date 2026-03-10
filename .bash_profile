@@ -7,3 +7,9 @@
 && [ -f "${HOME}/.bashrc" ] \
 && [ "$(ps -cp "$$" -o command="")" = "-bash" ] \
 && source "${HOME}/.bashrc"
+
+# Added by Comate
+export PATH="/Users/ouyangzhu/.comate/bin:$PATH"
+
+# Added by DuCC (symlink)
+export PATH="/Users/ouyangzhu/.comate/baidu-cc/bin:$PATH"

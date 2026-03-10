@@ -588,17 +588,17 @@ func_vi_conditional() {
 	# GUI env: use gvim/macvim (gui)
 	# NOTE 1: use window title "SINGLE_VIM" to identify
 	# NOTE 2: seems in ubuntu gui, not need "&" to make it background job
-	# NOTE 3: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
-	# NOTE 5: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
-	local macvim_path="$HOME/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/mvim"
+	# NOTE 3: why? seems direct use "vim" will NOT trigger "vim" alias, I suppose this happens and cause infinite loop, BUT it is not!
 	if func_is_os_osx ; then
 		# pre condition: '+clientserver', "-g": use GUI version
 		# directly use "vim -g" behaves wired (mess up terminal)
-		#LD_LIBRARY_PATH="" /Users/ouyangzhu/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/Vim -g --servername SINGLE_VIM --remote-tab "$@"
-		if [ -e "${macvim_path}" ] ; then
-			"${macvim_path}" -g --servername SINGLE_VIM --remote-tab "$@"
-		elif func_is_cmd_exist gvim ; then
+
+		# 优先用homebrew安装的版本，不行再看有没有zbox的版本
+		local macvim_path="$HOME/.zbox/ins/macvim/macvim-git/MacVim.app/Contents/MacOS/mvim"
+		if func_is_cmd_exist gvim ; then
 			gvim -g --servername SINGLE_VIM --remote-tab "$@"
+		elif [ -e "${macvim_path}" ] ; then
+			"${macvim_path}" -g --servername SINGLE_VIM --remote-tab "$@"
 		fi
 
 		# Seems osx mojave not need this any more
@@ -618,6 +618,7 @@ func_vi_conditional() {
 
 	elif func_is_cmd_exist gvim ; then
 		# otherwise prefer gvim
+		# NOTE: python in zbox will set env "LD_LIBRARY_PATH" which makes Vim+YouCompleteMe not works
 		if LD_LIBRARY_PATH="" gvim --version | grep -q '+clientserver' ; then
 			LD_LIBRARY_PATH="" gvim --servername SINGLE_VIM --remote-tab "$@"
 		else
