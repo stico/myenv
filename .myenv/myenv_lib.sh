@@ -1751,6 +1751,7 @@ func_pkg_mgmt_cmd() {
 	local os_name="$(func_os_name)" 
 	[ "${os_name}" = "${OS_DEBIAN}" ] && echo "apt" && return
 	func_is_os_osx && [ -d "/opt/local/man" ] && echo "port" && return
+	func_is_os_osx && [ -d "/usr/local/Cellar" ] && echo "brew" && return
 	func_is_os_osx && [ -d "/opt/homebrew/Cellar" ] && echo "brew" && return
 	echo "UNKNOWN_PKG_CMD"
 }

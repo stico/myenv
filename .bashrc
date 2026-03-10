@@ -7,9 +7,10 @@
 #[ -z "$PS1" ] && return		# (moved to ~/.bash_profile, since return only valid in function. If not running interactively, just return
 
 # Variables. Note: homebrew has cmd: homebrew --prefix
-MACPORTS_PATH="/opt/local"
+HOMEBREW_PATH=""
 HOMEBREW_X86="/usr/local"
 HOMEBREW_ARM="/opt/homebrew"
+MACPORTS_PATH="/opt/local"
 COMPLETION="/etc/bash_completion"
 HOST_NAME="$(hostname -s)"
 
@@ -25,12 +26,16 @@ if uname -s | grep -iq darwin ; then
 	# detect macports. Note, need use the man/ dir, since lapmac3@osx (use homebrew) also have dir: /usr/local/bin (some simple link)
 	if [ -d "${MACPORTS_PATH}/man" ] ; then		
 		export PATH="${MACPORTS_PATH}/bin:${MACPORTS_PATH}/sbin:${MACPORTS_PATH}/libexec/gnubin/:/usr/bin/:/bin/"
+
 	# detect intel serial mac (Note: sbin actually NOT need in path)
 	elif [ -d "${HOMEBREW_X86}/Cellar" ] ; then
-		export PATH="${HOMEBREW_X86}/bin:${HOMEBREW_X86}/opt/gnu-getopt/bin/:${HOMEBREW_X86}/opt/coreutils/libexec/gnubin/:/usr/bin/:/bin/"
+		HOMEBREW_PATH="${HOMEBREW_X86}"
+		export PATH="${HOMEBREW_PATH}/bin:${HOMEBREW_PATH}/opt/gnu-getopt/bin/:${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin/:/usr/bin/:/bin/"
+
 	# detect M (silicon) serial mac (Note: sbin actually NOT need in path)
 	elif [ -d "${HOMEBREW_ARM}/Cellar" ] ; then
-		export PATH="${HOMEBREW_ARM}/bin:${HOMEBREW_ARM}/opt/gnu-getopt/bin/:${HOMEBREW_ARM}/opt/coreutils/libexec/gnubin/:/usr/bin/:/bin/"
+		HOMEBREW_PATH="${HOMEBREW_ARM}"
+		export PATH="${HOMEBREW_PATH}/bin:${HOMEBREW_PATH}/opt/gnu-getopt/bin/:${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin/:/usr/bin/:/bin/"
 	fi
 fi
 
