@@ -54,8 +54,9 @@ for env_file in "${envVarSrc[@]}" ; do
 done
 
 # Gen var PATH. TODO: 有些检查是不是这里做比较好: 1) 路径要以"/"结尾，否则有些系统(如OSX)不会作为路径来搜索。2) 重复路径处理。
-printf 'export PATH=${PATH}:' >> "$zgen_var_path"
-"${CMD_SED}" -e "/PATH=/!d;s/^.*PATH=//;" "$zgen_var_all" | func_shrink_dup_lines | func_combine_lines -s ':' -n 888 >> "$zgen_var_path"
+# 注: 用 func_combine_lines 来合并行时，有"${}"的行都消失了，在命令行下用这个函数则工作正常，只好用其它方式处理。暂时不清楚原因。
+#"${CMD_SED}" -e '/PATH=/!d;s/^.*PATH=//;' "$zgen_var_all" | func_shrink_dup_lines | func_combine_lines -s ':' -n 888  | sed -e 's/^/export PATH=${PATH}:/' >> "$zgen_var_path"
+"${CMD_SED}" -e '/PATH=/!d;s/^.*PATH=//;s/$/:/;' "$zgen_var_all" | tr -d '\n' | sed -e 's/^/export PATH=${PATH}:/;s/:$//;' >> "$zgen_var_path"
 
 # Gen var others
 "${CMD_SED}" -e "/PATH=/d" "$zgen_var_all" >> "$zgen_var_others"
@@ -78,7 +79,7 @@ done
 echo -e "\n" >> "$zgen_var_path"
 echo -e "\n" >> "$zgen_var_others"
 echo -e "\n" >> "$zgen_alias_all"
-#source "$zgen_var_path"
+source "$zgen_var_path"
 source "$zgen_var_others"
 source "$zgen_alias_all"
 

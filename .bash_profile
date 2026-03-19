@@ -13,3 +13,6 @@ export PATH="/Users/ouyangzhu/.comate/bin:$PATH"
 
 # Added by DuCC (symlink)
 export PATH="/Users/ouyangzhu/.comate/baidu-cc/bin:$PATH"
+
+# icode-cli
+export PATH="/Users/ouyangzhu/.icode/bin:$PATH"

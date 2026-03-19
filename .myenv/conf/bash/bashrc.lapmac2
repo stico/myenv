@@ -30,7 +30,7 @@ zbox_use_silent mysql		5.6.23
 #zbox_use_silent ruby		2.2.0
 #zbox_use_silent gradle		4.0
 #zbox_use_silent chromedriver	2.19
-zbox_use_silent fzf		git
+#zbox_use_silent fzf		git
 zbox_use_silent shellcheck	git
 zbox_use_silent ntfs-3g		2016.2.22	# unison_fs_lampac_all need this
 #zbox_use_silent nodejs		20.11.1

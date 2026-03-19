@@ -1060,7 +1060,44 @@
 			<key>Transparency</key>
 			<real>0.0</real>
 			<key>Triggers</key>
-			<array/>
+			<array>
+				<dict>
+					<key>action</key>
+					<string>MuteCoprocessTrigger</string>
+					<key>contentregex</key>
+					<string></string>
+					<key>disabled</key>
+					<integer>0</integer>
+					<key>matchType</key>
+					<integer>0</integer>
+					<key>name</key>
+					<string></string>
+					<key>parameter</key>
+					<string>/usr/local/bin/iterm2-send-zmodem.sh</string>
+					<key>partial</key>
+					<true/>
+					<key>regex</key>
+					<string>rz waiting to receive.\*\*B0100</string>
+				</dict>
+				<dict>
+					<key>action</key>
+					<string>MuteCoprocessTrigger</string>
+					<key>contentregex</key>
+					<string></string>
+					<key>disabled</key>
+					<integer>0</integer>
+					<key>matchType</key>
+					<integer>0</integer>
+					<key>name</key>
+					<string></string>
+					<key>parameter</key>
+					<string>/usr/local/bin/iterm2-recv-zmodem.sh</string>
+					<key>partial</key>
+					<true/>
+					<key>regex</key>
+					<string>\*\*B00000000000000</string>
+				</dict>
+			</array>
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>
