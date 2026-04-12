@@ -1448,13 +1448,17 @@ func_unison_cs_run() {
 		func_unison_cs_run_on_lapmac3
 		return
 	fi
+	if [[ "${hn}" == "lapmac5" ]] ; then
+		func_unison_cs_run_on_lapmac5
+		return
+	fi
 	echo "ERROR: can NOT match hostname (${hn}), pls check!"
 }
 
 func_unison_cs_run_on_lapmac2() {
 	local profile_path="$HOME/.unison/cs_workpcII_lapmac2_all.prf"
 
-	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}" && return 1
 
 	echo "Start to run with profile: ${profile_path##*/}"
 	# macports version of unison on lapmac2 need "-ui text"
@@ -1462,12 +1466,23 @@ func_unison_cs_run_on_lapmac2() {
 }
 
 func_unison_cs_run_on_lapmac3() {
-	local profile_path="$HOME/.unison/cs_lapmac2to3_run_on_3_all.prf"
+	local profile_path
 
-	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
+	if ping -c 1 -W 1 lapmac2 &>/dev/null ; then 
+		profile_path="$HOME/.unison/cs_lapmac2to3_run_on_3_all.prf"
+	elif ping -c 1 -W 1 lapmac5 &>/dev/null ; then 
+		profile_path="$HOME/.unison/cs_lapmac3to5_run_on_3_all.prf"
+	fi
+
+	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}" && return 1
 
 	echo "Start to run with profile: ${profile_path##*/}"
 	unison "${profile_path##*/}"
+}
+
+func_unison_cs_run_on_lapmac5() {
+	echo "Start to run with profile: ${profile_path##*/}"
+	echo "ERROR: NOT impl on lapmac5 yet"
 }
 
 # seems deprecated

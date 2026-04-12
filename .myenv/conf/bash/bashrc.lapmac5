@@ -1,0 +1,37 @@
+# lapmac5
+# 	HW	mac book air (13.6") M5 1T
+# 	OS	High Sierra (2026-03)
+# 	FOR	home
+
+bash_prompt_color=green
+
+# cmd `ls` need this to correctly show Chinese filename
+export LC_ALL="en_US.UTF-8"
+
+# homebrew mirror
+#export HOMEBREW_BREW_GIT_REMOTE="..."  # put your Git mirror of Homebrew/brew here
+#export HOMEBREW_CORE_GIT_REMOTE="..."  # put your Git mirror of Homebrew/homebrew-core here
+
+## homebrew env (output of /opt/homebrew/bin/brew shellenv)
+#export HOMEBREW_PREFIX="/opt/homebrew";
+#export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
+#export HOMEBREW_REPOSITORY="/opt/homebrew";
+#export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
+#export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
+#export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
+#
+## homebrew mactex@tool
+#export PATH="/Library/TeX/texbin:$PATH"
+#
+## homebrew (coreutils already sourced in .bashrc)
+##export PATH="${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/findutils/libexec/gnubin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/gnu-sed/libexec/gnubin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/grep/libexec/gnubin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/gawk/libexec/gnubin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/curl/bin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/util-linux/bin:$PATH"
+#export PATH="${HOMEBREW_PATH}/opt/util-linux/sbin:$PATH"
+
+# zbox (see example in bashrc.lapmac3)
+#zbox_use_silent maven		3.1.1
