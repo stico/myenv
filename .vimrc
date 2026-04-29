@@ -336,6 +336,7 @@ endif
 """""""""""""""""""""""""""""" H1 - Topic - Completion (also see 
 " NOTE: iskeyword MUST after the "set nocompatible"
 set iskeyword+=-
+set iskeyword+=#
 "hi Pmenu	ctermbg=White ctermfg=DarkGrey
 "hi PmenuSel	ctermbg=White ctermfg=LightMagenta guibg=LightCyan guifg=LightBlue
 

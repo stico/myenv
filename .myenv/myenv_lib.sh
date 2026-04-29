@@ -894,7 +894,8 @@ func_complain_path_inexist() { func_complain_path_not_exist "$@" ;}
 func_complain_path_not_exist() {
 	local usage="Usage: ${FUNCNAME[0]} <path> <msg>"
 	local desc="Desc: complains if path not exist, return 0 if not exist, otherwise 1" 
-	func_param_check 1 "$@"
+
+	[ $# -lt 1 ] && func_error_stderr "WARN: NO param provided for checking"  && return 0
 	
 	func_is_str_blank "${1}" && func_error_stderr "${FUNCNAME[0]}: path param blank!" && func_script_stacktrace && return 0
 	[ ! -e "${1}" ] && func_error_stderr "${2:-WARN: path ${1} NOT exist}" && return 0
