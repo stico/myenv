@@ -3177,7 +3177,7 @@ func_mydata_bi_sync() {
 
 	local sync_item a b opts
 	if [[ ! -e "${1}" ]] || [[ ! -e "${2}" ]] ; then
-		func_info "SKIP: ${1} <-> ${2}"
+		func_info "SKIP (for: ${3}): ${1} <-> ${2}"
 		return
 	fi
 	
