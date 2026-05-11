@@ -66,6 +66,11 @@ screenBoth		"xrandr --output HDMI1 --auto --output LVDS1 --auto --right-of HDMI1
 screenBigOnly		"xrandr --output HDMI1 --auto --output LVDS1 --off"
 screenSmallOnly		"xrandr --output HDMI1 --off --output LVDS1 --auto"
 
+tgre			"\cd ~/workspace/claude_cli/; bash tg-aggregator/bin/restart.sh;"
+tgrestart		"\cd ~/workspace/claude_cli/; bash tg-aggregator/bin/restart.sh;"
+tgstop			"\cd ~/workspace/claude_cli/; bash tg-aggregator/bin/stop.sh;"
+tgbak			"\cd ~/workspace/claude_cli/; dbackup ./;"
+
 httpcode		"dev_http_code"
 httpresp		"dev_http_resp"
 httpbody		"dev_http_body"
