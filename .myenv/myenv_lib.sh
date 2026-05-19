@@ -53,6 +53,43 @@ func_is_str_dati() {
 	[[ "$(func_str_trim "${1}")" =~ ^[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]_[0-2][0-9]-[0-5][0-9]-[0-5][0-9]$ ]] && return 0 || return 1
 }
 
+func_dati_increase() {
+	local usage="Usage: ${FUNCNAME[0]} <dati_1> <dati_2>"
+	local desc="Desc: check if dati_1 to dati_2 is increased, also return true if equals"
+	func_param_check 2 "$@"
+	
+	# check
+	func_is_str_dati "${1}" || func_die "ERROR: 1st dati is invalid, pls check!"
+	func_is_str_dati "${2}" || func_die "ERROR: 2nd dati is invalid, pls check!"
+	
+	# convert to Unix Timestamp (note: 4/3 in sed means sub the 4th/3rd match
+	local ts1 ts2 fmt1 fmt2
+	fmt1=$(echo "$1" | sed 's/_/ /; s/-/:/4; s/-/:/3')
+	fmt2=$(echo "$2" | sed 's/_/ /; s/-/:/4; s/-/:/3')
+	ts1=$(date -d "$fmt1" +%s)
+	ts2=$(date -d "$fmt2" +%s)
+
+	# compare
+	[ "$ts1" -gt "$ts2" ] && return 1 || return 0
+}
+
+func_dati_in_str() {
+	local usage="Usage: ${FUNCNAME[0]} <str>" 
+	local desc="Desc: extract dati str from str"
+
+	local dati_str
+	local pattern='\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}'
+	if [ $# -gt 0 ]; then
+		dati_str="$(printf '%s\n' "$@" | grep -oP "$pattern")"
+	else
+		# PIPE_CONTENT_GOES_HERE 
+		dati_str="$(grep -oP "$pattern")"
+	fi
+
+	func_is_str_dati "${dati_str}" || func_die "ERROR: NO dati string found in str, pls check!"
+	echo "${dati_str}"
+}
+
 func_date_in_dati() {
 	local usage="Usage: ${FUNCNAME[0]} <dati_str>" 
 	local desc="Desc: extract date str from dati str"
@@ -192,7 +229,7 @@ func_vcs_update() {
 
 func_ver_increase() {
 	local usage="Usage: ${FUNCNAME[0]} <v1> <v2>"
-	local desc="Desc: check if v1 > v2 is increased, also return true if equals"
+	local desc="Desc: check if v1 to v2 is increased, also return true if equals"
 	func_param_check 2 "$@"
 	
 	# ref: https://stackoverflow.com/questions/4023830/how-to-compare-two-strings-in-dot-separated-version-format-in-bash
@@ -1086,6 +1123,36 @@ func_find_latest() {
 	func_param_check 2 "$@"
 
 	find "$@" -printf "%T@ %p\n" | sort -n | cut -d' ' -f2-
+}
+
+func_find_newer_dati_file() {
+	local usage="Usage: ${FUNCNAME[0]} <fn_wildcard_w/t_dati> <where_to_find> <where_to_check>"
+	local desc="Desc: find a newer version of file, dati (format as func_dati) is in beginning of file name"
+	func_param_check 3 "$@"
+
+	local pattern p_find p_check maybe_newer latest_used curr_dati last_dati
+	p_find="${2}"
+	p_check="${3}"
+	pattern="20??-??-??_??-??-??*${1}"
+	func_validate_path_exist "${p_find}" "${p_check}"
+
+	# find files 
+	maybe_newer="$(func_find_latest "${p_find}" -name "${pattern}" | tail -1)"
+	latest_used="$(func_find_latest "${p_check}" -name "${pattern}" | tail -1)"
+	func_is_str_blank "${latest_used}" && func_die "ERROR: NO file found in path (${p_find})"
+	func_validate_path_exist "${latest_used}" "${maybe_newer}"
+
+	# extract dati
+	curr_dati="$(func_dati_in_str "${maybe_newer}")"
+	last_dati="$(func_dati_in_str "${latest_used}")"
+	func_is_str_blank "${last_dati}" && func_die "ERROR: NO suitalbe file found in path (${p_check})"
+
+	# compare
+	if func_dati_increase "${last_dati}" "${curr_dati}" ; then
+		echo "${maybe_newer}"
+	else
+		func_die "ERROR: NO newer ver found, last V.S found: ${last_dati} V.S ${curr_dati}"
+	fi
 }
 
 ################################################################################

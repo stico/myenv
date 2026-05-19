@@ -23,12 +23,12 @@ export LC_ALL="en_US.UTF-8"
 ## homebrew mactex@tool
 #export PATH="/Library/TeX/texbin:$PATH"
 #
-## homebrew (coreutils already sourced in .bashrc)
-##export PATH="${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin:$PATH"
-#export PATH="${HOMEBREW_PATH}/opt/findutils/libexec/gnubin:$PATH"
-#export PATH="${HOMEBREW_PATH}/opt/gnu-sed/libexec/gnubin:$PATH"
-#export PATH="${HOMEBREW_PATH}/opt/grep/libexec/gnubin:$PATH"
-#export PATH="${HOMEBREW_PATH}/opt/gawk/libexec/gnubin:$PATH"
+# homebrew (coreutils already sourced in .bashrc)
+#export PATH="${HOMEBREW_PATH}/opt/coreutils/libexec/gnubin:$PATH"
+export PATH="${HOMEBREW_PATH}/opt/findutils/libexec/gnubin:$PATH"
+export PATH="${HOMEBREW_PATH}/opt/gnu-sed/libexec/gnubin:$PATH"
+export PATH="${HOMEBREW_PATH}/opt/grep/libexec/gnubin:$PATH"
+export PATH="${HOMEBREW_PATH}/opt/gawk/libexec/gnubin:$PATH"
 #export PATH="${HOMEBREW_PATH}/opt/curl/bin:$PATH"
 #export PATH="${HOMEBREW_PATH}/opt/util-linux/bin:$PATH"
 #export PATH="${HOMEBREW_PATH}/opt/util-linux/sbin:$PATH"
