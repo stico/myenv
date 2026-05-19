@@ -1696,7 +1696,7 @@ func_dist_sync() {
 		# to avoid grep /etc/hosts, since mights multiple result (e.g. IPv6 addr) or nothing, both are NOT wanted
 		dist_hosts="127.0.0.1"
 	else
-		dist_hosts="$(grep "^[^#]*[[:blank:]]${target_prefix}" /etc/hosts | sed -e "/${source_ip:-__DIST-INEXIST#STR__}/d;s/\s.*//;" | sort -u)"
+		dist_hosts="$(grep "^[^#]*[[:blank:]]${target_prefix}" /etc/hosts | sed -e "/${source_ip:-__DIST-INEXIST#STR__}/d;s/\s.*//;" | ${ME_SORT_U} )"
 	fi
 
 	# Distribute
@@ -2965,7 +2965,7 @@ func_export_script() {
 		func_debug "processing: ${c}, DONE: ${fdone[*]}, TODO: ${ftodo[*]}"
 
 		# Recursive
-		for f in $(type "${c}" | grep -o "func_[[:alnum:]_]*" | sort -u) ; do
+		for f in $(type "${c}" | grep -o "func_[[:alnum:]_]*" | ${ME_SORT_U} ) ; do
 			count=$(( count + 1 ))
 
 			func_array_contains "${f}" "${fdone[@]}" "${ftodo[@]}" && continue
@@ -2979,7 +2979,7 @@ func_export_script() {
 
 		# Export MY_ENV_xxx VAR. TODO: 1) one time grep is NOT enough (the var assignment migth contain other var OR func_). 2) only grep myenv_func.sh might NOT enough
 		local var_pattern var_strings
-		var_pattern="$(grep -o "MY_[_A-Z]*" "${target}" | sort -u | sed -z 's/\n/\\|/g;s/^/\\(/;s/$/MY_ENV\\)=/;')"
+		var_pattern="$(grep -o "MY_[_A-Z]*" "${target}" | ${ME_SORT_U} | sed -z 's/\n/\\|/g;s/^/\\(/;s/$/MY_ENV\\)=/;')"
 		var_strings="$(grep "${var_pattern}" ~/.myenv/myenv_func.sh)"
 		[ -n "${var_strings}" ] && echo "${var_strings}" | sed -i -e '1r /dev/stdin' "${target}"
 

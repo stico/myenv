@@ -15,11 +15,14 @@
 ################################################################################
 # Const
 ################################################################################
-PARAM_NON_INTERACTIVE_MODE="param_non_interactive_mode"
-DEFAULT_TIME_ZONE="Asia/Shanghai"
 UNCOMFIRMED_YM="0000-00"
 FIND_UTIL_EXCLUDE=".fu.exclude"
 FIND_UTIL_FILESIZE=".fu.filesize"
+DEFAULT_TIME_ZONE="Asia/Shanghai"
+PARAM_NON_INTERACTIVE_MODE="param_non_interactive_mode"
+
+# "LC_ALL=C" 十分重要，强制按字节比对，否则有些字符集下可能导致sort -u 误删除。
+ME_SORT_U="LC_ALL=C sort -u"
 
 ################################################################################
 # Time
@@ -1302,7 +1305,7 @@ func_rsync_del_detect() {
 	rsync --dry-run -rv --delete "${1}" "${2}"	\
 		| grep '^deleting '			\
 		| sed -e 's+/[^/]*$+/+'			\
-		| sort -u
+		| ${ME_SORT_U}
 }
 
 func_rsync_out_brief() {

@@ -10,6 +10,7 @@ mydata=$MY_ENV/zgen/mydata/fl_latest
 vimrc=$HOME/.vimrc
 oumg=$HOME/.vim/bundle/vim-oumg/plugin/oumg.vim
 icloud=$HOME/Library/Mobile\ Documents/com~apple~CloudDocs/PERSONAL/
+imisc=$HOME/Library/Mobile\ Documents/com~apple~CloudDocs/PERSONAL/misc/
 
 # Workspace
 ws=$HOME/workspace
