@@ -35,6 +35,7 @@ psgf			"ps -ef | grep"
 free			'[ "$(func_os_name)" = "osx" ] && python $MY_ENV/scpt/free_for_osx.py || free'
 tree			"tree -A"
 less			"less -i"
+sort			"LC_ALL=C sort"
 cleancat		"func_clean_cat"
 cleanless		"func_clean_less"
 cleangrep		"func_clean_grep"
