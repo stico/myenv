@@ -1726,7 +1726,8 @@ func_os_name() {
 	# Check bash buildin var
 	local fullname arch
 	if [ -n "$OSTYPE" ] ; then
-		fullname="${OSTYPE,,}"
+		#fullname="${OSTYPE,,}"	# NOT work when init, bash 3.2 NOT support
+		fullname="$(echo "${OSTYPE}" | tr '[:upper:]' '[:lower:]')"
 	else
 		func_validate_cmd_exist uname
 		fullname="$(uname -o)"
