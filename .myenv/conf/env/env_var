@@ -48,6 +48,9 @@ MY_ENV_UTIL	%HOME%.myenv#util
 MY_ENV_SECU	%HOME%.myenv#secu
 MY_ENV_ZGEN	%HOME%.myenv#zgen
 
+# 阻止GIT把HOME目录当作工作目录 (一些工具，如codex/claude会一直向上寻找带.git的目录，导致HOME被认为是工作目录)
+GIT_CEILING_DIRECTORIES		$HOME
+
 ################################################################################
 # ENV - Misc
 ################################################################################
