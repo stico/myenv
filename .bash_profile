@@ -16,3 +16,6 @@ export PATH="/Users/ouyangzhu/.comate/baidu-cc/bin:$PATH"
 
 # icode-cli
 export PATH="/Users/ouyangzhu/.icode/bin:$PATH"
+
+# Added by Comate (zulu-cli)
+export PATH="/Users/ouyangzhu/.comate/zulu-cli/bin:$PATH"

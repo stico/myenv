@@ -1452,6 +1452,10 @@ func_unison_cs_run() {
 		func_unison_cs_run_on_lapmac5
 		return
 	fi
+	if [[ "${hn}" == "deskmac6" ]] ; then
+		func_unison_cs_run_on_deskmac6
+		return
+	fi
 	echo "ERROR: can NOT match hostname (${hn}), pls check!"
 }
 
@@ -1465,11 +1469,20 @@ func_unison_cs_run_on_lapmac2() {
 	unison -ui text "${profile_path##*/}"
 }
 
+func_unison_cs_run_on_deskmac6() {
+	local profile_path="$HOME/.unison/cs_deskmac6_to_lapmac2_run_on_6_all.prf"
+
+	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}" && return 1
+
+	echo "Start to run with profile: ${profile_path##*/}"
+	unison "${profile_path##*/}"
+}
+
 func_unison_cs_run_on_lapmac3() {
 	local profile_path
 
-	if ping -c 1 -W 1 lapmac2 &>/dev/null ; then 
-		profile_path="$HOME/.unison/cs_lapmac2to3_run_on_3_all.prf"
+	if ping -c 1 -W 1 deskmac6 &>/dev/null ; then 
+		profile_path="$HOME/.unison/cs_deskmac6_to_lapmac3_run_on_3_all.prf"
 	elif ping -c 1 -W 1 lapmac5 &>/dev/null ; then 
 		profile_path="$HOME/.unison/cs_lapmac3to5_run_on_3_all.prf"
 	fi

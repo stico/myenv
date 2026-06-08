@@ -48,7 +48,7 @@ CMD_DIRCOLORS="$(command -v gdircolors)"
 
 # Step 3: dircolors, run after PATH (macports: libexec/gnubin/dircolors, homebrew: /usr/{local,homebrew}/bin/gdircolors)
 [ -f "${HOME}/.dir_colors" ] &&	CONF_DIRCOLORS="${HOME}/.dir_colors" || CONF_DIRCOLORS="/etc/DIR_COLORS"
-if command -v "${CMD_DIRCOLORS}" ; then
+if command -v "${CMD_DIRCOLORS}" &> /dev/null ; then
 	SHELL="${CMD_BASH}" eval "$("${CMD_DIRCOLORS}" -b "${CONF_DIRCOLORS}")"
 fi
 
