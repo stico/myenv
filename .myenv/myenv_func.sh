@@ -1406,6 +1406,40 @@ func_git_commit_push() {
 	git push origin				&&
 	git status
 	func_git_commit_check | sort
+
+	if [[ "${hn}" == "lapmac3" ]] ; then
+		echo "################################################################################"
+		echo "# Run git pull on lapmac2"
+		echo "################################################################################"
+		if ping -c 1 -W 1 lapmac2 &>/dev/null ; then 
+			ssh lapmac2 "git pull origin master ; git status"
+		fi
+
+		echo "################################################################################"
+		echo "# Run git pull on deskmac6"
+		echo "################################################################################"
+		if ping -c 1 -W 1 deskmac6 &>/dev/null ; then 
+			ssh deskmac6 "git pull origin master ; git status"
+		fi
+	fi
+
+	if [[ "${hn}" == "lapmac2" ]] ; then
+		echo "################################################################################"
+		echo "# Run git pull on lapmac3"
+		echo "################################################################################"
+		if ping -c 1 -W 1 lapmac3 &>/dev/null ; then 
+			ssh lapmac3 "git pull origin master ; git status"
+		fi
+	fi
+
+	if [[ "${hn}" == "lapmac3" ]] ; then
+		echo "################################################################################"
+		echo "# Run git pull on lapmac2"
+		echo "################################################################################"
+		if ping -c 1 -W 1 lapmac2 &>/dev/null ; then 
+			ssh lapmac2 "git pull origin master ; git status"
+		fi
+	fi
 }
 
 func_git_commit_check() { 
@@ -1485,7 +1519,9 @@ func_unison_cs_run_on_lapmac3() {
 		profile_path="$HOME/.unison/cs_deskmac6_to_lapmac3_run_on_3_all.prf"
 
 		if ping -c 1 -W 1 lapmac2 &>/dev/null ; then 
-			echo "INFO: sync deskmac6 <> lapmac2 first!"
+			echo "################################################################################"
+			echo "# INFO: sync deskmac6 <> lapmac2 first!"
+			echo "################################################################################"
 			ssh deskmac6 "/opt/homebrew/bin/unison cs_deskmac6_to_lapmac2_run_on_6_all.prf"
 		fi
 
@@ -1495,7 +1531,9 @@ func_unison_cs_run_on_lapmac3() {
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}" && return 1
 
-	echo "INFO: start to run with profile: ${profile_path##*/}"
+	echo "################################################################################"
+	echo "# INFO: start to run with profile: ${profile_path##*/}"
+	echo "################################################################################"
 	unison "${profile_path##*/}"
 }
 
