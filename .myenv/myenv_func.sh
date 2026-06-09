@@ -13,6 +13,7 @@
 #source ${HOME}/.myenv/myenv_func.sh || source ./myenv_func.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_func.sh")" || exit 1
 #source $HOME/.myenv/myenv_lib.sh || source ./myenv_lib.sh || eval "$(wget -q -O - "https://raw.github.com/stico/myenv/master/.myenv/myenv_lib.sh")" || exit 1
 # To simplify, just try myenv_lib.sh in myenv
+MYENV_HN="$(hostname -s)"
 MYENV_LIB_PATH="${HOME}/.myenv/myenv_lib.sh"
 MYENV_SECU_PATH="${HOME}/.myenv/myenv_secu.sh"
 [ -f "${MYENV_LIB_PATH}" ] && source "${MYENV_LIB_PATH}"
@@ -1407,7 +1408,7 @@ func_git_commit_push() {
 	git status
 	func_git_commit_check | sort
 
-	if [[ "${hn}" == "lapmac3" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac3" ]] ; then
 		echo "################################################################################"
 		echo "# Run git pull on lapmac2"
 		echo "################################################################################"
@@ -1423,7 +1424,7 @@ func_git_commit_push() {
 		fi
 	fi
 
-	if [[ "${hn}" == "lapmac2" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac2" ]] ; then
 		echo "################################################################################"
 		echo "# Run git pull on lapmac3"
 		echo "################################################################################"
@@ -1432,7 +1433,7 @@ func_git_commit_push() {
 		fi
 	fi
 
-	if [[ "${hn}" == "lapmac3" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac3" ]] ; then
 		echo "################################################################################"
 		echo "# Run git pull on lapmac2"
 		echo "################################################################################"
@@ -1454,43 +1455,41 @@ func_git_commit_check() {
 }
 
 func_unison_fs_run() {
-	local hn profile_path
-	hn="$(hostname -s)"
+	local profile_path
 	profile_path="$HOME/.unison/fs_$(hostname -s)_all.prf"
 
-	if [[ "${hn}" == "lapmac2" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac2" ]] ; then
 		echo "WARN: should only run on lapmac3"
 		return
 	fi
 
-	if [[ "${hn}" == "lapmac3" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac3" ]] ; then
 		func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}"
 		func_backup_myenv_today
 		unison -ui text "${profile_path##*/}"
 		return
 	fi
 
-	echo "ERROR: can NOT match hostname (${hn}), pls check!"
+	echo "ERROR: can NOT match hostname (${MYENV_HN}), pls check!"
 }
 func_unison_cs_run() {
-	local hn="$(hostname -s)"
-	if [[ "${hn}" == "lapmac2" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac2" ]] ; then
 		func_unison_cs_run_on_lapmac2
 		return
 	fi
-	if [[ "${hn}" == "lapmac3" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac3" ]] ; then
 		func_unison_cs_run_on_lapmac3
 		return
 	fi
-	if [[ "${hn}" == "lapmac5" ]] ; then
+	if [[ "${MYENV_HN}" == "lapmac5" ]] ; then
 		func_unison_cs_run_on_lapmac5
 		return
 	fi
-	if [[ "${hn}" == "deskmac6" ]] ; then
+	if [[ "${MYENV_HN}" == "deskmac6" ]] ; then
 		func_unison_cs_run_on_deskmac6
 		return
 	fi
-	echo "ERROR: can NOT match hostname (${hn}), pls check!"
+	echo "ERROR: can NOT match hostname (${MYENV_HN}), pls check!"
 }
 
 func_unison_cs_run_on_lapmac2() {
