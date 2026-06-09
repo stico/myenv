@@ -1426,14 +1426,14 @@ func_git_commit_push() {
 
 	if [[ "${MYENV_HN}" == "lapmac2" ]] ; then
 		echo "################################################################################"
-		echo "# Run git pull on lapmac3"
+		echo "# Run git pull on deskmac6"
 		echo "################################################################################"
-		if ping -c 1 -W 1 lapmac3 &>/dev/null ; then 
+		if ping -c 1 -W 1 deskmac6 &>/dev/null ; then 
 			ssh lapmac3 "git pull origin master ; git status"
 		fi
 	fi
 
-	if [[ "${MYENV_HN}" == "lapmac3" ]] ; then
+	if [[ "${MYENV_HN}" == "deskmac6" ]] ; then
 		echo "################################################################################"
 		echo "# Run git pull on lapmac2"
 		echo "################################################################################"
