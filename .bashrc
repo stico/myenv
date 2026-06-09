@@ -15,11 +15,13 @@ COMPLETION="/etc/bash_completion"
 HOST_NAME="$(hostname -s)"
 
 # Misc
-stty -ixon			# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
-stty -ixoff
 shopt -s histappend
 shopt -s histreedit
 shopt -s checkwinsize
+if [ -t 0 ]; then
+	stty -ixon			# avoid ^s/^q to frozen/unfrozen terminal (so vim could also use those keys)
+	stty -ixoff			# if output closed, stop input
+fi
 
 # Step 1: set PATH for OSX/{macports,homebrew} to use correct/basic tool
 if uname -s | grep -iq darwin ; then

@@ -1483,13 +1483,19 @@ func_unison_cs_run_on_lapmac3() {
 
 	if ping -c 1 -W 1 deskmac6 &>/dev/null ; then 
 		profile_path="$HOME/.unison/cs_deskmac6_to_lapmac3_run_on_3_all.prf"
+
+		if ping -c 1 -W 1 lapmac2 &>/dev/null ; then 
+			echo "INFO: sync deskmac6 <> lapmac2 first!"
+			ssh deskmac6 "/opt/homebrew/bin/unison cs_deskmac6_to_lapmac2_run_on_6_all.prf"
+		fi
+
 	elif ping -c 1 -W 1 lapmac5 &>/dev/null ; then 
 		profile_path="$HOME/.unison/cs_lapmac3to5_run_on_3_all.prf"
 	fi
 
 	func_complain_path_not_exist "${profile_path}" "ERROR: can NOT find profile for hostname: ${profile_path}" && return 1
 
-	echo "Start to run with profile: ${profile_path##*/}"
+	echo "INFO: start to run with profile: ${profile_path##*/}"
 	unison "${profile_path##*/}"
 }
 
