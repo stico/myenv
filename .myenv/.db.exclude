@@ -8,9 +8,10 @@
 # NOTE
 # - 这样的"相对路径"不生效 (e.g: ../.unison/[fa][pr][0-9a-z]*)。只能额外Hard Code加, 见 ~func_backup_myenv@~/.myenv/myenv_func.sh
 
-# 以下5个，再次确认是生效的 (2024-10-27)
+# 以下6个，再次确认是生效的 (2026-06-09)
 zgen/mlocate.db
 zgen/gnulocatedb
+zgen/mydata/fl_history/*
 zgen/collection/all_content.txt
 zgen/collection/code_content.txt
 zgen/collection/stdnote_content.txt
